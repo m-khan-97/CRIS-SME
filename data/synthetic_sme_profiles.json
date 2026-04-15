@@ -1,0 +1,167 @@
+[
+  {
+    "organization_id": "sme-finance-001",
+    "organization_name": "Northbridge Finance Ltd",
+    "provider": "azure",
+    "sector": "Financial Services",
+    "tenant_scope": "Tenant root / Entra ID",
+    "iam": {
+      "privileged_accounts": 4,
+      "privileged_accounts_without_mfa": 2,
+      "overprivileged_accounts": 1,
+      "stale_service_principals": 3,
+      "rbac_review_age_days": 210,
+      "conditional_access_enforced_for_admins": false
+    },
+    "network": {
+      "internet_exposed_rdp_assets": 1,
+      "internet_exposed_ssh_assets": 0,
+      "permissive_nsg_rules": 3,
+      "public_storage_endpoints": 1,
+      "private_endpoints_required": 3,
+      "private_endpoints_configured": 1
+    },
+    "data": {
+      "public_storage_assets": 1,
+      "unencrypted_data_stores": 1,
+      "backup_coverage_ratio": 0.55,
+      "retention_policy_coverage_ratio": 0.6,
+      "key_vault_mfa_enabled": false,
+      "key_vault_purge_protection_enabled": false
+    },
+    "monitoring": {
+      "activity_log_retention_days": 30,
+      "critical_alert_coverage_ratio": 0.4,
+      "defender_coverage_ratio": 0.5,
+      "centralized_logging_enabled": false,
+      "incident_response_runbooks_enabled": false
+    },
+    "compute": {
+      "unpatched_critical_vms": 2,
+      "endpoint_protection_coverage_ratio": 0.5,
+      "hardened_baseline_coverage_ratio": 0.45,
+      "workload_backup_agent_coverage_ratio": 0.6,
+      "linux_password_auth_enabled_vms": 2
+    },
+    "governance": {
+      "tagging_coverage_ratio": 0.55,
+      "budget_alerts_enabled": false,
+      "policy_assignment_coverage_ratio": 0.5,
+      "orphaned_resource_count": 6
+    },
+    "metadata": {
+      "profile_source": "synthetic",
+      "risk_context": "client financial records"
+    }
+  },
+  {
+    "organization_id": "sme-health-002",
+    "organization_name": "Westhaven Care CIC",
+    "provider": "azure",
+    "sector": "Healthcare",
+    "tenant_scope": "Tenant root / Entra ID",
+    "iam": {
+      "privileged_accounts": 3,
+      "privileged_accounts_without_mfa": 0,
+      "overprivileged_accounts": 0,
+      "stale_service_principals": 1,
+      "rbac_review_age_days": 45,
+      "conditional_access_enforced_for_admins": true
+    },
+    "network": {
+      "internet_exposed_rdp_assets": 0,
+      "internet_exposed_ssh_assets": 0,
+      "permissive_nsg_rules": 0,
+      "public_storage_endpoints": 0,
+      "private_endpoints_required": 2,
+      "private_endpoints_configured": 2
+    },
+    "data": {
+      "public_storage_assets": 0,
+      "unencrypted_data_stores": 0,
+      "backup_coverage_ratio": 0.95,
+      "retention_policy_coverage_ratio": 0.95,
+      "key_vault_mfa_enabled": true,
+      "key_vault_purge_protection_enabled": true
+    },
+    "monitoring": {
+      "activity_log_retention_days": 180,
+      "critical_alert_coverage_ratio": 0.95,
+      "defender_coverage_ratio": 0.9,
+      "centralized_logging_enabled": true,
+      "incident_response_runbooks_enabled": true
+    },
+    "compute": {
+      "unpatched_critical_vms": 0,
+      "endpoint_protection_coverage_ratio": 0.95,
+      "hardened_baseline_coverage_ratio": 0.9,
+      "workload_backup_agent_coverage_ratio": 0.95,
+      "linux_password_auth_enabled_vms": 0
+    },
+    "governance": {
+      "tagging_coverage_ratio": 0.95,
+      "budget_alerts_enabled": true,
+      "policy_assignment_coverage_ratio": 0.95,
+      "orphaned_resource_count": 0
+    },
+    "metadata": {
+      "profile_source": "synthetic",
+      "risk_context": "health-related operational systems"
+    }
+  },
+  {
+    "organization_id": "sme-retail-003",
+    "organization_name": "Meridian Retail Group",
+    "provider": "azure",
+    "sector": "Retail",
+    "tenant_scope": "Tenant root / Entra ID",
+    "iam": {
+      "privileged_accounts": 6,
+      "privileged_accounts_without_mfa": 1,
+      "overprivileged_accounts": 2,
+      "stale_service_principals": 0,
+      "rbac_review_age_days": 120,
+      "conditional_access_enforced_for_admins": true
+    },
+    "network": {
+      "internet_exposed_rdp_assets": 0,
+      "internet_exposed_ssh_assets": 2,
+      "permissive_nsg_rules": 1,
+      "public_storage_endpoints": 0,
+      "private_endpoints_required": 2,
+      "private_endpoints_configured": 1
+    },
+    "data": {
+      "public_storage_assets": 0,
+      "unencrypted_data_stores": 0,
+      "backup_coverage_ratio": 0.75,
+      "retention_policy_coverage_ratio": 0.7,
+      "key_vault_mfa_enabled": true,
+      "key_vault_purge_protection_enabled": false
+    },
+    "monitoring": {
+      "activity_log_retention_days": 90,
+      "critical_alert_coverage_ratio": 0.7,
+      "defender_coverage_ratio": 0.6,
+      "centralized_logging_enabled": true,
+      "incident_response_runbooks_enabled": false
+    },
+    "compute": {
+      "unpatched_critical_vms": 1,
+      "endpoint_protection_coverage_ratio": 0.7,
+      "hardened_baseline_coverage_ratio": 0.65,
+      "workload_backup_agent_coverage_ratio": 0.8,
+      "linux_password_auth_enabled_vms": 1
+    },
+    "governance": {
+      "tagging_coverage_ratio": 0.75,
+      "budget_alerts_enabled": false,
+      "policy_assignment_coverage_ratio": 0.7,
+      "orphaned_resource_count": 3
+    },
+    "metadata": {
+      "profile_source": "synthetic",
+      "risk_context": "payment-adjacent business processes"
+    }
+  }
+]

@@ -1,0 +1,54 @@
+name: Scheduled Assessment
+
+on:
+  schedule:
+    - cron: "0 5 * * *"
+  workflow_dispatch:
+    inputs:
+      collector_mode:
+        description: "Collector mode for the assessment run"
+        required: true
+        default: "mock"
+        type: choice
+        options:
+          - mock
+          - azure
+
+jobs:
+  scheduled-assessment:
+    runs-on: ubuntu-latest
+
+    env:
+      CRIS_SME_COLLECTOR: ${{ github.event.inputs.collector_mode || 'mock' }}
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Run archived assessment snapshot
+        run: |
+          python scripts/run_assessment_snapshot.py --collector "${CRIS_SME_COLLECTOR}"
+
+      - name: Upload assessment artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: cris-sme-${{ env.CRIS_SME_COLLECTOR }}-assessment
+          path: |
+            outputs/reports
+            outputs/figures
+
+      - name: Guidance for live Azure runs
+        if: ${{ env.CRIS_SME_COLLECTOR == 'azure' }}
+        run: |
+          echo "Azure collector mode requires authenticated Azure context."
+          echo "Use a self-hosted runner or add Azure credentials before enabling scheduled live runs."

@@ -1,0 +1,28 @@
+# Python cache and virtual environments.
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+# Test and coverage artifacts.
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Local environment files.
+.env
+.env.*
+
+# Build and packaging artifacts.
+build/
+dist/
+*.egg-info/
+
+# Notebook checkpoints.
+.ipynb_checkpoints/
+
+# Generated outputs.
+outputs/reports/*
+outputs/figures/*
+!outputs/reports/.gitkeep
+!outputs/figures/.gitkeep

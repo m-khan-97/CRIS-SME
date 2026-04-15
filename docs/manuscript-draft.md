@@ -1,0 +1,197 @@
+# Manuscript Draft
+
+## CRIS-SME: An Explainable Cloud Risk Intelligence Framework for SME Cloud Governance Assessment
+
+### Abstract
+
+Small and medium enterprises (SMEs) increasingly rely on cloud infrastructure but often lack the governance capability, automation maturity, and explainable risk tooling needed to manage cloud security and compliance effectively. Enterprise-grade cloud security posture management platforms provide substantial coverage, but they are frequently too complex, costly, or opaque for smaller organizations. This paper presents CRIS-SME, a Cloud Risk Intelligence System designed to support SME-oriented cloud governance assessment through deterministic control evaluation, explainable scoring, compliance mapping, and progressively enriched live-cloud evidence collection. CRIS-SME uses a provider-neutral core architecture with an Azure-first implementation. The framework evaluates posture across identity and access management, network exposure, data protection, monitoring and logging, compute/workload hardening, and governance hygiene. Findings are normalized into a common risk model, scored using deterministic factors, aggregated into category-level and overall risk views, and exported into provenance-aware reports, figures, and appendix-ready artifacts. The current implementation was validated using both synthetic SME profiles and repeated live Azure-backed assessments. In the latest live Azure case study, CRIS-SME identified 16 non-compliant findings and produced an overall risk score of 33.12/100. The dominant risks related to public administrative exposure, permissive network rules, Linux password-based SSH access, incomplete key-management protections, and weak endpoint and workload protection coverage. Identity evidence was strengthened through subscription-scoped privileged role collection and Entra-adjacent directory-role visibility, while still explicitly recording tenant-wide observability boundaries. The contribution of CRIS-SME is not a claim of fully autonomous security intelligence, but an explainable, research-backed, and iteratively extensible framework that bridges engineering implementation and publishable cloud governance research for SMEs.
+
+### 1. Introduction
+
+Cloud adoption has become an operational necessity for many SMEs, but governance capability has not matured at the same rate. Smaller organizations often move critical workloads into public cloud platforms without structured control baselines, continuous compliance validation, or accessible decision-support tooling. As a result, governance and resilience gaps can accumulate even in relatively small cloud estates.
+
+This problem is intensified by the current market shape of cloud security tooling. Enterprise cloud security posture management platforms offer broad visibility, but they are often designed for organizations with specialist security teams, larger budgets, and mature governance functions. SMEs, by contrast, need simpler and more transparent systems that provide actionable risk insight without imposing excessive operational overhead.
+
+CRIS-SME addresses this gap by proposing an explainable cloud risk intelligence framework tailored to SME cloud governance assessment. The framework prioritizes deterministic control evaluation, explicit evidence provenance, modular architecture, and repeatable outputs suitable for engineering use as well as research dissemination. Rather than beginning with opaque AI-based prioritization, CRIS-SME starts with interpretable governance logic and positions AI-assisted prioritization as a later-stage enhancement.
+
+The current reference implementation is Azure-first, but the architecture is intentionally provider-neutral at the core. This creates a realistic path for iterative delivery: credible live Azure evidence first, then structured expansion toward additional providers such as AWS and GCP.
+
+The main contributions of this work are:
+
+1. an SME-oriented cloud governance assessment framework with a provider-neutral core and Azure-first implementation
+2. a deterministic and explainable scoring engine that converts governance findings into interpretable risk outputs
+3. a provenance-aware reporting pipeline with archived run history, comparison figures, and appendix-ready exports
+4. a live Azure validation path that explicitly records observability boundaries instead of overstating coverage
+
+### 2. Problem Statement and Motivation
+
+UK SMEs migrating to cloud environments frequently lack structured governance frameworks, automated compliance validation mechanisms, and risk intelligence systems tailored to their scale. Existing enterprise-grade solutions are often cost-prohibitive or operationally complex, creating a measurable governance and compliance gap. This gap matters not only for security but also for resilience, accountability, and the practical ability to make cloud risk visible to decision-makers.
+
+The motivation behind CRIS-SME is therefore twofold. First, there is an engineering need for a lightweight framework that can turn cloud posture observations into prioritized, explainable findings. Second, there is a research need for a defensible technical artifact that supports empirical case studies, repeatable experimentation, and comparative analysis across environments.
+
+### 3. Related Positioning
+
+CRIS-SME should not be interpreted as a replacement for broad enterprise CSPM platforms. Its intended operating point is different. The framework prioritizes explainability, modularity, and SME suitability over exhaustive enterprise feature breadth. It also avoids marketing-heavy AI language in favor of a staged maturity model in which deterministic scoring and explicit provenance come first.
+
+This position is important academically. Many cloud security systems emphasize automation and scale, but comparatively fewer emphasize transparent score construction, repeatable evidence boundaries, and lightweight outputs that can support both engineering decisions and research communication. CRIS-SME contributes in that space.
+
+### 4. Framework Architecture
+
+CRIS-SME is organized into six main layers:
+
+1. collectors
+2. provider adapters
+3. control modules
+4. risk engine
+5. compliance mapping
+6. reporting and artifact generation
+
+Collectors acquire posture information either from synthetic datasets or live provider APIs and CLIs. Provider adapters normalize raw provider-specific records into a shared internal `CloudProfile` model. Control modules evaluate governance conditions across IAM, Network, Data, Monitoring, Compute, and Governance domains. The risk engine transforms findings into scored, ranked, and aggregated outputs. The compliance layer maps findings into governance references. The reporting layer then converts results into JSON, HTML, text, SVG, PNG, Markdown, and CSV artifacts.
+
+This architecture supports inspection and iteration because each layer can evolve independently. Provider-specific collection can deepen without forcing changes to the scoring model. New reporting artifacts can be added without rewriting controls. Additional providers can be introduced through adapters without rebuilding the core logic.
+
+### 5. Methodology
+
+The methodology follows five principles:
+
+- realism over hype
+- explainability over opacity
+- modularity over monolithic tooling
+- iterative validation over premature platform complexity
+- SME suitability over enterprise-only assumptions
+
+The implementation began with synthetic SME posture profiles to validate scoring and control behavior in a repeatable way. Live Azure-backed collection was then added to move the framework beyond mock-only evaluation while preserving explicit provenance. This staged approach is methodologically defensible because it allows the risk model and control logic to be stabilized before live-provider variability is introduced.
+
+The current pipeline is:
+
+1. collect synthetic or live posture evidence
+2. normalize evidence into a common cloud profile
+3. evaluate governance and compliance controls
+4. generate normalized findings
+5. score findings using deterministic logic
+6. aggregate category and overall risk views
+7. map findings to governance references
+8. archive report snapshots for repeated-run comparison
+9. export reports, figures, and appendix tables
+
+### 6. Scoring Model
+
+CRIS-SME uses a deterministic scoring model designed for interpretability rather than vendor-style opacity. Each finding includes severity, exposure, data sensitivity, confidence, and remediation effort. Severity is mapped using fixed weights:
+
+- Critical = 10
+- High = 7
+- Medium = 4
+- Low = 1
+
+The score modifiers are:
+
+- likelihood factor = `0.8 + 0.8 * exposure`
+- data factor = `0.8 + 0.8 * data_sensitivity`
+- confidence factor = `0.7 + 0.3 * confidence`
+- remediation factor = bounded uplift for operational persistence and effort
+
+Scores are normalized to a 0-100 scale and then aggregated into category averages and a weighted overall score. The current category weighting model is:
+
+- IAM = 25%
+- Network = 20%
+- Data = 20%
+- Monitoring/Logging = 15%
+- Compute/Workloads = 10%
+- Cost/Governance Hygiene = 10%
+
+This weighting reflects an SME-oriented assumption that identity, external exposure, and data protection should dominate the overall risk picture.
+
+### 7. Implementation
+
+The implementation is written in Python 3.10+ with typed models using Pydantic v2. The current system includes:
+
+- six control domains
+- provider-normalized collection
+- live Azure-backed evidence paths
+- HTML, JSON, and summary reporting
+- archived report history
+- SVG and PNG figure generation
+- appendix-ready Markdown and CSV exports
+- notebook-driven research workflows
+
+The live collector now includes Azure-backed evidence across Network, Data, Monitoring, Compute, Governance, and enriched IAM/Entra-adjacent context. It also records observability boundaries instead of silently treating inaccessible evidence as absent.
+
+### 8. Evaluation Design
+
+The present evaluation is structured around two complementary modes:
+
+- synthetic SME baseline assessment
+- live Azure-backed case-study assessment
+
+This is not framed as a competitive benchmark against commercial CSPM tools. Instead, the evaluation addresses three questions:
+
+1. can CRIS-SME turn posture observations into explainable governance findings?
+2. does the scoring engine produce interpretable category and overall risk outputs?
+3. do archived runs support comparison across different assessment contexts?
+
+### 9. Results
+
+The archived runs currently include a mock baseline and multiple live Azure assessments. The latest report history comparison shows:
+
+- history count: 5
+- current live Azure overall risk score: 33.12
+- delta versus previous Azure run: 0.0
+- delta versus previous distinct mock run: -6.78
+
+The latest live Azure assessment produced:
+
+- 16 non-compliant findings
+- IAM score: 14.64
+- Network score: 47.41
+- Data score: 39.53
+- Monitoring/Logging score: 36.47
+- Compute/Workloads score: 39.06
+- Cost/Governance Hygiene score: 26.90
+
+The most significant live findings were:
+
+1. public administrative network exposure
+2. permissive network security rules
+3. password-based SSH exposure on Linux workloads
+4. incomplete key-management protections
+5. low endpoint and workload protection coverage
+
+Control-level comparison against the previous distinct-mode baseline showed notable increases for several live risks, including `NET-002`, `CMP-005`, `DATA-004`, `CMP-002`, and `MON-002`. This is useful because it demonstrates that the framework can move beyond headline scores and compare how specific governance conditions differ between synthetic and live contexts.
+
+### 10. Identity and Observability Discussion
+
+IAM is a particularly important area for methodological honesty. The current system can observe subscription-scoped privileged role assignments and some Entra-adjacent signals, including signed-in-user directory-role visibility and tenant directory-role catalog visibility where accessible. In the latest live run, the signed-in assessment identity exposed zero visible Entra directory roles, while the tenant directory-role catalog exposed 57 visible entries. The resulting observability state was recorded as `broad`.
+
+This does not imply full tenant-wide identity governance coverage. Conditional Access and other tenant-wide controls remain only partially observable in the current implementation. That boundary is explicitly surfaced as a finding (`IAM-005`) and in collection provenance. This is an important design choice because it favors research defensibility over overstated control coverage.
+
+### 11. Discussion
+
+The current results suggest that CRIS-SME is already capable of supporting credible engineering and research workflows. The framework can transform posture evidence into explainable findings, preserve the difference between observed evidence and limited visibility, and export outputs that are immediately useful for demonstrations, notebooks, figures, and paper drafting.
+
+The most important design lesson so far is that transparency matters. Deterministic scoring, explicit provenance, and archived comparison provide a stronger foundation for both trust and academic communication than a premature move toward opaque “AI risk intelligence” claims.
+
+### 12. Limitations
+
+The present work has several limitations:
+
+- evaluation currently centers on a single live Azure subscription
+- repeated live runs currently show stability more than operational drift
+- some Entra-wide controls remain only partially observable
+- AWS and GCP expansion remains at adapter-planning stage
+- the scoring model, while explainable, still requires broader empirical calibration
+
+These limitations do not undermine the framework. Instead, they define the current maturity boundary clearly.
+
+### 13. Future Work
+
+The next defensible extensions are:
+
+1. deeper tenant-level identity and budget-governance evidence
+2. expanded repeated-run evaluation across longer time windows
+3. mock and live AWS/GCP implementations through the existing adapter strategy
+4. scoring sensitivity experiments across broader SME-style environments
+5. carefully scoped AI-assisted prioritization experiments layered on top of the deterministic core
+
+### 14. Conclusion
+
+CRIS-SME demonstrates that an SME-oriented cloud governance framework can be technically clean, explainable, and research-ready without depending on heavyweight enterprise tooling or overstated AI claims. The framework now supports synthetic and live Azure-backed assessment, archived comparison, figure generation, appendix export, and manuscript-oriented documentation. As such, it provides a credible bridge between iterative engineering work and publishable cloud governance research.

@@ -1,0 +1,35 @@
+# Project metadata and tool configuration for the CRIS-SME Python package.
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "cris-sme"
+version = "0.1.0"
+description = "Cloud Risk Intelligence System for Small & Medium Enterprises"
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+authors = [
+  { name = "Muhammad Ibrahim" }
+]
+dependencies = [
+  "pydantic>=2.7,<3.0",
+]
+
+[project.optional-dependencies]
+dev = [
+  "pytest>=8.0,<9.0",
+]
+azure = [
+  "azure-identity>=1.17,<2.0",
+  "azure-mgmt-resource>=23.1,<24.0",
+  "azure-mgmt-network>=28.0,<29.0",
+  "azure-mgmt-storage>=21.2,<22.0",
+  "azure-mgmt-sql>=3.0,<4.0",
+  "azure-mgmt-compute>=34.0,<35.0",
+]
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+testpaths = ["tests"]

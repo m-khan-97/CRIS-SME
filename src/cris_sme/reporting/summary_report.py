@@ -1,0 +1,105 @@
+# Concise summary reporting for executive and research-facing CRIS-SME outputs.
+from __future__ import annotations
+
+from collections import Counter
+from pathlib import Path
+
+from cris_sme.engine.scoring import ScoringResult
+from cris_sme.models.cloud_profile import CloudProfile
+
+
+def build_summary_report(
+    *,
+    profiles: list[CloudProfile],
+    scoring_result: ScoringResult,
+    top_n: int = 3,
+) -> str:
+    """Build a concise narrative summary suitable for demos and reports."""
+    organizations = ", ".join(
+        f"{profile.organization_name} ({profile.provider})" for profile in profiles
+    )
+    top_items = scoring_result.prioritized_findings[:top_n]
+
+    if top_items:
+        top_risks = "; ".join(
+            (
+                f"{item.finding.control_id} in "
+                f"{item.finding.metadata.get('organization_name', 'unknown organization')} "
+                f"scored {item.score:.2f} ({item.priority})"
+            )
+            for item in top_items
+        )
+    else:
+        top_risks = "No non-compliant findings were identified."
+
+    priority_counter = Counter(item.priority for item in scoring_result.prioritized_findings)
+    priority_summary = ", ".join(
+        f"{label}: {count}" for label, count in sorted(priority_counter.items())
+    ) or "No active priorities"
+    collection_summary = _build_collection_summary(profiles)
+
+    return (
+        f"CRIS-SME evaluated {len(profiles)} profile(s): {organizations}. "
+        f"The overall risk score is {scoring_result.overall_risk_score:.2f}/100, with "
+        f"{scoring_result.non_compliant_findings} non-compliant finding(s). "
+        f"Collection context: {collection_summary}. "
+        f"Priority distribution: {priority_summary}. "
+        f"Top risk observations: {top_risks}"
+    )
+
+
+def write_summary_report(summary: str, output_path: str | Path) -> Path:
+    """Write a plain-text summary report to disk and return the resolved output path."""
+    path = Path(output_path)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(summary + "\n", encoding="utf-8")
+    return path
+
+
+def _build_collection_summary(profiles: list[CloudProfile]) -> str:
+    """Build a concise summary of how profile evidence was collected."""
+    fragments: list[str] = []
+
+    for profile in profiles:
+        metadata = profile.metadata
+        profile_source = str(metadata.get("profile_source", "unknown"))
+        provider = profile.provider
+
+        if profile_source == "synthetic":
+            fragments.append(f"{profile.organization_name} uses synthetic mock posture data")
+            continue
+
+        mode_parts = [
+            str(metadata.get("iam_collection_mode", "iam-default")),
+            str(metadata.get("network_collection_mode", "network-default")),
+            str(metadata.get("data_collection_mode", "data-default")),
+            str(metadata.get("monitoring_collection_mode", "monitoring-default")),
+            str(metadata.get("compute_collection_mode", "compute-default")),
+            str(metadata.get("governance_collection_mode", "governance-default")),
+        ]
+        mode_summary = ", ".join(mode_parts)
+
+        evidence_bits: list[str] = []
+        if "privileged_assignment_count" in metadata:
+            evidence_bits.append(
+                f"{metadata['privileged_assignment_count']} privileged assignment(s)"
+            )
+        if "signed_in_user_directory_role_count" in metadata:
+            evidence_bits.append(
+                f"{metadata['signed_in_user_directory_role_count']} visible Entra directory role(s)"
+            )
+        if "virtual_machine_count" in metadata:
+            evidence_bits.append(f"{metadata['virtual_machine_count']} VM(s)")
+        if "storage_account_count" in metadata:
+            evidence_bits.append(f"{metadata['storage_account_count']} storage account(s)")
+        if "sql_database_count" in metadata:
+            evidence_bits.append(f"{metadata['sql_database_count']} SQL database(s)")
+        if "policy_assignment_count" in metadata:
+            evidence_bits.append(f"{metadata['policy_assignment_count']} policy assignment(s)")
+
+        evidence_summary = ", ".join(evidence_bits) if evidence_bits else "limited asset counts"
+        fragments.append(
+            f"{profile.organization_name} uses live {provider} evidence with {mode_summary}; observed {evidence_summary}"
+        )
+
+    return " | ".join(fragments) if fragments else "No collection context available"

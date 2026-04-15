@@ -1,0 +1,197 @@
+# Report history utilities for archiving CRIS-SME assessment snapshots over time.
+from __future__ import annotations
+
+import json
+from datetime import UTC, datetime
+from pathlib import Path
+from typing import Any
+
+
+def archive_report_snapshot(
+    report: dict[str, Any],
+    output_dir: str | Path,
+    *,
+    timestamp: datetime | None = None,
+) -> Path:
+    """Persist a timestamped JSON snapshot for later trend and comparison analysis."""
+    snapshot_time = timestamp or datetime.now(UTC)
+    history_dir = Path(output_dir) / "history"
+    history_dir.mkdir(parents=True, exist_ok=True)
+
+    stamp = snapshot_time.strftime("%Y%m%dT%H%M%SZ")
+    snapshot_path = history_dir / f"cris_sme_report_{stamp}.json"
+    snapshot_path.write_text(json.dumps(report, indent=2), encoding="utf-8")
+    return snapshot_path
+
+
+def load_report_history(history_dir: str | Path) -> list[dict[str, Any]]:
+    """Load archived CRIS-SME report snapshots ordered by capture time."""
+    directory = Path(history_dir)
+    if not directory.exists():
+        return []
+
+    reports: list[dict[str, Any]] = []
+    for path in sorted(directory.glob("cris_sme_report_*.json")):
+        try:
+            reports.append(json.loads(path.read_text(encoding="utf-8")))
+        except json.JSONDecodeError:
+            continue
+    return reports
+
+
+def build_history_comparison(
+    reports: list[dict[str, Any]],
+) -> dict[str, Any]:
+    """Build a compact comparison between the current and previous archived runs."""
+    if not reports:
+        return {
+            "history_count": 0,
+            "latest_generated_at": None,
+            "previous_generated_at": None,
+            "overall_risk_delta": None,
+            "non_compliant_findings_delta": None,
+            "category_score_deltas": {},
+            "current_collector_mode": None,
+            "previous_collector_mode": None,
+        }
+
+    current = reports[-1]
+    previous = reports[-2] if len(reports) >= 2 else None
+    previous_distinct_mode = _find_previous_distinct_mode_report(reports)
+    current_categories = current.get("category_scores", {})
+    previous_categories = previous.get("category_scores", {}) if previous else {}
+
+    category_deltas: dict[str, float] = {}
+    if isinstance(current_categories, dict):
+        for category, value in current_categories.items():
+            current_score = _safe_float(value)
+            previous_score = _safe_float(previous_categories.get(category))
+            category_deltas[str(category)] = round(current_score - previous_score, 2)
+
+    current_context = current.get("evaluation_context", {})
+    previous_context = previous.get("evaluation_context", {}) if previous else {}
+
+    comparison = {
+        "history_count": len(reports),
+        "latest_generated_at": current.get("generated_at"),
+        "previous_generated_at": previous.get("generated_at") if previous else None,
+        "overall_risk_delta": (
+            round(
+                _safe_float(current.get("overall_risk_score"))
+                - _safe_float(previous.get("overall_risk_score")),
+                2,
+            )
+            if previous
+            else None
+        ),
+        "non_compliant_findings_delta": (
+            int(current_context.get("non_compliant_findings", 0))
+            - int(previous_context.get("non_compliant_findings", 0))
+            if previous
+            else None
+        ),
+        "category_score_deltas": category_deltas,
+        "current_collector_mode": current.get("collector_mode"),
+        "previous_collector_mode": previous.get("collector_mode") if previous else None,
+        "previous_distinct_mode": (
+            previous_distinct_mode.get("collector_mode")
+            if previous_distinct_mode
+            else None
+        ),
+        "previous_distinct_generated_at": (
+            previous_distinct_mode.get("generated_at")
+            if previous_distinct_mode
+            else None
+        ),
+        "overall_risk_delta_vs_distinct_mode": (
+            round(
+                _safe_float(current.get("overall_risk_score"))
+                - _safe_float(previous_distinct_mode.get("overall_risk_score")),
+                2,
+            )
+            if previous_distinct_mode
+            else None
+        ),
+        "control_score_deltas": _build_control_score_deltas(
+            current,
+            previous,
+        ),
+        "control_score_deltas_vs_distinct_mode": _build_control_score_deltas(
+            current,
+            previous_distinct_mode,
+        ),
+    }
+    return comparison
+
+
+def _safe_float(value: Any) -> float:
+    """Return a float-like value or zero when conversion fails."""
+    try:
+        return float(value)
+    except (TypeError, ValueError):
+        return 0.0
+
+
+def _find_previous_distinct_mode_report(
+    reports: list[dict[str, Any]],
+) -> dict[str, Any] | None:
+    """Return the most recent archived report with a different collector mode."""
+    if len(reports) < 2:
+        return None
+
+    current_mode = reports[-1].get("collector_mode")
+    for report in reversed(reports[:-1]):
+        if report.get("collector_mode") != current_mode:
+            return report
+    return None
+
+
+def _build_control_score_deltas(
+    current: dict[str, Any],
+    previous: dict[str, Any] | None,
+) -> list[dict[str, Any]]:
+    """Return control-level score changes between two reports."""
+    if previous is None:
+        return []
+
+    current_risks = _index_risks_by_control_id(current.get("prioritized_risks", []))
+    previous_risks = _index_risks_by_control_id(previous.get("prioritized_risks", []))
+
+    deltas: list[dict[str, Any]] = []
+    for control_id, risk in current_risks.items():
+        previous_risk = previous_risks.get(control_id)
+        current_score = _safe_float(risk.get("score"))
+        previous_score = _safe_float(previous_risk.get("score")) if previous_risk else 0.0
+        deltas.append(
+            {
+                "control_id": control_id,
+                "title": risk.get("title"),
+                "category": risk.get("category"),
+                "current_score": round(current_score, 2),
+                "previous_score": round(previous_score, 2),
+                "delta": round(current_score - previous_score, 2),
+                "current_priority": risk.get("priority"),
+                "previous_priority": previous_risk.get("priority") if previous_risk else None,
+            }
+        )
+
+    return sorted(
+        deltas,
+        key=lambda item: abs(_safe_float(item.get("delta"))),
+        reverse=True,
+    )
+
+
+def _index_risks_by_control_id(risks: Any) -> dict[str, dict[str, Any]]:
+    """Index prioritized risks by control identifier."""
+    indexed: dict[str, dict[str, Any]] = {}
+    if not isinstance(risks, list):
+        return indexed
+
+    for risk in risks:
+        if not isinstance(risk, dict):
+            continue
+        control_id = str(risk.get("control_id", "")).strip()
+        if control_id:
+            indexed[control_id] = risk
+    return indexed
