@@ -570,6 +570,10 @@ def test_azure_collector_enriches_governance_profile_from_resource_inventory(
             self.stdout = stdout
 
     def fake_run_cli_command(command: list[str], *_args, **_kwargs) -> FakeCompletedProcess:
+        if command[:3] == ["az", "account", "list"]:
+            return FakeCompletedProcess(
+                '[{"id":"sub-123","name":"Governance Subscription","tenantId":"tenant-001","state":"Enabled"}]'
+            )
         if command[:4] == ["az", "role", "assignment", "list"]:
             return FakeCompletedProcess("[]")
         if command[:4] == ["az", "policy", "assignment", "list"]:
@@ -637,6 +641,10 @@ def test_azure_collector_enriches_monitoring_profile_from_cli_and_workflows(
             self.stdout = stdout
 
     def fake_run_cli_command(command: list[str], *_args, **_kwargs) -> FakeCompletedProcess:
+        if command[:3] == ["az", "account", "list"]:
+            return FakeCompletedProcess(
+                '[{"id":"sub-123","name":"Monitoring Subscription","tenantId":"tenant-001","state":"Enabled"}]'
+            )
         if command[:4] == ["az", "role", "assignment", "list"]:
             return FakeCompletedProcess("[]")
         if command[:4] == ["az", "monitor", "log-profiles", "list"]:

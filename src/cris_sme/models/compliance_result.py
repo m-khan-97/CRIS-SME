@@ -22,6 +22,17 @@ class ComplianceMappingEntry(BaseModel):
     references: list[ComplianceReference] = Field(default_factory=list)
 
 
+class RegulatoryProfileSummary(BaseModel):
+    """Derived view of a selected subset of frameworks, such as UK SME obligations."""
+
+    profile_name: str = Field(..., min_length=3)
+    frameworks_covered: list[str] = Field(default_factory=list)
+    findings_by_framework: dict[str, int] = Field(default_factory=dict)
+    mapped_control_ids: list[str] = Field(default_factory=list)
+    mapped_control_count: int = 0
+    mapped_finding_count: int = 0
+
+
 class ComplianceAssessmentResult(BaseModel):
     """Compliance summary generated from mapped findings."""
 
@@ -29,3 +40,4 @@ class ComplianceAssessmentResult(BaseModel):
     control_reference_counts: dict[str, int] = Field(default_factory=dict)
     findings_by_framework: dict[str, int] = Field(default_factory=dict)
     mapped_findings: list[dict[str, object]] = Field(default_factory=list)
+    uk_sme_profile: RegulatoryProfileSummary | None = None

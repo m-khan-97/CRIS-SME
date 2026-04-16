@@ -97,14 +97,28 @@ class AzureCollector:
 
     def _collect_subscription_records(self) -> list[dict[str, Any]]:
         """Enumerate enabled Azure subscriptions and return normalized metadata records."""
-        credential = self._build_credential()
-        client = self._build_subscription_client(credential)
-        subscriptions = list(client.subscriptions.list())
+        # Prefer Azure CLI discovery because it is the most stable path in the
+        # current project environment and avoids indefinite SDK subscription hangs.
+        records = self._collect_subscription_records_from_cli()
 
-        if not subscriptions:
+        if not records:
+            records = self._collect_subscription_records_from_sdk()
+
+        if not records:
             raise ValueError(
-                "No Azure subscriptions were returned for the current credential context."
+                "No enabled Azure subscriptions were returned for the current credential context."
             )
+
+        return records
+
+    def _collect_subscription_records_from_sdk(self) -> list[dict[str, Any]]:
+        """Return enabled Azure subscriptions from the Azure SDK as a fallback path."""
+        try:
+            credential = self._build_credential()
+            client = self._build_subscription_client(credential)
+            subscriptions = list(client.subscriptions.list())
+        except Exception:
+            return []
 
         records: list[dict[str, Any]] = []
         for subscription in subscriptions:
@@ -124,14 +138,6 @@ class AzureCollector:
                     "tenant_id": getattr(subscription, "tenant_id", None),
                     "state": state,
                 }
-            )
-
-        if not records:
-            records = self._collect_subscription_records_from_cli()
-
-        if not records:
-            raise ValueError(
-                "No enabled Azure subscriptions were returned for the current credential context."
             )
 
         return records
@@ -667,6 +673,15 @@ class AzureCollector:
         credential: Any,
     ) -> tuple[DataProfile, dict[str, int | str]]:
         """Collect Azure storage posture for public access, encryption, and retention signals."""
+        if (
+            self._storage_client_factory is None
+            and self._sql_client_factory is None
+            and self._credential_factory is None
+        ):
+            cli_data_profile = self._collect_data_profile_from_cli(subscription_id)
+            if cli_data_profile is not None:
+                return cli_data_profile
+
         try:
             client = self._build_storage_client(credential, subscription_id)
             storage_accounts = list(client.storage_accounts.list())
@@ -780,12 +795,150 @@ class AzureCollector:
             },
         )
 
+    def _collect_data_profile_from_cli(
+        self,
+        subscription_id: str,
+    ) -> tuple[DataProfile, dict[str, int | str]] | None:
+        """Collect Azure data posture from Azure CLI inventory."""
+        storage_accounts = self._run_cli_json(
+            [
+                "az",
+                "storage",
+                "account",
+                "list",
+                "--subscription",
+                subscription_id,
+                "--output",
+                "json",
+            ]
+        )
+        sql_servers = self._run_cli_json(
+            [
+                "az",
+                "sql",
+                "server",
+                "list",
+                "--subscription",
+                subscription_id,
+                "--output",
+                "json",
+            ]
+        )
+
+        if not isinstance(storage_accounts, list) and not isinstance(sql_servers, list):
+            return None
+
+        public_storage_assets = 0
+        unencrypted_data_stores = 0
+        retention_enabled_count = 0
+        storage_account_count = len(storage_accounts) if isinstance(storage_accounts, list) else 0
+
+        for account in storage_accounts if isinstance(storage_accounts, list) else []:
+            if self._storage_account_is_public_dict(account):
+                public_storage_assets += 1
+            if not self._storage_account_is_encrypted_dict(account):
+                unencrypted_data_stores += 1
+
+        covered_data_store_count = retention_enabled_count
+        total_data_store_count = storage_account_count
+        sql_server_count = 0
+        sql_database_count = 0
+        public_sql_server_count = 0
+        unencrypted_sql_database_count = 0
+
+        for server in sql_servers if isinstance(sql_servers, list) else []:
+            sql_server_count += 1
+            if self._sql_server_is_public_dict(server):
+                public_sql_server_count += 1
+
+            resource_group_name = server.get("resourceGroup")
+            server_name = server.get("name")
+            if not resource_group_name or not server_name:
+                continue
+
+            databases = self._run_cli_json(
+                [
+                    "az",
+                    "sql",
+                    "db",
+                    "list",
+                    "--subscription",
+                    subscription_id,
+                    "--resource-group",
+                    str(resource_group_name),
+                    "--server",
+                    str(server_name),
+                    "--output",
+                    "json",
+                ]
+            )
+            if not isinstance(databases, list):
+                continue
+
+            for database in databases:
+                database_name = str(database.get("name", ""))
+                if database_name.lower() == "master":
+                    continue
+
+                sql_database_count += 1
+                total_data_store_count += 1
+                if self._sql_database_is_encrypted_from_cli(
+                    subscription_id=subscription_id,
+                    resource_group_name=str(resource_group_name),
+                    server_name=str(server_name),
+                    database_name=database_name,
+                ):
+                    covered_data_store_count += 1
+                else:
+                    unencrypted_data_stores += 1
+                    unencrypted_sql_database_count += 1
+
+        coverage_ratio = (
+            round(covered_data_store_count / total_data_store_count, 4)
+            if total_data_store_count
+            else 0.0
+        )
+
+        return (
+            DataProfile(
+                public_storage_assets=public_storage_assets,
+                unencrypted_data_stores=unencrypted_data_stores,
+                backup_coverage_ratio=coverage_ratio,
+                retention_policy_coverage_ratio=coverage_ratio,
+                key_vault_mfa_enabled=False,
+                key_vault_purge_protection_enabled=False,
+            ),
+            {
+                "data_collection_mode": (
+                    "azure_storage_and_sql_cli_inventory"
+                    if storage_account_count and sql_server_count
+                    else "azure_storage_cli_inventory"
+                    if storage_account_count
+                    else "azure_sql_cli_inventory"
+                    if sql_server_count
+                    else "default_no_storage_inventory"
+                ),
+                "storage_account_count": storage_account_count,
+                "public_storage_asset_count": public_storage_assets,
+                "unencrypted_data_store_count": unencrypted_data_stores,
+                "sql_server_count": sql_server_count,
+                "sql_database_count": sql_database_count,
+                "public_sql_server_count": public_sql_server_count,
+                "unencrypted_sql_database_count": unencrypted_sql_database_count,
+            },
+        )
+
     def _collect_network_profile(
         self,
         subscription_id: str,
         credential: Any,
     ) -> tuple[NetworkProfile, dict[str, str]]:
         """Collect Azure network posture from NSGs and private endpoint inventory."""
+        if self._network_client_factory is None and self._credential_factory is None:
+            cli_network_profile = self._collect_network_profile_from_cli(subscription_id)
+            if cli_network_profile is not None:
+                return cli_network_profile
+
         try:
             client = self._build_network_client(credential, subscription_id)
             network_security_groups = list(client.network_security_groups.list_all())
@@ -850,6 +1003,81 @@ class AzureCollector:
             },
         )
 
+    def _collect_network_profile_from_cli(
+        self,
+        subscription_id: str,
+    ) -> tuple[NetworkProfile, dict[str, str]] | None:
+        """Collect Azure network posture from Azure CLI inventory."""
+        network_security_groups = self._run_cli_json(
+            [
+                "az",
+                "network",
+                "nsg",
+                "list",
+                "--subscription",
+                subscription_id,
+                "--output",
+                "json",
+            ]
+        )
+        private_endpoints = self._run_cli_json(
+            [
+                "az",
+                "network",
+                "private-endpoint",
+                "list",
+                "--subscription",
+                subscription_id,
+                "--output",
+                "json",
+            ]
+        )
+
+        if not isinstance(network_security_groups, list) and not isinstance(
+            private_endpoints, list
+        ):
+            return None
+
+        rdp_exposure_targets: set[str] = set()
+        ssh_exposure_targets: set[str] = set()
+        permissive_rule_count = 0
+
+        for nsg in network_security_groups if isinstance(network_security_groups, list) else []:
+            nsg_identifier = str(nsg.get("id") or nsg.get("name") or "nsg-unknown")
+            for rule in nsg.get("securityRules", []) or []:
+                if not self._is_public_inbound_allow_rule_dict(rule):
+                    continue
+
+                if self._rule_exposes_port_dict(rule, target_port=3389):
+                    rdp_exposure_targets.add(nsg_identifier)
+                    permissive_rule_count += 1
+                    continue
+
+                if self._rule_exposes_port_dict(rule, target_port=22):
+                    ssh_exposure_targets.add(nsg_identifier)
+                    permissive_rule_count += 1
+                    continue
+
+                if self._rule_is_broadly_permissive_dict(rule):
+                    permissive_rule_count += 1
+
+        return (
+            NetworkProfile(
+                internet_exposed_rdp_assets=len(rdp_exposure_targets),
+                internet_exposed_ssh_assets=len(ssh_exposure_targets),
+                permissive_nsg_rules=permissive_rule_count,
+                public_storage_endpoints=0,
+                private_endpoints_required=0,
+                private_endpoints_configured=len(private_endpoints)
+                if isinstance(private_endpoints, list)
+                else 0,
+            ),
+            {
+                "collector_stage": "network_enriched",
+                "network_collection_mode": "azure_network_cli_inventory",
+            },
+        )
+
     def _collect_monitoring_profile(
         self,
         subscription_id: str,
@@ -861,16 +1089,19 @@ class AzureCollector:
         activity_log_alerts = self._collect_activity_log_alerts_from_cli()
         security_pricings = self._collect_security_pricings_from_cli()
 
-        try:
-            resource_client = self._build_resource_client(credential, subscription_id)
-            workflows = [
-                resource
-                for resource in resource_client.resources.list()
-                if str(getattr(resource, "type", "")).lower()
-                == "microsoft.logic/workflows"
-            ]
-        except Exception:
-            workflows = []
+        if self._resource_client_factory is None and self._credential_factory is None:
+            workflows = self._collect_logic_app_workflows_from_cli(subscription_id)
+        else:
+            try:
+                resource_client = self._build_resource_client(credential, subscription_id)
+                workflows = [
+                    resource
+                    for resource in resource_client.resources.list()
+                    if str(getattr(resource, "type", "")).lower()
+                    == "microsoft.logic/workflows"
+                ]
+            except Exception:
+                workflows = []
 
         activity_log_retention_days = 0
         if log_profiles:
@@ -920,17 +1151,24 @@ class AzureCollector:
         credential: Any,
     ) -> tuple[GovernanceProfile, dict[str, int | str]]:
         """Collect governance posture from Azure resource inventory and CLI policy context."""
-        try:
-            resource_client = self._build_resource_client(credential, subscription_id)
-            resources = list(resource_client.resources.list())
-        except Exception:
-            resources = []
+        if self._resource_client_factory is None and self._credential_factory is None:
+            resources = self._collect_resources_from_cli(subscription_id)
+        else:
+            try:
+                resource_client = self._build_resource_client(credential, subscription_id)
+                resources = list(resource_client.resources.list())
+            except Exception:
+                resources = []
 
         total_resources = len(resources)
         tagged_resources = 0
 
         for resource in resources:
-            tags = getattr(resource, "tags", None) or {}
+            tags = (
+                resource.get("tags", {})
+                if isinstance(resource, dict)
+                else getattr(resource, "tags", None) or {}
+            )
             if isinstance(tags, dict) and tags:
                 tagged_resources += 1
 
@@ -941,10 +1179,15 @@ class AzureCollector:
             subscription_id
         )
         policy_assignment_coverage_ratio = min(policy_assignment_count / 5.0, 1.0)
-        orphaned_resource_count = self._collect_orphaned_resource_count(
-            subscription_id=subscription_id,
-            credential=credential,
-        )
+        if self._network_client_factory is None and self._credential_factory is None:
+            orphaned_resource_count = self._collect_orphaned_resource_count_from_cli(
+                subscription_id
+            )
+        else:
+            orphaned_resource_count = self._collect_orphaned_resource_count(
+                subscription_id=subscription_id,
+                credential=credential,
+            )
 
         return (
             GovernanceProfile(
@@ -1366,6 +1609,41 @@ class AzureCollector:
 
         return len(protected_vm_ids)
 
+    def _collect_resources_from_cli(self, subscription_id: str) -> list[dict[str, Any]]:
+        """Return generic Azure resource inventory from the Azure CLI."""
+        payload = self._run_cli_json(
+            [
+                "az",
+                "resource",
+                "list",
+                "--subscription",
+                subscription_id,
+                "--output",
+                "json",
+            ]
+        )
+        return payload if isinstance(payload, list) else []
+
+    def _collect_logic_app_workflows_from_cli(
+        self,
+        subscription_id: str,
+    ) -> list[dict[str, Any]]:
+        """Return Logic App workflow resources from the Azure CLI."""
+        payload = self._run_cli_json(
+            [
+                "az",
+                "resource",
+                "list",
+                "--subscription",
+                subscription_id,
+                "--resource-type",
+                "Microsoft.Logic/workflows",
+                "--output",
+                "json",
+            ]
+        )
+        return payload if isinstance(payload, list) else []
+
     def _run_cli_json(self, command: list[str]) -> Any:
         """Execute an Azure CLI command and parse its JSON output."""
         completed = self._run_cli_command(command, timeout=20)
@@ -1494,6 +1772,49 @@ class AzureCollector:
 
         return orphaned_network_interfaces + orphaned_public_ips
 
+    def _collect_orphaned_resource_count_from_cli(self, subscription_id: str) -> int:
+        """Return a conservative orphaned-resource count from CLI network asset inventory."""
+        network_interfaces = self._run_cli_json(
+            [
+                "az",
+                "network",
+                "nic",
+                "list",
+                "--subscription",
+                subscription_id,
+                "--output",
+                "json",
+            ]
+        )
+        public_ip_addresses = self._run_cli_json(
+            [
+                "az",
+                "network",
+                "public-ip",
+                "list",
+                "--subscription",
+                subscription_id,
+                "--output",
+                "json",
+            ]
+        )
+        if not isinstance(network_interfaces, list):
+            network_interfaces = []
+        if not isinstance(public_ip_addresses, list):
+            public_ip_addresses = []
+
+        orphaned_network_interfaces = sum(
+            1
+            for nic in network_interfaces
+            if not nic.get("virtualMachine")
+        )
+        orphaned_public_ips = sum(
+            1
+            for public_ip in public_ip_addresses
+            if not public_ip.get("ipConfiguration")
+        )
+        return orphaned_network_interfaces + orphaned_public_ips
+
     @staticmethod
     def _storage_account_is_public(account: Any) -> bool:
         """Return whether a storage account appears publicly reachable."""
@@ -1506,6 +1827,13 @@ class AzureCollector:
             public_network_access == "enabled"
             or allow_blob_public_access is True
         )
+
+    @staticmethod
+    def _storage_account_is_public_dict(account: dict[str, Any]) -> bool:
+        """Return whether a CLI-derived storage account appears publicly reachable."""
+        public_network_access = str(account.get("publicNetworkAccess", "Enabled")).lower()
+        allow_blob_public_access = account.get("allowBlobPublicAccess")
+        return public_network_access == "enabled" or allow_blob_public_access is True
 
     @staticmethod
     def _storage_account_is_encrypted(account: Any) -> bool:
@@ -1522,6 +1850,24 @@ class AzureCollector:
             service = getattr(services, service_name, None)
             if service is not None:
                 return bool(getattr(service, "enabled", False))
+
+        return False
+
+    @staticmethod
+    def _storage_account_is_encrypted_dict(account: dict[str, Any]) -> bool:
+        """Return whether a CLI-derived storage account appears encrypted at rest."""
+        encryption = account.get("encryption", {})
+        if not isinstance(encryption, dict):
+            return False
+
+        services = encryption.get("services", {})
+        if not isinstance(services, dict):
+            return False
+
+        for service_name in ("blob", "file", "table", "queue"):
+            service = services.get(service_name, {})
+            if isinstance(service, dict) and service.get("enabled") is True:
+                return True
 
         return False
 
@@ -1563,6 +1909,12 @@ class AzureCollector:
         ).lower()
         return public_network_access == "enabled"
 
+    @staticmethod
+    def _sql_server_is_public_dict(server: dict[str, Any]) -> bool:
+        """Return whether a CLI-derived Azure SQL server allows public network access."""
+        public_network_access = str(server.get("publicNetworkAccess", "Enabled")).lower()
+        return public_network_access == "enabled"
+
     def _sql_database_is_encrypted(
         self,
         sql_client: Any,
@@ -1582,6 +1934,38 @@ class AzureCollector:
             return False
 
         return str(getattr(tde, "status", "")).lower() == "enabled"
+
+    def _sql_database_is_encrypted_from_cli(
+        self,
+        *,
+        subscription_id: str,
+        resource_group_name: str,
+        server_name: str,
+        database_name: str,
+    ) -> bool:
+        """Return whether transparent data encryption is enabled for a SQL database via CLI."""
+        payload = self._run_cli_json(
+            [
+                "az",
+                "sql",
+                "db",
+                "tde",
+                "show",
+                "--subscription",
+                subscription_id,
+                "--resource-group",
+                resource_group_name,
+                "--server",
+                server_name,
+                "--database",
+                database_name,
+                "--output",
+                "json",
+            ]
+        )
+        if not isinstance(payload, dict):
+            return False
+        return str(payload.get("status", "")).lower() == "enabled"
 
     def _collect_vm_extensions(
         self,
@@ -1873,6 +2257,50 @@ class AzureCollector:
                 values.append(str(item))
 
         return values
+
+    @staticmethod
+    def _is_public_inbound_allow_rule_dict(rule: dict[str, Any]) -> bool:
+        """Return whether a CLI-derived security rule allows inbound traffic from public sources."""
+        direction = str(rule.get("direction", "")).lower()
+        access = str(rule.get("access", "")).lower()
+        if direction != "inbound" or access != "allow":
+            return False
+
+        prefixes = AzureCollector._normalize_scalar_or_list(
+            rule.get("sourceAddressPrefix") or rule.get("sourceAddressPrefixes")
+        )
+        return any(
+            prefix.lower() in {"*", "0.0.0.0/0", "internet", "any"}
+            for prefix in prefixes
+        )
+
+    @staticmethod
+    def _rule_exposes_port_dict(rule: dict[str, Any], target_port: int) -> bool:
+        """Return whether a CLI-derived rule exposes a target administrative port."""
+        ports = AzureCollector._normalize_scalar_or_list(
+            rule.get("destinationPortRange") or rule.get("destinationPortRanges")
+        )
+        return any(
+            AzureCollector._port_expression_matches_target(port, target_port)
+            for port in ports
+        )
+
+    @staticmethod
+    def _rule_is_broadly_permissive_dict(rule: dict[str, Any]) -> bool:
+        """Return whether a CLI-derived rule is broadly permissive."""
+        ports = AzureCollector._normalize_scalar_or_list(
+            rule.get("destinationPortRange") or rule.get("destinationPortRanges")
+        )
+        return any(port in {"*", "0-65535"} for port in ports)
+
+    @staticmethod
+    def _normalize_scalar_or_list(value: Any) -> list[str]:
+        """Normalize one-or-many scalar values from Azure CLI payloads."""
+        if value in (None, ""):
+            return []
+        if isinstance(value, list):
+            return [str(item) for item in value if item not in (None, "")]
+        return [str(value)]
 
     @staticmethod
     def _port_expression_matches_target(port_expression: str, target_port: int) -> bool:

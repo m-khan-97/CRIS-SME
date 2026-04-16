@@ -19,6 +19,8 @@ CRIS-SME responds to this challenge through a framework that combines:
 - Governance control validation
 - Deterministic risk scoring and prioritisation
 - Compliance mapping
+- UK-specific regulatory interpretation for SME-relevant controls
+- Budget-aware remediation action packs for SME decision-making
 - Explainable outputs for decision support
 - AI-assisted prioritisation as a later enhancement
 
@@ -41,6 +43,8 @@ The current MVP is no longer just a scoring prototype. It includes:
 - Domain control evaluation across six categories
 - Deterministic, explainable risk scoring
 - Compliance mapping to selected governance frameworks
+- UK SME regulatory profile covering Cyber Essentials, UK GDPR, FCA SYSC, and DSPT
+- Budget-aware remediation planning across free, lean, and broader SME budget bands
 - JSON, HTML, and summary report export suitable for demos and notebooks
 - Archived report history, comparison figures, and appendix-ready outputs
 - Live Azure-backed assessment support behind the collector layer

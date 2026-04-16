@@ -4,6 +4,7 @@ from __future__ import annotations
 from collections import Counter
 from pathlib import Path
 
+from cris_sme.engine.remediation import build_budget_aware_remediation_plan
 from cris_sme.engine.scoring import ScoringResult
 from cris_sme.models.cloud_profile import CloudProfile
 
@@ -37,12 +38,14 @@ def build_summary_report(
         f"{label}: {count}" for label, count in sorted(priority_counter.items())
     ) or "No active priorities"
     collection_summary = _build_collection_summary(profiles)
+    remediation_summary = _build_remediation_summary(scoring_result)
 
     return (
         f"CRIS-SME evaluated {len(profiles)} profile(s): {organizations}. "
         f"The overall risk score is {scoring_result.overall_risk_score:.2f}/100, with "
         f"{scoring_result.non_compliant_findings} non-compliant finding(s). "
         f"Collection context: {collection_summary}. "
+        f"Budget-aware remediation: {remediation_summary}. "
         f"Priority distribution: {priority_summary}. "
         f"Top risk observations: {top_risks}"
     )
@@ -103,3 +106,19 @@ def _build_collection_summary(profiles: list[CloudProfile]) -> str:
         )
 
     return " | ".join(fragments) if fragments else "No collection context available"
+
+
+def _build_remediation_summary(scoring_result: ScoringResult) -> str:
+    """Summarize the most practical budget-aware remediation options."""
+    plan = build_budget_aware_remediation_plan(scoring_result.prioritized_findings)
+    by_id = {profile.profile_id: profile for profile in plan.budget_profiles}
+
+    free_profile = by_id.get("free_this_week")
+    lean_profile = by_id.get("under_200_month")
+    if free_profile is None or lean_profile is None:
+        return "no budget-aware action packs available"
+
+    return (
+        f"{free_profile.total_recommended} free fix(es) can be prioritized immediately, "
+        f"and {lean_profile.total_recommended} action(s) fit within GBP200/month"
+    )

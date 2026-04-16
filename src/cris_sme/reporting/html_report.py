@@ -15,6 +15,8 @@ def build_html_report(report: dict[str, object]) -> str:
     organizations = report.get("organizations", [])
     prioritized_risks = report.get("prioritized_risks", [])
     history_comparison = report.get("history_comparison", {})
+    compliance = report.get("compliance", {})
+    budget_aware_remediation = report.get("budget_aware_remediation", {})
 
     category_cards = "".join(
         f"""
@@ -38,6 +40,8 @@ def build_html_report(report: dict[str, object]) -> str:
         if isinstance(risk, dict)
     )
     comparison_card = _build_history_comparison_card(history_comparison)
+    uk_regulatory_card = _build_uk_regulatory_card(compliance)
+    remediation_card = _build_budget_remediation_card(budget_aware_remediation)
 
     return f"""<!DOCTYPE html>
 <html lang="en">
@@ -353,6 +357,16 @@ def build_html_report(report: dict[str, object]) -> str:
         {comparison_card}
       </section>
 
+      <section class="section-panel">
+        <h2>UK Regulatory Mapping</h2>
+        {uk_regulatory_card}
+      </section>
+
+      <section class="section-panel">
+        <h2>Budget-Aware Remediation</h2>
+        {remediation_card}
+      </section>
+
       <section>
         <h2>Prioritized Risks</h2>
         <div class="table-panel">
@@ -450,6 +464,10 @@ def _build_risk_row(risk: dict[str, object]) -> str:
         mapping_items = []
     remediation_summary = str(risk.get("remediation_summary", "")).strip()
     remediation_cost_tier = risk.get("remediation_cost_tier")
+    remediation_value_score = risk.get("remediation_value_score")
+    budget_fit_profiles = risk.get("budget_fit_profiles", [])
+    if not isinstance(budget_fit_profiles, list):
+        budget_fit_profiles = []
 
     priority = str(risk.get("priority", "Monitor"))
     priority_class = f"pill-{priority.lower()}"
@@ -465,6 +483,13 @@ def _build_risk_row(risk: dict[str, object]) -> str:
         remediation_markup += (
             f"<br /><span class=\"pill pill-monitor\">"
             f"{escape(str(remediation_cost_tier))}</span>"
+        )
+    if remediation_value_score is not None:
+        remediation_markup += f"<br />Value score: {float(remediation_value_score):.2f}"
+    if budget_fit_profiles:
+        remediation_markup += (
+            "<br />Budget fits: "
+            f"{escape(', '.join(str(item) for item in budget_fit_profiles))}"
         )
 
     return f"""
@@ -520,3 +545,84 @@ def _build_history_comparison_card(history_comparison: object) -> str:
         if value not in (None, "", {})
     )
     return f"<ul class=\"detail-list\">{detail_markup}</ul>"
+
+
+def _build_uk_regulatory_card(compliance: object) -> str:
+    """Build a compact UK-focused compliance summary card for HTML reports."""
+    if not isinstance(compliance, dict):
+        return "<p>No compliance summary is available yet.</p>"
+
+    uk_profile = compliance.get("uk_sme_profile", {})
+    if not isinstance(uk_profile, dict):
+        return "<p>No UK SME regulatory summary is available yet.</p>"
+
+    rows: list[tuple[str, object]] = [
+        ("Profile", uk_profile.get("profile_name")),
+        ("Mapped controls", uk_profile.get("mapped_control_count")),
+        ("Mapped non-compliant findings", uk_profile.get("mapped_finding_count")),
+        ("Frameworks covered", ", ".join(uk_profile.get("frameworks_covered", []))),
+    ]
+
+    findings_by_framework = uk_profile.get("findings_by_framework", {})
+    if isinstance(findings_by_framework, dict):
+        for framework, count in findings_by_framework.items():
+            rows.append((f"{framework} mapped findings", count))
+
+    detail_markup = "".join(
+        f"<li><span class=\"detail-label\">{escape(str(label))}:</span> {escape(str(value))}</li>"
+        for label, value in rows
+        if value not in (None, "", {})
+    )
+    if not detail_markup:
+        return "<p>No UK SME regulatory mappings were identified for this report.</p>"
+    return f"<ul class=\"detail-list\">{detail_markup}</ul>"
+
+
+def _build_budget_remediation_card(remediation: object) -> str:
+    """Build compact HTML for SME budget-aware remediation planning."""
+    if not isinstance(remediation, dict):
+        return "<p>No budget-aware remediation plan is available yet.</p>"
+
+    budget_profiles = remediation.get("budget_profiles", [])
+    if not isinstance(budget_profiles, list) or not budget_profiles:
+        return "<p>No budget-aware remediation plan is available yet.</p>"
+
+    sections: list[str] = []
+    for profile in budget_profiles:
+        if not isinstance(profile, dict):
+            continue
+        actions = profile.get("recommended_actions", [])
+        if not isinstance(actions, list):
+            actions = []
+
+        action_markup = "".join(
+            (
+                "<li>"
+                f"<span class=\"detail-label\">{escape(str(action.get('control_id', '')))}:</span> "
+                f"{escape(str(action.get('title', '')))} "
+                f"({float(action.get('score', 0.0)):.2f} risk, "
+                f"value {float(action.get('remediation_value_score', 0.0)):.2f})"
+                "</li>"
+            )
+            for action in actions[:5]
+            if isinstance(action, dict)
+        ) or "<li>No actions fit this budget profile.</li>"
+
+        sections.append(
+            f"""
+            <article class="org-card">
+              <h3>{escape(str(profile.get("label", "Budget profile")))}</h3>
+              <p>{escape(str(profile.get("description", "")))}</p>
+              <ul class="detail-list">
+                <li><span class="detail-label">Budget cap:</span> GBP {escape(str(profile.get("max_monthly_cost_gbp", 0)))}</li>
+                <li><span class="detail-label">Allowed tiers:</span> {escape(", ".join(profile.get("allowed_cost_tiers", [])))}</li>
+                <li><span class="detail-label">Recommended actions:</span> {escape(str(profile.get("total_recommended", 0)))}</li>
+                <li><span class="detail-label">Cumulative risk score:</span> {escape(str(profile.get("cumulative_risk_score", 0.0)))}</li>
+                <li><span class="detail-label">Average value score:</span> {escape(str(profile.get("average_value_score", 0.0)))}</li>
+                {action_markup}
+              </ul>
+            </article>
+            """
+        )
+
+    return "".join(sections) if sections else "<p>No budget-aware remediation plan is available yet.</p>"

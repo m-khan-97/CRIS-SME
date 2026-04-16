@@ -8,6 +8,7 @@ from cris_sme.controls.governance_controls import evaluate_governance_controls
 from cris_sme.controls.iam_controls import evaluate_iam_controls
 from cris_sme.controls.monitoring_controls import evaluate_monitoring_controls
 from cris_sme.controls.network_controls import evaluate_network_controls
+from cris_sme.engine.compliance import assess_compliance_mappings, load_compliance_mappings
 from cris_sme.engine.scoring import score_findings
 from cris_sme.models.cloud_profile import (
     CloudProfile,
@@ -141,15 +142,17 @@ def test_build_json_report_includes_context_and_prioritized_risks() -> None:
         *evaluate_governance_controls(profiles),
     ]
     scoring_result = score_findings(findings)
+    compliance_result = assess_compliance_mappings(findings, load_compliance_mappings())
 
     report = build_json_report(
         profiles=profiles,
         findings=findings,
         scoring_result=scoring_result,
+        compliance_result=compliance_result,
     )
 
     assert report["overall_risk_score"] == scoring_result.overall_risk_score
-    assert report["report_schema_version"] == "1.1.0"
+    assert report["report_schema_version"] == "1.2.0"
     assert report["evaluation_context"]["evaluated_profiles"] == 1
     assert report["evaluation_context"]["generated_findings"] == len(findings)
     assert len(report["prioritized_risks"]) == scoring_result.non_compliant_findings
@@ -163,6 +166,10 @@ def test_build_json_report_includes_context_and_prioritized_risks() -> None:
     first_risk = report["prioritized_risks"][0]
     assert first_risk["remediation_summary"]
     assert first_risk["remediation_cost_tier"] in {"free", "low", "medium", "high"}
+    assert first_risk["remediation_value_score"] is not None
+    assert isinstance(first_risk["budget_fit_profiles"], list)
+    assert report["budget_aware_remediation"]["budget_profiles"]
+    assert report["compliance"]["uk_sme_profile"]["mapped_control_count"] >= 1
 
 
 def test_build_summary_report_mentions_profiles_score_and_priority_distribution() -> None:
@@ -185,6 +192,7 @@ def test_build_summary_report_mentions_profiles_score_and_priority_distribution(
     assert "Reporting SME Ltd" in summary
     assert "overall risk score" in summary
     assert "Collection context" in summary
+    assert "Budget-aware remediation" in summary
     assert "Priority distribution" in summary
 
 
@@ -199,10 +207,12 @@ def test_build_html_report_includes_risk_and_provenance_content() -> None:
         *evaluate_governance_controls(profiles),
     ]
     scoring_result = score_findings(findings)
+    compliance_result = assess_compliance_mappings(findings, load_compliance_mappings())
     report = build_json_report(
         profiles=profiles,
         findings=findings,
         scoring_result=scoring_result,
+        compliance_result=compliance_result,
     )
     report["executive_summary"] = build_summary_report(
         profiles=profiles,
@@ -215,6 +225,9 @@ def test_build_html_report_includes_risk_and_provenance_content() -> None:
     assert "Reporting SME Ltd" in html
     assert "Collection Provenance" in html
     assert "Run Comparison" in html
+    assert "UK Regulatory Mapping" in html
+    assert "Budget-Aware Remediation" in html
+    assert "Cyber Essentials" in html
     assert "azure_compute_cli_inventory" in html
 
 
@@ -347,6 +360,6 @@ def test_report_history_archive_and_history_figures_work(tmp_path) -> None:
     assert trend_png.exists()
     assert "CRIS-SME Results Appendix" in appendix_md
     assert (
-        "control_id,title,category,priority,severity,score,organization,remediation_cost_tier,remediation_summary"
+        "control_id,title,category,priority,severity,score,organization,remediation_cost_tier,remediation_value_score,budget_fit_profiles,remediation_summary"
         in appendix_csv
     )

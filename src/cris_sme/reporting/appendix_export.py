@@ -31,6 +31,7 @@ def build_results_appendix_markdown(report: dict[str, Any]) -> str:
     category_scores = report.get("category_scores", {})
     history_comparison = report.get("history_comparison", {})
     prioritized_risks = report.get("prioritized_risks", [])
+    remediation = report.get("budget_aware_remediation", {})
     control_deltas = []
     if isinstance(history_comparison, dict):
         control_deltas = history_comparison.get("control_score_deltas_vs_distinct_mode", [])
@@ -61,8 +62,8 @@ def build_results_appendix_markdown(report: dict[str, Any]) -> str:
                 )
 
     top_risk_lines = [
-        "| Control | Category | Priority | Score |",
-        "| --- | --- | --- | ---: |",
+        "| Control | Category | Priority | Score | Cost Tier | Value Score |",
+        "| --- | --- | --- | ---: | --- | ---: |",
     ]
     if isinstance(prioritized_risks, list):
         for risk in prioritized_risks[:10]:
@@ -73,7 +74,27 @@ def build_results_appendix_markdown(report: dict[str, Any]) -> str:
                 f"{risk.get('control_id', '')} | "
                 f"{risk.get('category', '')} | "
                 f"{risk.get('priority', '')} | "
-                f"{float(risk.get('score', 0.0)):.2f} |"
+                f"{float(risk.get('score', 0.0)):.2f} | "
+                f"{risk.get('remediation_cost_tier', '')} | "
+                f"{float(risk.get('remediation_value_score', 0.0)):.2f} |"
+            )
+
+    remediation_lines = [
+        "| Budget Profile | Budget Cap | Actions | Cumulative Risk | Avg Value Score |",
+        "| --- | ---: | ---: | ---: | ---: |",
+    ]
+    budget_profiles = remediation.get("budget_profiles", []) if isinstance(remediation, dict) else []
+    if isinstance(budget_profiles, list):
+        for profile in budget_profiles:
+            if not isinstance(profile, dict):
+                continue
+            remediation_lines.append(
+                "| "
+                f"{profile.get('label', '')} | "
+                f"{profile.get('max_monthly_cost_gbp', 0)} | "
+                f"{profile.get('total_recommended', 0)} | "
+                f"{float(profile.get('cumulative_risk_score', 0.0)):.2f} | "
+                f"{float(profile.get('average_value_score', 0.0)):.2f} |"
             )
 
     delta_lines = [
@@ -117,6 +138,10 @@ def build_results_appendix_markdown(report: dict[str, Any]) -> str:
             "",
             *top_risk_lines,
             "",
+            "## Budget-Aware Remediation Packs",
+            "",
+            *remediation_lines,
+            "",
             "## Top Control Deltas Versus Previous Distinct Mode",
             "",
             *delta_lines,
@@ -143,6 +168,8 @@ def write_prioritized_risks_csv(report: dict[str, Any], output_path: str | Path)
                 "score",
                 "organization",
                 "remediation_cost_tier",
+                "remediation_value_score",
+                "budget_fit_profiles",
                 "remediation_summary",
             ]
         )
@@ -160,6 +187,8 @@ def write_prioritized_risks_csv(report: dict[str, Any], output_path: str | Path)
                         risk.get("score", ""),
                         risk.get("organization", ""),
                         risk.get("remediation_cost_tier", ""),
+                        risk.get("remediation_value_score", ""),
+                        ",".join(risk.get("budget_fit_profiles", [])),
                         risk.get("remediation_summary", ""),
                     ]
                 )

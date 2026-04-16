@@ -16,3 +16,4 @@ def test_control_catalog_entry_exposes_remediation_metadata() -> None:
     assert entry.title == "Administrative services are exposed to the public internet"
     assert entry.remediation_summary
     assert entry.remediation_cost_tier.value in {"free", "low", "medium", "high"}
+    assert "Cyber Essentials Firewalls" in entry.mapping

@@ -21,6 +21,24 @@
         "reference_id": "PR.AA-02",
         "title": "Identities are proofed and bound to credentials",
         "relevance": "Identity and access control assurance"
+      },
+      {
+        "framework": "Cyber Essentials",
+        "reference_id": "Access control",
+        "title": "Use access controls to protect accounts and services",
+        "relevance": "SME-oriented baseline for privileged access protection"
+      },
+      {
+        "framework": "UK GDPR",
+        "reference_id": "Article 32",
+        "title": "Security of processing",
+        "relevance": "Protection of administrative access to systems handling personal data"
+      },
+      {
+        "framework": "FCA SYSC",
+        "reference_id": "SYSC 3.2.6R",
+        "title": "A firm must establish and maintain effective systems and controls",
+        "relevance": "Identity control baseline for regulated SME environments"
       }
     ]
   },
@@ -40,6 +58,18 @@
         "reference_id": "PR.AA-05",
         "title": "Physical and logical access permissions are managed",
         "relevance": "Privileged access governance"
+      },
+      {
+        "framework": "Cyber Essentials",
+        "reference_id": "Access control",
+        "title": "Use access controls to protect accounts and services",
+        "relevance": "Least-privilege expectations for SME administrative users"
+      },
+      {
+        "framework": "FCA SYSC",
+        "reference_id": "SYSC 3.2.6R",
+        "title": "A firm must establish and maintain effective systems and controls",
+        "relevance": "Governance expectation for privileged access allocation"
       }
     ]
   },
@@ -116,6 +146,18 @@
         "reference_id": "A.8.20",
         "title": "Network security",
         "relevance": "Protection of administrative interfaces"
+      },
+      {
+        "framework": "Cyber Essentials",
+        "reference_id": "Firewalls",
+        "title": "Use firewalls to secure internet connections",
+        "relevance": "SME baseline for restricting internet-reachable admin services"
+      },
+      {
+        "framework": "FCA SYSC",
+        "reference_id": "SYSC 3.2.6R",
+        "title": "A firm must establish and maintain effective systems and controls",
+        "relevance": "Boundary control expectation for regulated environments"
       }
     ]
   },
@@ -135,6 +177,12 @@
         "reference_id": "PR.AC-05",
         "title": "Network integrity is protected",
         "relevance": "Segmentation and rule hygiene"
+      },
+      {
+        "framework": "Cyber Essentials",
+        "reference_id": "Firewalls",
+        "title": "Use firewalls to secure internet connections",
+        "relevance": "Firewall rule hygiene for SME-facing internet exposure"
       }
     ]
   },
@@ -192,6 +240,12 @@
         "reference_id": "A.8.12",
         "title": "Data leakage prevention",
         "relevance": "Public storage exposure management"
+      },
+      {
+        "framework": "UK GDPR",
+        "reference_id": "Article 32",
+        "title": "Security of processing",
+        "relevance": "Protection of personal data from public cloud exposure"
       }
     ]
   },
@@ -211,6 +265,12 @@
         "reference_id": "PR.DS-01",
         "title": "Data at rest is protected",
         "relevance": "Encryption and protection of data stores"
+      },
+      {
+        "framework": "UK GDPR",
+        "reference_id": "Article 32",
+        "title": "Security of processing",
+        "relevance": "Encryption and resilience for personal-data processing environments"
       }
     ]
   },
@@ -230,6 +290,12 @@
         "reference_id": "PR.DS-04",
         "title": "Adequate capacity and redundancy are maintained",
         "relevance": "Recovery and retention readiness"
+      },
+      {
+        "framework": "DSPT",
+        "reference_id": "NDG Standard 7",
+        "title": "A continuity plan is in place to respond to data security incidents",
+        "relevance": "Backup and recovery expectations for healthcare-adjacent SMEs"
       }
     ]
   },
@@ -268,6 +334,18 @@
         "reference_id": "PR.AC-01",
         "title": "Identities and credentials for authorized users are managed by the organization",
         "relevance": "Administrative authentication hardening on workloads"
+      },
+      {
+        "framework": "Cyber Essentials",
+        "reference_id": "Access control",
+        "title": "Use access controls to protect accounts and services",
+        "relevance": "Administrative access hardening for Linux workloads"
+      },
+      {
+        "framework": "Cyber Essentials",
+        "reference_id": "Secure configuration",
+        "title": "Secure the settings on devices and software",
+        "relevance": "SSH authentication posture and secure Linux baseline configuration"
       }
     ]
   },
@@ -287,6 +365,12 @@
         "reference_id": "DE.CM-01",
         "title": "Networks and network services are monitored",
         "relevance": "Baseline monitoring and evidence retention"
+      },
+      {
+        "framework": "DSPT",
+        "reference_id": "NDG Standard 6",
+        "title": "Personal confidential data is handled in secure and supported systems",
+        "relevance": "Monitoring evidence and secure operational visibility for health-related environments"
       }
     ]
   },
@@ -363,6 +447,18 @@
         "reference_id": "PR.PS-03",
         "title": "Hardware is managed consistent with risk strategy",
         "relevance": "Critical system maintenance and patching"
+      },
+      {
+        "framework": "Cyber Essentials",
+        "reference_id": "Security update management",
+        "title": "Keep devices and software up to date",
+        "relevance": "SME patch management baseline"
+      },
+      {
+        "framework": "DSPT",
+        "reference_id": "NDG Standard 6",
+        "title": "Personal confidential data is handled in secure and supported systems",
+        "relevance": "Patch and support expectations for health and care suppliers"
       }
     ]
   },
@@ -382,6 +478,12 @@
         "reference_id": "PR.PS-01",
         "title": "Configuration management practices are established",
         "relevance": "Security tooling on workloads"
+      },
+      {
+        "framework": "Cyber Essentials",
+        "reference_id": "Malware protection",
+        "title": "Protect against malware",
+        "relevance": "Malware resilience baseline for SME workloads"
       }
     ]
   },

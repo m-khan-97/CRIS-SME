@@ -95,5 +95,12 @@ def test_assess_compliance_mappings_summarizes_frameworks_and_findings() -> None
 
     assert "ISO 27001" in result.frameworks_covered
     assert "NIST CSF 2.0" in result.frameworks_covered
+    assert result.uk_sme_profile is not None
+    assert "Cyber Essentials" in result.uk_sme_profile.frameworks_covered
+    assert "UK GDPR" in result.uk_sme_profile.frameworks_covered
+    assert "FCA SYSC" in result.uk_sme_profile.frameworks_covered
+    assert "DSPT" in result.uk_sme_profile.frameworks_covered
+    assert result.uk_sme_profile.mapped_control_count >= 1
+    assert result.uk_sme_profile.mapped_finding_count >= 1
     assert result.findings_by_framework["ISO 27001"] >= 1
     assert any(item["control_id"] == "IAM-001" for item in result.mapped_findings)
