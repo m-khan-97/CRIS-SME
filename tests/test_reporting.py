@@ -227,6 +227,7 @@ def test_build_html_report_includes_risk_and_provenance_content() -> None:
     assert "Run Comparison" in html
     assert "UK Regulatory Mapping" in html
     assert "Budget-Aware Remediation" in html
+    assert "Plain-Language Narrator" in html
     assert "Cyber Essentials" in html
     assert "azure_compute_cli_inventory" in html
 

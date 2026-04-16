@@ -45,6 +45,7 @@ The current MVP is no longer just a scoring prototype. It includes:
 - Compliance mapping to selected governance frameworks
 - UK SME regulatory profile covering Cyber Essentials, UK GDPR, FCA SYSC, and DSPT
 - Budget-aware remediation planning across free, lean, and broader SME budget bands
+- Optional LLM plain-language narration for SME owners and board-facing summaries
 - JSON, HTML, and summary report export suitable for demos and notebooks
 - Archived report history, comparison figures, and appendix-ready outputs
 - Live Azure-backed assessment support behind the collector layer
@@ -137,6 +138,8 @@ Running the CLI currently generates:
 - `outputs/reports/cris_sme_report.json`
 - `outputs/reports/cris_sme_report.html`
 - `outputs/reports/cris_sme_summary.txt`
+- `outputs/reports/cris_sme_plain_language.md` when the narrator is enabled
+- `outputs/reports/cris_sme_board_brief.md` when the narrator is enabled
 - `outputs/reports/history/*.json`
 - `outputs/reports/results_appendix.md`
 - `outputs/reports/prioritized_risks.csv`
@@ -197,6 +200,16 @@ pip install -r requirements.txt
 ```bash
 PYTHONPATH=src python -m cris_sme.main
 ```
+
+### Run the Optional Plain-Language Narrator
+
+```bash
+export CRIS_SME_ENABLE_NARRATOR=true
+export ANTHROPIC_API_KEY=your_key_here
+PYTHONPATH=src python -m cris_sme.main
+```
+
+This keeps the deterministic scoring engine as the authoritative source of scores and evidence. The narrator is an optional translation layer for non-technical stakeholders.
 
 ### Run a Repeatable Archived Snapshot
 

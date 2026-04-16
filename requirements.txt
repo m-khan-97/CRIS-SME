@@ -1,3 +1,4 @@
 # Minimal runtime and test dependencies for the CRIS-SME MVP.
 pydantic>=2.7,<3.0
+Pillow>=10.4,<12.0
 pytest>=8.0,<9.0

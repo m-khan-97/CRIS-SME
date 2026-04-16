@@ -8,7 +8,11 @@ from pathlib import Path
 
 from cris_sme.collectors.azure_collector import AzureCollector
 from cris_sme.collectors.mock_collector import MockCollector
-from cris_sme.config import get_azure_collector_settings, get_collector_mode
+from cris_sme.config import (
+    get_azure_collector_settings,
+    get_collector_mode,
+    get_narrator_settings,
+)
 from cris_sme.controls import (
     evaluate_compute_controls,
     evaluate_data_controls,
@@ -26,10 +30,12 @@ from cris_sme.reporting import (
     build_json_report,
     build_summary_report,
     load_report_history,
+    maybe_generate_plain_language_narrative,
     write_appendix_tables,
     write_history_figures,
     write_html_report,
     write_json_report,
+    write_plain_language_reports,
     write_report_figures,
     write_summary_report,
 )
@@ -69,6 +75,12 @@ def main() -> None:
         scoring_result=result,
     )
     output["executive_summary"] = summary
+    narrator_output = maybe_generate_plain_language_narrative(
+        output,
+        get_narrator_settings(),
+    )
+    if narrator_output is not None:
+        output["plain_language_narrative"] = narrator_output.model_dump()
 
     output_dir = Path(os.getenv("CRIS_SME_OUTPUT_DIR", DEFAULT_OUTPUT_DIR))
     figure_dir = Path(os.getenv("CRIS_SME_FIGURE_DIR", DEFAULT_FIGURE_DIR))
@@ -86,12 +98,20 @@ def main() -> None:
     output["history_comparison"] = build_history_comparison(history_reports)
     history_figure_paths = write_history_figures(history_reports, figure_dir)
     appendix_paths = write_appendix_tables(output, output_dir)
+    narrator_paths = (
+        write_plain_language_reports(narrator_output, output_dir)
+        if narrator_output is not None
+        else {}
+    )
     output["report_artifacts"] = {
         "json_report": str(json_report_path),
         "html_report": str(html_report_path),
         "summary_report": str(summary_report_path),
         "history_snapshot": str(history_snapshot_path),
         "appendix_tables": {key: str(value) for key, value in appendix_paths.items()},
+        "plain_language_outputs": {
+            key: str(value) for key, value in narrator_paths.items()
+        },
         "figures": {key: str(value) for key, value in figure_paths.items()},
         "history_figures": {key: str(value) for key, value in history_figure_paths.items()},
     }

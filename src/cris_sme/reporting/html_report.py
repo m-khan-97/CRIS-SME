@@ -17,6 +17,7 @@ def build_html_report(report: dict[str, object]) -> str:
     history_comparison = report.get("history_comparison", {})
     compliance = report.get("compliance", {})
     budget_aware_remediation = report.get("budget_aware_remediation", {})
+    plain_language_narrative = report.get("plain_language_narrative", {})
 
     category_cards = "".join(
         f"""
@@ -42,6 +43,7 @@ def build_html_report(report: dict[str, object]) -> str:
     comparison_card = _build_history_comparison_card(history_comparison)
     uk_regulatory_card = _build_uk_regulatory_card(compliance)
     remediation_card = _build_budget_remediation_card(budget_aware_remediation)
+    narrator_card = _build_narrator_card(plain_language_narrative)
 
     return f"""<!DOCTYPE html>
 <html lang="en">
@@ -367,6 +369,11 @@ def build_html_report(report: dict[str, object]) -> str:
         {remediation_card}
       </section>
 
+      <section class="section-panel">
+        <h2>Plain-Language Narrator</h2>
+        {narrator_card}
+      </section>
+
       <section>
         <h2>Prioritized Risks</h2>
         <div class="table-panel">
@@ -626,3 +633,34 @@ def _build_budget_remediation_card(remediation: object) -> str:
         )
 
     return "".join(sections) if sections else "<p>No budget-aware remediation plan is available yet.</p>"
+
+
+def _build_narrator_card(narrative: object) -> str:
+    """Build compact HTML for optional LLM-generated plain-language outputs."""
+    if not isinstance(narrative, dict) or not narrative:
+        return "<p>The plain-language narrator is not enabled for this report.</p>"
+
+    rows: list[tuple[str, object]] = [
+        ("Provider", narrative.get("provider")),
+        ("Model", narrative.get("model")),
+        ("Generated at", narrative.get("generated_at")),
+    ]
+
+    detail_markup = "".join(
+        f"<li><span class=\"detail-label\">{escape(str(label))}:</span> {escape(str(value))}</li>"
+        for label, value in rows
+        if value not in (None, "", {})
+    )
+
+    executive = escape(str(narrative.get("executive_narrative", "")))
+    owner_plan = escape(str(narrative.get("owner_action_plan", "")))
+    board_brief = escape(str(narrative.get("board_brief", "")))
+    disclaimer = escape(str(narrative.get("disclaimer", "")))
+
+    return f"""
+    <ul class="detail-list">{detail_markup}</ul>
+    <p><span class="detail-label">Executive narrative:</span> {executive}</p>
+    <p><span class="detail-label">Owner action plan:</span> {owner_plan}</p>
+    <p><span class="detail-label">Board brief:</span> {board_brief}</p>
+    <p><span class="detail-label">Disclaimer:</span> {disclaimer}</p>
+    """
