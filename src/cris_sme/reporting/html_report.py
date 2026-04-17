@@ -17,6 +17,7 @@ def build_html_report(report: dict[str, object]) -> str:
     history_comparison = report.get("history_comparison", {})
     compliance = report.get("compliance", {})
     budget_aware_remediation = report.get("budget_aware_remediation", {})
+    cyber_insurance_evidence = report.get("cyber_insurance_evidence", {})
     plain_language_narrative = report.get("plain_language_narrative", {})
 
     category_cards = "".join(
@@ -43,6 +44,7 @@ def build_html_report(report: dict[str, object]) -> str:
     comparison_card = _build_history_comparison_card(history_comparison)
     uk_regulatory_card = _build_uk_regulatory_card(compliance)
     remediation_card = _build_budget_remediation_card(budget_aware_remediation)
+    insurance_card = _build_cyber_insurance_card(cyber_insurance_evidence)
     narrator_card = _build_narrator_card(plain_language_narrative)
 
     return f"""<!DOCTYPE html>
@@ -370,6 +372,11 @@ def build_html_report(report: dict[str, object]) -> str:
       </section>
 
       <section class="section-panel">
+        <h2>Cyber Insurance Evidence Pack</h2>
+        {insurance_card}
+      </section>
+
+      <section class="section-panel">
         <h2>Plain-Language Narrator</h2>
         {narrator_card}
       </section>
@@ -664,3 +671,51 @@ def _build_narrator_card(narrative: object) -> str:
     <p><span class="detail-label">Board brief:</span> {board_brief}</p>
     <p><span class="detail-label">Disclaimer:</span> {disclaimer}</p>
     """
+
+
+def _build_cyber_insurance_card(insurance_pack: object) -> str:
+    """Build compact HTML for insurer-facing evidence summaries."""
+    if not isinstance(insurance_pack, dict):
+        return "<p>No cyber insurance evidence pack is available yet.</p>"
+
+    readiness = insurance_pack.get("readiness_summary", {})
+    if not isinstance(readiness, dict):
+        readiness = {}
+
+    detail_rows = [
+        ("Jurisdiction", insurance_pack.get("jurisdiction")),
+        ("Readiness score", readiness.get("readiness_score")),
+        ("Questions assessed", readiness.get("question_count")),
+        ("Met", readiness.get("met_count")),
+        ("Partial", readiness.get("partial_count")),
+        ("Not met", readiness.get("not_met_count")),
+        ("Unknown", readiness.get("unknown_count")),
+    ]
+    detail_markup = "".join(
+        f"<li><span class=\"detail-label\">{escape(str(label))}:</span> {escape(str(value))}</li>"
+        for label, value in detail_rows
+        if value not in (None, "", {})
+    )
+
+    questions = insurance_pack.get("questions", [])
+    if not isinstance(questions, list):
+        questions = []
+    question_markup = "".join(
+        (
+            "<li>"
+            f"<span class=\"detail-label\">{escape(str(question.get('question_id', 'INS-?')))} - "
+            f"{escape(str(question.get('theme', 'Unknown theme')))} "
+            f"({escape(str(question.get('status', 'unknown')))}):</span> "
+            f"{escape(str(question.get('question', '')))} "
+            f"<br />{escape(str(question.get('evidence_statement', '')))}"
+            "</li>"
+        )
+        for question in questions[:6]
+        if isinstance(question, dict)
+    ) or "<li>No insurance evidence questions were generated.</li>"
+
+    disclaimer = escape(str(insurance_pack.get("disclaimer", "")))
+    return (
+        f"<ul class=\"detail-list\">{detail_markup}{question_markup}</ul>"
+        f"<p>{disclaimer}</p>"
+    )

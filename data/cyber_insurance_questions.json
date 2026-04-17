@@ -1,0 +1,50 @@
+[
+  {
+    "question_id": "INS-001",
+    "theme": "Access security",
+    "question": "Do you enforce multi-factor authentication for privileged and administrative accounts?",
+    "insurer_relevance": "UK cyber insurers routinely ask whether administrator access is protected by MFA because privileged credential compromise drives high-impact claims.",
+    "related_controls": ["IAM-001"],
+    "primary_control_id": "IAM-001"
+  },
+  {
+    "question_id": "INS-002",
+    "theme": "Least privilege",
+    "question": "Do you limit privileged access and review high-risk permissions regularly?",
+    "insurer_relevance": "Insurers assess whether privileged access is narrowly scoped and reviewed because excessive privilege expands ransomware and fraud blast radius.",
+    "related_controls": ["IAM-002", "IAM-004", "IAM-005"],
+    "primary_control_id": "IAM-002"
+  },
+  {
+    "question_id": "INS-003",
+    "theme": "Perimeter exposure",
+    "question": "Are administrative services and internet-facing rules restricted to least-privilege network access?",
+    "insurer_relevance": "Publicly reachable administrative services and permissive firewall rules are common signals in cyber insurance questionnaires and underwriting reviews.",
+    "related_controls": ["NET-001", "NET-002"],
+    "primary_control_id": "NET-001"
+  },
+  {
+    "question_id": "INS-004",
+    "theme": "Patch and malware protection",
+    "question": "Are critical workloads patched promptly and protected with endpoint or anti-malware controls?",
+    "insurer_relevance": "Patch latency and missing endpoint protection are frequent prerequisites for claims involving ransomware and exploitation of known vulnerabilities.",
+    "related_controls": ["CMP-001", "CMP-002", "CMP-003", "CMP-005"],
+    "primary_control_id": "CMP-001"
+  },
+  {
+    "question_id": "INS-005",
+    "theme": "Backup and recovery",
+    "question": "Do you maintain resilient backups for critical workloads and business data?",
+    "insurer_relevance": "Backup recoverability is a core underwriting concern because it directly affects business interruption exposure and ransom resilience.",
+    "related_controls": ["DATA-003", "CMP-004"],
+    "primary_control_id": "DATA-003"
+  },
+  {
+    "question_id": "INS-006",
+    "theme": "Monitoring and response",
+    "question": "Do you retain logs, generate security alerts, and maintain incident response procedures?",
+    "insurer_relevance": "Cyber insurance applications often ask for logging, alerting, and response evidence to gauge the organisation's ability to detect and contain incidents.",
+    "related_controls": ["MON-001", "MON-002", "MON-003", "MON-004"],
+    "primary_control_id": "MON-001"
+  }
+]

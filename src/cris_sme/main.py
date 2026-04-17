@@ -26,12 +26,14 @@ from cris_sme.engine.scoring import score_findings
 from cris_sme.reporting import (
     archive_report_snapshot,
     build_history_comparison,
+    build_cyber_insurance_evidence_pack,
     build_html_report,
     build_json_report,
     build_summary_report,
     load_report_history,
     maybe_generate_plain_language_narrative,
     write_appendix_tables,
+    write_cyber_insurance_evidence_pack,
     write_history_figures,
     write_html_report,
     write_json_report,
@@ -96,8 +98,10 @@ def main() -> None:
     )
     history_reports = load_report_history(output_dir / "history")
     output["history_comparison"] = build_history_comparison(history_reports)
+    output["cyber_insurance_evidence"] = build_cyber_insurance_evidence_pack(output)
     history_figure_paths = write_history_figures(history_reports, figure_dir)
     appendix_paths = write_appendix_tables(output, output_dir)
+    insurance_paths = write_cyber_insurance_evidence_pack(output["cyber_insurance_evidence"], output_dir)
     narrator_paths = (
         write_plain_language_reports(narrator_output, output_dir)
         if narrator_output is not None
@@ -109,6 +113,7 @@ def main() -> None:
         "summary_report": str(summary_report_path),
         "history_snapshot": str(history_snapshot_path),
         "appendix_tables": {key: str(value) for key, value in appendix_paths.items()},
+        "cyber_insurance_pack": {key: str(value) for key, value in insurance_paths.items()},
         "plain_language_outputs": {
             key: str(value) for key, value in narrator_paths.items()
         },

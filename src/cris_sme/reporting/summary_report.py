@@ -7,6 +7,7 @@ from pathlib import Path
 from cris_sme.engine.remediation import build_budget_aware_remediation_plan
 from cris_sme.engine.scoring import ScoringResult
 from cris_sme.models.cloud_profile import CloudProfile
+from cris_sme.reporting.insurance_pack import build_cyber_insurance_evidence_pack
 
 
 def build_summary_report(
@@ -39,6 +40,7 @@ def build_summary_report(
     ) or "No active priorities"
     collection_summary = _build_collection_summary(profiles)
     remediation_summary = _build_remediation_summary(scoring_result)
+    insurance_summary = _build_insurance_summary(profiles, scoring_result)
 
     return (
         f"CRIS-SME evaluated {len(profiles)} profile(s): {organizations}. "
@@ -46,6 +48,7 @@ def build_summary_report(
         f"{scoring_result.non_compliant_findings} non-compliant finding(s). "
         f"Collection context: {collection_summary}. "
         f"Budget-aware remediation: {remediation_summary}. "
+        f"Cyber insurance evidence: {insurance_summary}. "
         f"Priority distribution: {priority_summary}. "
         f"Top risk observations: {top_risks}"
     )
@@ -121,4 +124,46 @@ def _build_remediation_summary(scoring_result: ScoringResult) -> str:
     return (
         f"{free_profile.total_recommended} free fix(es) can be prioritized immediately, "
         f"and {lean_profile.total_recommended} action(s) fit within GBP200/month"
+    )
+
+
+def _build_insurance_summary(
+    profiles: list[CloudProfile],
+    scoring_result: ScoringResult,
+) -> str:
+    """Summarize insurer-facing evidence readiness from existing findings."""
+    report_stub = {
+        "generated_at": "not-yet-written",
+        "collector_mode": "summary",
+        "overall_risk_score": scoring_result.overall_risk_score,
+        "organizations": [
+            {
+                "organization_id": profile.organization_id,
+                "organization_name": profile.organization_name,
+                "provider": profile.provider,
+                "sector": profile.sector,
+            }
+            for profile in profiles
+        ],
+        "prioritized_risks": [
+            {
+                "control_id": item.finding.control_id,
+                "title": item.finding.title,
+                "priority": item.priority,
+                "score": item.score,
+                "evidence": item.finding.evidence,
+                "remediation_summary": item.finding.remediation_summary,
+            }
+            for item in scoring_result.prioritized_findings
+        ],
+    }
+    insurance_pack = build_cyber_insurance_evidence_pack(report_stub)
+    readiness = insurance_pack.get("readiness_summary", {})
+    if not isinstance(readiness, dict):
+        return "insurer-facing readiness data unavailable"
+    return (
+        f"{int(readiness.get('met_count', 0))} question(s) are met, "
+        f"{int(readiness.get('partial_count', 0))} are partial, and "
+        f"{int(readiness.get('not_met_count', 0))} are not met "
+        f"(readiness score {float(readiness.get('readiness_score', 0.0)):.2f})"
     )

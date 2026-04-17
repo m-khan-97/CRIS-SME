@@ -22,11 +22,13 @@ from cris_sme.models.cloud_profile import (
 from cris_sme.reporting import (
     archive_report_snapshot,
     build_html_report,
+    build_cyber_insurance_evidence_pack,
     build_history_comparison,
     build_json_report,
     build_summary_report,
     load_report_history,
     write_appendix_tables,
+    write_cyber_insurance_evidence_pack,
     write_history_figures,
     write_html_report,
     write_json_report,
@@ -152,7 +154,7 @@ def test_build_json_report_includes_context_and_prioritized_risks() -> None:
     )
 
     assert report["overall_risk_score"] == scoring_result.overall_risk_score
-    assert report["report_schema_version"] == "1.2.0"
+    assert report["report_schema_version"] == "1.3.0"
     assert report["evaluation_context"]["evaluated_profiles"] == 1
     assert report["evaluation_context"]["generated_findings"] == len(findings)
     assert len(report["prioritized_risks"]) == scoring_result.non_compliant_findings
@@ -169,6 +171,7 @@ def test_build_json_report_includes_context_and_prioritized_risks() -> None:
     assert first_risk["remediation_value_score"] is not None
     assert isinstance(first_risk["budget_fit_profiles"], list)
     assert report["budget_aware_remediation"]["budget_profiles"]
+    assert report["cyber_insurance_evidence"]["readiness_summary"]["question_count"] >= 1
     assert report["compliance"]["uk_sme_profile"]["mapped_control_count"] >= 1
 
 
@@ -193,6 +196,7 @@ def test_build_summary_report_mentions_profiles_score_and_priority_distribution(
     assert "overall risk score" in summary
     assert "Collection context" in summary
     assert "Budget-aware remediation" in summary
+    assert "Cyber insurance evidence" in summary
     assert "Priority distribution" in summary
 
 
@@ -227,9 +231,38 @@ def test_build_html_report_includes_risk_and_provenance_content() -> None:
     assert "Run Comparison" in html
     assert "UK Regulatory Mapping" in html
     assert "Budget-Aware Remediation" in html
+    assert "Cyber Insurance Evidence Pack" in html
     assert "Plain-Language Narrator" in html
     assert "Cyber Essentials" in html
+    assert "Access security" in html
     assert "azure_compute_cli_inventory" in html
+
+
+def test_cyber_insurance_pack_builds_and_writes_artifacts(tmp_path) -> None:
+    profiles = [make_profile()]
+    findings = [
+        *evaluate_iam_controls(profiles),
+        *evaluate_network_controls(profiles),
+        *evaluate_data_controls(profiles),
+        *evaluate_monitoring_controls(profiles),
+        *evaluate_compute_controls(profiles),
+        *evaluate_governance_controls(profiles),
+    ]
+    scoring_result = score_findings(findings)
+    report = build_json_report(
+        profiles=profiles,
+        findings=findings,
+        scoring_result=scoring_result,
+    )
+
+    insurance_pack = build_cyber_insurance_evidence_pack(report)
+    artifact_paths = write_cyber_insurance_evidence_pack(insurance_pack, tmp_path)
+
+    assert insurance_pack["pack_name"] == "CRIS-SME Cyber Insurance Evidence Pack"
+    assert insurance_pack["readiness_summary"]["question_count"] >= 1
+    assert artifact_paths["cyber_insurance_markdown"].exists()
+    assert artifact_paths["cyber_insurance_json"].exists()
+    assert "CRIS-SME Cyber Insurance Evidence Pack" in artifact_paths["cyber_insurance_markdown"].read_text(encoding="utf-8")
 
 
 def test_report_writers_persist_json_and_summary_outputs(tmp_path) -> None:

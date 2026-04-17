@@ -13,6 +13,7 @@ from cris_sme.models.compliance_result import ComplianceAssessmentResult
 from cris_sme.engine.scoring import ScoredFinding, ScoringResult
 from cris_sme.models.cloud_profile import CloudProfile
 from cris_sme.models.finding import Finding
+from cris_sme.reporting.insurance_pack import build_cyber_insurance_evidence_pack
 
 
 def build_json_report(
@@ -27,7 +28,7 @@ def build_json_report(
         scoring_result.prioritized_findings
     )
     report: dict[str, object] = {
-        "report_schema_version": "1.2.0",
+        "report_schema_version": "1.3.0",
         "summary": scoring_result.summary,
         "overall_risk_score": scoring_result.overall_risk_score,
         "category_scores": scoring_result.category_scores,
@@ -79,6 +80,8 @@ def build_json_report(
 
     if compliance_result is not None:
         report["compliance"] = compliance_result.model_dump()
+
+    report["cyber_insurance_evidence"] = build_cyber_insurance_evidence_pack(report)
 
     return report
 
