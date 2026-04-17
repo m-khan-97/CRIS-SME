@@ -10,6 +10,7 @@ from cris_sme.engine.remediation import (
     budget_fit_profile_ids,
 )
 from cris_sme.engine.confidence import summarize_confidence_calibration
+from cris_sme.engine.action_plan import build_30_day_action_plan
 from cris_sme.models.compliance_result import ComplianceAssessmentResult
 from cris_sme.engine.scoring import ScoredFinding, ScoringResult
 from cris_sme.models.cloud_profile import CloudProfile
@@ -29,7 +30,7 @@ def build_json_report(
         scoring_result.prioritized_findings
     )
     report: dict[str, object] = {
-        "report_schema_version": "1.4.0",
+        "report_schema_version": "1.5.0",
         "summary": scoring_result.summary,
         "overall_risk_score": scoring_result.overall_risk_score,
         "category_scores": scoring_result.category_scores,
@@ -85,6 +86,9 @@ def build_json_report(
             for item in scoring_result.prioritized_findings
         ],
         "budget_aware_remediation": remediation_plan.model_dump(),
+        "action_plan_30_day": build_30_day_action_plan(
+            scoring_result.prioritized_findings
+        ).model_dump(),
     }
 
     if compliance_result is not None:

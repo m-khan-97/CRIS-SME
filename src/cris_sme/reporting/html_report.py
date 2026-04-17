@@ -18,6 +18,7 @@ def build_html_report(report: dict[str, object]) -> str:
     history_comparison = report.get("history_comparison", {})
     compliance = report.get("compliance", {})
     budget_aware_remediation = report.get("budget_aware_remediation", {})
+    action_plan_30_day = report.get("action_plan_30_day", {})
     cyber_insurance_evidence = report.get("cyber_insurance_evidence", {})
     plain_language_narrative = report.get("plain_language_narrative", {})
 
@@ -46,6 +47,7 @@ def build_html_report(report: dict[str, object]) -> str:
     confidence_card = _build_confidence_calibration_card(confidence_calibration)
     uk_regulatory_card = _build_uk_regulatory_card(compliance)
     remediation_card = _build_budget_remediation_card(budget_aware_remediation)
+    action_plan_card = _build_action_plan_card(action_plan_30_day)
     insurance_card = _build_cyber_insurance_card(cyber_insurance_evidence)
     narrator_card = _build_narrator_card(plain_language_narrative)
 
@@ -376,6 +378,11 @@ def build_html_report(report: dict[str, object]) -> str:
       <section class="section-panel">
         <h2>Budget-Aware Remediation</h2>
         {remediation_card}
+      </section>
+
+      <section class="section-panel">
+        <h2>30-Day SME Action Plan</h2>
+        {action_plan_card}
       </section>
 
       <section class="section-panel">
@@ -750,3 +757,47 @@ def _build_cyber_insurance_card(insurance_pack: object) -> str:
         f"<ul class=\"detail-list\">{detail_markup}{question_markup}</ul>"
         f"<p>{disclaimer}</p>"
     )
+
+
+def _build_action_plan_card(action_plan: object) -> str:
+    """Build compact HTML for the 30-day SME action plan."""
+    if not isinstance(action_plan, dict):
+        return "<p>No 30-day action plan is available yet.</p>"
+
+    phases = action_plan.get("phases", [])
+    if not isinstance(phases, list) or not phases:
+        return "<p>No 30-day action plan is available yet.</p>"
+
+    sections: list[str] = []
+    for phase in phases:
+        if not isinstance(phase, dict):
+            continue
+        actions = phase.get("actions", [])
+        if not isinstance(actions, list):
+            actions = []
+        action_markup = "".join(
+            (
+                "<li>"
+                f"<span class=\"detail-label\">{escape(str(action.get('control_id', '')))}:</span> "
+                f"{escape(str(action.get('remediation_summary', '')))} "
+                f"({float(action.get('score', 0.0)):.2f} risk, {escape(str(action.get('remediation_cost_tier', '')))} cost)"
+                "</li>"
+            )
+            for action in actions[:5]
+            if isinstance(action, dict)
+        ) or "<li>No actions are scheduled in this phase.</li>"
+        sections.append(
+            f"""
+            <article class="org-card">
+              <h3>{escape(str(phase.get("label", "Plan phase")))}</h3>
+              <p>{escape(str(phase.get("goal", "")))}</p>
+              <ul class="detail-list">
+                <li><span class="detail-label">Time window:</span> {escape(str(phase.get("time_window", "")))}</li>
+                <li><span class="detail-label">Total actions:</span> {escape(str(phase.get("total_actions", 0)))}</li>
+                <li><span class="detail-label">Cumulative risk score:</span> {escape(str(phase.get("cumulative_risk_score", 0.0)))}</li>
+                {action_markup}
+              </ul>
+            </article>
+            """
+        )
+    return "".join(sections) if sections else "<p>No 30-day action plan is available yet.</p>"

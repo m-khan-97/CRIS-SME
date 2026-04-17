@@ -4,6 +4,7 @@ from __future__ import annotations
 from collections import Counter
 from pathlib import Path
 
+from cris_sme.engine.action_plan import build_30_day_action_plan
 from cris_sme.engine.confidence import summarize_confidence_calibration
 from cris_sme.engine.remediation import build_budget_aware_remediation_plan
 from cris_sme.engine.scoring import ScoringResult
@@ -43,6 +44,7 @@ def build_summary_report(
     remediation_summary = _build_remediation_summary(scoring_result)
     insurance_summary = _build_insurance_summary(profiles, scoring_result)
     confidence_summary = _build_confidence_summary(scoring_result)
+    action_plan_summary = _build_action_plan_summary(scoring_result)
 
     return (
         f"CRIS-SME evaluated {len(profiles)} profile(s): {organizations}. "
@@ -51,6 +53,7 @@ def build_summary_report(
         f"Collection context: {collection_summary}. "
         f"Confidence calibration: {confidence_summary}. "
         f"Budget-aware remediation: {remediation_summary}. "
+        f"30-day action plan: {action_plan_summary}. "
         f"Cyber insurance evidence: {insurance_summary}. "
         f"Priority distribution: {priority_summary}. "
         f"Top risk observations: {top_risks}"
@@ -185,4 +188,18 @@ def _build_confidence_summary(scoring_result: ScoringResult) -> str:
         f"average observed confidence {float(calibration.get('average_observed_confidence', 0.0)):.2f}, "
         f"average calibrated confidence {float(calibration.get('average_calibrated_confidence', 0.0)):.2f}, "
         f"statuses: {status_text}"
+    )
+
+
+def _build_action_plan_summary(scoring_result: ScoringResult) -> str:
+    """Summarize the new 30-day action plan for narrative reporting."""
+    plan = build_30_day_action_plan(scoring_result.prioritized_findings)
+    phases = {phase.phase_id: phase for phase in plan.phases}
+    week = phases.get("days_1_7")
+    month = phases.get("days_8_30")
+    carry = phases.get("carry_forward")
+    return (
+        f"{week.total_actions if week else 0} action(s) land in the first week, "
+        f"{month.total_actions if month else 0} action(s) in days 8-30, and "
+        f"{carry.total_actions if carry else 0} action(s) are queued beyond day 30"
     )

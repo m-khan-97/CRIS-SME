@@ -21,7 +21,11 @@ from cris_sme.controls import (
     evaluate_monitoring_controls,
     evaluate_network_controls,
 )
-from cris_sme.engine import assess_compliance_mappings, load_compliance_mappings
+from cris_sme.engine import (
+    assess_compliance_mappings,
+    build_30_day_action_plan,
+    load_compliance_mappings,
+)
 from cris_sme.engine.scoring import score_findings
 from cris_sme.reporting import (
     archive_report_snapshot,
@@ -33,6 +37,7 @@ from cris_sme.reporting import (
     load_report_history,
     maybe_generate_plain_language_narrative,
     write_appendix_tables,
+    write_action_plan_outputs,
     write_cyber_insurance_evidence_pack,
     write_history_figures,
     write_html_report,
@@ -99,9 +104,13 @@ def main() -> None:
     history_reports = load_report_history(output_dir / "history")
     output["history_comparison"] = build_history_comparison(history_reports)
     output["cyber_insurance_evidence"] = build_cyber_insurance_evidence_pack(output)
+    output["action_plan_30_day"] = build_30_day_action_plan(
+        result.prioritized_findings
+    ).model_dump()
     history_figure_paths = write_history_figures(history_reports, figure_dir)
     appendix_paths = write_appendix_tables(output, output_dir)
     insurance_paths = write_cyber_insurance_evidence_pack(output["cyber_insurance_evidence"], output_dir)
+    action_plan_paths = write_action_plan_outputs(output["action_plan_30_day"], output_dir)
     narrator_paths = (
         write_plain_language_reports(narrator_output, output_dir)
         if narrator_output is not None
@@ -114,6 +123,7 @@ def main() -> None:
         "history_snapshot": str(history_snapshot_path),
         "appendix_tables": {key: str(value) for key, value in appendix_paths.items()},
         "cyber_insurance_pack": {key: str(value) for key, value in insurance_paths.items()},
+        "action_plan_30_day": {key: str(value) for key, value in action_plan_paths.items()},
         "plain_language_outputs": {
             key: str(value) for key, value in narrator_paths.items()
         },

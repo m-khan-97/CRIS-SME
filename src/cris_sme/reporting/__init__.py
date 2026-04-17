@@ -1,4 +1,5 @@
 # Reporting components for JSON, HTML, and summary outputs.
+from .action_plan_export import write_action_plan_outputs
 from .appendix_export import write_appendix_tables
 from .figure_export import write_history_figures, write_report_figures
 from .history import archive_report_snapshot, build_history_comparison, load_report_history
@@ -19,6 +20,7 @@ from .summary_report import build_summary_report, write_summary_report
 __all__ = [
     "archive_report_snapshot",
     "build_history_comparison",
+    "write_action_plan_outputs",
     "load_report_history",
     "write_appendix_tables",
     "write_history_figures",

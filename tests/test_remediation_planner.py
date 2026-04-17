@@ -5,6 +5,7 @@ from cris_sme.controls.governance_controls import evaluate_governance_controls
 from cris_sme.controls.iam_controls import evaluate_iam_controls
 from cris_sme.controls.monitoring_controls import evaluate_monitoring_controls
 from cris_sme.controls.network_controls import evaluate_network_controls
+from cris_sme.engine.action_plan import build_30_day_action_plan
 from cris_sme.engine.remediation import build_budget_aware_remediation_plan
 from cris_sme.engine.scoring import score_findings
 from cris_sme.models.cloud_profile import (
@@ -105,3 +106,23 @@ def test_budget_aware_remediation_plan_builds_expected_action_packs() -> None:
         recommendation.remediation_cost_tier in {"free", "low"}
         for recommendation in lean_profile.recommended_actions
     )
+
+
+def test_30_day_action_plan_phases_free_and_low_effort_work_first() -> None:
+    profiles = [make_profile()]
+    findings = [
+        *evaluate_iam_controls(profiles),
+        *evaluate_network_controls(profiles),
+        *evaluate_data_controls(profiles),
+        *evaluate_monitoring_controls(profiles),
+        *evaluate_compute_controls(profiles),
+        *evaluate_governance_controls(profiles),
+    ]
+    scoring_result = score_findings(findings)
+
+    plan = build_30_day_action_plan(scoring_result.prioritized_findings)
+    phases = {phase.phase_id: phase for phase in plan.phases}
+
+    assert phases["days_1_7"].total_actions >= 1
+    assert all(action.remediation_cost_tier == "free" for action in phases["days_1_7"].actions)
+    assert phases["days_8_30"].total_actions >= 1
