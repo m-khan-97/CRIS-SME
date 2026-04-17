@@ -9,6 +9,7 @@ from cris_sme.engine.remediation import (
     build_budget_aware_remediation_plan,
     budget_fit_profile_ids,
 )
+from cris_sme.engine.confidence import summarize_confidence_calibration
 from cris_sme.models.compliance_result import ComplianceAssessmentResult
 from cris_sme.engine.scoring import ScoredFinding, ScoringResult
 from cris_sme.models.cloud_profile import CloudProfile
@@ -28,10 +29,13 @@ def build_json_report(
         scoring_result.prioritized_findings
     )
     report: dict[str, object] = {
-        "report_schema_version": "1.3.0",
+        "report_schema_version": "1.4.0",
         "summary": scoring_result.summary,
         "overall_risk_score": scoring_result.overall_risk_score,
         "category_scores": scoring_result.category_scores,
+        "confidence_calibration": summarize_confidence_calibration(
+            scoring_result.prioritized_findings
+        ),
         "evaluation_context": {
             "evaluated_profiles": len(profiles),
             "generated_findings": len(findings),
@@ -70,6 +74,11 @@ def build_json_report(
                 "budget_fit_profiles": budget_fit_profile_ids(
                     item.finding.remediation_cost_tier
                 ),
+                "confidence_calibration": {
+                    "observed_confidence": item.breakdown.observed_confidence,
+                    "calibrated_confidence": item.breakdown.calibrated_confidence,
+                    "calibration_status": item.breakdown.calibration_status,
+                },
                 "mapping": item.finding.mapping,
                 "score_breakdown": item.breakdown.model_dump(),
             }

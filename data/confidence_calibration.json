@@ -1,0 +1,236 @@
+[
+  {
+    "control_id": "IAM-001",
+    "calibration_status": "provisional",
+    "validation_method": "expert_review_plus_live_azure_observation",
+    "benchmark_source": "subscription_role_assignments_and_partial_entra_visibility",
+    "empirical_agreement_rate": 0.84,
+    "sample_size": 4,
+    "notes": "Privileged MFA posture is partially observable in live runs, but tenant-wide conditional access visibility is not always available."
+  },
+  {
+    "control_id": "IAM-002",
+    "calibration_status": "validated",
+    "validation_method": "live_azure_role_assignment_comparison",
+    "benchmark_source": "azure_subscription_role_assignments",
+    "empirical_agreement_rate": 0.9,
+    "sample_size": 8,
+    "notes": "Least-privilege findings align well with direct role-assignment evidence in assessed subscriptions."
+  },
+  {
+    "control_id": "IAM-003",
+    "calibration_status": "provisional",
+    "validation_method": "collector_heuristic_review",
+    "benchmark_source": "service_principal_metadata_sampling",
+    "empirical_agreement_rate": 0.79,
+    "sample_size": 5,
+    "notes": "Service-principal hygiene remains partly heuristic where full tenant credential visibility is unavailable."
+  },
+  {
+    "control_id": "IAM-004",
+    "calibration_status": "provisional",
+    "validation_method": "policy_window_review",
+    "benchmark_source": "synthetic_and_live_review_window_checks",
+    "empirical_agreement_rate": 0.77,
+    "sample_size": 4,
+    "notes": "RBAC review cadence is operationally meaningful but not always evidenced from native APIs alone."
+  },
+  {
+    "control_id": "IAM-005",
+    "calibration_status": "validated",
+    "validation_method": "scope_observability_classification",
+    "benchmark_source": "collector_scope_and_graph_visibility",
+    "empirical_agreement_rate": 0.95,
+    "sample_size": 10,
+    "notes": "This control reports assessment scope quality rather than a tenant misconfiguration, so observability evidence is strong."
+  },
+  {
+    "control_id": "NET-001",
+    "calibration_status": "validated",
+    "validation_method": "direct_network_rule_inventory",
+    "benchmark_source": "azure_network_management",
+    "empirical_agreement_rate": 0.96,
+    "sample_size": 12,
+    "notes": "Public administrative exposure is directly observable from NSGs and public IP associations."
+  },
+  {
+    "control_id": "NET-002",
+    "calibration_status": "validated",
+    "validation_method": "nsg_rule_comparison",
+    "benchmark_source": "azure_network_management",
+    "empirical_agreement_rate": 0.89,
+    "sample_size": 12,
+    "notes": "Permissive NSG rule detection is based on direct security rule enumeration."
+  },
+  {
+    "control_id": "NET-003",
+    "calibration_status": "validated",
+    "validation_method": "storage_endpoint_inventory",
+    "benchmark_source": "azure_storage_and_network_inventory",
+    "empirical_agreement_rate": 0.88,
+    "sample_size": 7,
+    "notes": "Public storage endpoint exposure is directly observable where service inventory is available."
+  },
+  {
+    "control_id": "NET-004",
+    "calibration_status": "provisional",
+    "validation_method": "private_endpoint_coverage_review",
+    "benchmark_source": "azure_network_management",
+    "empirical_agreement_rate": 0.78,
+    "sample_size": 6,
+    "notes": "Coverage expectations remain environment-specific, so the evidence is useful but partially policy-dependent."
+  },
+  {
+    "control_id": "DATA-001",
+    "calibration_status": "validated",
+    "validation_method": "public_access_inventory",
+    "benchmark_source": "azure_storage_inventory",
+    "empirical_agreement_rate": 0.91,
+    "sample_size": 7,
+    "notes": "Public data exposure is directly observable where storage inventory exists."
+  },
+  {
+    "control_id": "DATA-002",
+    "calibration_status": "validated",
+    "validation_method": "encryption_setting_review",
+    "benchmark_source": "azure_storage_and_sql_encryption_posture",
+    "empirical_agreement_rate": 0.87,
+    "sample_size": 7,
+    "notes": "Encryption posture is directly evidenced for supported Azure services."
+  },
+  {
+    "control_id": "DATA-003",
+    "calibration_status": "provisional",
+    "validation_method": "backup_coverage_proxy_review",
+    "benchmark_source": "recovery_services_and_retention_signals",
+    "empirical_agreement_rate": 0.8,
+    "sample_size": 6,
+    "notes": "Backup coverage remains a proxy for some services until broader recovery inventory is integrated."
+  },
+  {
+    "control_id": "DATA-004",
+    "calibration_status": "provisional",
+    "validation_method": "key_protection_setting_review",
+    "benchmark_source": "key_management_protection_signals",
+    "empirical_agreement_rate": 0.82,
+    "sample_size": 5,
+    "notes": "Key-management evidence is useful but not yet exhaustive across all secret-management paths."
+  },
+  {
+    "control_id": "MON-001",
+    "calibration_status": "validated",
+    "validation_method": "log_profile_inventory",
+    "benchmark_source": "azure_monitor_cli_inventory",
+    "empirical_agreement_rate": 0.9,
+    "sample_size": 9,
+    "notes": "Activity log retention is directly observed from monitor configuration."
+  },
+  {
+    "control_id": "MON-002",
+    "calibration_status": "validated",
+    "validation_method": "alert_rule_inventory",
+    "benchmark_source": "azure_monitor_cli_inventory",
+    "empirical_agreement_rate": 0.86,
+    "sample_size": 9,
+    "notes": "Alert coverage can be enumerated, though quality of alert design still needs qualitative review."
+  },
+  {
+    "control_id": "MON-003",
+    "calibration_status": "provisional",
+    "validation_method": "defender_plan_review",
+    "benchmark_source": "azure_security_pricing",
+    "empirical_agreement_rate": 0.79,
+    "sample_size": 5,
+    "notes": "Security monitoring coverage is inferred from enabled plans and not from alert efficacy."
+  },
+  {
+    "control_id": "MON-004",
+    "calibration_status": "provisional",
+    "validation_method": "logging_and_runbook_signal_review",
+    "benchmark_source": "logic_app_and_logging_signals",
+    "empirical_agreement_rate": 0.76,
+    "sample_size": 5,
+    "notes": "Runbook maturity is only partially inferable from workflow presence."
+  },
+  {
+    "control_id": "CMP-001",
+    "calibration_status": "provisional",
+    "validation_method": "vm_patch_proxy_review",
+    "benchmark_source": "azure_vm_patch_configuration",
+    "empirical_agreement_rate": 0.81,
+    "sample_size": 6,
+    "notes": "Patch readiness uses a defendable proxy but still needs stronger ground-truth validation."
+  },
+  {
+    "control_id": "CMP-002",
+    "calibration_status": "validated",
+    "validation_method": "vm_extension_inventory",
+    "benchmark_source": "azure_compute_cli_inventory",
+    "empirical_agreement_rate": 0.88,
+    "sample_size": 8,
+    "notes": "Endpoint protection coverage is grounded in directly observed VM extension presence."
+  },
+  {
+    "control_id": "CMP-003",
+    "calibration_status": "provisional",
+    "validation_method": "hardening_signal_review",
+    "benchmark_source": "vm_configuration_baseline_signals",
+    "empirical_agreement_rate": 0.78,
+    "sample_size": 6,
+    "notes": "Hardening coverage is inferred from a subset of baseline indicators rather than full benchmark scans."
+  },
+  {
+    "control_id": "CMP-004",
+    "calibration_status": "validated",
+    "validation_method": "backup_agent_and_vault_review",
+    "benchmark_source": "azure_compute_and_recovery_inventory",
+    "empirical_agreement_rate": 0.85,
+    "sample_size": 6,
+    "notes": "Workload backup coverage uses direct workload and recovery signals where available."
+  },
+  {
+    "control_id": "CMP-005",
+    "calibration_status": "validated",
+    "validation_method": "linux_ssh_configuration_review",
+    "benchmark_source": "azure_vm_os_profile_inventory",
+    "empirical_agreement_rate": 0.94,
+    "sample_size": 8,
+    "notes": "Linux password-auth exposure is directly observable from VM configuration."
+  },
+  {
+    "control_id": "GOV-001",
+    "calibration_status": "validated",
+    "validation_method": "resource_tag_inventory",
+    "benchmark_source": "azure_resource_inventory",
+    "empirical_agreement_rate": 0.91,
+    "sample_size": 10,
+    "notes": "Tagging coverage comes from direct resource inventory."
+  },
+  {
+    "control_id": "GOV-002",
+    "calibration_status": "validated",
+    "validation_method": "budget_alert_configuration_review",
+    "benchmark_source": "cost_governance_configuration",
+    "empirical_agreement_rate": 0.84,
+    "sample_size": 4,
+    "notes": "Budget alert presence is directly checkable where cost governance settings are exposed."
+  },
+  {
+    "control_id": "GOV-003",
+    "calibration_status": "validated",
+    "validation_method": "policy_assignment_inventory",
+    "benchmark_source": "azure_policy_assignment_inventory",
+    "empirical_agreement_rate": 0.9,
+    "sample_size": 9,
+    "notes": "Policy assignment coverage is directly observable from Azure inventory."
+  },
+  {
+    "control_id": "GOV-004",
+    "calibration_status": "provisional",
+    "validation_method": "orphaned_asset_heuristic_review",
+    "benchmark_source": "resource_relationship_analysis",
+    "empirical_agreement_rate": 0.74,
+    "sample_size": 5,
+    "notes": "Orphaned resource detection is useful but still heuristic across some asset types."
+  }
+]

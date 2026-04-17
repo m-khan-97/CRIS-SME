@@ -4,6 +4,7 @@ from __future__ import annotations
 from collections import Counter
 from pathlib import Path
 
+from cris_sme.engine.confidence import summarize_confidence_calibration
 from cris_sme.engine.remediation import build_budget_aware_remediation_plan
 from cris_sme.engine.scoring import ScoringResult
 from cris_sme.models.cloud_profile import CloudProfile
@@ -41,12 +42,14 @@ def build_summary_report(
     collection_summary = _build_collection_summary(profiles)
     remediation_summary = _build_remediation_summary(scoring_result)
     insurance_summary = _build_insurance_summary(profiles, scoring_result)
+    confidence_summary = _build_confidence_summary(scoring_result)
 
     return (
         f"CRIS-SME evaluated {len(profiles)} profile(s): {organizations}. "
         f"The overall risk score is {scoring_result.overall_risk_score:.2f}/100, with "
         f"{scoring_result.non_compliant_findings} non-compliant finding(s). "
         f"Collection context: {collection_summary}. "
+        f"Confidence calibration: {confidence_summary}. "
         f"Budget-aware remediation: {remediation_summary}. "
         f"Cyber insurance evidence: {insurance_summary}. "
         f"Priority distribution: {priority_summary}. "
@@ -166,4 +169,20 @@ def _build_insurance_summary(
         f"{int(readiness.get('partial_count', 0))} are partial, and "
         f"{int(readiness.get('not_met_count', 0))} are not met "
         f"(readiness score {float(readiness.get('readiness_score', 0.0)):.2f})"
+    )
+
+
+def _build_confidence_summary(scoring_result: ScoringResult) -> str:
+    """Summarize the new confidence calibration layer for narrative reporting."""
+    calibration = summarize_confidence_calibration(scoring_result.prioritized_findings)
+    status_counts = calibration.get("status_counts", {})
+    if not isinstance(status_counts, dict):
+        status_counts = {}
+    status_text = ", ".join(
+        f"{status}: {count}" for status, count in sorted(status_counts.items())
+    ) or "no calibration states recorded"
+    return (
+        f"average observed confidence {float(calibration.get('average_observed_confidence', 0.0)):.2f}, "
+        f"average calibrated confidence {float(calibration.get('average_calibrated_confidence', 0.0)):.2f}, "
+        f"statuses: {status_text}"
     )

@@ -12,6 +12,7 @@ def build_html_report(report: dict[str, object]) -> str:
     overall_risk_score = float(report.get("overall_risk_score", 0.0))
     evaluation_context = report.get("evaluation_context", {})
     category_scores = report.get("category_scores", {})
+    confidence_calibration = report.get("confidence_calibration", {})
     organizations = report.get("organizations", [])
     prioritized_risks = report.get("prioritized_risks", [])
     history_comparison = report.get("history_comparison", {})
@@ -42,6 +43,7 @@ def build_html_report(report: dict[str, object]) -> str:
         if isinstance(risk, dict)
     )
     comparison_card = _build_history_comparison_card(history_comparison)
+    confidence_card = _build_confidence_calibration_card(confidence_calibration)
     uk_regulatory_card = _build_uk_regulatory_card(compliance)
     remediation_card = _build_budget_remediation_card(budget_aware_remediation)
     insurance_card = _build_cyber_insurance_card(cyber_insurance_evidence)
@@ -357,6 +359,11 @@ def build_html_report(report: dict[str, object]) -> str:
       </section>
 
       <section class="section-panel">
+        <h2>Confidence Calibration</h2>
+        {confidence_card}
+      </section>
+
+      <section class="section-panel">
         <h2>Run Comparison</h2>
         {comparison_card}
       </section>
@@ -559,6 +566,30 @@ def _build_history_comparison_card(history_comparison: object) -> str:
         if value not in (None, "", {})
     )
     return f"<ul class=\"detail-list\">{detail_markup}</ul>"
+
+
+def _build_confidence_calibration_card(calibration: object) -> str:
+    """Build compact HTML for confidence calibration summary data."""
+    if not isinstance(calibration, dict):
+        return "<p>No confidence calibration summary is available yet.</p>"
+
+    rows: list[tuple[str, object]] = [
+        ("Controls with calibration", calibration.get("controls_with_calibration")),
+        ("Average observed confidence", calibration.get("average_observed_confidence")),
+        ("Average calibrated confidence", calibration.get("average_calibrated_confidence")),
+        ("Method summary", calibration.get("method_summary")),
+    ]
+    status_counts = calibration.get("status_counts", {})
+    if isinstance(status_counts, dict):
+        for status, count in status_counts.items():
+            rows.append((f"{status} controls", count))
+
+    detail_markup = "".join(
+        f"<li><span class=\"detail-label\">{escape(str(label))}:</span> {escape(str(value))}</li>"
+        for label, value in rows
+        if value not in (None, "", {})
+    )
+    return f"<ul class=\"detail-list\">{detail_markup}</ul>" if detail_markup else "<p>No confidence calibration summary is available yet.</p>"
 
 
 def _build_uk_regulatory_card(compliance: object) -> str:

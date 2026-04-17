@@ -5,6 +5,7 @@ from statistics import mean
 
 from pydantic import BaseModel, Field
 
+from cris_sme.engine.confidence import calibrate_finding_confidence
 from cris_sme.models.finding import Finding, FindingCategory, FindingSeverity
 
 SEVERITY_WEIGHTS: dict[FindingSeverity, float] = {
@@ -29,6 +30,18 @@ MAX_FINDING_SCORE = SEVERITY_WEIGHTS[FindingSeverity.CRITICAL] * 1.6 * 1.6 * 1.0
 class ScoreBreakdown(BaseModel):
     """Explainable breakdown of a single finding's deterministic score."""
 
+    observed_confidence: float = Field(
+        ...,
+        description="Raw control confidence prior to calibration.",
+    )
+    calibrated_confidence: float = Field(
+        ...,
+        description="Confidence after blending observed control confidence with calibration metadata.",
+    )
+    calibration_status: str = Field(
+        ...,
+        description="Calibration maturity label for the underlying control.",
+    )
     base_severity: float = Field(..., description="Numeric weight derived from severity.")
     likelihood_factor: float = Field(..., description="Modifier driven by exposure.")
     data_factor: float = Field(..., description="Modifier driven by data sensitivity.")
@@ -92,10 +105,11 @@ def score_findings(findings: list[Finding]) -> ScoringResult:
 
 def _score_finding(finding: Finding) -> ScoredFinding:
     """Apply the deterministic CRIS-SME scoring formula to one finding."""
+    calibration = calibrate_finding_confidence(finding)
     base_severity = SEVERITY_WEIGHTS[finding.severity]
     likelihood_factor = 0.8 + (0.8 * finding.exposure)
     data_factor = 0.8 + (0.8 * finding.data_sensitivity)
-    confidence_factor = 0.7 + (0.3 * finding.confidence)
+    confidence_factor = 0.7 + (0.3 * calibration.calibrated_confidence)
 
     # Remediation effort slightly increases urgency for issues that are likely to persist.
     remediation_factor = 1.0 + (0.15 * finding.remediation_effort)
@@ -110,6 +124,9 @@ def _score_finding(finding: Finding) -> ScoredFinding:
     normalized_score = min((raw_score / (MAX_FINDING_SCORE * 1.15)) * 100, 100.0)
 
     breakdown = ScoreBreakdown(
+        observed_confidence=round(calibration.observed_confidence, 4),
+        calibrated_confidence=round(calibration.calibrated_confidence, 4),
+        calibration_status=calibration.calibration_status,
         base_severity=base_severity,
         likelihood_factor=round(likelihood_factor, 4),
         data_factor=round(data_factor, 4),
