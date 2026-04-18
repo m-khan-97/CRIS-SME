@@ -26,27 +26,31 @@ def build_html_report(report: dict[str, object]) -> str:
     executive_pack = report.get("executive_pack", {})
     plain_language_narrative = report.get("plain_language_narrative", {})
 
-    category_cards = "".join(
-        f"""
-        <article class="metric-card">
-          <h3>{escape(str(category))}</h3>
-          <p class="metric-value">{float(score):.2f}</p>
-        </article>
-        """
-        for category, score in category_scores.items()
-    )
+    if not isinstance(evaluation_context, dict):
+        evaluation_context = {}
+    if not isinstance(category_scores, dict):
+        category_scores = {}
+    if not isinstance(prioritized_risks, list):
+        prioritized_risks = []
+    if not isinstance(organizations, list):
+        organizations = []
 
+    risk_angle = max(0.0, min(100.0, overall_risk_score)) * 3.6
+    risk_status = _risk_band_label(overall_risk_score)
+    risk_status_class = _risk_band_class(overall_risk_score)
+
+    category_cards = _build_category_cards(category_scores)
     organization_cards = "".join(
         _build_organization_card(organization)
         for organization in organizations
         if isinstance(organization, dict)
     )
-
     prioritized_rows = "".join(
         _build_risk_row(risk)
         for risk in prioritized_risks
         if isinstance(risk, dict)
     )
+
     comparison_card = _build_history_comparison_card(history_comparison)
     confidence_card = _build_confidence_calibration_card(confidence_calibration)
     native_validation_card = _build_native_validation_card(native_validation)
@@ -58,6 +62,11 @@ def build_html_report(report: dict[str, object]) -> str:
     uk_readiness_card = _build_uk_readiness_card(cyber_essentials_readiness)
     executive_pack_card = _build_executive_pack_card(executive_pack)
     narrator_card = _build_narrator_card(plain_language_narrative)
+    top_actions_card = _build_top_actions_panel(
+        prioritized_risks=prioritized_risks,
+        remediation=budget_aware_remediation,
+        action_plan=action_plan_30_day,
+    )
 
     return f"""<!DOCTYPE html>
 <html lang="en">
@@ -67,79 +76,263 @@ def build_html_report(report: dict[str, object]) -> str:
     <title>CRIS-SME Risk Report</title>
     <style>
       :root {{
-        --bg: #f4f0e8;
-        --panel: #fffaf2;
-        --panel-strong: #f1e5d2;
-        --ink: #182126;
-        --muted: #5f6b73;
-        --line: #d5c7b3;
-        --accent: #0b6e4f;
-        --accent-soft: #d9efe6;
-        --risk: #8b2e1f;
-        --risk-soft: #f8e0da;
-        --warn: #9f6b00;
-        --warn-soft: #f8edd2;
-        --shadow: 0 18px 42px rgba(41, 31, 21, 0.08);
-        --radius: 18px;
+        --bg: #eef4f7;
+        --bg-soft: #f8fbfd;
+        --panel: rgba(255, 255, 255, 0.88);
+        --panel-strong: #f4f8fb;
+        --ink: #10212b;
+        --muted: #5a6c78;
+        --line: rgba(73, 100, 115, 0.16);
+        --navy: #102230;
+        --navy-soft: #183547;
+        --accent: #007a78;
+        --accent-soft: rgba(0, 122, 120, 0.12);
+        --sky: #417dff;
+        --sky-soft: rgba(65, 125, 255, 0.12);
+        --risk: #c44536;
+        --risk-soft: rgba(196, 69, 54, 0.14);
+        --warn: #b97807;
+        --warn-soft: rgba(185, 120, 7, 0.14);
+        --ok: #2b8761;
+        --ok-soft: rgba(43, 135, 97, 0.14);
+        --shadow: 0 24px 64px rgba(16, 33, 43, 0.12);
+        --radius: 24px;
+        --radius-tight: 16px;
       }}
 
       * {{
         box-sizing: border-box;
       }}
 
+      html {{
+        scroll-behavior: smooth;
+      }}
+
       body {{
         margin: 0;
-        font-family: "IBM Plex Sans", "Segoe UI", sans-serif;
+        font-family: "IBM Plex Sans", "Aptos", "Segoe UI", sans-serif;
         color: var(--ink);
         background:
-          radial-gradient(circle at top left, rgba(11, 110, 79, 0.12), transparent 30%),
-          radial-gradient(circle at top right, rgba(139, 46, 31, 0.1), transparent 28%),
-          linear-gradient(180deg, #fbf7f0 0%, var(--bg) 100%);
+          radial-gradient(circle at top left, rgba(0, 122, 120, 0.13), transparent 28%),
+          radial-gradient(circle at 85% 10%, rgba(65, 125, 255, 0.14), transparent 26%),
+          linear-gradient(180deg, #f8fbfd 0%, var(--bg) 52%, #ecf3f7 100%);
+      }}
+
+      body::before {{
+        content: "";
+        position: fixed;
+        inset: 0;
+        background-image:
+          linear-gradient(rgba(16, 33, 43, 0.025) 1px, transparent 1px),
+          linear-gradient(90deg, rgba(16, 33, 43, 0.025) 1px, transparent 1px);
+        background-size: 36px 36px;
+        pointer-events: none;
+        mask-image: radial-gradient(circle at center, black, transparent 78%);
+      }}
+
+      .page-shell {{
+        position: relative;
+        max-width: 1440px;
+        margin: 0 auto;
+        padding: 28px 18px 64px;
+        display: grid;
+        grid-template-columns: 252px minmax(0, 1fr);
+        gap: 22px;
+      }}
+
+      .nav-rail {{
+        position: sticky;
+        top: 18px;
+        align-self: start;
+        padding: 22px;
+        background: linear-gradient(180deg, rgba(16, 34, 48, 0.98), rgba(24, 53, 71, 0.96));
+        color: #f2f8fb;
+        border-radius: 30px;
+        box-shadow: var(--shadow);
+        overflow: hidden;
+      }}
+
+      .nav-rail::after {{
+        content: "";
+        position: absolute;
+        inset: auto -34% -38% auto;
+        width: 240px;
+        height: 240px;
+        background: radial-gradient(circle, rgba(65, 125, 255, 0.24), transparent 68%);
+        pointer-events: none;
+      }}
+
+      .nav-kicker {{
+        margin: 0 0 8px;
+        font-size: 0.74rem;
+        font-weight: 600;
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+        color: rgba(242, 248, 251, 0.6);
+      }}
+
+      .nav-title {{
+        margin: 0;
+        font-family: "IBM Plex Serif", Georgia, serif;
+        font-size: 1.55rem;
+        line-height: 1.1;
+      }}
+
+      .nav-summary {{
+        margin: 12px 0 0;
+        color: rgba(242, 248, 251, 0.8);
+        line-height: 1.58;
+        font-size: 0.94rem;
+      }}
+
+      .nav-score {{
+        margin-top: 18px;
+        padding: 14px 16px;
+        border-radius: 18px;
+        background: rgba(255, 255, 255, 0.08);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+      }}
+
+      .nav-score strong {{
+        display: block;
+        font-size: 2rem;
+        line-height: 1;
+      }}
+
+      .nav-score span {{
+        display: block;
+        margin-top: 6px;
+        color: rgba(242, 248, 251, 0.72);
+        font-size: 0.9rem;
+      }}
+
+      .nav-links {{
+        margin: 20px 0 0;
+        padding: 0;
+        list-style: none;
+        display: grid;
+        gap: 8px;
+      }}
+
+      .nav-links a {{
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
+        padding: 10px 12px;
+        border-radius: 14px;
+        color: #f2f8fb;
+        text-decoration: none;
+        background: rgba(255, 255, 255, 0.04);
+        transition: transform 0.2s ease, background 0.2s ease;
+      }}
+
+      .nav-links a:hover {{
+        transform: translateX(3px);
+        background: rgba(255, 255, 255, 0.1);
+      }}
+
+      .nav-links a span {{
+        color: rgba(242, 248, 251, 0.62);
+        font-size: 0.8rem;
       }}
 
       main {{
-        max-width: 1240px;
-        margin: 0 auto;
-        padding: 32px 20px 64px;
+        min-width: 0;
+      }}
+
+      .report-section {{
+        margin-top: 26px;
       }}
 
       .hero {{
-        background: linear-gradient(135deg, rgba(11, 110, 79, 0.95), rgba(24, 33, 38, 0.95));
-        color: #f8fbfa;
-        border-radius: 28px;
-        padding: 32px;
+        position: relative;
+        overflow: hidden;
+        background:
+          radial-gradient(circle at 12% 18%, rgba(46, 212, 191, 0.24), transparent 24%),
+          radial-gradient(circle at 88% 24%, rgba(115, 163, 255, 0.28), transparent 26%),
+          linear-gradient(140deg, rgba(16, 34, 48, 0.98), rgba(22, 50, 68, 0.95) 58%, rgba(26, 63, 79, 0.93));
+        color: #f2f8fb;
+        border-radius: 32px;
+        padding: 30px;
         box-shadow: var(--shadow);
       }}
 
+      .hero-shell {{
+        display: grid;
+        grid-template-columns: minmax(0, 1.45fr) minmax(320px, 0.95fr);
+        gap: 22px;
+        align-items: start;
+      }}
+
+      .eyebrow {{
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 7px 11px;
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.08);
+        color: rgba(242, 248, 251, 0.86);
+        font-size: 0.76rem;
+        font-weight: 600;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+      }}
+
       .hero h1 {{
-        margin: 0 0 8px;
+        margin: 18px 0 10px;
         font-family: "IBM Plex Serif", Georgia, serif;
-        font-size: clamp(2rem, 4vw, 3.4rem);
-        line-height: 1.02;
+        font-size: clamp(2.2rem, 4.2vw, 4rem);
+        line-height: 0.98;
+        max-width: 12ch;
       }}
 
       .hero p {{
         margin: 0;
-        max-width: 920px;
-        font-size: 1rem;
-        line-height: 1.6;
+        max-width: 72ch;
+        font-size: 1.02rem;
+        line-height: 1.72;
+        color: rgba(242, 248, 251, 0.82);
       }}
 
-      .hero-grid,
+      .hero-meta,
       .metric-grid,
-      .org-grid {{
+      .org-grid,
+      .summary-grid,
+      .bento-grid {{
         display: grid;
         gap: 16px;
       }}
 
-      .hero-grid {{
+      .hero-meta {{
         margin-top: 24px;
-        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
       }}
 
       .metric-grid,
       .org-grid {{
         grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      }}
+
+      .summary-grid {{
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      }}
+
+      .bento-grid {{
+        grid-template-columns: minmax(0, 1.08fr) minmax(300px, 0.92fr);
+      }}
+
+      .hero-side {{
+        display: grid;
+        gap: 16px;
+      }}
+
+      .score-card,
+      .top-actions {{
+        padding: 22px;
+        border-radius: 26px;
+        background: rgba(255, 255, 255, 0.09);
+        border: 1px solid rgba(255, 255, 255, 0.1);
       }}
 
       .hero-card,
@@ -148,46 +341,244 @@ def build_html_report(report: dict[str, object]) -> str:
       .table-panel,
       .section-panel {{
         background: var(--panel);
-        border: 1px solid rgba(213, 199, 179, 0.7);
+        border: 1px solid var(--line);
         border-radius: var(--radius);
         box-shadow: var(--shadow);
+        backdrop-filter: blur(12px);
+      }}
+
+      .hero-card,
+      .metric-card,
+      .org-card,
+      .section-panel {{
+        padding: 20px;
       }}
 
       .hero-card {{
-        background: rgba(255, 250, 242, 0.13);
-        border-color: rgba(255, 250, 242, 0.18);
-        padding: 16px 18px;
+        background: rgba(255, 255, 255, 0.08);
+        border-color: rgba(255, 255, 255, 0.1);
       }}
 
       .hero-card .label {{
         display: block;
-        font-size: 0.82rem;
+        font-size: 0.8rem;
         text-transform: uppercase;
         letter-spacing: 0.08em;
-        color: rgba(248, 251, 250, 0.76);
+        color: rgba(242, 248, 251, 0.66);
       }}
 
       .hero-card .value {{
         display: block;
         margin-top: 8px;
-        font-size: 1.8rem;
+        font-size: 1.95rem;
         font-weight: 700;
       }}
 
-      section {{
-        margin-top: 28px;
+      .hero-card .subvalue {{
+        display: block;
+        margin-top: 8px;
+        color: rgba(242, 248, 251, 0.74);
+        font-size: 0.92rem;
+        line-height: 1.45;
       }}
 
-      h2 {{
-        margin: 0 0 14px;
+      .score-card h2,
+      .top-actions h2 {{
+        margin: 0 0 10px;
+        font-family: "IBM Plex Sans", "Aptos", "Segoe UI", sans-serif;
+        font-size: 1.05rem;
+        color: #f2f8fb;
+      }}
+
+      .score-dial-shell {{
+        margin-top: 18px;
+        display: flex;
+        align-items: center;
+        gap: 18px;
+      }}
+
+      .score-dial-wrap {{
+        position: relative;
+        width: 132px;
+        height: 132px;
+      }}
+
+      .score-dial {{
+        width: 132px;
+        height: 132px;
+        border-radius: 50%;
+        display: grid;
+        place-items: center;
+        background:
+          conic-gradient(
+            var(--risk) 0deg {risk_angle:.2f}deg,
+            rgba(255, 255, 255, 0.12) {risk_angle:.2f}deg 360deg
+          );
+      }}
+
+      .score-dial::before {{
+        content: "";
+        width: 94px;
+        height: 94px;
+        border-radius: 50%;
+        background: rgba(16, 34, 48, 0.98);
+        box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.06);
+      }}
+
+      .score-dial-value {{
+        position: absolute;
+        inset: 0;
+        display: grid;
+        place-items: center;
+        text-align: center;
+      }}
+
+      .score-dial-value strong {{
+        display: block;
+        font-size: 2rem;
+        line-height: 1;
+      }}
+
+      .score-dial-value span {{
+        display: block;
+        margin-top: 6px;
+        font-size: 0.78rem;
+        color: rgba(242, 248, 251, 0.66);
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+      }}
+
+      .score-copy p {{
+        margin: 4px 0 0;
+        font-size: 0.95rem;
+        line-height: 1.55;
+      }}
+
+      .score-status,
+      .pill {{
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 6px 10px;
+        border-radius: 999px;
+        font-size: 0.8rem;
+        font-weight: 600;
+      }}
+
+      .score-status {{
+        margin-top: 10px;
+      }}
+
+      .score-status-critical,
+      .pill-high,
+      .pill-immediate,
+      .pill-status_gap {{
+        background: var(--risk-soft);
+        color: var(--risk);
+      }}
+
+      .score-status-elevated,
+      .pill-planned,
+      .pill-status_partial {{
+        background: var(--warn-soft);
+        color: var(--warn);
+      }}
+
+      .score-status-managed,
+      .pill-monitor,
+      .pill-status_ready {{
+        background: var(--accent-soft);
+        color: var(--accent);
+      }}
+
+      .score-status-low,
+      .pill-low {{
+        background: var(--ok-soft);
+        color: var(--ok);
+      }}
+
+      .action-list {{
+        margin: 0;
+        padding: 0;
+        list-style: none;
+        display: grid;
+        gap: 10px;
+      }}
+
+      .action-list li {{
+        padding: 12px 13px;
+        border-radius: 16px;
+        background: rgba(255, 255, 255, 0.08);
+      }}
+
+      .action-list strong {{
+        display: block;
+        font-size: 0.95rem;
+      }}
+
+      .action-list span {{
+        display: block;
+        margin-top: 4px;
+        color: rgba(242, 248, 251, 0.74);
+        font-size: 0.9rem;
+        line-height: 1.45;
+      }}
+
+      .section-heading {{
+        display: flex;
+        align-items: end;
+        justify-content: space-between;
+        gap: 18px;
+        margin-bottom: 16px;
+      }}
+
+      .section-heading h2 {{
+        margin: 0;
         font-family: "IBM Plex Serif", Georgia, serif;
-        font-size: 1.45rem;
+        font-size: 1.55rem;
       }}
 
-      .metric-card,
-      .org-card,
-      .section-panel {{
-        padding: 20px;
+      .section-heading p {{
+        margin: 8px 0 0;
+        max-width: 72ch;
+        color: var(--muted);
+        line-height: 1.62;
+      }}
+
+      .section-kicker {{
+        display: inline-block;
+        margin-bottom: 8px;
+        font-size: 0.76rem;
+        font-weight: 600;
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+        color: var(--accent);
+      }}
+
+      .section-anchor {{
+        color: var(--muted);
+        text-decoration: none;
+        font-size: 0.88rem;
+        white-space: nowrap;
+      }}
+
+      .section-anchor:hover {{
+        color: var(--ink);
+      }}
+
+      .metric-card {{
+        position: relative;
+        overflow: hidden;
+      }}
+
+      .metric-card::after {{
+        content: "";
+        position: absolute;
+        inset: auto -10% -22% auto;
+        width: 120px;
+        height: 120px;
+        background: radial-gradient(circle, rgba(65, 125, 255, 0.12), transparent 68%);
+        pointer-events: none;
       }}
 
       .metric-card h3,
@@ -201,6 +592,32 @@ def build_html_report(report: dict[str, object]) -> str:
         margin: 10px 0 0;
         font-size: 2rem;
         font-weight: 700;
+      }}
+
+      .metric-bar {{
+        margin-top: 16px;
+        width: 100%;
+        height: 10px;
+        border-radius: 999px;
+        background: rgba(16, 33, 43, 0.08);
+        overflow: hidden;
+      }}
+
+      .metric-bar span {{
+        display: block;
+        height: 100%;
+        border-radius: inherit;
+        background: linear-gradient(90deg, var(--accent), var(--sky));
+      }}
+
+      .metric-foot {{
+        margin-top: 10px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 8px;
+        color: var(--muted);
+        font-size: 0.88rem;
       }}
 
       .org-card p,
@@ -232,6 +649,7 @@ def build_html_report(report: dict[str, object]) -> str:
 
       .table-panel {{
         overflow: hidden;
+        border-radius: 24px;
       }}
 
       table {{
@@ -240,7 +658,7 @@ def build_html_report(report: dict[str, object]) -> str:
       }}
 
       thead {{
-        background: #e9dfcf;
+        background: linear-gradient(90deg, rgba(16, 34, 48, 0.98), rgba(24, 53, 71, 0.96));
       }}
 
       th,
@@ -256,35 +674,11 @@ def build_html_report(report: dict[str, object]) -> str:
         font-size: 0.82rem;
         text-transform: uppercase;
         letter-spacing: 0.08em;
-        color: var(--muted);
+        color: rgba(242, 248, 251, 0.74);
       }}
 
       tbody tr:nth-child(even) {{
-        background: rgba(241, 229, 210, 0.35);
-      }}
-
-      .pill {{
-        display: inline-block;
-        padding: 5px 10px;
-        border-radius: 999px;
-        font-size: 0.8rem;
-        font-weight: 600;
-      }}
-
-      .pill-high,
-      .pill-immediate {{
-        background: var(--risk-soft);
-        color: var(--risk);
-      }}
-
-      .pill-planned {{
-        background: var(--warn-soft);
-        color: var(--warn);
-      }}
-
-      .pill-monitor {{
-        background: var(--accent-soft);
-        color: var(--accent);
+        background: rgba(244, 248, 251, 0.72);
       }}
 
       .evidence,
@@ -299,6 +693,21 @@ def build_html_report(report: dict[str, object]) -> str:
         font-size: 0.92rem;
       }}
 
+      @media (max-width: 1120px) {{
+        .page-shell {{
+          grid-template-columns: 1fr;
+        }}
+
+        .nav-rail {{
+          position: static;
+        }}
+
+        .hero-shell,
+        .bento-grid {{
+          grid-template-columns: 1fr;
+        }}
+      }}
+
       @media (max-width: 860px) {{
         th:nth-child(4),
         td:nth-child(4),
@@ -309,12 +718,17 @@ def build_html_report(report: dict[str, object]) -> str:
       }}
 
       @media (max-width: 640px) {{
-        main {{
-          padding: 18px 14px 42px;
+        .page-shell {{
+          padding: 16px 12px 42px;
         }}
 
         .hero {{
           padding: 22px;
+        }}
+
+        .score-dial-shell {{
+          flex-direction: column;
+          align-items: flex-start;
         }}
 
         th:nth-child(3),
@@ -329,128 +743,304 @@ def build_html_report(report: dict[str, object]) -> str:
     </style>
   </head>
   <body>
-    <main>
-      <section class="hero">
-        <h1>CRIS-SME Risk Intelligence Report</h1>
-        <p>{summary}</p>
-        <div class="hero-grid">
-          <div class="hero-card">
-            <span class="label">Overall Risk</span>
-            <span class="value">{overall_risk_score:.2f}/100</span>
-          </div>
-          <div class="hero-card">
-            <span class="label">Profiles Evaluated</span>
-            <span class="value">{int(evaluation_context.get("evaluated_profiles", 0))}</span>
-          </div>
-          <div class="hero-card">
-            <span class="label">Generated Findings</span>
-            <span class="value">{int(evaluation_context.get("generated_findings", 0))}</span>
-          </div>
-          <div class="hero-card">
-            <span class="label">Non-Compliant</span>
-            <span class="value">{int(evaluation_context.get("non_compliant_findings", 0))}</span>
-          </div>
-        </div>
-      </section>
-
-      <section class="section-panel">
-        <h2>Executive Summary</h2>
-        <p>{executive_summary}</p>
-      </section>
-
-      <section>
-        <h2>Category Scores</h2>
-        <div class="metric-grid">{category_cards}</div>
-      </section>
-
-      <section>
-        <h2>Collection Provenance</h2>
-        <div class="org-grid">{organization_cards}</div>
-      </section>
-
-      <section class="section-panel">
-        <h2>Confidence Calibration</h2>
-        {confidence_card}
-      </section>
-
-      <section class="section-panel">
-        <h2>Native Recommendation Validation</h2>
-        {native_validation_card}
-      </section>
-
-      <section class="section-panel">
-        <h2>Run Comparison</h2>
-        {comparison_card}
-      </section>
-
-      <section class="section-panel">
-        <h2>UK Regulatory Mapping</h2>
-        {uk_regulatory_card}
-      </section>
-
-      <section class="section-panel">
-        <h2>Budget-Aware Remediation</h2>
-        {remediation_card}
-      </section>
-
-      <section class="section-panel">
-        <h2>30-Day SME Action Plan</h2>
-        {action_plan_card}
-      </section>
-
-      <section class="section-panel">
-        <h2>Cyber Insurance Evidence Pack</h2>
-        {insurance_card}
-      </section>
-
-      <section class="section-panel">
-        <h2>Benchmark Scaffold</h2>
-        {benchmark_card}
-      </section>
-
-      <section class="section-panel">
-        <h2>Cyber Essentials Readiness</h2>
-        {uk_readiness_card}
-      </section>
-
-      <section class="section-panel">
-        <h2>Executive Pack</h2>
-        {executive_pack_card}
-      </section>
-
-      <section class="section-panel">
-        <h2>Plain-Language Narrator</h2>
-        {narrator_card}
-      </section>
-
-      <section>
-        <h2>Prioritized Risks</h2>
-        <div class="table-panel">
-          <table>
-            <thead>
-              <tr>
-                <th>Control</th>
-                <th>Category</th>
-                <th>Severity</th>
-                <th>Priority</th>
-                <th>Score</th>
-                <th>Organization</th>
-                <th>Evidence</th>
-                <th>Remediation</th>
-                <th>Mappings</th>
-              </tr>
-            </thead>
-            <tbody>
-              {prioritized_rows}
-            </tbody>
-          </table>
-        </div>
-        <p class="footnote">
-          This report uses the deterministic CRIS-SME scoring model and preserves collection provenance
-          so reviewers can distinguish live cloud evidence from mock or synthetic posture inputs.
+    <div class="page-shell">
+      <aside class="nav-rail">
+        <p class="nav-kicker">CRIS-SME</p>
+        <h2 class="nav-title">UK SME cloud risk reporting with product-grade clarity</h2>
+        <p class="nav-summary">
+          This report is designed around the strongest modern posture-report patterns:
+          security at a glance, top actions, longitudinal context, and evidence-backed
+          explanation for non-enterprise teams.
         </p>
-      </section>
-    </main>
+        <div class="nav-score">
+          <strong>{overall_risk_score:.2f}</strong>
+          <span>{escape(risk_status)} overall risk | {int(evaluation_context.get("non_compliant_findings", 0))} non-compliant findings</span>
+        </div>
+        <ul class="nav-links">
+          <li><a href="#overview">Overview <span>01</span></a></li>
+          <li><a href="#posture">Posture & actions <span>02</span></a></li>
+          <li><a href="#evidence">Evidence & provenance <span>03</span></a></li>
+          <li><a href="#assurance">Assurance & benchmark <span>04</span></a></li>
+          <li><a href="#uk">UK obligations <span>05</span></a></li>
+          <li><a href="#risks">Prioritized risks <span>06</span></a></li>
+        </ul>
+      </aside>
+
+      <main>
+        <section id="overview" class="hero report-section">
+          <div class="hero-shell">
+            <div>
+              <span class="eyebrow">Cloud Risk Intelligence Report</span>
+              <h1>CRIS-SME Risk Intelligence Report</h1>
+              <p>{summary}</p>
+              <div class="hero-meta">
+                <div class="hero-card">
+                  <span class="label">Profiles Evaluated</span>
+                  <span class="value">{int(evaluation_context.get("evaluated_profiles", 0))}</span>
+                  <span class="subvalue">Tenant or synthetic posture profiles assessed in this run.</span>
+                </div>
+                <div class="hero-card">
+                  <span class="label">Generated Findings</span>
+                  <span class="value">{int(evaluation_context.get("generated_findings", 0))}</span>
+                  <span class="subvalue">Deterministic control outcomes converted into scored findings.</span>
+                </div>
+                <div class="hero-card">
+                  <span class="label">Non-Compliant</span>
+                  <span class="value">{int(evaluation_context.get("non_compliant_findings", 0))}</span>
+                  <span class="subvalue">Issues currently driving the SME risk posture upward.</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="hero-side">
+              <div class="score-card">
+                <h2>Security at a glance</h2>
+                <div class="score-dial-shell">
+                  <div class="score-dial-wrap">
+                    <div class="score-dial"></div>
+                    <div class="score-dial-value">
+                      <div>
+                        <strong>{overall_risk_score:.2f}</strong>
+                        <span>Risk / 100</span>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="score-copy">
+                    <p>CRIS-SME keeps the model explainable, evidence-based, and transparent enough for research reviewers, security teams, and SME decision-makers to read from the same artifact.</p>
+                    <div class="score-status {risk_status_class}">{escape(risk_status)}</div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="top-actions">
+                <h2>Top actions</h2>
+                {top_actions_card}
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="report-section">
+          <div class="bento-grid">
+            <article class="section-panel">
+              <div class="section-heading">
+                <div>
+                  <span class="section-kicker">Executive Summary</span>
+                  <h2>What matters most right now</h2>
+                  <p>{executive_summary}</p>
+                </div>
+              </div>
+            </article>
+
+            <article class="section-panel">
+              <div class="section-heading">
+                <div>
+                  <span class="section-kicker">Board Snapshot</span>
+                  <h2>Fast-reading decision context</h2>
+                  <p>The report is structured to feel closer to the best posture platforms: quick orientation first, then action paths, then evidence and compliance detail.</p>
+                </div>
+              </div>
+              <div class="summary-grid">
+                <div class="metric-card">
+                  <h3>Calibration controls</h3>
+                  <p class="metric-value">{escape(str(confidence_calibration.get("controls_with_calibration", 0)))}</p>
+                </div>
+                <div class="metric-card">
+                  <h3>Native mappings</h3>
+                  <p class="metric-value">{escape(str(native_validation.get("controls_mapped", 0)))}</p>
+                </div>
+                <div class="metric-card">
+                  <h3>Benchmark status</h3>
+                  <p class="metric-value" style="font-size:1.3rem;">{escape(str(benchmark_comparison.get("status", "unknown")).replace("_", " "))}</p>
+                </div>
+              </div>
+            </article>
+          </div>
+        </section>
+
+        <section id="posture" class="report-section">
+          <div class="section-heading">
+            <div>
+              <span class="section-kicker">Posture & Priority</span>
+              <h2>Category Scores</h2>
+              <p>Borrowing from better market experiences, the emphasis here is on readability: where risk clusters, how much it matters, and which domains need attention first.</p>
+            </div>
+            <a class="section-anchor" href="#overview">Back to top</a>
+          </div>
+          <div class="metric-grid">{category_cards}</div>
+        </section>
+
+        <section id="evidence" class="report-section">
+          <div class="section-heading">
+            <div>
+              <span class="section-kicker">Collection Provenance</span>
+              <h2>Collection Provenance</h2>
+              <p>Strong reports separate conclusions from the telemetry that created them. This section keeps collection mode and evidence counts visible, not hidden.</p>
+            </div>
+            <a class="section-anchor" href="#overview">Back to top</a>
+          </div>
+          <div class="org-grid">{organization_cards}</div>
+        </section>
+
+        <section id="assurance" class="section-panel report-section">
+          <div class="section-heading">
+            <div>
+              <span class="section-kicker">Model Assurance</span>
+              <h2>Confidence Calibration</h2>
+              <p>Confidence is surfaced as part of the scoring story, so the report reads as measured and defensible rather than opaque.</p>
+            </div>
+            <a class="section-anchor" href="#overview">Back to top</a>
+          </div>
+          {confidence_card}
+        </section>
+
+        <section class="section-panel report-section">
+          <div class="section-heading">
+            <div>
+              <span class="section-kicker">Native Baseline</span>
+              <h2>Native Recommendation Validation</h2>
+              <p>Alignment against Microsoft Defender for Cloud adds external grounding and helps position CRIS-SME as an explainable overlay, not a disconnected scoring toy.</p>
+            </div>
+          </div>
+          {native_validation_card}
+        </section>
+
+        <section class="section-panel report-section">
+          <div class="section-heading">
+            <div>
+              <span class="section-kicker">Longitudinal Tracking</span>
+              <h2>Run Comparison</h2>
+              <p>Modern governance tools stand out when they show movement over time. This section highlights posture drift and progress, not just a one-off scan.</p>
+            </div>
+          </div>
+          {comparison_card}
+        </section>
+
+        <section class="section-panel report-section">
+          <div class="section-heading">
+            <div>
+              <span class="section-kicker">Budget-Aware Planning</span>
+              <h2>Budget-Aware Remediation</h2>
+              <p>SMEs need action sequences constrained by cost, not just a louder list of severe issues. The presentation now treats this as a core product capability.</p>
+            </div>
+          </div>
+          {remediation_card}
+        </section>
+
+        <section class="section-panel report-section">
+          <div class="section-heading">
+            <div>
+              <span class="section-kicker">Operational Delivery</span>
+              <h2>30-Day SME Action Plan</h2>
+              <p>The action plan is formatted as a practical execution layer so the report can move directly into operational follow-up.</p>
+            </div>
+          </div>
+          {action_plan_card}
+        </section>
+
+        <section class="section-panel report-section">
+          <div class="section-heading">
+            <div>
+              <span class="section-kicker">Insurance Readiness</span>
+              <h2>Cyber Insurance Evidence Pack</h2>
+              <p>Instead of looking like an engineer-only export, the report now carries a clearer insurer- and stakeholder-facing posture summary.</p>
+            </div>
+          </div>
+          {insurance_card}
+        </section>
+
+        <section class="section-panel report-section">
+          <div class="section-heading">
+            <div>
+              <span class="section-kicker">Benchmark Scaffold</span>
+              <h2>Benchmark Scaffold</h2>
+              <p>Even before the benchmark dataset matures, the report reserves visual space for peer comparison so the product category can evolve cleanly.</p>
+            </div>
+          </div>
+          {benchmark_card}
+        </section>
+
+        <section id="uk" class="section-panel report-section">
+          <div class="section-heading">
+            <div>
+              <span class="section-kicker">UK Obligations</span>
+              <h2>UK Regulatory Mapping</h2>
+              <p>This section keeps Cyber Essentials, UK GDPR, FCA SYSC, and related obligations visible in the same visual language as technical posture.</p>
+            </div>
+            <a class="section-anchor" href="#overview">Back to top</a>
+          </div>
+          {uk_regulatory_card}
+        </section>
+
+        <section class="section-panel report-section">
+          <div class="section-heading">
+            <div>
+              <span class="section-kicker">Government-Facing Readiness</span>
+              <h2>Cyber Essentials Readiness</h2>
+              <p>Instead of burying Cyber Essentials in mapping notes, the report treats it as a primary readiness story for UK SMEs.</p>
+            </div>
+          </div>
+          {uk_readiness_card}
+        </section>
+
+        <section class="section-panel report-section">
+          <div class="section-heading">
+            <div>
+              <span class="section-kicker">Board Output</span>
+              <h2>Executive Pack</h2>
+              <p>The executive layer is now visually closer to a board-ready briefing than a raw export, which helps with demos, case studies, and leadership conversations.</p>
+            </div>
+          </div>
+          {executive_pack_card}
+        </section>
+
+        <section class="section-panel report-section">
+          <div class="section-heading">
+            <div>
+              <span class="section-kicker">Narration Layer</span>
+              <h2>Plain-Language Narrator</h2>
+              <p>The optional narrator remains clearly secondary to the deterministic model, preserving trust and explainability.</p>
+            </div>
+          </div>
+          {narrator_card}
+        </section>
+
+        <section id="risks" class="report-section">
+          <div class="section-heading">
+            <div>
+              <span class="section-kicker">Risk Register</span>
+              <h2>Prioritized Risks</h2>
+              <p>This remains the evidence-rich core of the report, but it now sits under clearer context, triage, and action framing so the whole document scans more like a mature security product artifact.</p>
+            </div>
+            <a class="section-anchor" href="#overview">Back to top</a>
+          </div>
+          <div class="table-panel">
+            <table>
+              <thead>
+                <tr>
+                  <th>Control</th>
+                  <th>Category</th>
+                  <th>Severity</th>
+                  <th>Priority</th>
+                  <th>Score</th>
+                  <th>Organization</th>
+                  <th>Evidence</th>
+                  <th>Remediation</th>
+                  <th>Mappings</th>
+                </tr>
+              </thead>
+              <tbody>
+                {prioritized_rows}
+              </tbody>
+            </table>
+          </div>
+          <p class="footnote">
+            This report uses the deterministic CRIS-SME scoring model and preserves collection provenance
+            so reviewers can distinguish live cloud evidence from mock or synthetic posture inputs.
+          </p>
+        </section>
+      </main>
+    </div>
   </body>
 </html>
 """
@@ -462,6 +1052,107 @@ def write_html_report(html: str, output_path: str | Path) -> Path:
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(html, encoding="utf-8")
     return path
+
+
+def _risk_band_label(score: float) -> str:
+    """Map a numeric score to a human-readable risk band."""
+    if score >= 70:
+        return "Critical posture exposure"
+    if score >= 45:
+        return "Elevated posture exposure"
+    if score >= 20:
+        return "Managed but material risk"
+    return "Relatively contained risk"
+
+
+def _risk_band_class(score: float) -> str:
+    """Map a numeric score to the matching CSS status class."""
+    if score >= 70:
+        return "score-status-critical"
+    if score >= 45:
+        return "score-status-elevated"
+    if score >= 20:
+        return "score-status-managed"
+    return "score-status-low"
+
+
+def _build_category_cards(category_scores: dict[str, object]) -> str:
+    """Build category score cards with a more visual posture meter."""
+    cards: list[str] = []
+    for category, raw_score in category_scores.items():
+        score = float(raw_score)
+        clamped_score = max(0.0, min(100.0, score))
+        cards.append(
+            f"""
+            <article class="metric-card">
+              <h3>{escape(str(category))}</h3>
+              <p class="metric-value">{score:.2f}</p>
+              <div class="metric-bar"><span style="width: {clamped_score:.2f}%;"></span></div>
+              <div class="metric-foot">
+                <span>{escape(_risk_band_label(score))}</span>
+                <span>{clamped_score:.0f}% of risk scale</span>
+              </div>
+            </article>
+            """
+        )
+    return "".join(cards)
+
+
+def _build_top_actions_panel(
+    *,
+    prioritized_risks: list[object],
+    remediation: object,
+    action_plan: object,
+) -> str:
+    """Build a market-style top actions panel for the hero area."""
+    actions: list[str] = []
+    visible_risks = [
+        risk for risk in prioritized_risks[:3] if isinstance(risk, dict)
+    ]
+    for risk in visible_risks:
+        actions.append(
+            f"""
+            <li>
+              <strong>{escape(str(risk.get("control_id", "N/A")))} | {escape(str(risk.get("title", "")))}</strong>
+              <span>{escape(str(risk.get("priority", "Monitor")))} priority, {float(risk.get("score", 0.0)):.2f} risk score, {escape(str(risk.get("remediation_cost_tier", "unknown")))} remediation cost.</span>
+            </li>
+            """
+        )
+
+    if isinstance(remediation, dict):
+        budget_profiles = remediation.get("budget_profiles", [])
+        if isinstance(budget_profiles, list):
+            for profile in budget_profiles:
+                if not isinstance(profile, dict):
+                    continue
+                if str(profile.get("profile_id")) == "free_this_week":
+                    actions.append(
+                        f"""
+                        <li>
+                          <strong>Free this week</strong>
+                          <span>{int(profile.get("total_recommended", 0))} recommended free actions covering {float(profile.get("cumulative_risk_score", 0.0)):.2f} cumulative risk score.</span>
+                        </li>
+                        """
+                    )
+                    break
+
+    if isinstance(action_plan, dict):
+        phases = action_plan.get("phases", [])
+        if isinstance(phases, list) and phases:
+            phase = phases[0]
+            if isinstance(phase, dict):
+                actions.append(
+                    f"""
+                    <li>
+                      <strong>{escape(str(phase.get("label", "Immediate action phase")))}</strong>
+                      <span>{escape(str(phase.get("goal", "")))} Total actions: {int(phase.get("total_actions", 0))}.</span>
+                    </li>
+                    """
+                )
+
+    if not actions:
+        return "<p>No immediate actions are available yet.</p>"
+    return f"<ul class=\"action-list\">{''.join(actions[:4])}</ul>"
 
 
 def _build_organization_card(organization: dict[str, object]) -> str:
@@ -476,28 +1167,24 @@ def _build_organization_card(organization: dict[str, object]) -> str:
 
     mode_items = [
         ("Source", collection_details.get("profile_source")),
+        ("IAM", collection_details.get("iam_collection_mode")),
         ("Network", collection_details.get("network_collection_mode")),
         ("Data", collection_details.get("data_collection_mode")),
         ("Monitoring", collection_details.get("monitoring_collection_mode")),
         ("Compute", collection_details.get("compute_collection_mode")),
         ("Governance", collection_details.get("governance_collection_mode")),
+        ("Identity observability", collection_details.get("identity_observability")),
     ]
     evidence_items = [
         (key.replace("_", " "), value) for key, value in evidence_counts.items()
     ]
-
     detail_markup = "".join(
         f"<li><span class=\"detail-label\">{escape(str(label))}:</span> {escape(str(value))}</li>"
         for label, value in [*mode_items, *evidence_items]
         if value not in (None, "", {})
     )
-
     note = collection_details.get("note")
-    note_markup = (
-        f"<p>{escape(str(note))}</p>"
-        if note not in (None, "")
-        else ""
-    )
+    note_markup = f"<p>{escape(str(note))}</p>" if note not in (None, "") else ""
 
     return f"""
     <article class="org-card">
@@ -518,6 +1205,7 @@ def _build_risk_row(risk: dict[str, object]) -> str:
     mapping_items = risk.get("mapping", [])
     if not isinstance(mapping_items, list):
         mapping_items = []
+
     remediation_summary = str(risk.get("remediation_summary", "")).strip()
     remediation_cost_tier = risk.get("remediation_cost_tier")
     remediation_value_score = risk.get("remediation_value_score")
@@ -534,11 +1222,11 @@ def _build_risk_row(risk: dict[str, object]) -> str:
     mapping_markup = "".join(
         f"<li>{escape(str(item))}</li>" for item in mapping_items
     ) or "<li>No mapping recorded</li>"
+
     remediation_markup = escape(remediation_summary or "No remediation guidance recorded")
     if remediation_cost_tier:
         remediation_markup += (
-            f"<br /><span class=\"pill pill-monitor\">"
-            f"{escape(str(remediation_cost_tier))}</span>"
+            f"<br /><span class=\"pill pill-monitor\">{escape(str(remediation_cost_tier))}</span>"
         )
     if remediation_value_score is not None:
         remediation_markup += f"<br />Value score: {float(remediation_value_score):.2f}"
@@ -589,7 +1277,6 @@ def _build_history_comparison_card(history_comparison: object) -> str:
             history_comparison.get("previous_distinct_generated_at"),
         ),
     ]
-
     category_deltas = history_comparison.get("category_score_deltas", {})
     if isinstance(category_deltas, dict):
         for category, delta in category_deltas.items():
@@ -624,7 +1311,11 @@ def _build_confidence_calibration_card(calibration: object) -> str:
         for label, value in rows
         if value not in (None, "", {})
     )
-    return f"<ul class=\"detail-list\">{detail_markup}</ul>" if detail_markup else "<p>No confidence calibration summary is available yet.</p>"
+    return (
+        f"<ul class=\"detail-list\">{detail_markup}</ul>"
+        if detail_markup
+        else "<p>No confidence calibration summary is available yet.</p>"
+    )
 
 
 def _build_native_validation_card(native_validation: object) -> str:
@@ -681,7 +1372,6 @@ def _build_uk_regulatory_card(compliance: object) -> str:
         ("Mapped non-compliant findings", uk_profile.get("mapped_finding_count")),
         ("Frameworks covered", ", ".join(uk_profile.get("frameworks_covered", []))),
     ]
-
     findings_by_framework = uk_profile.get("findings_by_framework", {})
     if isinstance(findings_by_framework, dict):
         for framework, count in findings_by_framework.items():
@@ -713,7 +1403,6 @@ def _build_budget_remediation_card(remediation: object) -> str:
         actions = profile.get("recommended_actions", [])
         if not isinstance(actions, list):
             actions = []
-
         action_markup = "".join(
             (
                 "<li>"
@@ -757,18 +1446,15 @@ def _build_narrator_card(narrative: object) -> str:
         ("Model", narrative.get("model")),
         ("Generated at", narrative.get("generated_at")),
     ]
-
     detail_markup = "".join(
         f"<li><span class=\"detail-label\">{escape(str(label))}:</span> {escape(str(value))}</li>"
         for label, value in rows
         if value not in (None, "", {})
     )
-
     executive = escape(str(narrative.get("executive_narrative", "")))
     owner_plan = escape(str(narrative.get("owner_action_plan", "")))
     board_brief = escape(str(narrative.get("board_brief", "")))
     disclaimer = escape(str(narrative.get("disclaimer", "")))
-
     return f"""
     <ul class="detail-list">{detail_markup}</ul>
     <p><span class="detail-label">Executive narrative:</span> {executive}</p>
@@ -818,7 +1504,6 @@ def _build_cyber_insurance_card(insurance_pack: object) -> str:
         for question in questions[:6]
         if isinstance(question, dict)
     ) or "<li>No insurance evidence questions were generated.</li>"
-
     disclaimer = escape(str(insurance_pack.get("disclaimer", "")))
     return (
         f"<ul class=\"detail-list\">{detail_markup}{question_markup}</ul>"
@@ -853,6 +1538,7 @@ def _build_action_plan_card(action_plan: object) -> str:
             for action in actions[:5]
             if isinstance(action, dict)
         ) or "<li>No actions are scheduled in this phase.</li>"
+
         sections.append(
             f"""
             <article class="org-card">
@@ -896,7 +1582,11 @@ def _build_benchmark_card(benchmark_comparison: object) -> str:
         for label, value in rows
         if value not in (None, "", {})
     )
-    return f"<ul class=\"detail-list\">{detail_markup}</ul>" if detail_markup else "<p>No benchmark comparison summary is available yet.</p>"
+    return (
+        f"<ul class=\"detail-list\">{detail_markup}</ul>"
+        if detail_markup
+        else "<p>No benchmark comparison summary is available yet.</p>"
+    )
 
 
 def _build_uk_readiness_card(readiness: object) -> str:
@@ -915,7 +1605,8 @@ def _build_uk_readiness_card(readiness: object) -> str:
         (
             "<li>"
             f"<span class=\"detail-label\">{escape(str(pillar.get('pillar_name', '')))}:</span> "
-            f"{escape(str(pillar.get('status', '')))} ({float(pillar.get('readiness_score', 0.0)):.2f})"
+            f"<span class=\"pill pill-status_{escape(str(pillar.get('status', '')))}\">{escape(str(pillar.get('status', '')))}</span> "
+            f"({float(pillar.get('readiness_score', 0.0)):.2f})"
             "</li>"
         )
         for pillar in pillars
