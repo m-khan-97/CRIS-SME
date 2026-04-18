@@ -34,12 +34,15 @@ def build_html_report(report: dict[str, object]) -> str:
         prioritized_risks = []
     if not isinstance(organizations, list):
         organizations = []
+    primary_sector = _derive_primary_sector(organizations)
+    sector_theme = _build_sector_theme(primary_sector)
 
     risk_angle = max(0.0, min(100.0, overall_risk_score)) * 3.6
     risk_status = _risk_band_label(overall_risk_score)
     risk_status_class = _risk_band_class(overall_risk_score)
 
     category_cards = _build_category_cards(category_scores)
+    category_sparkline = _build_category_sparkline_svg(category_scores)
     organization_cards = "".join(
         _build_organization_card(organization)
         for organization in organizations
@@ -66,6 +69,15 @@ def build_html_report(report: dict[str, object]) -> str:
         prioritized_risks=prioritized_risks,
         remediation=budget_aware_remediation,
         action_plan=action_plan_30_day,
+    )
+    board_brief_card = _build_board_brief_card(
+        overall_risk_score=overall_risk_score,
+        risk_status=risk_status,
+        executive_pack=executive_pack,
+        insurance_pack=cyber_insurance_evidence,
+        uk_readiness=cyber_essentials_readiness,
+        benchmark=benchmark_comparison,
+        top_actions_html=top_actions_card,
     )
 
     return f"""<!DOCTYPE html>
@@ -99,6 +111,8 @@ def build_html_report(report: dict[str, object]) -> str:
         --radius: 24px;
         --radius-tight: 16px;
       }}
+
+      {sector_theme}
 
       * {{
         box-sizing: border-box;
@@ -237,6 +251,14 @@ def build_html_report(report: dict[str, object]) -> str:
         font-size: 0.8rem;
       }}
 
+      .screen-only {{
+        display: block;
+      }}
+
+      .print-only {{
+        display: none;
+      }}
+
       main {{
         min-width: 0;
       }}
@@ -299,7 +321,8 @@ def build_html_report(report: dict[str, object]) -> str:
       .metric-grid,
       .org-grid,
       .summary-grid,
-      .bento-grid {{
+      .bento-grid,
+      .trend-grid {{
         display: grid;
         gap: 16px;
       }}
@@ -320,6 +343,11 @@ def build_html_report(report: dict[str, object]) -> str:
 
       .bento-grid {{
         grid-template-columns: minmax(0, 1.08fr) minmax(300px, 0.92fr);
+      }}
+
+      .trend-grid {{
+        grid-template-columns: minmax(0, 1.15fr) minmax(260px, 0.85fr);
+        margin-bottom: 18px;
       }}
 
       .hero-side {{
@@ -388,6 +416,36 @@ def build_html_report(report: dict[str, object]) -> str:
         font-family: "IBM Plex Sans", "Aptos", "Segoe UI", sans-serif;
         font-size: 1.05rem;
         color: #f2f8fb;
+      }}
+
+      .trend-card {{
+        padding: 20px;
+        border-radius: 24px;
+        background: var(--panel);
+        border: 1px solid var(--line);
+        box-shadow: var(--shadow);
+      }}
+
+      .trend-card h3 {{
+        margin: 0;
+        font-size: 0.98rem;
+        color: var(--muted);
+      }}
+
+      .trend-card p {{
+        margin: 8px 0 0;
+        color: var(--muted);
+        line-height: 1.55;
+      }}
+
+      .trend-art {{
+        margin-top: 16px;
+      }}
+
+      .sparkline-svg {{
+        display: block;
+        width: 100%;
+        height: auto;
       }}
 
       .score-dial-shell {{
@@ -693,6 +751,56 @@ def build_html_report(report: dict[str, object]) -> str:
         font-size: 0.92rem;
       }}
 
+      .board-brief {{
+        padding: 22px;
+        border-radius: 28px;
+        background:
+          linear-gradient(135deg, rgba(16, 34, 48, 0.98), rgba(24, 53, 71, 0.95));
+        color: #f2f8fb;
+        box-shadow: var(--shadow);
+      }}
+
+      .board-brief h2 {{
+        margin: 0;
+        font-family: "IBM Plex Serif", Georgia, serif;
+        font-size: 1.8rem;
+      }}
+
+      .board-brief p {{
+        color: rgba(242, 248, 251, 0.82);
+      }}
+
+      .board-brief-grid {{
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 14px;
+        margin-top: 18px;
+      }}
+
+      .board-brief-card {{
+        padding: 16px;
+        border-radius: 18px;
+        background: rgba(255, 255, 255, 0.08);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+      }}
+
+      .board-brief-card h3 {{
+        margin: 0;
+        font-size: 0.95rem;
+        color: rgba(242, 248, 251, 0.72);
+      }}
+
+      .board-brief-card strong {{
+        display: block;
+        margin-top: 8px;
+        font-size: 1.8rem;
+        line-height: 1;
+      }}
+
+      .board-brief .action-list li {{
+        background: rgba(255, 255, 255, 0.06);
+      }}
+
       @media (max-width: 1120px) {{
         .page-shell {{
           grid-template-columns: 1fr;
@@ -703,7 +811,8 @@ def build_html_report(report: dict[str, object]) -> str:
         }}
 
         .hero-shell,
-        .bento-grid {{
+        .bento-grid,
+        .trend-grid {{
           grid-template-columns: 1fr;
         }}
       }}
@@ -740,6 +849,92 @@ def build_html_report(report: dict[str, object]) -> str:
           display: none;
         }}
       }}
+
+      @media print {{
+        body {{
+          background: white;
+        }}
+
+        body::before,
+        .nav-rail,
+        .screen-only,
+        .section-anchor {{
+          display: none !important;
+        }}
+
+        .print-only {{
+          display: block !important;
+        }}
+
+        .page-shell {{
+          display: block;
+          max-width: none;
+          padding: 0;
+        }}
+
+        main {{
+          width: 100%;
+        }}
+
+        .hero,
+        .section-panel,
+        .table-panel,
+        .board-brief {{
+          box-shadow: none;
+          break-inside: avoid;
+        }}
+
+        .report-section {{
+          margin-top: 16px;
+        }}
+
+        .hero,
+        .board-brief {{
+          color: #10212b;
+          background: white;
+          border: 1px solid #d3dce2;
+        }}
+
+        .hero p,
+        .board-brief p,
+        .hero-card .subvalue,
+        .hero-card .label {{
+          color: #435460;
+        }}
+
+        .hero-card,
+        .score-card,
+        .top-actions,
+        .board-brief-card {{
+          background: #f7fafc;
+          border: 1px solid #dde6ec;
+          color: #10212b;
+        }}
+
+        .hero-card .value,
+        .score-card h2,
+        .top-actions h2,
+        .board-brief-card h3 {{
+          color: #10212b;
+        }}
+
+        .score-dial::before {{
+          background: white;
+        }}
+
+        .score-dial-value span,
+        .action-list span {{
+          color: #435460;
+        }}
+
+        .print-primary {{
+          display: block !important;
+        }}
+
+        .print-condensed {{
+          display: none !important;
+        }}
+      }}
     </style>
   </head>
   <body>
@@ -767,6 +962,10 @@ def build_html_report(report: dict[str, object]) -> str:
       </aside>
 
       <main>
+        <section class="board-brief print-only report-section">
+          {board_brief_card}
+        </section>
+
         <section id="overview" class="hero report-section">
           <div class="hero-shell">
             <div>
@@ -866,6 +1065,17 @@ def build_html_report(report: dict[str, object]) -> str:
               <p>Borrowing from better market experiences, the emphasis here is on readability: where risk clusters, how much it matters, and which domains need attention first.</p>
             </div>
             <a class="section-anchor" href="#overview">Back to top</a>
+          </div>
+          <div class="trend-grid screen-only">
+            <article class="trend-card">
+              <h3>Category posture trend strip</h3>
+              <p>A compact visual pass across the current domain scores so the report scans more like a posture platform dashboard than a static export.</p>
+              <div class="trend-art">{category_sparkline}</div>
+            </article>
+            <article class="trend-card">
+              <h3>Sector lens</h3>
+              <p>This report skin adapts to the assessed primary sector: <strong>{escape(primary_sector or "general SME")}</strong>. That makes demos and stakeholder packs feel less generic across finance, healthcare, retail, and future sector packs.</p>
+            </article>
           </div>
           <div class="metric-grid">{category_cards}</div>
         </section>
@@ -994,6 +1204,10 @@ def build_html_report(report: dict[str, object]) -> str:
           {executive_pack_card}
         </section>
 
+        <section class="board-brief screen-only report-section">
+          {board_brief_card}
+        </section>
+
         <section class="section-panel report-section">
           <div class="section-heading">
             <div>
@@ -1074,6 +1288,160 @@ def _risk_band_class(score: float) -> str:
     if score >= 20:
         return "score-status-managed"
     return "score-status-low"
+
+
+def _derive_primary_sector(organizations: list[object]) -> str:
+    """Return the most representative sector label for the current report."""
+    for organization in organizations:
+        if isinstance(organization, dict):
+            sector = str(organization.get("sector", "")).strip()
+            if sector:
+                return sector
+    return "General SME"
+
+
+def _build_sector_theme(primary_sector: str) -> str:
+    """Build small sector-specific CSS overrides to avoid a generic look."""
+    sector = primary_sector.lower()
+    if "health" in sector or "care" in sector or "nhs" in sector:
+        accent = "#0b8f73"
+        sky = "#2f8fdb"
+    elif "retail" in sector or "commerce" in sector:
+        accent = "#946200"
+        sky = "#d96d00"
+    elif "public" in sector or "government" in sector:
+        accent = "#0b63a3"
+        sky = "#5576ff"
+    else:
+        accent = "#007a78"
+        sky = "#417dff"
+    return (
+        ":root {"
+        f"--accent: {accent};"
+        f"--accent-soft: color-mix(in srgb, {accent} 14%, white);"
+        f"--sky: {sky};"
+        f"--sky-soft: color-mix(in srgb, {sky} 14%, white);"
+        "}"
+    )
+
+
+def _build_category_sparkline_svg(category_scores: dict[str, object]) -> str:
+    """Build a compact inline SVG trend strip for current category scores."""
+    if not category_scores:
+        return "<p>No category score trend strip is available yet.</p>"
+
+    labels = list(category_scores.keys())
+    values = [max(0.0, min(100.0, float(value))) for value in category_scores.values()]
+    if len(values) == 1:
+        values = [values[0], values[0]]
+        labels = [labels[0], labels[0]]
+
+    width = 480
+    height = 140
+    left_pad = 18
+    right_pad = 16
+    top_pad = 18
+    bottom_pad = 34
+    inner_width = width - left_pad - right_pad
+    inner_height = height - top_pad - bottom_pad
+    step = inner_width / max(1, len(values) - 1)
+
+    points: list[tuple[float, float]] = []
+    for index, value in enumerate(values):
+        x = left_pad + (index * step)
+        y = top_pad + ((100.0 - value) / 100.0) * inner_height
+        points.append((x, y))
+
+    point_string = " ".join(f"{x:.1f},{y:.1f}" for x, y in points)
+    area_string = f"{left_pad:.1f},{top_pad + inner_height:.1f} {point_string} {points[-1][0]:.1f},{top_pad + inner_height:.1f}"
+
+    label_markup = "".join(
+        f"<text x=\"{x:.1f}\" y=\"{height - 10}\" text-anchor=\"middle\" fill=\"#5a6c78\" font-size=\"10\">{escape(label[:10])}</text>"
+        for (x, _), label in zip(points, labels)
+    )
+    dot_markup = "".join(
+        f"<circle cx=\"{x:.1f}\" cy=\"{y:.1f}\" r=\"4\" fill=\"var(--sky)\" stroke=\"white\" stroke-width=\"2\" />"
+        for x, y in points
+    )
+    return f"""
+    <svg class="sparkline-svg" viewBox="0 0 {width} {height}" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Category score trend strip">
+      <defs>
+        <linearGradient id="scoreFill" x1="0%" y1="0%" x2="0%" y2="100%">
+          <stop offset="0%" stop-color="var(--sky)" stop-opacity="0.28" />
+          <stop offset="100%" stop-color="var(--sky)" stop-opacity="0.02" />
+        </linearGradient>
+      </defs>
+      <line x1="{left_pad}" y1="{top_pad + inner_height:.1f}" x2="{width - right_pad}" y2="{top_pad + inner_height:.1f}" stroke="rgba(73, 100, 115, 0.25)" stroke-width="1" />
+      <polygon points="{area_string}" fill="url(#scoreFill)" />
+      <polyline points="{point_string}" fill="none" stroke="var(--accent)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" />
+      {dot_markup}
+      {label_markup}
+    </svg>
+    """
+
+
+def _build_board_brief_card(
+    *,
+    overall_risk_score: float,
+    risk_status: str,
+    executive_pack: object,
+    insurance_pack: object,
+    uk_readiness: object,
+    benchmark: object,
+    top_actions_html: str,
+) -> str:
+    """Build a compact board-ready brief for screen and print views."""
+    board_message = ""
+    if isinstance(executive_pack, dict):
+        board_message = str(executive_pack.get("board_message", "")).strip()
+
+    insurance_score = "N/A"
+    if isinstance(insurance_pack, dict):
+        readiness = insurance_pack.get("readiness_summary", {})
+        if isinstance(readiness, dict):
+            insurance_score = str(readiness.get("readiness_score", "N/A"))
+
+    uk_score = "N/A"
+    if isinstance(uk_readiness, dict):
+        uk_score = str(uk_readiness.get("overall_readiness_score", "N/A"))
+
+    benchmark_status = "unknown"
+    benchmark_note = ""
+    if isinstance(benchmark, dict):
+        benchmark_status = str(benchmark.get("status", "unknown")).replace("_", " ")
+        benchmark_note = str(benchmark.get("note", "")).strip()
+
+    return f"""
+    <span class="section-kicker" style="color: rgba(242, 248, 251, 0.72);">Board Brief</span>
+    <h2>Executive Briefing Snapshot</h2>
+    <p>{escape(board_message or "This one-page brief condenses the current CRIS-SME assessment into a board-facing view: overall exposure, immediate actions, and external-readiness indicators.")}</p>
+    <div class="board-brief-grid">
+      <div class="board-brief-card">
+        <h3>Overall risk</h3>
+        <strong>{overall_risk_score:.2f}</strong>
+        <p>{escape(risk_status)}</p>
+      </div>
+      <div class="board-brief-card">
+        <h3>Cyber Essentials</h3>
+        <strong>{escape(uk_score)}</strong>
+        <p>Current readiness score across the five technical themes.</p>
+      </div>
+      <div class="board-brief-card">
+        <h3>Insurance readiness</h3>
+        <strong>{escape(insurance_score)}</strong>
+        <p>Evidence-pack readiness score for insurer-style questions.</p>
+      </div>
+      <div class="board-brief-card">
+        <h3>Benchmark position</h3>
+        <strong style="font-size: 1.15rem; line-height: 1.2;">{escape(benchmark_status)}</strong>
+        <p>{escape(benchmark_note or "Benchmarking will strengthen as the UK SME dataset grows.")}</p>
+      </div>
+    </div>
+    <div style="margin-top: 18px;">
+      <h3 style="margin: 0 0 12px; font-size: 1rem; color: rgba(242, 248, 251, 0.82);">Immediate actions</h3>
+      {top_actions_html}
+    </div>
+    """
 
 
 def _build_category_cards(category_scores: dict[str, object]) -> str:
