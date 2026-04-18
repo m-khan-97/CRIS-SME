@@ -59,6 +59,7 @@ def build_summary_report(
         f"Native validation: {native_summary}. "
         f"Cyber insurance evidence: {insurance_summary}. "
         f"Benchmarking: export-ready observation available for future peer comparison. "
+        f"UK readiness: Cyber Essentials summary available for board and assurance reporting. "
         f"Priority distribution: {priority_summary}. "
         f"Top risk observations: {top_risks}"
     )

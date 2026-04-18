@@ -22,6 +22,8 @@ def build_html_report(report: dict[str, object]) -> str:
     action_plan_30_day = report.get("action_plan_30_day", {})
     cyber_insurance_evidence = report.get("cyber_insurance_evidence", {})
     benchmark_comparison = report.get("benchmark_comparison", {})
+    cyber_essentials_readiness = report.get("cyber_essentials_readiness", {})
+    executive_pack = report.get("executive_pack", {})
     plain_language_narrative = report.get("plain_language_narrative", {})
 
     category_cards = "".join(
@@ -53,6 +55,8 @@ def build_html_report(report: dict[str, object]) -> str:
     action_plan_card = _build_action_plan_card(action_plan_30_day)
     insurance_card = _build_cyber_insurance_card(cyber_insurance_evidence)
     benchmark_card = _build_benchmark_card(benchmark_comparison)
+    uk_readiness_card = _build_uk_readiness_card(cyber_essentials_readiness)
+    executive_pack_card = _build_executive_pack_card(executive_pack)
     narrator_card = _build_narrator_card(plain_language_narrative)
 
     return f"""<!DOCTYPE html>
@@ -402,6 +406,16 @@ def build_html_report(report: dict[str, object]) -> str:
       <section class="section-panel">
         <h2>Benchmark Scaffold</h2>
         {benchmark_card}
+      </section>
+
+      <section class="section-panel">
+        <h2>Cyber Essentials Readiness</h2>
+        {uk_readiness_card}
+      </section>
+
+      <section class="section-panel">
+        <h2>Executive Pack</h2>
+        {executive_pack_card}
       </section>
 
       <section class="section-panel">
@@ -883,3 +897,65 @@ def _build_benchmark_card(benchmark_comparison: object) -> str:
         if value not in (None, "", {})
     )
     return f"<ul class=\"detail-list\">{detail_markup}</ul>" if detail_markup else "<p>No benchmark comparison summary is available yet.</p>"
+
+
+def _build_uk_readiness_card(readiness: object) -> str:
+    """Build compact HTML for Cyber Essentials readiness."""
+    if not isinstance(readiness, dict):
+        return "<p>No Cyber Essentials readiness summary is available yet.</p>"
+    rows = [
+        ("Profile", readiness.get("profile_name")),
+        ("Overall readiness score", readiness.get("overall_readiness_score")),
+        ("Pillar count", readiness.get("pillar_count")),
+    ]
+    pillars = readiness.get("pillars", [])
+    if not isinstance(pillars, list):
+        pillars = []
+    pillar_markup = "".join(
+        (
+            "<li>"
+            f"<span class=\"detail-label\">{escape(str(pillar.get('pillar_name', '')))}:</span> "
+            f"{escape(str(pillar.get('status', '')))} ({float(pillar.get('readiness_score', 0.0)):.2f})"
+            "</li>"
+        )
+        for pillar in pillars
+        if isinstance(pillar, dict)
+    )
+    detail_markup = "".join(
+        f"<li><span class=\"detail-label\">{escape(str(label))}:</span> {escape(str(value))}</li>"
+        for label, value in rows
+        if value not in (None, "", {})
+    )
+    return f"<ul class=\"detail-list\">{detail_markup}{pillar_markup}</ul>"
+
+
+def _build_executive_pack_card(executive_pack: object) -> str:
+    """Build compact HTML for the board-ready executive pack."""
+    if not isinstance(executive_pack, dict):
+        return "<p>No executive pack is available yet.</p>"
+    rows = [
+        ("Pack", executive_pack.get("pack_name")),
+        ("Board message", executive_pack.get("board_message")),
+        ("Benchmark status", executive_pack.get("benchmark_status")),
+        ("Benchmark note", executive_pack.get("benchmark_note")),
+    ]
+    top_risks = executive_pack.get("top_risks", [])
+    if not isinstance(top_risks, list):
+        top_risks = []
+    risk_markup = "".join(
+        (
+            "<li>"
+            f"<span class=\"detail-label\">{escape(str(risk.get('control_id', '')))}:</span> "
+            f"{escape(str(risk.get('title', '')))} ({escape(str(risk.get('priority', '')))}, "
+            f"{float(risk.get('score', 0.0)):.2f})"
+            "</li>"
+        )
+        for risk in top_risks[:5]
+        if isinstance(risk, dict)
+    )
+    detail_markup = "".join(
+        f"<li><span class=\"detail-label\">{escape(str(label))}:</span> {escape(str(value))}</li>"
+        for label, value in rows
+        if value not in (None, "", {})
+    )
+    return f"<ul class=\"detail-list\">{detail_markup}{risk_markup}</ul>"

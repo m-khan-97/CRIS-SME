@@ -154,11 +154,13 @@ def test_build_json_report_includes_context_and_prioritized_risks() -> None:
     )
 
     assert report["overall_risk_score"] == scoring_result.overall_risk_score
-    assert report["report_schema_version"] == "1.7.0"
+    assert report["report_schema_version"] == "1.8.0"
     assert report["confidence_calibration"]["controls_with_calibration"] >= 1
     assert report["native_validation"]["controls_mapped"] >= 1
     assert report["benchmark_observation"]["provider"] == "azure"
     assert report["benchmark_comparison"]["dataset_size"] >= 1
+    assert report["cyber_essentials_readiness"]["pillar_count"] == 5
+    assert report["executive_pack"]["pack_name"] == "CRIS-SME Executive Pack"
     assert report["evaluation_context"]["evaluated_profiles"] == 1
     assert report["evaluation_context"]["generated_findings"] == len(findings)
     assert len(report["prioritized_risks"]) == scoring_result.non_compliant_findings
@@ -207,6 +209,7 @@ def test_build_summary_report_mentions_profiles_score_and_priority_distribution(
     assert "30-day action plan" in summary
     assert "Cyber insurance evidence" in summary
     assert "Benchmarking" in summary
+    assert "UK readiness" in summary
     assert "Priority distribution" in summary
 
 
@@ -246,6 +249,8 @@ def test_build_html_report_includes_risk_and_provenance_content() -> None:
     assert "30-Day SME Action Plan" in html
     assert "Cyber Insurance Evidence Pack" in html
     assert "Benchmark Scaffold" in html
+    assert "Cyber Essentials Readiness" in html
+    assert "Executive Pack" in html
     assert "Plain-Language Narrator" in html
     assert "Cyber Essentials" in html
     assert "Access security" in html

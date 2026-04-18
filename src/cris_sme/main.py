@@ -26,11 +26,13 @@ from cris_sme.engine import (
     build_30_day_action_plan,
     load_compliance_mappings,
 )
+from cris_sme.engine.uk_readiness import build_cyber_essentials_readiness
 from cris_sme.engine.scoring import score_findings
 from cris_sme.reporting import (
     archive_report_snapshot,
     build_history_comparison,
     build_cyber_insurance_evidence_pack,
+    build_executive_pack,
     build_html_report,
     build_json_report,
     build_summary_report,
@@ -40,6 +42,7 @@ from cris_sme.reporting import (
     write_action_plan_outputs,
     write_benchmark_outputs,
     write_cyber_insurance_evidence_pack,
+    write_executive_pack,
     write_history_figures,
     write_html_report,
     write_json_report,
@@ -104,10 +107,12 @@ def main() -> None:
     )
     history_reports = load_report_history(output_dir / "history")
     output["history_comparison"] = build_history_comparison(history_reports)
+    output["cyber_essentials_readiness"] = build_cyber_essentials_readiness(findings)
     output["cyber_insurance_evidence"] = build_cyber_insurance_evidence_pack(output)
     output["action_plan_30_day"] = build_30_day_action_plan(
         result.prioritized_findings
     ).model_dump()
+    output["executive_pack"] = build_executive_pack(output)
     history_figure_paths = write_history_figures(history_reports, figure_dir)
     appendix_paths = write_appendix_tables(output, output_dir)
     insurance_paths = write_cyber_insurance_evidence_pack(output["cyber_insurance_evidence"], output_dir)
@@ -117,6 +122,7 @@ def main() -> None:
         output["benchmark_comparison"],
         output_dir,
     )
+    executive_pack_paths = write_executive_pack(output["executive_pack"], output_dir)
     narrator_paths = (
         write_plain_language_reports(narrator_output, output_dir)
         if narrator_output is not None
@@ -131,6 +137,7 @@ def main() -> None:
         "cyber_insurance_pack": {key: str(value) for key, value in insurance_paths.items()},
         "action_plan_30_day": {key: str(value) for key, value in action_plan_paths.items()},
         "benchmark_outputs": {key: str(value) for key, value in benchmark_paths.items()},
+        "executive_pack": {key: str(value) for key, value in executive_pack_paths.items()},
         "plain_language_outputs": {
             key: str(value) for key, value in narrator_paths.items()
         },

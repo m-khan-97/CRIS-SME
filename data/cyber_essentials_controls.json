@@ -1,0 +1,27 @@
+[
+  {
+    "pillar_id": "firewalls",
+    "pillar_name": "Firewalls",
+    "control_ids": ["NET-001", "NET-002"]
+  },
+  {
+    "pillar_id": "secure_configuration",
+    "pillar_name": "Secure configuration",
+    "control_ids": ["CMP-005"]
+  },
+  {
+    "pillar_id": "access_control",
+    "pillar_name": "Access control",
+    "control_ids": ["IAM-001", "IAM-002", "CMP-005"]
+  },
+  {
+    "pillar_id": "malware_protection",
+    "pillar_name": "Malware protection",
+    "control_ids": ["CMP-002"]
+  },
+  {
+    "pillar_id": "security_update_management",
+    "pillar_name": "Security update management",
+    "control_ids": ["CMP-001"]
+  }
+]

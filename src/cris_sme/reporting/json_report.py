@@ -17,10 +17,12 @@ from cris_sme.engine.benchmark import (
 )
 from cris_sme.engine.confidence import summarize_confidence_calibration
 from cris_sme.engine.native_validation import build_native_validation_summary
+from cris_sme.engine.uk_readiness import build_cyber_essentials_readiness
 from cris_sme.models.compliance_result import ComplianceAssessmentResult
 from cris_sme.engine.scoring import ScoredFinding, ScoringResult
 from cris_sme.models.cloud_profile import CloudProfile
 from cris_sme.models.finding import Finding
+from cris_sme.reporting.executive_pack import build_executive_pack
 from cris_sme.reporting.insurance_pack import build_cyber_insurance_evidence_pack
 
 
@@ -36,7 +38,7 @@ def build_json_report(
         scoring_result.prioritized_findings
     )
     report: dict[str, object] = {
-        "report_schema_version": "1.7.0",
+        "report_schema_version": "1.8.0",
         "summary": scoring_result.summary,
         "overall_risk_score": scoring_result.overall_risk_score,
         "category_scores": scoring_result.category_scores,
@@ -99,6 +101,7 @@ def build_json_report(
         "action_plan_30_day": build_30_day_action_plan(
             scoring_result.prioritized_findings
         ).model_dump(),
+        "cyber_essentials_readiness": build_cyber_essentials_readiness(findings),
     }
 
     if compliance_result is not None:
@@ -111,6 +114,7 @@ def build_json_report(
         report,
         benchmark_dataset,
     )
+    report["executive_pack"] = build_executive_pack(report)
 
     return report
 
