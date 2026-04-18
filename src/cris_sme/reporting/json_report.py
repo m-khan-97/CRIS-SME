@@ -10,6 +10,11 @@ from cris_sme.engine.remediation import (
     budget_fit_profile_ids,
 )
 from cris_sme.engine.action_plan import build_30_day_action_plan
+from cris_sme.engine.benchmark import (
+    build_benchmark_comparison,
+    build_benchmark_observation,
+    load_benchmark_dataset,
+)
 from cris_sme.engine.confidence import summarize_confidence_calibration
 from cris_sme.engine.native_validation import build_native_validation_summary
 from cris_sme.models.compliance_result import ComplianceAssessmentResult
@@ -31,7 +36,7 @@ def build_json_report(
         scoring_result.prioritized_findings
     )
     report: dict[str, object] = {
-        "report_schema_version": "1.6.0",
+        "report_schema_version": "1.7.0",
         "summary": scoring_result.summary,
         "overall_risk_score": scoring_result.overall_risk_score,
         "category_scores": scoring_result.category_scores,
@@ -100,6 +105,12 @@ def build_json_report(
         report["compliance"] = compliance_result.model_dump()
 
     report["cyber_insurance_evidence"] = build_cyber_insurance_evidence_pack(report)
+    benchmark_dataset = load_benchmark_dataset()
+    report["benchmark_observation"] = build_benchmark_observation(report).model_dump()
+    report["benchmark_comparison"] = build_benchmark_comparison(
+        report,
+        benchmark_dataset,
+    )
 
     return report
 

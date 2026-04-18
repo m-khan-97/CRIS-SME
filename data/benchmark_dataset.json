@@ -1,0 +1,40 @@
+[
+  {
+    "observation_id": "synthetic-cohort-baseline-20260417",
+    "generated_at": "2026-04-17T00:24:48.138194Z",
+    "organization_label": "Synthetic SME cohort",
+    "provider": "azure",
+    "sector": "mixed",
+    "collector_mode": "mock",
+    "sample_source": "synthetic",
+    "organization_count": 3,
+    "overall_risk_score": 39.84,
+    "category_scores": {
+      "IAM": 34.07,
+      "Network": 51.57,
+      "Data": 42.23,
+      "Monitoring/Logging": 37.72,
+      "Compute/Workloads": 42.85,
+      "Cost/Governance Hygiene": 26.82
+    }
+  },
+  {
+    "observation_id": "azure-live-baseline-20260418",
+    "generated_at": "2026-04-18T00:36:21.829633Z",
+    "organization_label": "Azure SME Tenant",
+    "provider": "azure",
+    "sector": "SME",
+    "collector_mode": "azure",
+    "sample_source": "live",
+    "organization_count": 1,
+    "overall_risk_score": 33.23,
+    "category_scores": {
+      "IAM": 14.64,
+      "Network": 47.42,
+      "Data": 18.88,
+      "Monitoring/Logging": 36.47,
+      "Compute/Workloads": 39.17,
+      "Cost/Governance Hygiene": 22.26
+    }
+  }
+]

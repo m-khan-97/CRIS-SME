@@ -21,6 +21,7 @@ def build_html_report(report: dict[str, object]) -> str:
     budget_aware_remediation = report.get("budget_aware_remediation", {})
     action_plan_30_day = report.get("action_plan_30_day", {})
     cyber_insurance_evidence = report.get("cyber_insurance_evidence", {})
+    benchmark_comparison = report.get("benchmark_comparison", {})
     plain_language_narrative = report.get("plain_language_narrative", {})
 
     category_cards = "".join(
@@ -51,6 +52,7 @@ def build_html_report(report: dict[str, object]) -> str:
     remediation_card = _build_budget_remediation_card(budget_aware_remediation)
     action_plan_card = _build_action_plan_card(action_plan_30_day)
     insurance_card = _build_cyber_insurance_card(cyber_insurance_evidence)
+    benchmark_card = _build_benchmark_card(benchmark_comparison)
     narrator_card = _build_narrator_card(plain_language_narrative)
 
     return f"""<!DOCTYPE html>
@@ -395,6 +397,11 @@ def build_html_report(report: dict[str, object]) -> str:
       <section class="section-panel">
         <h2>Cyber Insurance Evidence Pack</h2>
         {insurance_card}
+      </section>
+
+      <section class="section-panel">
+        <h2>Benchmark Scaffold</h2>
+        {benchmark_card}
       </section>
 
       <section class="section-panel">
@@ -847,3 +854,32 @@ def _build_action_plan_card(action_plan: object) -> str:
             """
         )
     return "".join(sections) if sections else "<p>No 30-day action plan is available yet.</p>"
+
+
+def _build_benchmark_card(benchmark_comparison: object) -> str:
+    """Build compact HTML for benchmark scaffold status."""
+    if not isinstance(benchmark_comparison, dict):
+        return "<p>No benchmark comparison summary is available yet.</p>"
+
+    rows = [
+        ("Dataset size", benchmark_comparison.get("dataset_size")),
+        ("Peer count", benchmark_comparison.get("peer_count")),
+        ("Provider", benchmark_comparison.get("provider")),
+        ("Collector mode", benchmark_comparison.get("collector_mode")),
+        ("Status", benchmark_comparison.get("status")),
+        ("Note", benchmark_comparison.get("note")),
+        (
+            "Peer average overall risk",
+            benchmark_comparison.get("peer_average_overall_risk"),
+        ),
+        (
+            "Percentile worse than peers",
+            benchmark_comparison.get("percentile_worse_than_peers"),
+        ),
+    ]
+    detail_markup = "".join(
+        f"<li><span class=\"detail-label\">{escape(str(label))}:</span> {escape(str(value))}</li>"
+        for label, value in rows
+        if value not in (None, "", {})
+    )
+    return f"<ul class=\"detail-list\">{detail_markup}</ul>" if detail_markup else "<p>No benchmark comparison summary is available yet.</p>"

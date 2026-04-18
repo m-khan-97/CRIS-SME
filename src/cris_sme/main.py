@@ -38,6 +38,7 @@ from cris_sme.reporting import (
     maybe_generate_plain_language_narrative,
     write_appendix_tables,
     write_action_plan_outputs,
+    write_benchmark_outputs,
     write_cyber_insurance_evidence_pack,
     write_history_figures,
     write_html_report,
@@ -111,6 +112,11 @@ def main() -> None:
     appendix_paths = write_appendix_tables(output, output_dir)
     insurance_paths = write_cyber_insurance_evidence_pack(output["cyber_insurance_evidence"], output_dir)
     action_plan_paths = write_action_plan_outputs(output["action_plan_30_day"], output_dir)
+    benchmark_paths = write_benchmark_outputs(
+        output["benchmark_observation"],
+        output["benchmark_comparison"],
+        output_dir,
+    )
     narrator_paths = (
         write_plain_language_reports(narrator_output, output_dir)
         if narrator_output is not None
@@ -124,6 +130,7 @@ def main() -> None:
         "appendix_tables": {key: str(value) for key, value in appendix_paths.items()},
         "cyber_insurance_pack": {key: str(value) for key, value in insurance_paths.items()},
         "action_plan_30_day": {key: str(value) for key, value in action_plan_paths.items()},
+        "benchmark_outputs": {key: str(value) for key, value in benchmark_paths.items()},
         "plain_language_outputs": {
             key: str(value) for key, value in narrator_paths.items()
         },

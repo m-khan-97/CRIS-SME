@@ -58,6 +58,7 @@ def build_summary_report(
         f"30-day action plan: {action_plan_summary}. "
         f"Native validation: {native_summary}. "
         f"Cyber insurance evidence: {insurance_summary}. "
+        f"Benchmarking: export-ready observation available for future peer comparison. "
         f"Priority distribution: {priority_summary}. "
         f"Top risk observations: {top_risks}"
     )
