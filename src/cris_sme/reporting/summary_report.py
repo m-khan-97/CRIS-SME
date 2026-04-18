@@ -6,6 +6,7 @@ from pathlib import Path
 
 from cris_sme.engine.action_plan import build_30_day_action_plan
 from cris_sme.engine.confidence import summarize_confidence_calibration
+from cris_sme.engine.native_validation import build_native_validation_summary
 from cris_sme.engine.remediation import build_budget_aware_remediation_plan
 from cris_sme.engine.scoring import ScoringResult
 from cris_sme.models.cloud_profile import CloudProfile
@@ -45,6 +46,7 @@ def build_summary_report(
     insurance_summary = _build_insurance_summary(profiles, scoring_result)
     confidence_summary = _build_confidence_summary(scoring_result)
     action_plan_summary = _build_action_plan_summary(scoring_result)
+    native_summary = _build_native_validation_summary(profiles, scoring_result)
 
     return (
         f"CRIS-SME evaluated {len(profiles)} profile(s): {organizations}. "
@@ -54,6 +56,7 @@ def build_summary_report(
         f"Confidence calibration: {confidence_summary}. "
         f"Budget-aware remediation: {remediation_summary}. "
         f"30-day action plan: {action_plan_summary}. "
+        f"Native validation: {native_summary}. "
         f"Cyber insurance evidence: {insurance_summary}. "
         f"Priority distribution: {priority_summary}. "
         f"Top risk observations: {top_risks}"
@@ -202,4 +205,20 @@ def _build_action_plan_summary(scoring_result: ScoringResult) -> str:
         f"{week.total_actions if week else 0} action(s) land in the first week, "
         f"{month.total_actions if month else 0} action(s) in days 8-30, and "
         f"{carry.total_actions if carry else 0} action(s) are queued beyond day 30"
+    )
+
+
+def _build_native_validation_summary(
+    profiles: list[CloudProfile],
+    scoring_result: ScoringResult,
+) -> str:
+    """Summarize Azure-native recommendation comparison for the narrative report."""
+    native_validation = build_native_validation_summary(
+        profiles,
+        scoring_result.prioritized_findings,
+    )
+    return (
+        f"{int(native_validation.get('agreement_count', 0))} mapped control(s) agree with native recommendations, "
+        f"{int(native_validation.get('cris_only_count', 0))} appear only in CRIS-SME, and "
+        f"{int(native_validation.get('native_only_count', 0))} appear only in native recommendations"
     )

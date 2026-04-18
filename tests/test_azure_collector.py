@@ -488,6 +488,8 @@ def test_azure_collector_enriches_iam_profile_from_role_assignments_and_graph(
             return FakeCompletedProcess("[]")
         if command[:4] == ["az", "security", "pricing", "list"]:
             return FakeCompletedProcess('{"value":[]}')
+        if command[:4] == ["az", "security", "assessment", "list"]:
+            return FakeCompletedProcess("[]")
         if command[:3] == ["az", "resource", "list"]:
             return FakeCompletedProcess("[]")
         if command[:4] == ["az", "backup", "item", "list"]:
@@ -584,6 +586,8 @@ def test_azure_collector_enriches_governance_profile_from_resource_inventory(
             return FakeCompletedProcess("[]")
         if command[:4] == ["az", "security", "pricing", "list"]:
             return FakeCompletedProcess('{"value":[]}')
+        if command[:4] == ["az", "security", "assessment", "list"]:
+            return FakeCompletedProcess("[]")
         raise AssertionError(f"Unexpected CLI command: {command}")
 
     monkeypatch.setattr(
@@ -657,6 +661,8 @@ def test_azure_collector_enriches_monitoring_profile_from_cli_and_workflows(
             return FakeCompletedProcess(
                 '{"value":[{"name":"VirtualMachines","pricingTier":"Standard"},{"name":"SqlServers","pricingTier":"Free"},{"name":"CloudPosture","pricingTier":"Standard"}]}'
             )
+        if command[:4] == ["az", "security", "assessment", "list"]:
+            return FakeCompletedProcess("[]")
         if command[:4] == ["az", "policy", "assignment", "list"]:
             return FakeCompletedProcess("[]")
         raise AssertionError(f"Unexpected CLI command: {command}")
@@ -689,6 +695,65 @@ def test_azure_collector_enriches_monitoring_profile_from_cli_and_workflows(
     assert profile.metadata["monitoring_collection_mode"] == "azure_monitor_cli_inventory"
     assert profile.metadata["activity_log_alert_count"] == 2
     assert profile.metadata["logic_app_workflow_count"] == 2
+
+
+def test_azure_collector_collects_native_security_recommendations(
+    monkeypatch,
+) -> None:
+    subscriptions = [
+        SimpleNamespace(
+            subscription_id="sub-123",
+            display_name="Validation Subscription",
+            tenant_id="tenant-001",
+            state="Enabled",
+        )
+    ]
+
+    class FakeCompletedProcess:
+        def __init__(self, stdout: str) -> None:
+            self.stdout = stdout
+
+    def fake_run_cli_command(command: list[str], *_args, **_kwargs) -> FakeCompletedProcess:
+        if command[:3] == ["az", "account", "list"]:
+            return FakeCompletedProcess(
+                '[{"id":"sub-123","name":"Validation Subscription","tenantId":"tenant-001","state":"Enabled"}]'
+            )
+        if command[:4] == ["az", "role", "assignment", "list"]:
+            return FakeCompletedProcess("[]")
+        if command[:4] == ["az", "monitor", "log-profiles", "list"]:
+            return FakeCompletedProcess("[]")
+        if command[:5] == ["az", "monitor", "activity-log", "alert", "list"]:
+            return FakeCompletedProcess("[]")
+        if command[:4] == ["az", "security", "pricing", "list"]:
+            return FakeCompletedProcess('{"value":[]}')
+        if command[:4] == ["az", "security", "assessment", "list"]:
+            return FakeCompletedProcess(
+                '[{"name":"net-open-001","displayName":"All network ports should be restricted on network security groups associated to your virtual machine","status":{"code":"Unhealthy","cause":"NetworkPortsAreOpenToAllSources","description":"Network ports are open to all sources."},"resourceDetails":{"ResourceType":"microsoft.compute/virtualmachines","ResourceName":"vm-01"},"resourceGroup":"rg-demo"}]'
+            )
+        if command[:4] == ["az", "policy", "assignment", "list"]:
+            return FakeCompletedProcess("[]")
+        raise AssertionError(f"Unexpected CLI command: {command}")
+
+    monkeypatch.setattr(
+        AzureCollector,
+        "_run_cli_command",
+        staticmethod(fake_run_cli_command),
+    )
+
+    collector = AzureCollector(
+        credential_factory=lambda: object(),
+        subscription_client_factory=lambda _credential: FakeSubscriptionClient(
+            subscriptions
+        ),
+    )
+
+    profiles = collector.collect_profiles()
+
+    profile = profiles[0]
+    assert profile.metadata["native_recommendation_collection_mode"] == "azure_security_assessment_inventory"
+    assert profile.metadata["native_security_recommendation_count"] == 1
+    assert profile.metadata["native_unhealthy_recommendation_count"] == 1
+    assert profile.metadata["native_security_recommendations"][0]["resource_name"] == "vm-01"
 
 
 def test_azure_collector_enriches_data_profile_from_storage_inventory() -> None:

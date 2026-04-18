@@ -218,6 +218,9 @@ class AzureCollector:
             subscription_id=subscription_id,
             credential=credential,
         )
+        native_recommendations = self._collect_security_assessments_from_cli(
+            subscription_id
+        )
 
         return {
             "organization_id": organization_id,
@@ -335,6 +338,18 @@ class AzureCollector:
                 "orphaned_resource_count": governance_metadata[
                     "orphaned_resource_count"
                 ],
+                "native_recommendation_collection_mode": (
+                    "azure_security_assessment_inventory"
+                    if native_recommendations
+                    else "default_no_native_recommendation_inventory"
+                ),
+                "native_security_recommendation_count": len(native_recommendations),
+                "native_unhealthy_recommendation_count": sum(
+                    1
+                    for item in native_recommendations
+                    if str(item.get("status_code", "")).lower() == "unhealthy"
+                ),
+                "native_security_recommendations": native_recommendations[:50],
                 "note": (
                     "This profile was created from live Azure account context. "
                     "IAM, network, data, monitoring, compute, and governance posture "
@@ -1371,6 +1386,51 @@ class AzureCollector:
             return value if isinstance(value, list) else []
         return payload if isinstance(payload, list) else []
 
+    def _collect_security_assessments_from_cli(
+        self,
+        subscription_id: str,
+    ) -> list[dict[str, Any]]:
+        """Return compact Defender assessment records from the Azure CLI."""
+        payload = self._run_cli_json(
+            [
+                "az",
+                "security",
+                "assessment",
+                "list",
+                "--subscription",
+                subscription_id,
+                "--output",
+                "json",
+            ],
+            timeout=40,
+        )
+        if not isinstance(payload, list):
+            return []
+
+        compact_records: list[dict[str, Any]] = []
+        for item in payload:
+            if not isinstance(item, dict):
+                continue
+            status = item.get("status", {})
+            if not isinstance(status, dict):
+                status = {}
+            resource_details = item.get("resourceDetails", {})
+            if not isinstance(resource_details, dict):
+                resource_details = {}
+            compact_records.append(
+                {
+                    "assessment_id": item.get("name"),
+                    "display_name": item.get("displayName"),
+                    "status_code": status.get("code"),
+                    "status_cause": status.get("cause"),
+                    "status_description": status.get("description"),
+                    "resource_type": resource_details.get("ResourceType"),
+                    "resource_name": resource_details.get("ResourceName"),
+                    "resource_group": item.get("resourceGroup"),
+                }
+            )
+        return compact_records
+
     def _collect_role_assignments_from_cli(
         self,
         subscription_id: str,
@@ -1644,9 +1704,9 @@ class AzureCollector:
         )
         return payload if isinstance(payload, list) else []
 
-    def _run_cli_json(self, command: list[str]) -> Any:
+    def _run_cli_json(self, command: list[str], timeout: int = 20) -> Any:
         """Execute an Azure CLI command and parse its JSON output."""
-        completed = self._run_cli_command(command, timeout=20)
+        completed = self._run_cli_command(command, timeout=timeout)
         if completed is None:
             return []
 

@@ -9,8 +9,9 @@ from cris_sme.engine.remediation import (
     build_budget_aware_remediation_plan,
     budget_fit_profile_ids,
 )
-from cris_sme.engine.confidence import summarize_confidence_calibration
 from cris_sme.engine.action_plan import build_30_day_action_plan
+from cris_sme.engine.confidence import summarize_confidence_calibration
+from cris_sme.engine.native_validation import build_native_validation_summary
 from cris_sme.models.compliance_result import ComplianceAssessmentResult
 from cris_sme.engine.scoring import ScoredFinding, ScoringResult
 from cris_sme.models.cloud_profile import CloudProfile
@@ -30,12 +31,16 @@ def build_json_report(
         scoring_result.prioritized_findings
     )
     report: dict[str, object] = {
-        "report_schema_version": "1.5.0",
+        "report_schema_version": "1.6.0",
         "summary": scoring_result.summary,
         "overall_risk_score": scoring_result.overall_risk_score,
         "category_scores": scoring_result.category_scores,
         "confidence_calibration": summarize_confidence_calibration(
             scoring_result.prioritized_findings
+        ),
+        "native_validation": build_native_validation_summary(
+            profiles,
+            scoring_result.prioritized_findings,
         ),
         "evaluation_context": {
             "evaluated_profiles": len(profiles),
@@ -120,6 +125,7 @@ def _build_collection_details(profile: CloudProfile) -> dict[str, object]:
         "monitoring_collection_mode",
         "compute_collection_mode",
         "governance_collection_mode",
+        "native_recommendation_collection_mode",
     ):
         if key in metadata:
             details[key] = metadata[key]
@@ -160,6 +166,12 @@ def _build_collection_details(profile: CloudProfile) -> dict[str, object]:
         ),
         "governance_resource_count": metadata.get("governance_resource_count"),
         "policy_assignment_count": metadata.get("policy_assignment_count"),
+        "native_security_recommendation_count": metadata.get(
+            "native_security_recommendation_count"
+        ),
+        "native_unhealthy_recommendation_count": metadata.get(
+            "native_unhealthy_recommendation_count"
+        ),
     }
     details["evidence_counts"] = {
         key: value for key, value in evidence_counts.items() if value is not None

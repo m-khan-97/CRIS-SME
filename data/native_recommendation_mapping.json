@@ -1,0 +1,66 @@
+[
+  {
+    "control_id": "IAM-002",
+    "framework": "Microsoft Defender for Cloud",
+    "keyword_rules": [
+      "there should be more than one owner assigned to subscriptions",
+      "a maximum of 3 owners should be designated for subscriptions",
+      "guest accounts with write permissions on azure resources should be removed",
+      "disabled accounts with owner permissions on azure resources should be removed"
+    ],
+    "notes": "Mapped to Defender identity and subscription-ownership hygiene recommendations."
+  },
+  {
+    "control_id": "NET-001",
+    "framework": "Microsoft Defender for Cloud",
+    "keyword_rules": [
+      "internet-facing virtual machines should be protected with network security groups",
+      "non-internet-facing virtual machines should be protected with network security groups"
+    ],
+    "notes": "Mapped to Defender perimeter and exposure recommendations for virtual machines."
+  },
+  {
+    "control_id": "NET-002",
+    "framework": "Microsoft Defender for Cloud",
+    "keyword_rules": [
+      "all network ports should be restricted on network security groups associated to your virtual machine"
+    ],
+    "notes": "Mapped to Defender recommendations about open network ports and permissive NSG posture."
+  },
+  {
+    "control_id": "CMP-001",
+    "framework": "Microsoft Defender for Cloud",
+    "keyword_rules": [
+      "system updates should be installed on your machines"
+    ],
+    "notes": "Mapped to Defender recommendations for patching and update posture."
+  },
+  {
+    "control_id": "CMP-002",
+    "framework": "Microsoft Defender for Cloud",
+    "keyword_rules": [
+      "endpoint protection solution should be installed on virtual machines",
+      "endpoint protection solution should be installed on virtual machine scale sets"
+    ],
+    "notes": "Mapped to Defender endpoint protection coverage recommendations."
+  },
+  {
+    "control_id": "CMP-003",
+    "framework": "Microsoft Defender for Cloud",
+    "keyword_rules": [
+      "vulnerabilities in security configuration on your linux machines should be remediated",
+      "vulnerabilities in security configuration on your windows machines should be remediated"
+    ],
+    "notes": "Mapped to Defender guest-configuration and hardening recommendations."
+  },
+  {
+    "control_id": "MON-003",
+    "framework": "Microsoft Defender for Cloud",
+    "keyword_rules": [
+      "microsoft defender for servers should be enabled",
+      "microsoft defender for sql should be enabled",
+      "microsoft defender for storage should be enabled"
+    ],
+    "notes": "Mapped to Defender plan-enablement recommendations that align with monitoring and security coverage."
+  }
+]

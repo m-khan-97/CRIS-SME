@@ -13,6 +13,7 @@ def build_html_report(report: dict[str, object]) -> str:
     evaluation_context = report.get("evaluation_context", {})
     category_scores = report.get("category_scores", {})
     confidence_calibration = report.get("confidence_calibration", {})
+    native_validation = report.get("native_validation", {})
     organizations = report.get("organizations", [])
     prioritized_risks = report.get("prioritized_risks", [])
     history_comparison = report.get("history_comparison", {})
@@ -45,6 +46,7 @@ def build_html_report(report: dict[str, object]) -> str:
     )
     comparison_card = _build_history_comparison_card(history_comparison)
     confidence_card = _build_confidence_calibration_card(confidence_calibration)
+    native_validation_card = _build_native_validation_card(native_validation)
     uk_regulatory_card = _build_uk_regulatory_card(compliance)
     remediation_card = _build_budget_remediation_card(budget_aware_remediation)
     action_plan_card = _build_action_plan_card(action_plan_30_day)
@@ -366,6 +368,11 @@ def build_html_report(report: dict[str, object]) -> str:
       </section>
 
       <section class="section-panel">
+        <h2>Native Recommendation Validation</h2>
+        {native_validation_card}
+      </section>
+
+      <section class="section-panel">
         <h2>Run Comparison</h2>
         {comparison_card}
       </section>
@@ -597,6 +604,45 @@ def _build_confidence_calibration_card(calibration: object) -> str:
         if value not in (None, "", {})
     )
     return f"<ul class=\"detail-list\">{detail_markup}</ul>" if detail_markup else "<p>No confidence calibration summary is available yet.</p>"
+
+
+def _build_native_validation_card(native_validation: object) -> str:
+    """Build compact HTML for Azure-native recommendation comparison."""
+    if not isinstance(native_validation, dict):
+        return "<p>No native recommendation validation summary is available yet.</p>"
+
+    rows: list[tuple[str, object]] = [
+        ("Framework", native_validation.get("framework")),
+        ("Controls mapped", native_validation.get("controls_mapped")),
+        (
+            "Native unhealthy recommendations",
+            native_validation.get("native_unhealthy_recommendation_count"),
+        ),
+        ("Agreement count", native_validation.get("agreement_count")),
+        ("CRIS-only count", native_validation.get("cris_only_count")),
+        ("Native-only count", native_validation.get("native_only_count")),
+        ("Coverage note", native_validation.get("coverage_note")),
+    ]
+    comparisons = native_validation.get("control_comparisons", [])
+    if not isinstance(comparisons, list):
+        comparisons = []
+    comparison_markup = "".join(
+        (
+            "<li>"
+            f"<span class=\"detail-label\">{escape(str(item.get('control_id', '')))} "
+            f"({escape(str(item.get('comparison_status', 'unknown')))}):</span> "
+            f"{int(item.get('native_recommendation_count', 0))} native recommendation(s)"
+            "</li>"
+        )
+        for item in comparisons[:8]
+        if isinstance(item, dict)
+    ) or "<li>No mapped control comparisons are available.</li>"
+    detail_markup = "".join(
+        f"<li><span class=\"detail-label\">{escape(str(label))}:</span> {escape(str(value))}</li>"
+        for label, value in rows
+        if value not in (None, "", {})
+    )
+    return f"<ul class=\"detail-list\">{detail_markup}{comparison_markup}</ul>"
 
 
 def _build_uk_regulatory_card(compliance: object) -> str:

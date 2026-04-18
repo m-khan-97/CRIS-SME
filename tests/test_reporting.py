@@ -154,8 +154,9 @@ def test_build_json_report_includes_context_and_prioritized_risks() -> None:
     )
 
     assert report["overall_risk_score"] == scoring_result.overall_risk_score
-    assert report["report_schema_version"] == "1.5.0"
+    assert report["report_schema_version"] == "1.6.0"
     assert report["confidence_calibration"]["controls_with_calibration"] >= 1
+    assert report["native_validation"]["controls_mapped"] >= 1
     assert report["evaluation_context"]["evaluated_profiles"] == 1
     assert report["evaluation_context"]["generated_findings"] == len(findings)
     assert len(report["prioritized_risks"]) == scoring_result.non_compliant_findings
@@ -199,6 +200,7 @@ def test_build_summary_report_mentions_profiles_score_and_priority_distribution(
     assert "overall risk score" in summary
     assert "Collection context" in summary
     assert "Confidence calibration" in summary
+    assert "Native validation" in summary
     assert "Budget-aware remediation" in summary
     assert "30-day action plan" in summary
     assert "Cyber insurance evidence" in summary
@@ -234,6 +236,7 @@ def test_build_html_report_includes_risk_and_provenance_content() -> None:
     assert "Reporting SME Ltd" in html
     assert "Collection Provenance" in html
     assert "Confidence Calibration" in html
+    assert "Native Recommendation Validation" in html
     assert "Run Comparison" in html
     assert "UK Regulatory Mapping" in html
     assert "Budget-Aware Remediation" in html
