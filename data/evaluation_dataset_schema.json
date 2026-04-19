@@ -1,0 +1,95 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "CRIS-SME Evaluation Dataset Catalog",
+  "description": "Schema for tracked CRIS-SME evaluation environments and assessment datasets used in research, validation, and benchmarking.",
+  "type": "object",
+  "required": [
+    "dataset_catalog_version",
+    "datasets"
+  ],
+  "properties": {
+    "dataset_catalog_version": {
+      "type": "string"
+    },
+    "datasets": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "dataset_id",
+          "display_name",
+          "source_type",
+          "authorization_basis",
+          "provider",
+          "use_case",
+          "status"
+        ],
+        "properties": {
+          "dataset_id": {
+            "type": "string"
+          },
+          "display_name": {
+            "type": "string"
+          },
+          "source_type": {
+            "type": "string",
+            "enum": [
+              "synthetic",
+              "live_real",
+              "sandbox",
+              "vulnerable_lab"
+            ]
+          },
+          "authorization_basis": {
+            "type": "string",
+            "enum": [
+              "synthetic_dataset",
+              "authorized_tenant_access",
+              "provider_sandbox",
+              "intentionally_vulnerable_lab",
+              "explicit_third_party_consent"
+            ]
+          },
+          "provider": {
+            "type": "string"
+          },
+          "use_case": {
+            "type": "string",
+            "enum": [
+              "research_baseline",
+              "live_case_study",
+              "benchmark_candidate",
+              "control_stress_test",
+              "training_lab"
+            ]
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "active",
+              "planned",
+              "archived"
+            ]
+          },
+          "environment_scope": {
+            "type": "string"
+          },
+          "notes": {
+            "type": "string"
+          },
+          "ethics_note": {
+            "type": "string"
+          },
+          "reference_links": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "additionalProperties": true
+      }
+    }
+  },
+  "additionalProperties": false
+}

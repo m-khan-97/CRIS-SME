@@ -42,6 +42,7 @@ def build_json_report(
         "summary": scoring_result.summary,
         "overall_risk_score": scoring_result.overall_risk_score,
         "category_scores": scoring_result.category_scores,
+        "evaluation_dataset": _build_evaluation_dataset_summary(profiles),
         "confidence_calibration": summarize_confidence_calibration(
             scoring_result.prioritized_findings
         ),
@@ -127,6 +128,9 @@ def _build_collection_details(profile: CloudProfile) -> dict[str, object]:
     }
 
     for key in (
+        "dataset_source_type",
+        "authorization_basis",
+        "dataset_use",
         "collection_mode",
         "collector_stage",
         "subscription_id",
@@ -223,6 +227,44 @@ def _remediation_value_score(item: object) -> float | None:
     if tier is None:
         return None
     return round(item.score / COST_TIER_WEIGHTS[tier], 2)
+
+
+def _build_evaluation_dataset_summary(
+    profiles: list[CloudProfile],
+) -> dict[str, object]:
+    """Summarize dataset provenance across the current assessment profiles."""
+    source_types = sorted(
+        {
+            str(profile.metadata.get("dataset_source_type"))
+            for profile in profiles
+            if profile.metadata.get("dataset_source_type")
+        }
+    )
+    authorization_bases = sorted(
+        {
+            str(profile.metadata.get("authorization_basis"))
+            for profile in profiles
+            if profile.metadata.get("authorization_basis")
+        }
+    )
+    dataset_uses = sorted(
+        {
+            str(profile.metadata.get("dataset_use"))
+            for profile in profiles
+            if profile.metadata.get("dataset_use")
+        }
+    )
+    return {
+        "profile_count": len(profiles),
+        "source_types": source_types,
+        "authorization_bases": authorization_bases,
+        "dataset_uses": dataset_uses,
+        "note": (
+            "CRIS-SME evaluation datasets should come from synthetic profiles, owned or "
+            "explicitly authorized cloud environments, provider sandboxes, or intentionally "
+            "vulnerable training labs rather than arbitrary public infrastructure."
+        ),
+    }
 
 
 def write_json_report(report: dict[str, object], output_path: str | Path) -> Path:

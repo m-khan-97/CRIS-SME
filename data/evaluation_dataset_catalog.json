@@ -1,0 +1,60 @@
+{
+  "dataset_catalog_version": "1.0.0",
+  "datasets": [
+    {
+      "dataset_id": "synthetic-sme-baseline",
+      "display_name": "Synthetic SME baseline profiles",
+      "source_type": "synthetic",
+      "authorization_basis": "synthetic_dataset",
+      "provider": "azure",
+      "use_case": "research_baseline",
+      "status": "active",
+      "environment_scope": "Repository-managed synthetic cloud posture profiles",
+      "notes": "Primary repeatable baseline used for control validation, scoring experiments, and regression testing.",
+      "ethics_note": "Contains no real tenant data and is safe for public sharing."
+    },
+    {
+      "dataset_id": "live-azure-case-study",
+      "display_name": "Authorized live Azure case study",
+      "source_type": "live_real",
+      "authorization_basis": "authorized_tenant_access",
+      "provider": "azure",
+      "use_case": "live_case_study",
+      "status": "active",
+      "environment_scope": "Authenticated Azure subscription used for the current live validation track",
+      "notes": "Primary empirical case-study environment for CRIS-SME live assessment and Defender-grounded validation.",
+      "ethics_note": "Use only with owned or explicitly authorized tenant access. Do not treat arbitrary public Azure resources as assessable dataset targets."
+    },
+    {
+      "dataset_id": "microsoft-sandbox-track",
+      "display_name": "Microsoft Learn or Azure sandbox track",
+      "source_type": "sandbox",
+      "authorization_basis": "provider_sandbox",
+      "provider": "azure",
+      "use_case": "benchmark_candidate",
+      "status": "planned",
+      "environment_scope": "Temporary sandbox environments explicitly provided for hands-on Azure learning and experimentation",
+      "notes": "Suitable for reproducible, low-risk cloud posture experiments where sandbox terms and boundaries allow use.",
+      "ethics_note": "Only assess within the scope of the sandbox offering and avoid actions outside the documented learning environment.",
+      "reference_links": [
+        "https://learn.microsoft.com/training/support/faq?pivots=profile",
+        "https://learn.microsoft.com/en-us/azure/architecture/guide/azure-sandbox/azure-sandbox"
+      ]
+    },
+    {
+      "dataset_id": "azuregoat-lab-track",
+      "display_name": "AzureGoat vulnerable lab track",
+      "source_type": "vulnerable_lab",
+      "authorization_basis": "intentionally_vulnerable_lab",
+      "provider": "azure",
+      "use_case": "control_stress_test",
+      "status": "planned",
+      "environment_scope": "Intentionally vulnerable Azure training environment",
+      "notes": "Strong candidate for generating richer control-coverage and high-variance case-study data in a lawful, research-friendly setting.",
+      "ethics_note": "Deploy only in isolated test subscriptions and never against external public infrastructure.",
+      "reference_links": [
+        "https://github.com/ine-labs/AzureGoat"
+      ]
+    }
+  ]
+}

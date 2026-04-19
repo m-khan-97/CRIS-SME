@@ -109,6 +109,9 @@ def make_profile(
         ),
         metadata={
             "profile_source": "azure_live",
+            "dataset_source_type": "live_real",
+            "authorization_basis": "authorized_tenant_access",
+            "dataset_use": "live_case_study",
             "iam_collection_mode": "azure_role_assignments_and_graph",
             "identity_observability": "partial",
             "privileged_assignment_count": 3,
@@ -155,6 +158,11 @@ def test_build_json_report_includes_context_and_prioritized_risks() -> None:
 
     assert report["overall_risk_score"] == scoring_result.overall_risk_score
     assert report["report_schema_version"] == "1.8.0"
+    assert report["evaluation_dataset"]["source_types"] == ["live_real"]
+    assert report["evaluation_dataset"]["authorization_bases"] == [
+        "authorized_tenant_access"
+    ]
+    assert report["evaluation_dataset"]["dataset_uses"] == ["live_case_study"]
     assert report["confidence_calibration"]["controls_with_calibration"] >= 1
     assert report["native_validation"]["controls_mapped"] >= 1
     assert report["benchmark_observation"]["provider"] == "azure"
@@ -166,6 +174,8 @@ def test_build_json_report_includes_context_and_prioritized_risks() -> None:
     assert len(report["prioritized_risks"]) == scoring_result.non_compliant_findings
     organization = report["organizations"][0]
     assert organization["collection_details"]["iam_collection_mode"] == "azure_role_assignments_and_graph"
+    assert organization["collection_details"]["dataset_source_type"] == "live_real"
+    assert organization["collection_details"]["authorization_basis"] == "authorized_tenant_access"
     assert organization["collection_details"]["compute_collection_mode"] == "azure_compute_cli_inventory"
     assert organization["collection_details"]["identity_observability"] == "partial"
     assert organization["collection_details"]["evidence_counts"]["virtual_machine_count"] == 3

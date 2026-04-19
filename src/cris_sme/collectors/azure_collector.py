@@ -236,6 +236,10 @@ class AzureCollector:
             "governance": governance_profile.model_dump(),
             "metadata": {
                 "collection_mode": "azure_sdk_subscription_inventory",
+                "profile_source": "azure_live",
+                "dataset_source_type": "live_real",
+                "authorization_basis": "authorized_tenant_access",
+                "dataset_use": "live_case_study",
                 "subscription_id": subscription_id,
                 "subscription_display_name": display_name,
                 "subscription_state": subscription_record.get("state", "Unknown"),

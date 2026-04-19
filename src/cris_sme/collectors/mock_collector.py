@@ -43,7 +43,12 @@ class MockCollector:
         for raw_item in self.collect_raw_profiles():
             provider = str(raw_item.get("provider", "azure"))
             adapter = get_profile_adapter(provider)
-            profiles.append(adapter.normalize_profile(raw_item))
+            profile = adapter.normalize_profile(raw_item)
+            profile.metadata.setdefault("profile_source", "synthetic")
+            profile.metadata.setdefault("dataset_source_type", "synthetic")
+            profile.metadata.setdefault("authorization_basis", "synthetic_dataset")
+            profile.metadata.setdefault("dataset_use", "research_baseline")
+            profiles.append(profile)
 
         return profiles
 

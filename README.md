@@ -240,6 +240,7 @@ PYTHONPATH=src pytest
 - `docs/compliance-mapping.md`
 - `docs/live-azure-case-study.md`
 - `docs/evaluation-plan.md`
+- `docs/evaluation-dataset-track.md`
 - `docs/evaluation-results-draft.md`
 - `docs/related-work.md`
 - `docs/paper-results-tables.md`
