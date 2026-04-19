@@ -23,6 +23,18 @@ def get_azure_collector_settings() -> AzureCollectorSettings:
         sector=os.getenv("CRIS_SME_AZURE_SECTOR", "SME"),
         tenant_scope=_get_optional_env("CRIS_SME_AZURE_TENANT_SCOPE"),
         organization_id=_get_optional_env("CRIS_SME_AZURE_ORGANIZATION_ID"),
+        dataset_source_type=os.getenv(
+            "CRIS_SME_DATASET_SOURCE_TYPE",
+            "live_real",
+        ).strip(),
+        authorization_basis=os.getenv(
+            "CRIS_SME_AUTHORIZATION_BASIS",
+            "authorized_tenant_access",
+        ).strip(),
+        dataset_use=os.getenv(
+            "CRIS_SME_DATASET_USE",
+            "live_case_study",
+        ).strip(),
     )
 
 

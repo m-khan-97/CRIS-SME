@@ -237,7 +237,43 @@ def test_azure_collector_builds_profile_from_enabled_subscription() -> None:
     assert profile.organization_name == "CRIS SME Research"
     assert profile.metadata["subscription_id"] == "sub-123"
     assert profile.metadata["collector_stage"] == "azure_live_enriched"
+    assert profile.metadata["dataset_source_type"] == "live_real"
+    assert profile.metadata["authorization_basis"] == "authorized_tenant_access"
+    assert profile.metadata["dataset_use"] == "live_case_study"
     assert profile.iam.privileged_accounts == 0
+
+
+def test_azure_collector_supports_lab_dataset_metadata_overrides() -> None:
+    subscriptions = [
+        SimpleNamespace(
+            subscription_id="sub-lab-001",
+            display_name="AzureGoat Lab Subscription",
+            tenant_id="tenant-lab-001",
+            state="Enabled",
+        )
+    ]
+
+    collector = AzureCollector(
+        settings=AzureCollectorSettings(
+            organization_name="AzureGoat Lab",
+            sector="Training Lab",
+            dataset_source_type="vulnerable_lab",
+            authorization_basis="intentionally_vulnerable_lab",
+            dataset_use="control_stress_test",
+        ),
+        credential_factory=lambda: object(),
+        subscription_client_factory=lambda _credential: FakeSubscriptionClient(
+            subscriptions
+        ),
+    )
+
+    profiles = collector.collect_profiles()
+
+    assert len(profiles) == 1
+    profile = profiles[0]
+    assert profile.metadata["dataset_source_type"] == "vulnerable_lab"
+    assert profile.metadata["authorization_basis"] == "intentionally_vulnerable_lab"
+    assert profile.metadata["dataset_use"] == "control_stress_test"
 
 
 def test_azure_collector_filters_non_enabled_subscriptions() -> None:

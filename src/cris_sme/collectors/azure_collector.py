@@ -38,6 +38,9 @@ class AzureCollectorSettings:
     sector: str = "SME"
     tenant_scope: str | None = None
     organization_id: str | None = None
+    dataset_source_type: str = "live_real"
+    authorization_basis: str = "authorized_tenant_access"
+    dataset_use: str = "live_case_study"
 
 
 class AzureCollector:
@@ -237,9 +240,9 @@ class AzureCollector:
             "metadata": {
                 "collection_mode": "azure_sdk_subscription_inventory",
                 "profile_source": "azure_live",
-                "dataset_source_type": "live_real",
-                "authorization_basis": "authorized_tenant_access",
-                "dataset_use": "live_case_study",
+                "dataset_source_type": self.settings.dataset_source_type,
+                "authorization_basis": self.settings.authorization_basis,
+                "dataset_use": self.settings.dataset_use,
                 "subscription_id": subscription_id,
                 "subscription_display_name": display_name,
                 "subscription_state": subscription_record.get("state", "Unknown"),
