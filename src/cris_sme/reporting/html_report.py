@@ -158,12 +158,14 @@ def build_html_report(report: dict[str, object]) -> str:
         position: sticky;
         top: 18px;
         align-self: start;
+        max-height: calc(100vh - 36px);
         padding: 22px;
         background: linear-gradient(180deg, rgba(16, 34, 48, 0.98), rgba(24, 53, 71, 0.96));
         color: #f2f8fb;
         border-radius: 30px;
         box-shadow: var(--shadow);
-        overflow: hidden;
+        overflow-x: hidden;
+        overflow-y: auto;
       }}
 
       .nav-rail::after {{
@@ -706,13 +708,35 @@ def build_html_report(report: dict[str, object]) -> str:
       }}
 
       .table-panel {{
-        overflow: hidden;
+        overflow-x: auto;
+        overflow-y: hidden;
         border-radius: 24px;
       }}
 
       table {{
         width: 100%;
+        min-width: 1520px;
         border-collapse: collapse;
+      }}
+
+      th:nth-child(1),
+      td:nth-child(1) {{
+        min-width: 230px;
+      }}
+
+      th:nth-child(7),
+      td:nth-child(7) {{
+        min-width: 220px;
+      }}
+
+      th:nth-child(8),
+      td:nth-child(8) {{
+        min-width: 260px;
+      }}
+
+      th:nth-child(9),
+      td:nth-child(9) {{
+        min-width: 260px;
       }}
 
       thead {{
