@@ -31,6 +31,7 @@ Inputs:
 
 - synthetic SME posture profiles
 - live Azure-backed assessment data
+- intentionally vulnerable Azure lab data
 - archived report history
 
 Outputs:
@@ -98,7 +99,7 @@ Questions answered:
 
 ## Datasets
 
-The paper should explicitly separate three dataset classes.
+The paper should explicitly separate four dataset classes.
 
 ### A. Synthetic SME Dataset
 
@@ -148,7 +149,32 @@ Limitations:
 - currently one live subscription
 - live results are case-study evidence, not broad population evidence
 
-### C. Historical Comparison Dataset
+### C. Vulnerable-Lab Azure Dataset
+
+Source:
+
+- AzureGoat-derived assessment runs executed in an isolated, explicitly authorized subscription context
+
+Purpose:
+
+- stress-test control coverage against intentionally vulnerable cloud resources
+- provide a lawful middle ground between synthetic posture and production-adjacent live assessment
+- increase risk variance in evaluation without relying on arbitrary public infrastructure
+
+Current reference vulnerable-lab snapshot:
+
+- Azure-backed vulnerable-lab run with overall risk score `32.79`
+- `18` non-compliant findings
+- dataset source type `vulnerable_lab`
+- authorization basis `intentionally_vulnerable_lab`
+
+Important methodological note:
+
+- the current AzureGoat deployment is a constrained variant, not a stock lab rollout
+- tenant location policy, Automation Account restrictions, and regional VM-capacity limits prevented a full unmodified deployment
+- this is still a valid research dataset because the environment remains intentionally vulnerable and explicitly authorized, but the deployment constraints should be disclosed
+
+### D. Historical Comparison Dataset
 
 Source:
 
@@ -167,7 +193,7 @@ Current use:
 
 ## Baselines
 
-The paper should use two baselines, each with a different purpose.
+The paper should use three baselines or reference modes, each with a different purpose.
 
 ### Baseline 1: Synthetic Mock Baseline
 
@@ -196,6 +222,19 @@ Role in paper:
 Important framing:
 
 CRIS-SME is not evaluated as a replacement for Defender for Cloud. The comparison is used to understand overlap, divergence, and SME-facing interpretability.
+
+### Baseline 3: Vulnerable-Lab Stress Track
+
+Use:
+
+- control-coverage stress testing
+- deliberate exposure of risky storage, network, and application patterns
+- bridge between synthetic scenarios and real subscription evidence
+
+Role in paper:
+
+- demonstrates that CRIS-SME can operate against intentionally vulnerable cloud environments without relying on unauthorized public scanning
+- strengthens the claim that the framework supports multiple evidence classes, not just one live tenant
 
 ## Metrics
 

@@ -4,12 +4,13 @@ This document is a draft evaluation/results section that can be reused in papers
 
 ## Evaluation Scope
 
-CRIS-SME has been evaluated across two complementary modes:
+CRIS-SME has been evaluated across three complementary modes:
 
 - synthetic SME posture assessment using controlled mock profiles
 - live Azure-backed assessment using an authenticated subscription context
+- AzureGoat-derived vulnerable-lab assessment using an intentionally vulnerable Azure environment
 
-This dual-mode strategy is important because it allows the framework to support repeatable engineering tests while also demonstrating live-cloud relevance.
+This three-mode strategy is important because it allows the framework to support repeatable engineering tests, live-cloud case-study evidence, and intentionally stressed cloud posture without relying on unauthorized public infrastructure.
 
 ## Experimental Framing
 
@@ -25,6 +26,7 @@ Archived runs currently include:
 
 - a mock assessment snapshot with an overall score of `39.90`
 - multiple live Azure snapshots with an overall score of `33.12`
+- an AzureGoat vulnerable-lab snapshot with an overall score of `32.79`
 
 The latest report history comparison shows:
 
@@ -36,6 +38,10 @@ This is useful because it separates two forms of comparison:
 
 - stability across repeated live runs
 - contrast between synthetic baseline and live Azure evidence
+
+It also creates a third evaluation lens:
+
+- stress testing against an intentionally vulnerable Azure lab in an explicitly authorized environment
 
 ## Latest Live Azure Results
 
@@ -57,6 +63,25 @@ The most significant live findings remain concentrated in:
 - workload hardening gaps
 - incomplete endpoint and backup coverage
 - data/key-management weaknesses
+
+## AzureGoat Vulnerable-Lab Results
+
+The current AzureGoat-derived vulnerable-lab assessment produced:
+
+- overall risk score: `32.79/100`
+- non-compliant findings: `18`
+- dataset source type: `vulnerable_lab`
+- authorization basis: `intentionally_vulnerable_lab`
+- dataset use: `control_stress_test`
+
+The AzureGoat run is important for the evaluation because it introduces a high-variance but ethically defensible test environment. In the current constrained deployment variant, CRIS-SME still observed substantial risk across:
+
+- network exposure and permissive security-group posture
+- public or weakly governed data paths
+- monitoring and workload hardening gaps
+- governance weakness in an intentionally exposed application environment
+
+One important methodological note is that this was not a fully stock AzureGoat rollout. The deployment had to be adapted for subscription-policy constraints, including region restrictions, blocked Automation Account deployment, Basic public-IP restrictions, and repeated VM-capacity failures. Those constraints should be disclosed in the paper, but they do not invalidate the dataset class.
 
 ## Identity and Entra Interpretation
 
@@ -98,12 +123,14 @@ The current evaluation supports several research-relevant conclusions:
 - provenance-aware reporting makes it easier to distinguish observed evidence from partial observability
 - archived history provides a defensible base for repeated-run analysis
 - mock-versus-live comparison is now concrete rather than purely conceptual
+- intentionally vulnerable lab evidence provides a lawful, higher-variance third mode for evaluation
 
 ## Limitations of Current Evaluation
 
 The present evaluation still has several boundaries:
 
 - one live Azure subscription is not a broad empirical dataset
+- one vulnerable-lab deployment is not the same as a broad benchmark corpus
 - repeated live runs currently show stability rather than longitudinal operational change
 - Entra-wide policy visibility remains incomplete
 - AWS and GCP are still at planning/scaffolding stage rather than implemented collectors
@@ -114,6 +141,8 @@ This draft can serve as the backbone for a results section in a conference paper
 
 - use the archived mock run as the baseline
 - use the live Azure run as the primary case study
+- use the AzureGoat lab run as the secondary stress-test case
 - embed the SVG or PNG figures from `outputs/figures/`
 - cite the appendix tables from `outputs/reports/results_appendix.md`
 - use the control delta section to discuss why live evidence changes risk interpretation
+- disclose the constrained AzureGoat deployment adaptation in the threats-to-validity discussion

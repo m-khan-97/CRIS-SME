@@ -4,7 +4,7 @@
 
 ### Abstract
 
-Small and medium enterprises (SMEs) increasingly rely on cloud infrastructure but often lack the governance capability, automation maturity, and explainable risk tooling needed to manage cloud security and compliance effectively. Enterprise-grade cloud security posture management platforms provide substantial coverage, but they are frequently too complex, costly, or opaque for smaller organizations. This paper presents CRIS-SME, a Cloud Risk Intelligence System designed to support SME-oriented cloud governance assessment through deterministic control evaluation, explainable scoring, compliance mapping, and progressively enriched live-cloud evidence collection. CRIS-SME uses a provider-neutral core architecture with an Azure-first implementation. The framework evaluates posture across identity and access management, network exposure, data protection, monitoring and logging, compute/workload hardening, and governance hygiene. Findings are normalized into a common risk model, scored using deterministic factors, aggregated into category-level and overall risk views, and exported into provenance-aware reports, figures, and appendix-ready artifacts. The current implementation was validated using both synthetic SME profiles and repeated live Azure-backed assessments. In the latest live Azure case study, CRIS-SME identified 16 non-compliant findings and produced an overall risk score of 33.12/100. The dominant risks related to public administrative exposure, permissive network rules, Linux password-based SSH access, incomplete key-management protections, and weak endpoint and workload protection coverage. Identity evidence was strengthened through subscription-scoped privileged role collection and Entra-adjacent directory-role visibility, while still explicitly recording tenant-wide observability boundaries. The contribution of CRIS-SME is not a claim of fully autonomous security intelligence, but an explainable, research-backed, and iteratively extensible framework that bridges engineering implementation and publishable cloud governance research for SMEs.
+Small and medium enterprises (SMEs) increasingly rely on cloud infrastructure but often lack the governance capability, automation maturity, and explainable risk tooling needed to manage cloud security and compliance effectively. Enterprise-grade cloud security posture management platforms provide substantial coverage, but they are frequently too complex, costly, or opaque for smaller organizations. This paper presents CRIS-SME, a Cloud Risk Intelligence System designed to support SME-oriented cloud governance assessment through deterministic control evaluation, explainable scoring, compliance mapping, and progressively enriched live-cloud evidence collection. CRIS-SME uses a provider-neutral core architecture with an Azure-first implementation. The framework evaluates posture across identity and access management, network exposure, data protection, monitoring and logging, compute/workload hardening, and governance hygiene. Findings are normalized into a common risk model, scored using deterministic factors, aggregated into category-level and overall risk views, and exported into provenance-aware reports, figures, and appendix-ready artifacts. The current implementation was validated using synthetic SME profiles, repeated live Azure-backed assessments, and an intentionally vulnerable AzureGoat-derived lab track. In the current vulnerable-lab snapshot, CRIS-SME identified 18 non-compliant findings and produced an overall risk score of 32.79/100. Across the present evidence base, dominant risks relate to public administrative exposure, permissive network rules, Linux password-based SSH access, incomplete key-management protections, and weak endpoint and workload protection coverage. Identity evidence was strengthened through subscription-scoped privileged role collection and Entra-adjacent directory-role visibility, while still explicitly recording tenant-wide observability boundaries. The contribution of CRIS-SME is not a claim of fully autonomous security intelligence, but an explainable, research-backed, and iteratively extensible framework that bridges engineering implementation and publishable cloud governance research for SMEs.
 
 ### 1. Introduction
 
@@ -118,10 +118,11 @@ The live collector now includes Azure-backed evidence across Network, Data, Moni
 
 ### 8. Evaluation Design
 
-The present evaluation is structured around two complementary modes:
+The present evaluation is structured around three complementary modes:
 
 - synthetic SME baseline assessment
 - live Azure-backed case-study assessment
+- AzureGoat-derived vulnerable-lab assessment
 
 This is not framed as a competitive benchmark against commercial CSPM tools. Instead, the evaluation addresses three questions:
 
@@ -131,7 +132,7 @@ This is not framed as a competitive benchmark against commercial CSPM tools. Ins
 
 ### 9. Results
 
-The archived runs currently include a mock baseline and multiple live Azure assessments. The latest report history comparison shows:
+The archived runs currently include a mock baseline, multiple live Azure assessments, and an active vulnerable-lab track. The latest report history comparison shows:
 
 - history count: 5
 - current live Azure overall risk score: 33.12
@@ -156,6 +157,15 @@ The most significant live findings were:
 4. incomplete key-management protections
 5. low endpoint and workload protection coverage
 
+The current AzureGoat-derived vulnerable-lab assessment produced:
+
+- 18 non-compliant findings
+- overall risk score of 32.79
+- dataset source type `vulnerable_lab`
+- authorization basis `intentionally_vulnerable_lab`
+
+This lab-derived run is important because it broadens the evidence base without relying on unauthorized public infrastructure. It also increases evaluation variance by introducing intentionally exposed storage, application, and network conditions. The current deployment was a constrained AzureGoat variant because tenant location policy, Automation Account incompatibility, Basic public-IP restrictions, and live VM-capacity shortages prevented a full stock deployment. This limitation should be disclosed, but it does not negate the value of the environment as an explicitly authorized vulnerable-lab dataset.
+
 Control-level comparison against the previous distinct-mode baseline showed notable increases for several live risks, including `NET-002`, `CMP-005`, `DATA-004`, `CMP-002`, and `MON-002`. This is useful because it demonstrates that the framework can move beyond headline scores and compare how specific governance conditions differ between synthetic and live contexts.
 
 ### 10. Identity and Observability Discussion
@@ -166,7 +176,7 @@ This does not imply full tenant-wide identity governance coverage. Conditional A
 
 ### 11. Discussion
 
-The current results suggest that CRIS-SME is already capable of supporting credible engineering and research workflows. The framework can transform posture evidence into explainable findings, preserve the difference between observed evidence and limited visibility, and export outputs that are immediately useful for demonstrations, notebooks, figures, and paper drafting.
+The current results suggest that CRIS-SME is already capable of supporting credible engineering and research workflows. The framework can transform posture evidence into explainable findings, preserve the difference between observed evidence and limited visibility, and export outputs that are immediately useful for demonstrations, notebooks, figures, and paper drafting. Importantly, the framework now supports three evidence classes: synthetic baseline profiles, production-adjacent live Azure case-study evidence, and intentionally vulnerable lab evidence.
 
 The most important design lesson so far is that transparency matters. Deterministic scoring, explicit provenance, and archived comparison provide a stronger foundation for both trust and academic communication than a premature move toward opaque “AI risk intelligence” claims.
 
@@ -175,6 +185,7 @@ The most important design lesson so far is that transparency matters. Determinis
 The present work has several limitations:
 
 - evaluation currently centers on a single live Azure subscription
+- the current vulnerable-lab track is based on one constrained AzureGoat deployment variant
 - repeated live runs currently show stability more than operational drift
 - some Entra-wide controls remain only partially observable
 - AWS and GCP expansion remains at adapter-planning stage
