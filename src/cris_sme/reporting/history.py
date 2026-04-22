@@ -70,6 +70,20 @@ def build_history_comparison(
 
     current_context = current.get("evaluation_context", {})
     previous_context = previous.get("evaluation_context", {}) if previous else {}
+    trend_series = _build_overall_trend_series(reports)
+    domain_trend = _build_domain_trend_series(reports)
+    current_risk_index = _index_risks_by_key(current.get("prioritized_risks", []))
+    previous_risk_index = _index_risks_by_key(
+        previous.get("prioritized_risks", [])
+    ) if previous else {}
+    new_keys = set(current_risk_index) - set(previous_risk_index)
+    resolved_keys = set(previous_risk_index) - set(current_risk_index)
+    recurring_regressions = [
+        key
+        for key in (set(current_risk_index) & set(previous_risk_index))
+        if _safe_float(current_risk_index[key].get("score"))
+        >= _safe_float(previous_risk_index[key].get("score"))
+    ]
 
     comparison = {
         "history_count": len(reports),
@@ -120,6 +134,23 @@ def build_history_comparison(
             current,
             previous_distinct_mode,
         ),
+        "overall_trend": trend_series,
+        "domain_trend": domain_trend,
+        "new_findings_count": len(new_keys),
+        "resolved_findings_count": len(resolved_keys),
+        "recurring_regression_count": len(recurring_regressions),
+        "new_findings": [_compact_key_details(key) for key in sorted(new_keys)[:30]],
+        "resolved_findings": [_compact_key_details(key) for key in sorted(resolved_keys)[:30]],
+        "recurring_regressions": [
+            {
+                **_compact_key_details(key),
+                "current_score": round(_safe_float(current_risk_index[key].get("score")), 2),
+                "previous_score": round(_safe_float(previous_risk_index[key].get("score")), 2),
+            }
+            for key in sorted(recurring_regressions)[:30]
+        ],
+        "priority_distribution_trend": _build_priority_distribution_trend(reports),
+        "framework_readiness_trend": _build_framework_readiness_trend(reports),
     }
     return comparison
 
@@ -195,3 +226,126 @@ def _index_risks_by_control_id(risks: Any) -> dict[str, dict[str, Any]]:
         if control_id:
             indexed[control_id] = risk
     return indexed
+
+
+def _index_risks_by_key(risks: Any) -> dict[str, dict[str, Any]]:
+    """Index prioritized risks by a stable control/organization/scope composite key."""
+    indexed: dict[str, dict[str, Any]] = {}
+    if not isinstance(risks, list):
+        return indexed
+    for risk in risks:
+        if not isinstance(risk, dict):
+            continue
+        control_id = str(risk.get("control_id", "")).strip()
+        provider = str(risk.get("provider", "azure")).strip().lower()
+        organization = str(risk.get("organization", "")).strip().lower()
+        scope = str(risk.get("resource_scope", "")).strip().lower()
+        if not control_id:
+            continue
+        indexed[f"{control_id}|{provider}|{organization}|{scope}"] = risk
+    return indexed
+
+
+def _compact_key_details(key: str) -> dict[str, str]:
+    """Convert a composite risk key into a compact serializable detail object."""
+    control_id, provider, organization, scope = (key.split("|", 3) + ["", "", "", ""])[:4]
+    return {
+        "control_id": control_id,
+        "provider": provider,
+        "organization": organization,
+        "resource_scope": scope,
+    }
+
+
+def _build_overall_trend_series(reports: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    """Return run-by-run overall score trend data."""
+    return [
+        {
+            "generated_at": report.get("generated_at"),
+            "collector_mode": report.get("collector_mode"),
+            "overall_risk_score": round(_safe_float(report.get("overall_risk_score")), 2),
+            "non_compliant_findings": int(
+                (report.get("evaluation_context", {}) or {}).get("non_compliant_findings", 0)
+            ),
+        }
+        for report in reports
+    ]
+
+
+def _build_domain_trend_series(reports: list[dict[str, Any]]) -> dict[str, list[dict[str, Any]]]:
+    """Return per-domain score trend records keyed by category name."""
+    categories: dict[str, list[dict[str, Any]]] = {}
+    for report in reports:
+        generated_at = report.get("generated_at")
+        category_scores = report.get("category_scores", {})
+        if not isinstance(category_scores, dict):
+            continue
+        for category, score in category_scores.items():
+            categories.setdefault(str(category), []).append(
+                {
+                    "generated_at": generated_at,
+                    "score": round(_safe_float(score), 2),
+                }
+            )
+    return categories
+
+
+def _build_priority_distribution_trend(
+    reports: list[dict[str, Any]],
+) -> list[dict[str, Any]]:
+    """Build trend data for priority-band distributions across runs."""
+    trend: list[dict[str, Any]] = []
+    for report in reports:
+        priorities = {"Immediate": 0, "High": 0, "Planned": 0, "Monitor": 0}
+        risks = report.get("prioritized_risks", [])
+        if isinstance(risks, list):
+            for risk in risks:
+                if not isinstance(risk, dict):
+                    continue
+                label = str(risk.get("priority", "Monitor"))
+                priorities[label] = priorities.get(label, 0) + 1
+        trend.append(
+            {
+                "generated_at": report.get("generated_at"),
+                "collector_mode": report.get("collector_mode"),
+                "distribution": priorities,
+            }
+        )
+    return trend
+
+
+def _build_framework_readiness_trend(
+    reports: list[dict[str, Any]],
+) -> list[dict[str, Any]]:
+    """Build trend records for UK-readiness and insurance-readiness outputs."""
+    trend: list[dict[str, Any]] = []
+    for report in reports:
+        readiness = report.get("cyber_essentials_readiness", {})
+        insurance = report.get("cyber_insurance_evidence", {})
+        insurance_summary = (
+            insurance.get("readiness_summary", {})
+            if isinstance(insurance, dict)
+            else {}
+        )
+        trend.append(
+            {
+                "generated_at": report.get("generated_at"),
+                "cyber_essentials_score": round(
+                    _safe_float(
+                        readiness.get("overall_readiness_score")
+                        if isinstance(readiness, dict)
+                        else 0.0
+                    ),
+                    2,
+                ),
+                "insurance_readiness_score": round(
+                    _safe_float(
+                        insurance_summary.get("readiness_score")
+                        if isinstance(insurance_summary, dict)
+                        else 0.0
+                    ),
+                    2,
+                ),
+            }
+        )
+    return trend

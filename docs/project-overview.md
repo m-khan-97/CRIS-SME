@@ -1,59 +1,51 @@
 # Project Overview
 
-CRIS-SME is a cloud risk intelligence framework for SMEs, with an initial implementation focus on Azure governance and compliance assessment.
+CRIS-SME is a cloud risk intelligence platform for SMEs that converts posture evidence into explainable risk decisions.
 
-The project is motivated by a practical and research-relevant problem: many SMEs adopting cloud services do not have access to structured governance practices, automated control validation, or lightweight risk intelligence tooling that fits their scale. CRIS-SME is intended to bridge that gap with a framework that is technically useful, explainable, and suitable for iterative research.
+It is intentionally built around deterministic engineering and explicit evidence boundaries, not opaque AI-first scoring.
 
-## Core Objective
+## Core Goal
 
-The objective of CRIS-SME is to transform cloud posture observations into decision-useful risk intelligence through a repeatable pipeline:
+Transform cloud posture into decision-quality outputs that SMEs can actually use:
 
-- collect or ingest provider posture data
-- normalize that data into a common internal model
-- evaluate governance and compliance controls
-- score findings in an explainable way
-- aggregate results into category and overall views
-- generate outputs suitable for engineering, demos, and research communication
+1. collect posture evidence
+2. evaluate deterministic controls
+3. score and prioritize risk
+4. map to governance/compliance references
+5. produce action plans and stakeholder-ready outputs
+6. track drift over time
 
-## Current MVP Scope
+## Product Position
 
-The current MVP uses synthetic SME posture data and mock collection to validate the framework design before live cloud integration. This keeps the early system:
+CRIS-SME sits between:
 
-- easier to test
-- easier to reason about
-- suitable for rapid scoring experiments
-- credible as a research prototype without overstating production readiness
+- enterprise CNAPP/CSPM platforms (often too heavy for SMEs)
+- simple scanners (often high volume, low decision context)
 
-## Implemented MVP Domains
+CRIS-SME focuses on:
 
-The current control coverage spans six governance areas:
+- explainability
+- affordability-aware remediation
+- UK-oriented governance framing
+- practical local execution
 
-- IAM
-- Network
-- Data Protection
-- Monitoring and Logging
-- Compute and Workloads
-- Cost and Governance Hygiene
+## Current System Shape
 
-Each domain produces structured findings that can be scored, prioritised, and mapped to external governance references.
+- Azure-first live collector path
+- Provider-neutral core models
+- 6 domains / 26 controls
+- Deterministic scoring with confidence calibration
+- Finding lifecycle + exception support
+- Lightweight graph-context prioritization
+- Historical drift outputs
+- Interactive dashboard output and technical export suite
 
-## Research Positioning
+## Current Maturity
 
-CRIS-SME is designed to support several parallel outcomes:
+Production-shaped in architecture and outputs, still pragmatic in scope:
 
-- a practical engineering framework for SME-oriented cloud posture assessment
-- a defensible scoring model for explainable risk prioritisation
-- a demonstrable platform for conference papers, posters, and technical demos
-- a foundation for later AI-assisted prioritisation research
+- active live support: Azure
+- planned live support: AWS, GCP
+- explicit partial-observability handling in identity/governance areas where needed
 
-## Delivery Philosophy
-
-The implementation strategy is intentionally conservative:
-
-- deterministic scoring first
-- mock and synthetic data before live provider integration
-- modular controls before dashboard work
-- explainability before AI claims
-- provider-neutral core before broader multi-cloud expansion
-
-This approach keeps the project academically credible and engineering-friendly at the same time.
+CRIS-SME does not claim complete multicloud parity today.

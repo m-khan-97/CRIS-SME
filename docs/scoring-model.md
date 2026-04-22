@@ -1,71 +1,85 @@
 # Scoring Model
 
-CRIS-SME uses a deterministic and explainable scoring model for the MVP. The purpose of the model is not to imitate enterprise vendor scoring systems, but to provide a transparent method for turning governance findings into prioritised risk outputs.
+CRIS-SME scoring is deterministic and explainable by design.
 
-## Finding Inputs
+## Inputs
 
-Each finding includes a set of fields used by the scoring engine, including:
+Each finding contributes:
 
 - severity
 - exposure
 - data sensitivity
-- confidence
+- confidence (observed + calibrated)
 - remediation effort
-- compliance status
 - category
-- evidence and resource scope for interpretation
 
-## Severity Weights
+Only non-compliant findings are scored into risk outputs.
 
-The current base severity weights are:
+## Base Severity Weights
 
 - Critical = 10
 - High = 7
 - Medium = 4
 - Low = 1
 
-These values intentionally create meaningful separation between high-impact and low-impact issues while remaining simple enough to defend in documentation and experiments.
+## Score Formula
 
-## Modifier Logic
+```
+likelihood_factor = 0.8 + (0.8 * exposure)
+data_factor       = 0.8 + (0.8 * data_sensitivity)
+confidence_factor = 0.7 + (0.3 * calibrated_confidence)
+remediation_factor = 1.0 + (0.15 * remediation_effort)
 
-The current MVP uses three primary score modifiers and one implementation-oriented adjustment:
+raw_score =
+  severity_weight
+  * likelihood_factor
+  * data_factor
+  * confidence_factor
+  * remediation_factor
+```
 
-- `likelihood_factor = 0.8 + 0.8 * exposure`
-- `data_factor = 0.8 + 0.8 * data_sensitivity`
-- `confidence_factor = 0.7 + 0.3 * confidence`
-- a bounded remediation-effort adjustment is applied so operationally difficult issues remain visible in prioritisation
+Raw score is normalized to 0-100 with bounded headroom.
 
-This approach keeps the model:
-- interpretable
-- reproducible
-- suitable for experimentation
-- easy to compare across later revisions
+## Category Aggregation
 
-## Aggregation Model
+Domain scores are average non-compliant finding scores per category.
 
-The engine produces:
+Overall weighted score:
 
-- per-finding risk scores
-- ranked non-compliant findings
-- category-level average scores
-- weighted overall risk score out of 100
+- IAM: 25%
+- Network: 20%
+- Data: 20%
+- Monitoring/Logging: 15%
+- Compute/Workloads: 10%
+- Cost/Governance Hygiene: 10%
 
-The current category weighting model is:
+## Priority Bands
 
-- IAM = 25%
-- Network = 20%
-- Data = 20%
-- Monitoring/Logging = 15%
-- Compute/Workloads = 10%
-- Cost/Governance Hygiene = 10%
+- `Immediate`: score >= 75
+- `High`: score >= 50
+- `Planned`: score >= 25
+- `Monitor`: score < 25
 
-These weights reflect an SME-oriented initial posture model in which identity, network exposure, and data protection have the strongest effect on overall governance risk.
+## Confidence Calibration
 
-## Explainability
+Calibrated confidence blends observed confidence with control-level empirical agreement metadata.
 
-Each scored finding retains an explanation payload describing the score inputs and factor contributions. This is a core part of CRIS-SME's design and is intended to support:
+- validated controls: stronger empirical weighting
+- provisional controls: lighter empirical weighting
+- unmapped controls: observed confidence retained
 
-- user trust
-- engineering validation
-- research transparency
-- future comparison with AI-assisted prioritisation methods
+Calibration metadata is explicit in output artifacts.
+
+## Context-Aware Signals
+
+Graph-context outputs (blast radius, toxic combinations, exposure chains) augment prioritization context but do not replace deterministic scoring math.
+
+This separation keeps CRIS-SME auditable and stable.
+
+## What Scoring Is Not
+
+- not a black-box ML model
+- not a legal/compliance certification score
+- not a direct incident-probability predictor
+
+It is a deterministic governance risk prioritization model.

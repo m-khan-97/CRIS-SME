@@ -1,5 +1,8 @@
 # Conference Abstract Draft
 
+> Status: paper-facing draft.  
+> Includes historical/frozen values for manuscript development and is not guaranteed to match the latest local run outputs unless refreshed.
+
 ## Working Title
 
 CRIS-SME: An Explainable Cloud Risk Intelligence Framework for SME Azure Governance Assessment

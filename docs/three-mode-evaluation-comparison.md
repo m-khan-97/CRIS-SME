@@ -1,5 +1,8 @@
 # Three-Mode Evaluation Comparison
 
+> Status: paper-facing comparison draft.  
+> Contains curated historical values and should be refreshed when using new run snapshots.
+
 This document provides a paper-ready comparison of the three current CRIS-SME evaluation modes:
 
 - synthetic SME baseline

@@ -25,6 +25,8 @@ def build_html_report(report: dict[str, object]) -> str:
     cyber_essentials_readiness = report.get("cyber_essentials_readiness", {})
     executive_pack = report.get("executive_pack", {})
     plain_language_narrative = report.get("plain_language_narrative", {})
+    graph_context = report.get("graph_context", {})
+    finding_lifecycle_summary = report.get("finding_lifecycle_summary", {})
 
     if not isinstance(evaluation_context, dict):
         evaluation_context = {}
@@ -65,6 +67,10 @@ def build_html_report(report: dict[str, object]) -> str:
     uk_readiness_card = _build_uk_readiness_card(cyber_essentials_readiness)
     executive_pack_card = _build_executive_pack_card(executive_pack)
     narrator_card = _build_narrator_card(plain_language_narrative)
+    graph_context_card = _build_graph_context_card(graph_context)
+    finding_lifecycle_card = _build_finding_lifecycle_card(
+        finding_lifecycle_summary
+    )
     top_actions_card = _build_top_actions_panel(
         prioritized_risks=prioritized_risks,
         remediation=budget_aware_remediation,
@@ -1153,6 +1159,28 @@ def build_html_report(report: dict[str, object]) -> str:
         <section class="section-panel report-section">
           <div class="section-heading">
             <div>
+              <span class="section-kicker">Context Graph</span>
+              <h2>Graph-Context Prioritization</h2>
+              <p>Context-aware risk interpretation highlights toxic combinations, blast-radius signals, and exposure chains without overclaiming full attack-path simulation.</p>
+            </div>
+          </div>
+          {graph_context_card}
+        </section>
+
+        <section class="section-panel report-section">
+          <div class="section-heading">
+            <div>
+              <span class="section-kicker">Finding Lifecycle</span>
+              <h2>Lifecycle and Exceptions</h2>
+              <p>Findings are tracked with lifecycle states, first/last seen context, and bounded exception visibility for governance accountability.</p>
+            </div>
+          </div>
+          {finding_lifecycle_card}
+        </section>
+
+        <section class="section-panel report-section">
+          <div class="section-heading">
+            <div>
               <span class="section-kicker">Budget-Aware Planning</span>
               <h2>Budget-Aware Remediation</h2>
               <p>SMEs need action sequences constrained by cost, not just a louder list of severe issues. The presentation now treats this as a core product capability.</p>
@@ -1680,6 +1708,73 @@ def _build_history_comparison_card(history_comparison: object) -> str:
         if value not in (None, "", {})
     )
     return f"<ul class=\"detail-list\">{detail_markup}</ul>"
+
+
+def _build_graph_context_card(graph_context: object) -> str:
+    """Build compact HTML for graph-context prioritization signals."""
+    if not isinstance(graph_context, dict):
+        return "<p>No graph-context summary is available yet.</p>"
+
+    blast = graph_context.get("blast_radius", {})
+    if not isinstance(blast, dict):
+        blast = {}
+    rows: list[tuple[str, object]] = [
+        ("Graph model", graph_context.get("graph_model")),
+        ("Assets", graph_context.get("asset_count")),
+        ("Relationships", graph_context.get("relationship_count")),
+        ("Blast radius score", blast.get("score")),
+        ("Blast radius band", blast.get("band")),
+        ("Coverage note", graph_context.get("coverage_note")),
+    ]
+    toxic = graph_context.get("toxic_combinations", [])
+    if not isinstance(toxic, list):
+        toxic = []
+
+    toxic_markup = "".join(
+        (
+            "<li>"
+            f"<span class=\"detail-label\">{escape(str(item.get('title', 'Toxic combination')))} "
+            f"({escape(str(item.get('impact', 'unknown')))}):</span> "
+            f"{escape(str(item.get('narrative', '')))}"
+            "</li>"
+        )
+        for item in toxic[:8]
+        if isinstance(item, dict)
+    ) or "<li>No toxic combinations were detected for the current run.</li>"
+    detail_markup = "".join(
+        f"<li><span class=\"detail-label\">{escape(str(label))}:</span> {escape(str(value))}</li>"
+        for label, value in rows
+        if value not in (None, "", {})
+    )
+    return f"<ul class=\"detail-list\">{detail_markup}{toxic_markup}</ul>"
+
+
+def _build_finding_lifecycle_card(lifecycle_summary: object) -> str:
+    """Build compact HTML for finding lifecycle and exception summaries."""
+    if not isinstance(lifecycle_summary, dict):
+        return "<p>No lifecycle summary is available yet.</p>"
+
+    rows: list[tuple[str, object]] = [
+        ("New findings", lifecycle_summary.get("new_findings")),
+        ("Existing findings", lifecycle_summary.get("existing_findings")),
+        ("Exceptions applied", lifecycle_summary.get("exception_applied_count")),
+        ("Exception registry entries", lifecycle_summary.get("exception_registry_count")),
+    ]
+    status_counts = lifecycle_summary.get("status_counts", {})
+    if isinstance(status_counts, dict):
+        for status, count in status_counts.items():
+            rows.append((f"{status} findings", count))
+
+    detail_markup = "".join(
+        f"<li><span class=\"detail-label\">{escape(str(label))}:</span> {escape(str(value))}</li>"
+        for label, value in rows
+        if value not in (None, "", {})
+    )
+    return (
+        f"<ul class=\"detail-list\">{detail_markup}</ul>"
+        if detail_markup
+        else "<p>No lifecycle summary is available yet.</p>"
+    )
 
 
 def _build_confidence_calibration_card(calibration: object) -> str:

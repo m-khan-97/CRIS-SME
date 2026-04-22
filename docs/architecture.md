@@ -1,107 +1,89 @@
 # Architecture
 
-CRIS-SME uses a modular architecture that separates data collection, control evaluation, risk scoring, compliance interpretation, and reporting. This separation is important both for maintainability and for research credibility, because it allows scoring assumptions and control logic to be inspected independently.
+CRIS-SME uses a layered architecture that separates **evidence ingestion**, **asset/context modeling**, and **decision logic**.
 
-## Architectural Layers
+This keeps the system explainable and extensible without introducing unnecessary enterprise complexity.
 
-### 1. Collectors
+## Layer 1: Evidence
 
-Collectors are responsible for loading posture information into the system.
+Purpose:
+- gather provider posture signals
+- preserve collection provenance
+- record observability limits explicitly
 
-Current state:
-- `MockCollector` loads synthetic SME profiles and sample findings from local JSON data.
-- `AzureCollector` exists as a placeholder for future live Azure-backed ingestion.
+Main components:
+- collectors (`mock`, `azure`)
+- provider adapters and registry
+- collector coverage metadata
 
-The collector layer is intentionally conservative at this stage so the project can validate scoring and reporting behavior before introducing provider-specific operational complexity.
+Outputs:
+- normalized `CloudProfile` instances
+- collection detail fields (mode, source type, auth basis, evidence counts)
 
-### 2. Provider Adapters
+## Layer 2: Asset and Context
 
-Provider adapters normalize provider-specific posture into the provider-neutral `CloudProfile` model.
+Purpose:
+- normalize assessed estate into meaningful assets/relationships
+- support context-aware prioritization
 
-Current state:
-- Azure is the first registered provider adapter.
-- Raw profile records are routed through the adapter registry before control evaluation.
+Main components:
+- platform schemas (`Asset`, `AssetRelationship`, `EvidenceRecord`)
+- lightweight context graph builder
 
-This design allows CRIS-SME to remain Azure-first without hard-wiring Azure-specific assumptions into the core scoring and reporting layers.
+Outputs:
+- asset/relationship summaries
+- blast-radius estimate
+- toxic combinations
+- exposure chain hints
 
-### 3. Control Modules
+## Layer 3: Decision
 
-Control modules evaluate domain-specific governance and compliance conditions and produce normalized findings.
+Purpose:
+- evaluate controls and produce deterministic risk decisions
 
-Current control domains:
-- IAM
-- Network
-- Data Protection
-- Monitoring and Logging
-- Compute and Workloads
-- Cost and Governance Hygiene
+Main components:
+- domain control modules (IAM/Network/Data/Monitoring/Compute/Governance)
+- deterministic scoring engine
+- confidence calibration
+- compliance mapping
+- lifecycle/enrichment (status, first/last seen, exceptions)
 
-Each control module emits findings with:
-- control identifiers
-- severity
-- compliance status
-- evidence
-- resource scope
-- scoring inputs
-- governance or compliance mappings
+Outputs:
+- scored prioritized findings with traceability
+- lifecycle-aware finding records
+- remediation/action plans
+- readiness profiles
 
-### 4. Risk Engine
+## Layer 4: Reporting and Experience
 
-The risk engine transforms findings into decision-support outputs.
+Purpose:
+- expose decision outputs for technical, executive, and research users
 
-Its main responsibilities are:
-- assign per-finding scores
-- explain the score construction
-- rank non-compliant findings
-- aggregate category scores
-- compute the overall weighted risk score
+Main components:
+- JSON report schema
+- HTML report
+- interactive dashboard bundle (`dashboard_payload` + dashboard HTML)
+- figures, appendix exports, executive/insurance packs
+- historical drift comparison utilities
 
-The engine is deterministic by design in the MVP so results remain interpretable and reproducible.
+## Data and Policy Governance
 
-### 5. Compliance Mapping
+CRIS-SME governs control behavior through:
 
-The compliance layer maps findings to external governance references and control frameworks. This does not claim formal certification readiness. Instead, it provides a lightweight interpretation layer showing where findings intersect with established standards or guidance.
+- central control catalog (title, mappings, remediation metadata)
+- control spec metadata pack (intent, applicability, support, limitations, penalties)
+- explicit schema versioning in reports
 
-### 6. Reporting
+## Determinism and Explainability Guarantees
 
-The reporting layer translates engine outputs into artifacts suitable for different audiences.
+- Scoring remains deterministic and formula-based.
+- Narration is optional and non-authoritative.
+- Findings keep evidence lineage and confidence rationale.
+- Partial observability is surfaced, not hidden.
 
-Current outputs:
-- machine-readable JSON report
-- concise summary text report
+## Provider Strategy
 
-These outputs support:
-- command-line inspection
-- notebook analysis
-- demo screenshots
-- future dashboard and figure generation
+- Azure: active first-class path
+- AWS/GCP: planned adapters and expansion path
 
-## Internal Flow
-
-The current pipeline is:
-
-1. load synthetic provider records
-2. normalize them through a provider adapter
-3. evaluate domain controls
-4. score and prioritise findings
-5. map findings to compliance references
-6. build report artifacts
-7. write outputs to `outputs/reports/`
-
-## Provider-Neutral Core
-
-A key architectural choice in CRIS-SME is to keep the core framework provider-neutral while implementing Azure as the first reference provider.
-
-Provider-neutral layers:
-- finding models
-- cloud profile abstraction
-- scoring engine
-- compliance engine
-- reporting
-
-Provider-specific layers:
-- raw posture ingestion
-- adapter normalization
-- future cloud SDK integrations
-
-This structure is intended to support future AWS and GCP expansion without rewriting the core framework.
+The architecture is provider-neutral by design, Azure-first by implementation maturity.

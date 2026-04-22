@@ -1,5 +1,8 @@
 # Evaluation and Results Draft
 
+> Status: draft / historical narrative.  
+> Values in this file are intended for manuscript drafting and may reflect frozen snapshots rather than the latest local run.
+
 This document is a draft evaluation/results section that can be reused in papers, presentations, posters, or proposal materials.
 
 ## Evaluation Scope

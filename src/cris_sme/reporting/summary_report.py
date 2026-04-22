@@ -6,6 +6,7 @@ from pathlib import Path
 
 from cris_sme.engine.action_plan import build_30_day_action_plan
 from cris_sme.engine.confidence import summarize_confidence_calibration
+from cris_sme.engine.graph_context import build_graph_context_summary
 from cris_sme.engine.native_validation import build_native_validation_summary
 from cris_sme.engine.remediation import build_budget_aware_remediation_plan
 from cris_sme.engine.scoring import ScoringResult
@@ -47,6 +48,7 @@ def build_summary_report(
     confidence_summary = _build_confidence_summary(scoring_result)
     action_plan_summary = _build_action_plan_summary(scoring_result)
     native_summary = _build_native_validation_summary(profiles, scoring_result)
+    graph_summary = _build_graph_context_summary(profiles, scoring_result)
 
     return (
         f"CRIS-SME evaluated {len(profiles)} profile(s): {organizations}. "
@@ -57,6 +59,7 @@ def build_summary_report(
         f"Budget-aware remediation: {remediation_summary}. "
         f"30-day action plan: {action_plan_summary}. "
         f"Native validation: {native_summary}. "
+        f"Graph context: {graph_summary}. "
         f"Cyber insurance evidence: {insurance_summary}. "
         f"Benchmarking: export-ready observation available for future peer comparison. "
         f"UK readiness: Cyber Essentials summary available for board and assurance reporting. "
@@ -223,4 +226,21 @@ def _build_native_validation_summary(
         f"{int(native_validation.get('agreement_count', 0))} mapped control(s) agree with native recommendations, "
         f"{int(native_validation.get('cris_only_count', 0))} appear only in CRIS-SME, and "
         f"{int(native_validation.get('native_only_count', 0))} appear only in native recommendations"
+    )
+
+
+def _build_graph_context_summary(
+    profiles: list[CloudProfile],
+    scoring_result: ScoringResult,
+) -> str:
+    """Summarize graph-context risk signals for narrative reporting."""
+    context = build_graph_context_summary(
+        profiles,
+        scoring_result.prioritized_findings,
+    )
+    blast = context.get("blast_radius", {})
+    toxic_count = len(context.get("toxic_combinations", []))
+    return (
+        f"blast-radius score {float(blast.get('score', 0.0)):.2f} "
+        f"({blast.get('band', 'unknown')}), with {toxic_count} toxic combination(s)"
     )

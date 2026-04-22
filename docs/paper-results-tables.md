@@ -1,5 +1,8 @@
 # Paper Results Tables
 
+> Status: manuscript support artifact.  
+> Table values may be frozen to specific archival snapshots and are not guaranteed to match current local outputs unless regenerated.
+
 This document consolidates the current CRIS-SME results into a paper-friendly form. It is intended to support the evaluation and results sections of the first manuscript.
 
 The tables below deliberately separate:

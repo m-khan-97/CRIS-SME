@@ -4,6 +4,14 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
+from cris_sme.engine.graph_context import build_graph_context_summary
+from cris_sme.engine.lineage import (
+    build_collector_coverage,
+    build_confidence_assessment,
+    build_finding_trace,
+    build_run_metadata,
+    build_stable_finding_id,
+)
 from cris_sme.engine.remediation import (
     COST_TIER_WEIGHTS,
     build_budget_aware_remediation_plan,
@@ -22,6 +30,7 @@ from cris_sme.models.compliance_result import ComplianceAssessmentResult
 from cris_sme.engine.scoring import ScoredFinding, ScoringResult
 from cris_sme.models.cloud_profile import CloudProfile
 from cris_sme.models.finding import Finding
+from cris_sme.policies import load_policy_pack_metadata
 from cris_sme.reporting.executive_pack import build_executive_pack
 from cris_sme.reporting.insurance_pack import build_cyber_insurance_evidence_pack
 
@@ -37,11 +46,13 @@ def build_json_report(
     remediation_plan = build_budget_aware_remediation_plan(
         scoring_result.prioritized_findings
     )
+    collector_coverage = build_collector_coverage(profiles)
     report: dict[str, object] = {
-        "report_schema_version": "1.8.0",
+        "report_schema_version": "2.0.0",
         "summary": scoring_result.summary,
         "overall_risk_score": scoring_result.overall_risk_score,
         "category_scores": scoring_result.category_scores,
+        "collector_coverage": [item.model_dump() for item in collector_coverage],
         "evaluation_dataset": _build_evaluation_dataset_summary(profiles),
         "confidence_calibration": summarize_confidence_calibration(
             scoring_result.prioritized_findings
@@ -67,35 +78,7 @@ def build_json_report(
             for profile in profiles
         ],
         "prioritized_risks": [
-            {
-                "control_id": item.finding.control_id,
-                "title": item.finding.title,
-                "organization": item.finding.metadata.get("organization_name"),
-                "provider": item.finding.metadata.get("provider", "azure"),
-                "category": item.finding.category.value,
-                "severity": item.finding.severity.value,
-                "score": item.score,
-                "priority": item.priority,
-                "resource_scope": item.finding.resource_scope,
-                "evidence": item.finding.evidence,
-                "remediation_summary": item.finding.remediation_summary,
-                "remediation_cost_tier": (
-                    item.finding.remediation_cost_tier.value
-                    if item.finding.remediation_cost_tier is not None
-                    else None
-                ),
-                "remediation_value_score": _remediation_value_score(item),
-                "budget_fit_profiles": budget_fit_profile_ids(
-                    item.finding.remediation_cost_tier
-                ),
-                "confidence_calibration": {
-                    "observed_confidence": item.breakdown.observed_confidence,
-                    "calibrated_confidence": item.breakdown.calibrated_confidence,
-                    "calibration_status": item.breakdown.calibration_status,
-                },
-                "mapping": item.finding.mapping,
-                "score_breakdown": item.breakdown.model_dump(),
-            }
+            _prioritized_risk_item(item)
             for item in scoring_result.prioritized_findings
         ],
         "budget_aware_remediation": remediation_plan.model_dump(),
@@ -103,6 +86,10 @@ def build_json_report(
             scoring_result.prioritized_findings
         ).model_dump(),
         "cyber_essentials_readiness": build_cyber_essentials_readiness(findings),
+        "graph_context": build_graph_context_summary(
+            profiles,
+            scoring_result.prioritized_findings,
+        ),
     }
 
     if compliance_result is not None:
@@ -116,8 +103,71 @@ def build_json_report(
         benchmark_dataset,
     )
     report["executive_pack"] = build_executive_pack(report)
+    report["run_metadata"] = build_run_metadata(
+        generated_at=str(report.get("generated_at") or "1970-01-01T00:00:00Z"),
+        collector_mode=str(report.get("collector_mode", "unknown")),
+        schema_version=str(report["report_schema_version"]),
+        narrator_enabled=False,
+        providers_in_scope=[profile.provider for profile in profiles],
+        policy_pack=load_policy_pack_metadata(),
+        collector_coverage=collector_coverage,
+    ).model_dump()
 
     return report
+
+
+def _prioritized_risk_item(item: ScoredFinding) -> dict[str, object]:
+    """Build a traceable prioritized-risk record from one scored finding."""
+    trace = build_finding_trace(item)
+    confidence = build_confidence_assessment(item)
+    finding_id = build_stable_finding_id(item.finding)
+    return {
+        "finding_id": finding_id,
+        "control_id": item.finding.control_id,
+        "rule_version": str(item.finding.metadata.get("rule_version", "1.0.0")),
+        "title": item.finding.title,
+        "organization": item.finding.metadata.get("organization_name"),
+        "organization_id": item.finding.metadata.get("organization_id"),
+        "provider": item.finding.metadata.get("provider", "azure"),
+        "category": item.finding.category.value,
+        "severity": item.finding.severity.value,
+        "score": item.score,
+        "priority": item.priority,
+        "resource_scope": item.finding.resource_scope,
+        "evidence": item.finding.evidence,
+        "evidence_quality": {
+            "observation_class": trace.observation_class.value,
+            "direct_evidence_count": trace.direct_evidence_count,
+            "inferred_evidence_count": trace.inferred_evidence_count,
+            "unavailable_evidence_count": trace.unavailable_evidence_count,
+        },
+        "finding_trace": trace.model_dump(),
+        "confidence_calibration": confidence.model_dump(),
+        "remediation_summary": item.finding.remediation_summary,
+        "remediation_cost_tier": (
+            item.finding.remediation_cost_tier.value
+            if item.finding.remediation_cost_tier is not None
+            else None
+        ),
+        "remediation_value_score": _remediation_value_score(item),
+        "budget_fit_profiles": budget_fit_profile_ids(item.finding.remediation_cost_tier),
+        "mapping": item.finding.mapping,
+        "score_breakdown": item.breakdown.model_dump(),
+        "lifecycle": {
+            "status": "open",
+            "status_reason": "Active non-compliant finding in current assessment.",
+            "first_seen": None,
+            "last_seen": None,
+            "previous_seen": None,
+            "is_new": True,
+            "seen_count": 1,
+            "recurrence_count": 0,
+        },
+        "decision_rationale": (
+            "Deterministic scoring prioritization using severity, exposure, data sensitivity, "
+            "confidence calibration, and remediation effort factors."
+        ),
+    }
 
 
 def _build_collection_details(profile: CloudProfile) -> dict[str, object]:

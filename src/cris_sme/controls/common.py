@@ -4,6 +4,7 @@ from __future__ import annotations
 from typing import Any
 
 from cris_sme.controls.catalog import get_control_entry
+from cris_sme.policies import get_control_spec
 from cris_sme.models.cloud_profile import CloudProfile
 from cris_sme.models.finding import Finding, FindingSeverity
 
@@ -24,9 +25,16 @@ def build_control_finding(
 ) -> Finding:
     """Build a finding using the central control catalog as the metadata source of truth."""
     control = get_control_entry(control_id)
+    control_spec = get_control_spec(control_id)
     merged_metadata = {
         **base_metadata(profile, generated_by=generated_by),
         "control_category": control.category.value,
+        "rule_version": control_spec.version,
+        "control_intent": control_spec.intent,
+        "control_applicability": control_spec.applicability,
+        "control_known_limitations": list(control_spec.known_limitations),
+        "evidence_requirements": list(control_spec.evidence_requirements),
+        "provider_support": dict(control_spec.provider_support),
     }
     if metadata:
         merged_metadata.update(metadata)

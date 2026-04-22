@@ -1,5 +1,11 @@
 # Reporting components for JSON, HTML, and summary outputs.
 from .benchmark_export import write_benchmark_outputs
+from .dashboard import (
+    build_dashboard_html,
+    build_dashboard_payload,
+    write_dashboard_html,
+    write_dashboard_payload,
+)
 from .executive_pack import build_executive_pack, write_executive_pack
 from .action_plan_export import write_action_plan_outputs
 from .appendix_export import write_appendix_tables
@@ -22,11 +28,15 @@ from .summary_report import build_summary_report, write_summary_report
 __all__ = [
     "archive_report_snapshot",
     "build_history_comparison",
+    "build_dashboard_html",
+    "build_dashboard_payload",
     "build_executive_pack",
     "write_benchmark_outputs",
     "write_action_plan_outputs",
     "load_report_history",
     "write_appendix_tables",
+    "write_dashboard_html",
+    "write_dashboard_payload",
     "write_history_figures",
     "write_report_figures",
     "write_executive_pack",

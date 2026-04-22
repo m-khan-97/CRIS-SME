@@ -1,0 +1,26 @@
+{
+  "IAM-005": {
+    "version": "1.1.0",
+    "intent": "Make identity observability boundaries explicit so decision-makers do not over-trust partial IAM visibility.",
+    "provider_support": {
+      "azure": "active",
+      "aws": "planned",
+      "gcp": "planned"
+    },
+    "known_limitations": [
+      "tenant-wide Conditional Access evidence remains partially observable in the current Azure collector path"
+    ]
+  },
+  "CMP-001": {
+    "version": "1.1.0",
+    "known_limitations": [
+      "patch posture uses a conservative VM configuration proxy and does not claim full patch-state verification"
+    ]
+  },
+  "GOV-002": {
+    "version": "1.1.0",
+    "known_limitations": [
+      "live budget-alert evidence is currently conservative in some collection contexts"
+    ]
+  }
+}

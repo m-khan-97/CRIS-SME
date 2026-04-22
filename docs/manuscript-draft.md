@@ -1,5 +1,8 @@
 # Manuscript Draft
 
+> Status: working draft for publication.  
+> Includes historical/frozen values for narrative consistency; refresh metrics before submission.
+
 ## CRIS-SME: An Explainable Cloud Risk Intelligence Framework for SME Cloud Governance Assessment
 
 ### Abstract

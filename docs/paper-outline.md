@@ -10,7 +10,7 @@ This document provides a working manuscript structure for turning CRIS-SME into 
 
 ## Abstract
 
-Use [conference-abstract-draft.md](/home/muhammad-ibrahim/Github/CRIS-SME/docs/conference-abstract-draft.md) as the starting point.
+Use [conference-abstract-draft.md](conference-abstract-draft.md) as the starting point.
 
 ## 1. Introduction
 
@@ -54,7 +54,7 @@ Useful framing:
 
 ## 4. Framework Architecture
 
-Base this on [architecture.md](/home/muhammad-ibrahim/Github/CRIS-SME/docs/architecture.md).
+Base this on [architecture.md](architecture.md).
 
 Recommended structure:
 
@@ -69,7 +69,7 @@ Include the provider-neutral core and Azure-first implementation argument.
 
 ## 5. Methodology
 
-Base this on [methodology.md](/home/muhammad-ibrahim/Github/CRIS-SME/docs/methodology.md).
+Base this on [methodology.md](methodology.md).
 
 Recommended themes:
 
@@ -81,7 +81,7 @@ Recommended themes:
 
 ## 6. Scoring Model
 
-Base this on [scoring-model.md](/home/muhammad-ibrahim/Github/CRIS-SME/docs/scoring-model.md).
+Base this on [scoring-model.md](scoring-model.md).
 
 Key elements:
 
@@ -103,7 +103,7 @@ Recommended implementation narrative:
 
 ## 8. Evaluation and Results
 
-Base this on the live report and [live-azure-case-study.md](/home/muhammad-ibrahim/Github/CRIS-SME/docs/live-azure-case-study.md).
+Base this on the live report and [live-azure-case-study.md](live-azure-case-study.md).
 
 Suggested structure:
 

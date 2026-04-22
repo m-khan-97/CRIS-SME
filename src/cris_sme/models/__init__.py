@@ -14,6 +14,22 @@ from .compliance_result import (
     ComplianceReference,
 )
 from .finding import Finding, FindingCategory, FindingSeverity
+from .platform import (
+    ActionItem,
+    Asset,
+    AssetRelationship,
+    CollectorCoverage,
+    ConfidenceAssessment,
+    EvidenceRecord,
+    ExceptionRecord,
+    FindingStatus,
+    FindingTrace,
+    FrameworkMapping,
+    HistoricalSnapshot,
+    ObservationClass,
+    PolicyPackMetadata,
+    RunMetadata,
+)
 
 __all__ = [
     "CloudProfile",
@@ -23,10 +39,24 @@ __all__ = [
     "ComplianceAssessmentResult",
     "ComplianceMappingEntry",
     "ComplianceReference",
+    "CollectorCoverage",
+    "ConfidenceAssessment",
+    "EvidenceRecord",
+    "ExceptionRecord",
     "Finding",
     "FindingCategory",
     "FindingSeverity",
+    "FindingStatus",
+    "FindingTrace",
+    "FrameworkMapping",
+    "HistoricalSnapshot",
     "IamProfile",
     "MonitoringProfile",
     "NetworkProfile",
+    "ObservationClass",
+    "PolicyPackMetadata",
+    "RunMetadata",
+    "Asset",
+    "AssetRelationship",
+    "ActionItem",
 ]

@@ -24,12 +24,24 @@ from cris_sme.controls import (
 from cris_sme.engine import (
     assess_compliance_mappings,
     build_30_day_action_plan,
+    build_collector_coverage,
+    build_run_metadata,
+    enrich_report_finding_lifecycle,
     load_compliance_mappings,
+    load_exception_registry,
+)
+from cris_sme.engine.benchmark import (
+    build_benchmark_comparison,
+    build_benchmark_observation,
+    load_benchmark_dataset,
 )
 from cris_sme.engine.uk_readiness import build_cyber_essentials_readiness
 from cris_sme.engine.scoring import score_findings
+from cris_sme.policies import load_policy_pack_metadata
 from cris_sme.reporting import (
     archive_report_snapshot,
+    build_dashboard_html,
+    build_dashboard_payload,
     build_history_comparison,
     build_cyber_insurance_evidence_pack,
     build_executive_pack,
@@ -42,6 +54,8 @@ from cris_sme.reporting import (
     write_action_plan_outputs,
     write_benchmark_outputs,
     write_cyber_insurance_evidence_pack,
+    write_dashboard_html,
+    write_dashboard_payload,
     write_executive_pack,
     write_history_figures,
     write_html_report,
@@ -86,6 +100,29 @@ def main() -> None:
         scoring_result=result,
     )
     output["executive_summary"] = summary
+    output_dir = Path(os.getenv("CRIS_SME_OUTPUT_DIR", DEFAULT_OUTPUT_DIR))
+    figure_dir = Path(os.getenv("CRIS_SME_FIGURE_DIR", DEFAULT_FIGURE_DIR))
+    history_reports_before = load_report_history(output_dir / "history")
+
+    # Refresh benchmark outputs now that run metadata fields are finalized.
+    benchmark_dataset = load_benchmark_dataset()
+    output["benchmark_observation"] = build_benchmark_observation(output).model_dump()
+    output["benchmark_comparison"] = build_benchmark_comparison(
+        output,
+        benchmark_dataset,
+    )
+
+    # Build history comparison using existing snapshots plus the current in-memory run.
+    comparison_reports = [*history_reports_before, output]
+    output["history_comparison"] = build_history_comparison(comparison_reports)
+
+    # Attach finding lifecycle state from historical snapshots and approved exceptions.
+    output["finding_lifecycle_summary"] = enrich_report_finding_lifecycle(
+        output,
+        history_reports_before,
+        exception_registry=load_exception_registry(),
+    )
+
     narrator_output = maybe_generate_plain_language_narrative(
         output,
         get_narrator_settings(),
@@ -93,10 +130,35 @@ def main() -> None:
     if narrator_output is not None:
         output["plain_language_narrative"] = narrator_output.model_dump()
 
-    output_dir = Path(os.getenv("CRIS_SME_OUTPUT_DIR", DEFAULT_OUTPUT_DIR))
-    figure_dir = Path(os.getenv("CRIS_SME_FIGURE_DIR", DEFAULT_FIGURE_DIR))
+    output["run_metadata"] = build_run_metadata(
+        generated_at=output["generated_at"],
+        collector_mode=collector_mode,
+        schema_version=str(output.get("report_schema_version", "2.0.0")),
+        narrator_enabled=narrator_output is not None,
+        providers_in_scope=[profile.provider for profile in profiles],
+        policy_pack=load_policy_pack_metadata(),
+        collector_coverage=build_collector_coverage(profiles),
+    ).model_dump()
+
+    output["cyber_essentials_readiness"] = build_cyber_essentials_readiness(findings)
+    output["cyber_insurance_evidence"] = build_cyber_insurance_evidence_pack(output)
+    output["action_plan_30_day"] = build_30_day_action_plan(
+        result.prioritized_findings
+    ).model_dump()
+    output["executive_pack"] = build_executive_pack(output)
+
+    # Build dashboard bundle after lifecycle, trend, and remediation layers are fully populated.
+    dashboard_payload = build_dashboard_payload(output, comparison_reports)
+    dashboard_payload_path = write_dashboard_payload(dashboard_payload, output_dir)
+    dashboard_html_path = write_dashboard_html(
+        build_dashboard_html(dashboard_payload),
+        output_dir / "cris_sme_dashboard.html",
+    )
+
     json_report_path = write_json_report(output, output_dir / "cris_sme_report.json")
-    summary_report_path = write_summary_report(summary, output_dir / "cris_sme_summary.txt")
+    summary_report_path = write_summary_report(
+        summary, output_dir / "cris_sme_summary.txt"
+    )
     html_report = build_html_report(output)
     html_report_path = write_html_report(html_report, output_dir / "cris_sme_report.html")
     figure_paths = write_report_figures(output, figure_dir)
@@ -107,15 +169,11 @@ def main() -> None:
     )
     history_reports = load_report_history(output_dir / "history")
     output["history_comparison"] = build_history_comparison(history_reports)
-    output["cyber_essentials_readiness"] = build_cyber_essentials_readiness(findings)
-    output["cyber_insurance_evidence"] = build_cyber_insurance_evidence_pack(output)
-    output["action_plan_30_day"] = build_30_day_action_plan(
-        result.prioritized_findings
-    ).model_dump()
-    output["executive_pack"] = build_executive_pack(output)
     history_figure_paths = write_history_figures(history_reports, figure_dir)
     appendix_paths = write_appendix_tables(output, output_dir)
-    insurance_paths = write_cyber_insurance_evidence_pack(output["cyber_insurance_evidence"], output_dir)
+    insurance_paths = write_cyber_insurance_evidence_pack(
+        output["cyber_insurance_evidence"], output_dir
+    )
     action_plan_paths = write_action_plan_outputs(output["action_plan_30_day"], output_dir)
     benchmark_paths = write_benchmark_outputs(
         output["benchmark_observation"],
@@ -138,6 +196,10 @@ def main() -> None:
         "action_plan_30_day": {key: str(value) for key, value in action_plan_paths.items()},
         "benchmark_outputs": {key: str(value) for key, value in benchmark_paths.items()},
         "executive_pack": {key: str(value) for key, value in executive_pack_paths.items()},
+        "dashboard": {
+            "dashboard_payload_json": str(dashboard_payload_path),
+            "dashboard_html": str(dashboard_html_path),
+        },
         "plain_language_outputs": {
             key: str(value) for key, value in narrator_paths.items()
         },

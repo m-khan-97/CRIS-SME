@@ -1,5 +1,8 @@
 # Live Azure Case Study
 
+> Status: historical reference snapshot.  
+> This document is paper-facing and may include frozen values from specific archived runs that are not guaranteed to match the latest local output.
+
 This document captures a real CRIS-SME assessment run against an authenticated Azure subscription. Its purpose is to show how the framework behaves when applied to live cloud evidence rather than synthetic SME profiles alone.
 
 ## Purpose
@@ -88,9 +91,9 @@ Category scores:
 
 ![Run comparison](../outputs/figures/run_comparison.svg)
 
-The figures were generated from CRIS-SME JSON report artifacts via [04-live-report-figures.ipynb](/home/muhammad-ibrahim/Github/CRIS-SME/notebooks/04-live-report-figures.ipynb) and the reusable chart exporter in [figure_export.py](/home/muhammad-ibrahim/Github/CRIS-SME/src/cris_sme/reporting/figure_export.py).
+The figures were generated from CRIS-SME JSON report artifacts via [04-live-report-figures.ipynb](../notebooks/04-live-report-figures.ipynb) and the reusable chart exporter in [figure_export.py](../src/cris_sme/reporting/figure_export.py).
 
-The history figures are based on archived report snapshots in [outputs/reports/history](/home/muhammad-ibrahim/Github/CRIS-SME/outputs/reports/history), which now include synthetic, live Azure, and vulnerable-lab runs. The frozen case-study values in this document should be treated as the canonical live Azure reference for the manuscript rather than inferred from whichever report artifact was generated most recently.
+The history figures are based on archived report snapshots in [outputs/reports/history](../outputs/reports/history), which now include synthetic, live Azure, and vulnerable-lab runs. The frozen case-study values in this document should be treated as the canonical live Azure reference for the manuscript rather than inferred from whichever report artifact was generated most recently.
 
 ## Most Significant Findings
 
@@ -190,11 +193,11 @@ The most defensible next steps after this case study are:
 
 ## Related Artifacts
 
-- [cris_sme_report.json](/home/muhammad-ibrahim/Github/CRIS-SME/outputs/reports/cris_sme_report.json)
-- [cris_sme_report.html](/home/muhammad-ibrahim/Github/CRIS-SME/outputs/reports/cris_sme_report.html)
-- [cris_sme_summary.txt](/home/muhammad-ibrahim/Github/CRIS-SME/outputs/reports/cris_sme_summary.txt)
-- [outputs/reports/history](/home/muhammad-ibrahim/Github/CRIS-SME/outputs/reports/history)
-- [live_category_scores.svg](/home/muhammad-ibrahim/Github/CRIS-SME/outputs/figures/live_category_scores.svg)
-- [live_priority_distribution.svg](/home/muhammad-ibrahim/Github/CRIS-SME/outputs/figures/live_priority_distribution.svg)
-- [risk_trend.svg](/home/muhammad-ibrahim/Github/CRIS-SME/outputs/figures/risk_trend.svg)
-- [run_comparison.svg](/home/muhammad-ibrahim/Github/CRIS-SME/outputs/figures/run_comparison.svg)
+- [cris_sme_report.json](../outputs/reports/cris_sme_report.json)
+- [cris_sme_report.html](../outputs/reports/cris_sme_report.html)
+- [cris_sme_summary.txt](../outputs/reports/cris_sme_summary.txt)
+- [outputs/reports/history](../outputs/reports/history)
+- [live_category_scores.svg](../outputs/figures/live_category_scores.svg)
+- [live_priority_distribution.svg](../outputs/figures/live_priority_distribution.svg)
+- [risk_trend.svg](../outputs/figures/risk_trend.svg)
+- [run_comparison.svg](../outputs/figures/run_comparison.svg)

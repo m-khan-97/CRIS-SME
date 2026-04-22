@@ -157,7 +157,9 @@ def test_build_json_report_includes_context_and_prioritized_risks() -> None:
     )
 
     assert report["overall_risk_score"] == scoring_result.overall_risk_score
-    assert report["report_schema_version"] == "1.8.0"
+    assert report["report_schema_version"] == "2.0.0"
+    assert report["collector_coverage"]
+    assert report["graph_context"]["graph_model"] == "cris_sme_lightweight_asset_context_v1"
     assert report["evaluation_dataset"]["source_types"] == ["live_real"]
     assert report["evaluation_dataset"]["authorization_bases"] == [
         "authorized_tenant_access"
@@ -182,6 +184,9 @@ def test_build_json_report_includes_context_and_prioritized_risks() -> None:
     assert organization["collection_details"]["evidence_counts"]["privileged_assignment_count"] == 3
     assert organization["collection_details"]["evidence_counts"]["signed_in_user_directory_role_count"] == 2
     first_risk = report["prioritized_risks"][0]
+    assert first_risk["finding_id"].startswith("fdg_")
+    assert first_risk["finding_trace"]["finding_id"] == first_risk["finding_id"]
+    assert first_risk["lifecycle"]["status"] == "open"
     assert first_risk["remediation_summary"]
     assert first_risk["remediation_cost_tier"] in {"free", "low", "medium", "high"}
     assert first_risk["remediation_value_score"] is not None

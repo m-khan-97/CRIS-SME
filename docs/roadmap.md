@@ -1,37 +1,34 @@
 # Roadmap
 
-This document tracks implementation phases for the CRIS-SME framework and helps separate completed MVP work from the next research-grade milestones.
-
 ## Completed Foundations
 
-- repository scaffold and Python package structure
-- provider-neutral core models with Azure-first implementation
-- synthetic SME posture dataset
-- deterministic scoring engine with explainability
-- control coverage across IAM, Network, Data, Monitoring, Compute, and Governance
-- compliance mapping layer
-- JSON, text, and HTML reporting
-- live Azure collector with evidence across Network, Data, Monitoring, Compute, and Governance
-- live Azure case-study documentation
+- deterministic control + scoring engine
+- confidence calibration layer
+- compliance mapping and UK-readiness outputs
+- rich export surfaces (technical + executive + insurer)
+- history snapshots and drift comparison
+- graph-context summaries (blast radius / toxic combinations / chain hints)
+- finding lifecycle and exception model
+- dashboard payload + interactive dashboard HTML
+- control-spec governance metadata pack
 
 ## Near-Term Priorities
 
-- improve live Azure budget and cost-governance collection
-- accumulate repeated-run history for more meaningful longitudinal comparison
-- refine evaluation and manuscript material for conference submission
-- formalize AWS and GCP expansion from planning into mock-provider implementation
+1. deepen live Azure identity/governance evidence paths
+2. improve budget governance evidence collection in live mode
+3. expand dashboard interactions (deeper drill-down, richer graph views)
+4. harden lifecycle workflows with action ownership and state transitions
 
-## Medium-Term Research Work
+## Medium-Term Priorities
 
-- evaluate scoring sensitivity across multiple SME-style environments
-- compare deterministic prioritisation with later AI-assisted prioritisation approaches
-- develop notebook-based experiments for category weighting and control confidence
-- formalize export pipelines for conference figures and tables
-- compare provider-specific observability boundaries across Azure, AWS, and GCP
+1. activate mock-backed AWS/GCP provider validation paths
+2. add richer provider capability contracts and conformance tests
+3. introduce optional policy-as-code adapter surface (while keeping deterministic core)
+4. increase longitudinal benchmarking depth with more snapshots/environments
 
-## Longer-Term Platform Direction
+## Longer-Term Direction
 
-- implement live AWS and GCP collectors behind the existing adapter architecture
-- support repeated assessments and longitudinal comparison at larger scale
-- explore lightweight dashboarding once the collector and scoring layers stabilize
-- package CRIS-SME as a reproducible research and demo framework
+1. graduate AWS/GCP collectors to active support when coverage is real
+2. strengthen attack-path style context while staying explainable
+3. package reusable API/dashboard deployment profile for small teams
+4. add controlled AI-assisted prioritization experiments as overlay, never replacement

@@ -4,22 +4,22 @@ This checklist is intended to help move CRIS-SME from a strong research repo int
 
 ## Paper Core
 
-- finalize [manuscript-draft.md](/home/muhammad-ibrahim/Github/CRIS-SME/docs/manuscript-draft.md)
-- refine [conference-abstract-draft.md](/home/muhammad-ibrahim/Github/CRIS-SME/docs/conference-abstract-draft.md) to match the target venue word limit
+- finalize [manuscript-draft.md](manuscript-draft.md)
+- refine [conference-abstract-draft.md](conference-abstract-draft.md) to match the target venue word limit
 - align terminology across architecture, methodology, scoring, and evaluation sections
 - ensure all numeric results match the latest archived live assessment
 
 ## Figures and Tables
 
-- confirm latest SVG and PNG figures in [outputs/figures](/home/muhammad-ibrahim/Github/CRIS-SME/outputs/figures)
+- confirm latest SVG and PNG figures in [outputs/figures](../outputs/figures)
 - select 2-4 figures for the paper body
-- select appendix tables from [results_appendix.md](/home/muhammad-ibrahim/Github/CRIS-SME/outputs/reports/results_appendix.md)
+- select appendix tables from [results_appendix.md](../outputs/reports/results_appendix.md)
 - confirm `prioritized_risks.csv` is suitable for external plotting or spreadsheet cleanup if needed
-- confirm [three-mode-evaluation-comparison.md](/home/muhammad-ibrahim/Github/CRIS-SME/docs/three-mode-evaluation-comparison.md) is numerically aligned with the manuscript
+- confirm [three-mode-evaluation-comparison.md](three-mode-evaluation-comparison.md) is numerically aligned with the manuscript
 
 ## Evaluation Readiness
 
-- verify the latest archived live run under [outputs/reports/history](/home/muhammad-ibrahim/Github/CRIS-SME/outputs/reports/history)
+- verify the latest archived live run under [outputs/reports/history](../outputs/reports/history)
 - document whether the live Azure result is stable across repeated runs
 - decide whether to present mock-versus-live comparison as a baseline experiment or supplementary analysis
 - decide how prominently to position the AzureGoat vulnerable-lab track in the main paper versus appendix
