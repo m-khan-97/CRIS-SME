@@ -193,7 +193,35 @@ The present work has several limitations:
 
 These limitations do not undermine the framework. Instead, they define the current maturity boundary clearly.
 
-### 13. Future Work
+### 13. Threats to Validity
+
+The current study has several threats to validity that should be stated explicitly in any submission.
+
+#### 13.1 Internal Validity
+
+CRIS-SME relies on deterministic control logic and a manually engineered scoring model. Although this improves explainability, it also means that implementation choices can influence the resulting score distribution. Control confidence is only partially calibrated at present, and some findings are necessarily shaped by heuristic thresholds rather than exhaustive empirical tuning.
+
+#### 13.2 Construct Validity
+
+The framework measures cloud governance posture through observable control evidence, not through direct business-impact outcomes such as financial loss, breach probability, or regulatory sanctions. As a result, the overall score should be interpreted as a structured governance-risk indicator rather than a literal prediction of incident likelihood.
+
+#### 13.3 External Validity
+
+The empirical evidence base remains limited. The live case-study track currently reflects one authenticated Azure subscription, and the vulnerable-lab track reflects one constrained AzureGoat deployment variant. These are useful for demonstrating feasibility and stress behavior, but they do not yet constitute a broad UK SME sample.
+
+#### 13.4 Platform Validity
+
+The current implementation is Azure-first. While the architecture is provider-neutral at the core, the present live evidence and comparison logic are centered on Azure APIs, Azure CLI, and Microsoft Defender for Cloud. Therefore, the current results should not be generalized directly to AWS- or GCP-based SME environments.
+
+#### 13.5 Observability Validity
+
+Some control families remain only partially observable in the authenticated environment. This is most relevant for Entra-wide identity controls, Conditional Access, and tenant-scoped policy visibility. CRIS-SME reduces the risk of overclaiming by surfacing observability state and provenance, but partial visibility still affects how some findings should be interpreted.
+
+#### 13.6 Environment-Constraint Validity
+
+The AzureGoat lab was collected from a constrained deployment variant rather than a completely stock deployment. Tenant region policy, Automation Account restrictions, Basic public-IP incompatibility, and repeated VM-capacity failures required selective adaptation. This does not invalidate the lab as an intentionally vulnerable dataset, but it does mean that some AzureGoat behaviors were not fully represented.
+
+### 14. Future Work
 
 The next defensible extensions are:
 
@@ -203,6 +231,6 @@ The next defensible extensions are:
 4. scoring sensitivity experiments across broader SME-style environments
 5. carefully scoped AI-assisted prioritization experiments layered on top of the deterministic core
 
-### 14. Conclusion
+### 15. Conclusion
 
 CRIS-SME demonstrates that an SME-oriented cloud governance framework can be technically clean, explainable, and research-ready without depending on heavyweight enterprise tooling or overstated AI claims. The framework now supports synthetic and live Azure-backed assessment, archived comparison, figure generation, appendix export, and manuscript-oriented documentation. As such, it provides a credible bridge between iterative engineering work and publishable cloud governance research.

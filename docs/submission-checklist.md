@@ -15,13 +15,16 @@ This checklist is intended to help move CRIS-SME from a strong research repo int
 - select 2-4 figures for the paper body
 - select appendix tables from [results_appendix.md](/home/muhammad-ibrahim/Github/CRIS-SME/outputs/reports/results_appendix.md)
 - confirm `prioritized_risks.csv` is suitable for external plotting or spreadsheet cleanup if needed
+- confirm [three-mode-evaluation-comparison.md](/home/muhammad-ibrahim/Github/CRIS-SME/docs/three-mode-evaluation-comparison.md) is numerically aligned with the manuscript
 
 ## Evaluation Readiness
 
 - verify the latest archived live run under [outputs/reports/history](/home/muhammad-ibrahim/Github/CRIS-SME/outputs/reports/history)
 - document whether the live Azure result is stable across repeated runs
 - decide whether to present mock-versus-live comparison as a baseline experiment or supplementary analysis
+- decide how prominently to position the AzureGoat vulnerable-lab track in the main paper versus appendix
 - explicitly state IAM and Entra observability limits
+- explicitly state AzureGoat deployment constraints in the threats-to-validity section
 
 ## Repository and Reproducibility
 
