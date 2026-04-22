@@ -48,9 +48,9 @@
       "authorization_basis": "intentionally_vulnerable_lab",
       "provider": "azure",
       "use_case": "control_stress_test",
-      "status": "planned",
-      "environment_scope": "Intentionally vulnerable Azure training environment",
-      "notes": "Strong candidate for generating richer control-coverage and high-variance case-study data in a lawful, research-friendly setting.",
+      "status": "active",
+      "environment_scope": "Intentionally vulnerable Azure training environment adapted for subscription-policy constraints",
+      "notes": "Active vulnerable-lab dataset track used for control-stress testing. The current deployment uses a constrained AzureGoat variant because student-subscription location policy, Automation Account restrictions, and regional VM capacity limited the stock lab deployment path.",
       "ethics_note": "Deploy only in isolated test subscriptions and never against external public infrastructure.",
       "reference_links": [
         "https://github.com/ine-labs/AzureGoat"

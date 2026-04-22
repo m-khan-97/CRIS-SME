@@ -6,6 +6,7 @@ The tables below deliberately separate:
 
 - the current synthetic SME baseline
 - the latest live Azure case-study baseline used for research discussion
+- the current AzureGoat-derived vulnerable-lab stress track
 
 ## Table 1. Assessment Modes Used in the Current Study
 
@@ -13,6 +14,7 @@ The tables below deliberately separate:
 | --- | --- | --- | --- |
 | Synthetic / mock | `data/synthetic_sme_profiles.json` | Repeatable control and scoring validation | Baseline for controlled comparison |
 | Live Azure | Archived Azure-backed assessment snapshot | Case-study evaluation with real cloud evidence | Main empirical case study |
+| AzureGoat vulnerable lab | Constrained AzureGoat deployment in an authorized subscription | Control-stress test with intentionally vulnerable resources | Secondary empirical stress track |
 
 ## Table 2. Headline Outcome Comparison: Synthetic Baseline vs Live Azure
 
@@ -28,6 +30,23 @@ Notes:
 
 - Synthetic data currently produces a broader and more numerous finding set because it covers multiple deliberately stressed SME profiles.
 - The live Azure case study is narrower but grounded in real subscription evidence.
+
+## Table 2a. AzureGoat Vulnerable-Lab Snapshot
+
+| Metric | AzureGoat Lab Track |
+| --- | ---: |
+| Overall risk score | 32.79 |
+| Evaluated profiles | 1 |
+| Non-compliant findings | 18 |
+| Collector mode | azure |
+| Dataset source type | vulnerable_lab |
+| Authorization basis | intentionally_vulnerable_lab |
+
+Interpretation:
+
+- The AzureGoat-derived run gives CRIS-SME a third evaluation mode between synthetic profiles and the live production-adjacent case study.
+- This track is especially useful for stressing exposed storage, function-app, network, and data-governance controls in an authorized environment.
+- The current AzureGoat snapshot was collected from a constrained deployment variant because subscription policy and regional capacity prevented a full stock-lab rollout.
 
 ## Table 3. Category Score Comparison
 
@@ -147,5 +166,6 @@ These tables were prepared from:
 
 - the current synthetic report in `outputs/reports/cris_sme_report.json`
 - the live Azure historical snapshot `outputs/reports/history/cris_sme_report_20260418T004604Z.json`
+- the AzureGoat vulnerable-lab run collected on `2026-04-22`
 
 If newer live snapshots are used in the paper, this document should be refreshed to keep the manuscript numerically consistent.
