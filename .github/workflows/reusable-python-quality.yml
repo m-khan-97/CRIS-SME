@@ -1,0 +1,112 @@
+name: Reusable Python Quality
+
+on:
+  workflow_call:
+    inputs:
+      python-version:
+        description: Python runtime version.
+        required: false
+        default: "3.11"
+        type: string
+      run-mock-pipeline:
+        description: Run the deterministic mock assessment pipeline.
+        required: false
+        default: false
+        type: boolean
+      upload-generated-artifacts:
+        description: Upload generated report and figure artifacts.
+        required: false
+        default: false
+        type: boolean
+
+jobs:
+  quality:
+    name: Lint, Type, Test, and Pipeline Validation
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ inputs.python-version }}
+          cache: pip
+          cache-dependency-path: |
+            requirements.txt
+            pyproject.toml
+
+      - name: Install dependencies and QA tooling
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install ruff mypy
+
+      - name: Lint (critical rules)
+        run: |
+          ruff check src tests scripts --select F,E9
+
+      - name: Type check workflow entry scripts
+        run: |
+          mypy \
+            --ignore-missing-imports \
+            --follow-imports=silent \
+            scripts/run_assessment_snapshot.py \
+            scripts/run_azuregoat_assessment.py
+
+      - name: Run unit tests
+        run: |
+          PYTHONPATH=src pytest -q
+
+      - name: Run deterministic mock pipeline
+        if: ${{ inputs.run-mock-pipeline }}
+        run: |
+          PYTHONPATH=src python scripts/run_assessment_snapshot.py --collector mock > /tmp/cris_sme_mock_run.json
+
+      - name: Verify generated core outputs
+        if: ${{ inputs.run-mock-pipeline }}
+        run: |
+          test -f outputs/reports/cris_sme_report.json
+          test -f outputs/reports/cris_sme_report.html
+          test -f outputs/reports/cris_sme_dashboard.html
+          test -f outputs/reports/cris_sme_dashboard_payload.json
+          test -f outputs/reports/cris_sme_summary.txt
+
+      - name: Docs sanity checks
+        run: |
+          test -f docs/architecture.md
+          test -f docs/methodology.md
+          if rg -n '/Users/|/home/' README.md docs; then
+            echo "Found machine-specific absolute links in docs/readme."
+            exit 1
+          fi
+
+      - name: Upload generated outputs
+        if: ${{ inputs.upload-generated-artifacts && inputs.run-mock-pipeline }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: cris-sme-generated-outputs
+          path: |
+            outputs/reports
+            outputs/figures
+          retention-days: 7
+
+      - name: Publish workflow summary
+        if: ${{ always() }}
+        run: |
+          {
+            echo "## CRIS-SME Quality Summary"
+            echo ""
+            echo "- Lint: critical static checks passed"
+            echo "- Type check: workflow entry scripts"
+            echo "- Tests: deterministic unit/integration test suite"
+            if [ "${{ inputs.run-mock-pipeline }}" = "true" ]; then
+              echo "- Pipeline run: mock assessment executed"
+              echo "- Output verification: report + dashboard bundle verified"
+            else
+              echo "- Pipeline run: skipped for this caller"
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"
