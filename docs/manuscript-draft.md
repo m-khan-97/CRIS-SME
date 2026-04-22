@@ -4,7 +4,7 @@
 
 ### Abstract
 
-Small and medium enterprises (SMEs) increasingly rely on cloud infrastructure but often lack the governance capability, automation maturity, and explainable risk tooling needed to manage cloud security and compliance effectively. Enterprise-grade cloud security posture management platforms provide substantial coverage, but they are frequently too complex, costly, or opaque for smaller organizations. This paper presents CRIS-SME, a Cloud Risk Intelligence System designed to support SME-oriented cloud governance assessment through deterministic control evaluation, explainable scoring, compliance mapping, and progressively enriched live-cloud evidence collection. CRIS-SME uses a provider-neutral core architecture with an Azure-first implementation. The framework evaluates posture across identity and access management, network exposure, data protection, monitoring and logging, compute/workload hardening, and governance hygiene. Findings are normalized into a common risk model, scored using deterministic factors, aggregated into category-level and overall risk views, and exported into provenance-aware reports, figures, and appendix-ready artifacts. The current implementation was validated using synthetic SME profiles, repeated live Azure-backed assessments, and an intentionally vulnerable AzureGoat-derived lab track. In the current vulnerable-lab snapshot, CRIS-SME identified 18 non-compliant findings and produced an overall risk score of 32.79/100. Across the present evidence base, dominant risks relate to public administrative exposure, permissive network rules, Linux password-based SSH access, incomplete key-management protections, and weak endpoint and workload protection coverage. Identity evidence was strengthened through subscription-scoped privileged role collection and Entra-adjacent directory-role visibility, while still explicitly recording tenant-wide observability boundaries. The contribution of CRIS-SME is not a claim of fully autonomous security intelligence, but an explainable, research-backed, and iteratively extensible framework that bridges engineering implementation and publishable cloud governance research for SMEs.
+Small and medium enterprises (SMEs) increasingly depend on cloud infrastructure, yet many lack governance capability, compliance automation, and risk tooling suited to their scale. Enterprise cloud security platforms offer broad coverage, but they are often too costly, operationally heavy, or opaque for smaller organizations. This paper presents CRIS-SME, a Cloud Risk Intelligence System designed for SME-oriented cloud governance assessment through deterministic control evaluation, explainable scoring, UK-oriented compliance framing, and provenance-aware reporting. CRIS-SME uses a provider-neutral core architecture with an Azure-first implementation. The framework evaluates posture across identity and access management, network exposure, data protection, monitoring and logging, compute and workload hardening, and governance hygiene. Findings are normalized into a common risk model, scored using deterministic factors, aggregated into category and overall risk views, and exported into report, figure, and appendix-ready artifacts. The current implementation was evaluated across three evidence modes: synthetic SME profiles, a frozen live Azure case-study snapshot, and an intentionally vulnerable AzureGoat-derived lab track. In the frozen live Azure case study, CRIS-SME identified 18 non-compliant findings and produced an overall risk score of 33.23/100. In the vulnerable-lab track, CRIS-SME also identified 18 non-compliant findings with an overall risk score of 32.79/100. Across the current evidence base, dominant risks relate to public administrative exposure, permissive network rules, Linux password-based SSH access, incomplete key-management protections, and weak endpoint and workload protection coverage. The contribution of CRIS-SME is not a claim of fully autonomous security intelligence, but an explainable and research-defensible framework that bridges practical cloud governance engineering and publishable SME-focused cloud risk research.
 
 ### 1. Introduction
 
@@ -12,9 +12,9 @@ Cloud adoption has become an operational necessity for many SMEs, but governance
 
 This problem is intensified by the current market shape of cloud security tooling. Enterprise cloud security posture management platforms offer broad visibility, but they are often designed for organizations with specialist security teams, larger budgets, and mature governance functions. SMEs, by contrast, need simpler and more transparent systems that provide actionable risk insight without imposing excessive operational overhead.
 
-CRIS-SME addresses this gap by proposing an explainable cloud risk intelligence framework tailored to SME cloud governance assessment. The framework prioritizes deterministic control evaluation, explicit evidence provenance, modular architecture, and repeatable outputs suitable for engineering use as well as research dissemination. Rather than beginning with opaque AI-based prioritization, CRIS-SME starts with interpretable governance logic and positions AI-assisted prioritization as a later-stage enhancement.
+CRIS-SME addresses this gap by proposing an explainable cloud risk intelligence framework tailored to SME cloud governance assessment. The framework prioritizes deterministic control evaluation, explicit evidence provenance, modular architecture, and repeatable outputs suitable for engineering use and research dissemination. Rather than beginning with opaque AI-based prioritization, CRIS-SME starts with interpretable governance logic and treats AI-assisted prioritization as a later-stage extension rather than a foundational dependency.
 
-The current reference implementation is Azure-first, but the architecture is intentionally provider-neutral at the core. This creates a realistic path for iterative delivery: credible live Azure evidence first, then structured expansion toward additional providers such as AWS and GCP.
+The current reference implementation is Azure-first, but the architecture is intentionally provider-neutral at the core. This creates a realistic delivery path: credible live Azure evidence first, then structured expansion toward additional providers such as AWS and GCP.
 
 The main contributions of this work are:
 
@@ -37,7 +37,7 @@ Open-source auditing tools such as Prowler and Scout Suite provide a more lightw
 
 Provider-native posture tooling is also relevant because it defines the default baseline many SMEs already encounter. Microsoft Defender for Cloud provides built-in recommendations, standards mappings, and secure-score style aggregation inside Azure and the wider Microsoft ecosystem. In CRIS-SME, this makes Defender especially useful as an external validation reference rather than as a system CRIS-SME is trying to replace.
 
-CRIS-SME therefore occupies a distinct design point. It is not attempting breadth parity with enterprise CNAPP platforms, nor is it simply a wrapper around raw cloud findings. Its contribution is a lighter and more interpretable operating point that combines deterministic score construction, provenance-aware reporting, UK-oriented compliance framing, budget-aware remediation, and outputs suitable for boards, insurers, and research communication. This positioning matters academically because it treats explainability not as a user-interface convenience, but as part of the methodological design of the framework.
+CRIS-SME therefore occupies a distinct design point. It is not attempting breadth parity with enterprise CNAPP platforms, nor is it simply a wrapper around raw cloud findings. Its contribution is a lighter and more interpretable operating point that combines deterministic score construction, provenance-aware reporting, UK-oriented compliance framing, budget-aware remediation, and outputs suitable for boards, insurers, and research communication. This positioning matters academically because it treats explainability not as a user-interface convenience, but as part of the methodological design of the framework itself.
 
 ### 4. Framework Architecture
 
@@ -50,9 +50,9 @@ CRIS-SME is organized into six main layers:
 5. compliance mapping
 6. reporting and artifact generation
 
-Collectors acquire posture information either from synthetic datasets or live provider APIs and CLIs. Provider adapters normalize raw provider-specific records into a shared internal `CloudProfile` model. Control modules evaluate governance conditions across IAM, Network, Data, Monitoring, Compute, and Governance domains. The risk engine transforms findings into scored, ranked, and aggregated outputs. The compliance layer maps findings into governance references. The reporting layer then converts results into JSON, HTML, text, SVG, PNG, Markdown, and CSV artifacts.
+Collectors acquire posture information from either synthetic datasets or live provider APIs and CLIs. Provider adapters normalize raw provider-specific records into a shared internal `CloudProfile` model. Control modules evaluate governance conditions across IAM, Network, Data, Monitoring, Compute, and Governance domains. The risk engine transforms findings into scored, ranked, and aggregated outputs. The compliance layer maps findings into governance references. The reporting layer then converts results into JSON, HTML, text, SVG, PNG, Markdown, and CSV artifacts.
 
-This architecture supports inspection and iteration because each layer can evolve independently. Provider-specific collection can deepen without forcing changes to the scoring model. New reporting artifacts can be added without rewriting controls. Additional providers can be introduced through adapters without rebuilding the core logic.
+This architecture supports inspection and iteration because each layer can evolve independently. Provider-specific collection can deepen without forcing changes to the scoring model, new reporting artifacts can be added without rewriting controls, and additional providers can be introduced through adapters without rebuilding the core logic.
 
 ### 5. Methodology
 
@@ -64,7 +64,7 @@ The methodology follows five principles:
 - iterative validation over premature platform complexity
 - SME suitability over enterprise-only assumptions
 
-The implementation began with synthetic SME posture profiles to validate scoring and control behavior in a repeatable way. Live Azure-backed collection was then added to move the framework beyond mock-only evaluation while preserving explicit provenance. This staged approach is methodologically defensible because it allows the risk model and control logic to be stabilized before live-provider variability is introduced.
+The implementation began with synthetic SME posture profiles to validate scoring and control behavior in a repeatable way. Live Azure-backed collection was then added to move the framework beyond mock-only evaluation while preserving explicit provenance. Finally, an intentionally vulnerable AzureGoat-derived lab track was introduced to increase evaluation variance without relying on unauthorized public infrastructure. This staged approach is methodologically defensible because it allows the risk model and control logic to stabilize before live-provider variability is introduced.
 
 The current pipeline is:
 
@@ -103,7 +103,7 @@ Scores are normalized to a 0-100 scale and then aggregated into category average
 - Compute/Workloads = 10%
 - Cost/Governance Hygiene = 10%
 
-This weighting reflects an SME-oriented assumption that identity, external exposure, and data protection should dominate the overall risk picture. The current weights are expert-judgment defaults rather than empirically fitted parameters, and should therefore be interpreted as a transparent starting point for future calibration rather than a final universal model.
+This weighting reflects an SME-oriented assumption that identity, external exposure, and data protection should dominate the overall risk picture. The current weights are expert-judgment defaults rather than empirically fitted parameters and should therefore be interpreted as a transparent starting point for future calibration rather than a universal final model.
 
 ### 7. Implementation
 
@@ -118,7 +118,7 @@ The implementation is written in Python 3.10+ with typed models using Pydantic v
 - appendix-ready Markdown and CSV exports
 - notebook-driven research workflows
 
-The live collector now includes Azure-backed evidence across Network, Data, Monitoring, Compute, Governance, and enriched IAM/Entra-adjacent context. It also records observability boundaries instead of silently treating inaccessible evidence as absent.
+The live collector includes Azure-backed evidence across Network, Data, Monitoring, Compute, Governance, and enriched IAM/Entra-adjacent context. It also records observability boundaries instead of silently treating inaccessible evidence as absence.
 
 ### 8. Evaluation Design
 
@@ -128,7 +128,7 @@ The present evaluation is structured around three complementary modes:
 - live Azure-backed case-study assessment
 - AzureGoat-derived vulnerable-lab assessment
 
-This is not framed as a competitive benchmark against commercial CSPM tools. Instead, the evaluation addresses three questions:
+This evaluation is not framed as a competitive benchmark against commercial CSPM tools. Instead, it addresses three questions:
 
 1. can CRIS-SME turn posture observations into explainable governance findings?
 2. does the scoring engine produce interpretable category and overall risk outputs?
@@ -166,7 +166,7 @@ The current AzureGoat-derived vulnerable-lab assessment produced:
 
 This lab-derived run is important because it broadens the evidence base without relying on unauthorized public infrastructure. It also increases evaluation variance by introducing intentionally exposed storage, application, and network conditions. The current deployment was a constrained AzureGoat variant because tenant location policy, Automation Account incompatibility, Basic public-IP restrictions, and live VM-capacity shortages prevented a full stock deployment. This limitation should be disclosed, but it does not negate the value of the environment as an explicitly authorized vulnerable-lab dataset.
 
-Control-level comparison against the previous distinct-mode baseline showed notable increases for several live risks, including `NET-002`, `CMP-005`, `DATA-004`, `CMP-002`, and `MON-002`. This is useful because it demonstrates that the framework can move beyond headline scores and compare how specific governance conditions differ between synthetic and live contexts.
+Control-level comparison against the previous distinct-mode baseline showed notable increases for several live risks, including `NET-002`, `CMP-005`, `DATA-004`, `CMP-002`, and `MON-002`. This demonstrates that the framework can move beyond headline scores and compare how specific governance conditions differ across synthetic and live contexts.
 
 ### 10. Identity and Observability Discussion
 
@@ -176,7 +176,7 @@ This does not imply full tenant-wide identity governance coverage. Conditional A
 
 ### 11. Discussion
 
-The current results suggest that CRIS-SME is already capable of supporting credible engineering and research workflows. The framework can transform posture evidence into explainable findings, preserve the difference between observed evidence and limited visibility, and export outputs that are immediately useful for demonstrations, notebooks, figures, and paper drafting. Importantly, the framework now supports three evidence classes: synthetic baseline profiles, production-adjacent live Azure case-study evidence, and intentionally vulnerable lab evidence.
+The current results suggest that CRIS-SME is already capable of supporting credible engineering and research workflows. The framework can transform posture evidence into explainable findings, preserve the distinction between observed evidence and limited visibility, and export outputs that are immediately useful for demonstrations, notebooks, figures, and paper drafting. Importantly, the framework now supports three evidence classes: synthetic baseline profiles, production-adjacent live Azure case-study evidence, and intentionally vulnerable lab evidence.
 
 The most important design lesson so far is that transparency matters. Deterministic scoring, explicit provenance, and archived comparison provide a stronger foundation for both trust and academic communication than a premature move toward opaque “AI risk intelligence” claims.
 
