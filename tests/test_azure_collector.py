@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import subprocess
 from types import SimpleNamespace
+from unittest.mock import patch
 
 from cris_sme.collectors.azure_collector import AzureCollector, AzureCollectorSettings
 
@@ -229,7 +230,8 @@ def test_azure_collector_builds_profile_from_enabled_subscription() -> None:
         ),
     )
 
-    profiles = collector.collect_profiles()
+    with patch("subprocess.Popen", side_effect=FileNotFoundError):
+        profiles = collector.collect_profiles()
 
     assert len(profiles) == 1
     profile = profiles[0]
@@ -293,14 +295,15 @@ def test_azure_collector_filters_non_enabled_subscriptions() -> None:
         ),
     )
 
-    try:
-        collector.collect_profiles()
-    except ValueError as exc:
-        assert "No enabled Azure subscriptions" in str(exc)
-    else:
-        raise AssertionError(
-            "Expected ValueError when no enabled subscriptions are returned"
-        )
+    with patch("subprocess.Popen", side_effect=FileNotFoundError):
+        try:
+            collector.collect_profiles()
+        except ValueError as exc:
+            assert "No enabled Azure subscriptions" in str(exc)
+        else:
+            raise AssertionError(
+                "Expected ValueError when no enabled subscriptions are returned"
+            )
 
 
 def test_azure_collector_filters_to_requested_subscription_id() -> None:
@@ -327,7 +330,8 @@ def test_azure_collector_filters_to_requested_subscription_id() -> None:
         ),
     )
 
-    profiles = collector.collect_profiles()
+    with patch("subprocess.Popen", side_effect=FileNotFoundError):
+        profiles = collector.collect_profiles()
 
     assert len(profiles) == 1
     assert profiles[0].metadata["subscription_id"] == "sub-456"
