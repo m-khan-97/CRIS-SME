@@ -23,7 +23,7 @@ class NarratorSettings:
     enabled: bool = False
     provider: str = "anthropic"
     api_key: str | None = None
-    model: str = "claude-sonnet-4-20250514"
+    model: str = "claude-sonnet-4-6"
     max_tokens: int = 1400
     temperature: float = 0.2
     timeout_seconds: int = 45

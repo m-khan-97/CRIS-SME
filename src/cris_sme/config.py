@@ -44,7 +44,7 @@ def get_narrator_settings() -> NarratorSettings:
         enabled=_get_bool_env("CRIS_SME_ENABLE_NARRATOR", default=False),
         provider=os.getenv("CRIS_SME_NARRATOR_PROVIDER", "anthropic").strip().lower(),
         api_key=_get_optional_env("ANTHROPIC_API_KEY"),
-        model=os.getenv("CRIS_SME_NARRATOR_MODEL", "claude-sonnet-4-20250514").strip(),
+        model=os.getenv("CRIS_SME_NARRATOR_MODEL", "claude-sonnet-4-6").strip(),
         max_tokens=int(os.getenv("CRIS_SME_NARRATOR_MAX_TOKENS", "1400")),
         temperature=float(os.getenv("CRIS_SME_NARRATOR_TEMPERATURE", "0.2")),
         timeout_seconds=int(os.getenv("CRIS_SME_NARRATOR_TIMEOUT_SECONDS", "45")),

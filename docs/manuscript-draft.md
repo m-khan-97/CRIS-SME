@@ -29,11 +29,15 @@ UK SMEs migrating to cloud environments frequently lack structured governance fr
 
 The motivation behind CRIS-SME is therefore twofold. First, there is an engineering need for a lightweight framework that can turn cloud posture observations into prioritized, explainable findings. Second, there is a research need for a defensible technical artifact that supports empirical case studies, repeatable experimentation, and comparative analysis across environments.
 
-### 3. Related Positioning
+### 3. Related Work and Positioning
 
-CRIS-SME should not be interpreted as a replacement for broad enterprise CSPM platforms. Its intended operating point is different. The framework prioritizes explainability, modularity, and SME suitability over exhaustive enterprise feature breadth. It also avoids marketing-heavy AI language in favor of a staged maturity model in which deterministic scoring and explicit provenance come first.
+The dominant commercial cloud posture market is led by enterprise CNAPP and CSPM platforms such as Microsoft Defender for Cloud, Wiz, and Orca Security. These platforms emphasize broad visibility, context-rich prioritization, graph or attack-path reasoning, and integrated multicloud workflows. They establish the state of practice in commercial posture management, but they are generally oriented toward larger estates, specialist teams, and enterprise procurement models rather than SME-specific governance usability.
 
-This position is important academically. Many cloud security systems emphasize automation and scale, but comparatively fewer emphasize transparent score construction, repeatable evidence boundaries, and lightweight outputs that can support both engineering decisions and research communication. CRIS-SME contributes in that space.
+Open-source auditing tools such as Prowler and Scout Suite provide a more lightweight comparison point. They are much closer in spirit to CRIS-SME because they favor transparent assessment and portable outputs over fully managed platforms. However, their output model remains largely scanner-centric: they surface broad sets of findings and generic control references, but typically stop short of explainable aggregate scoring, UK-specific governance framing, budget-aware action planning, or stakeholder-ready evidence packaging.
+
+Provider-native posture tooling is also relevant because it defines the default baseline many SMEs already encounter. Microsoft Defender for Cloud provides built-in recommendations, standards mappings, and secure-score style aggregation inside Azure and the wider Microsoft ecosystem. In CRIS-SME, this makes Defender especially useful as an external validation reference rather than as a system CRIS-SME is trying to replace.
+
+CRIS-SME therefore occupies a distinct design point. It is not attempting breadth parity with enterprise CNAPP platforms, nor is it simply a wrapper around raw cloud findings. Its contribution is a lighter and more interpretable operating point that combines deterministic score construction, provenance-aware reporting, UK-oriented compliance framing, budget-aware remediation, and outputs suitable for boards, insurers, and research communication. This positioning matters academically because it treats explainability not as a user-interface convenience, but as part of the methodological design of the framework.
 
 ### 4. Framework Architecture
 
@@ -99,7 +103,7 @@ Scores are normalized to a 0-100 scale and then aggregated into category average
 - Compute/Workloads = 10%
 - Cost/Governance Hygiene = 10%
 
-This weighting reflects an SME-oriented assumption that identity, external exposure, and data protection should dominate the overall risk picture.
+This weighting reflects an SME-oriented assumption that identity, external exposure, and data protection should dominate the overall risk picture. The current weights are expert-judgment defaults rather than empirically fitted parameters, and should therefore be interpreted as a transparent starting point for future calibration rather than a final universal model.
 
 ### 7. Implementation
 
@@ -132,22 +136,18 @@ This is not framed as a competitive benchmark against commercial CSPM tools. Ins
 
 ### 9. Results
 
-The archived runs currently include a mock baseline, multiple live Azure assessments, and an active vulnerable-lab track. The latest report history comparison shows:
+The archived runs currently include a synthetic baseline, a frozen live Azure case-study snapshot, and an active vulnerable-lab track. The live Azure snapshot used as the main empirical reference in this manuscript is `cris_sme_report_20260418T004604Z.json`. Relative to the synthetic baseline, it shows an overall score delta of `-6.61`, indicating a narrower but still meaningful governance-risk profile in the real tenant.
 
-- history count: 5
-- current live Azure overall risk score: 33.12
-- delta versus previous Azure run: 0.0
-- delta versus previous distinct mock run: -6.78
+The frozen live Azure assessment produced:
 
-The latest live Azure assessment produced:
-
-- 16 non-compliant findings
-- IAM score: 14.64
-- Network score: 47.41
-- Data score: 39.53
-- Monitoring/Logging score: 36.47
-- Compute/Workloads score: 39.06
-- Cost/Governance Hygiene score: 26.90
+- 18 non-compliant findings
+- overall risk score of 33.23
+- IAM score: 14.78
+- Network score: 47.59
+- Data score: 39.75
+- Monitoring/Logging score: 36.38
+- Compute/Workloads score: 39.02
+- Cost/Governance Hygiene score: 27.11
 
 The most significant live findings were:
 
@@ -170,7 +170,7 @@ Control-level comparison against the previous distinct-mode baseline showed nota
 
 ### 10. Identity and Observability Discussion
 
-IAM is a particularly important area for methodological honesty. The current system can observe subscription-scoped privileged role assignments and some Entra-adjacent signals, including signed-in-user directory-role visibility and tenant directory-role catalog visibility where accessible. In the latest live run, the signed-in assessment identity exposed zero visible Entra directory roles, while the tenant directory-role catalog exposed 57 visible entries. The resulting observability state was recorded as `broad`.
+IAM is a particularly important area for methodological honesty. The current system can observe subscription-scoped privileged role assignments and some Entra-adjacent signals, including signed-in-user directory-role visibility and tenant directory-role catalog visibility where accessible. In the frozen live Azure case-study snapshot, the signed-in assessment identity exposed zero visible Entra directory roles, while the tenant directory-role catalog exposed 57 visible entries. The resulting observability state was recorded as `broad`.
 
 This does not imply full tenant-wide identity governance coverage. Conditional Access and other tenant-wide controls remain only partially observable in the current implementation. That boundary is explicitly surfaced as a finding (`IAM-005`) and in collection provenance. This is an important design choice because it favors research defensibility over overstated control coverage.
 

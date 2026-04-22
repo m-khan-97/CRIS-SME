@@ -121,6 +121,9 @@ def _score_finding(finding: Finding) -> ScoredFinding:
         * confidence_factor
         * remediation_factor
     )
+    # Keep a small headroom band above the modeled maximum so very severe findings
+    # do not collapse into a saturated 100 too easily; this preserves ranking space
+    # for future calibration while keeping the current deterministic model bounded.
     normalized_score = min((raw_score / (MAX_FINDING_SCORE * 1.15)) * 100, 100.0)
 
     breakdown = ScoreBreakdown(

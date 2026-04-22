@@ -14,8 +14,11 @@ The case study should be read as an engineering validation artifact, not as a ge
 
 ## Assessment Context
 
+Assessment reference snapshot:
+- `outputs/reports/history/cris_sme_report_20260418T004604Z.json`
+
 Assessment date:
-- April 14-15, 2026
+- April 18, 2026
 
 Collector mode:
 - live Azure-backed collection via `CRIS_SME_COLLECTOR=azure`
@@ -40,7 +43,7 @@ Current identity boundary:
 
 ## Live Evidence Observed
 
-The live report recorded the following evidence counts:
+The frozen reference report recorded the following evidence counts:
 
 - `2` privileged assignments
 - `1` privileged principal
@@ -62,18 +65,18 @@ These values were exported into the report provenance section so downstream read
 
 The live Azure run produced:
 
-- overall risk score: `33.12/100`
-- non-compliant findings: `16`
+- overall risk score: `33.23/100`
+- non-compliant findings: `18`
 - evaluated profiles: `1`
 
 Category scores:
 
-- IAM: `14.64`
-- Network: `47.41`
-- Data: `39.53`
-- Monitoring/Logging: `36.47`
-- Compute/Workloads: `39.06`
-- Cost/Governance Hygiene: `26.90`
+- IAM: `14.78`
+- Network: `47.59`
+- Data: `39.75`
+- Monitoring/Logging: `36.38`
+- Compute/Workloads: `39.02`
+- Cost/Governance Hygiene: `27.11`
 
 ## Figure Snapshot
 
@@ -85,9 +88,9 @@ Category scores:
 
 ![Run comparison](../outputs/figures/run_comparison.svg)
 
-The figures were generated from the current JSON report via [04-live-report-figures.ipynb](/home/muhammad-ibrahim/Github/CRIS-SME/notebooks/04-live-report-figures.ipynb) and the reusable chart exporter in [figure_export.py](/home/muhammad-ibrahim/Github/CRIS-SME/src/cris_sme/reporting/figure_export.py).
+The figures were generated from CRIS-SME JSON report artifacts via [04-live-report-figures.ipynb](/home/muhammad-ibrahim/Github/CRIS-SME/notebooks/04-live-report-figures.ipynb) and the reusable chart exporter in [figure_export.py](/home/muhammad-ibrahim/Github/CRIS-SME/src/cris_sme/reporting/figure_export.py).
 
-The history figures are based on archived report snapshots in [outputs/reports/history](/home/muhammad-ibrahim/Github/CRIS-SME/outputs/reports/history), which currently include a mock baseline run and a live Azure run.
+The history figures are based on archived report snapshots in [outputs/reports/history](/home/muhammad-ibrahim/Github/CRIS-SME/outputs/reports/history), which now include synthetic, live Azure, and vulnerable-lab runs. The frozen case-study values in this document should be treated as the canonical live Azure reference for the manuscript rather than inferred from whichever report artifact was generated most recently.
 
 ## Most Significant Findings
 

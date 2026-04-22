@@ -25,14 +25,13 @@ The current evaluation is not framed as a benchmark against commercial CSPM tool
 Archived runs currently include:
 
 - a mock assessment snapshot with an overall score of `39.90`
-- multiple live Azure snapshots with an overall score of `33.12`
+- a frozen live Azure case-study snapshot with an overall score of `33.23`
 - an AzureGoat vulnerable-lab snapshot with an overall score of `32.79`
 
-The latest report history comparison shows:
+For the frozen live Azure case-study snapshot:
 
-- history count: `5`
 - delta versus previous Azure run: `0.0`
-- delta versus previous distinct mock run: `-6.78`
+- delta versus previous distinct mock run: `-6.61`
 
 This is useful because it separates two forms of comparison:
 
@@ -45,16 +44,16 @@ It also creates a third evaluation lens:
 
 ## Latest Live Azure Results
 
-The latest live Azure assessment produced:
+The frozen live Azure assessment produced:
 
-- overall risk score: `33.12/100`
-- non-compliant findings: `16`
-- IAM score: `14.64`
-- Network score: `47.41`
-- Data score: `39.53`
-- Monitoring/Logging score: `36.47`
-- Compute/Workloads score: `39.06`
-- Cost/Governance Hygiene score: `26.90`
+- overall risk score: `33.23/100`
+- non-compliant findings: `18`
+- IAM score: `14.78`
+- Network score: `47.59`
+- Data score: `39.75`
+- Monitoring/Logging score: `36.38`
+- Compute/Workloads score: `39.02`
+- Cost/Governance Hygiene score: `27.11`
 
 The most significant live findings remain concentrated in:
 
@@ -87,7 +86,7 @@ One important methodological note is that this was not a fully stock AzureGoat r
 
 The identity layer is now stronger than the earlier MVP, but still intentionally conservative.
 
-Observed identity context in the latest live run:
+Observed identity context in the frozen live Azure case-study snapshot:
 
 - `2` privileged assignments
 - `1` privileged principal
