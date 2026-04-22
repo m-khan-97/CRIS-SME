@@ -79,8 +79,8 @@ jobs:
         run: |
           test -f docs/architecture.md
           test -f docs/methodology.md
-          if rg -n '/Users/|/home/' README.md docs; then
-            echo "Found machine-specific absolute links in docs/readme."
+          if rg -n '/Users/|/home/' docs; then
+            echo "Found machine-specific absolute links in docs."
             exit 1
           fi
 
