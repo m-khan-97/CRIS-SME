@@ -66,6 +66,26 @@ Main components:
 - figures, appendix exports, executive/insurance packs
 - historical drift comparison utilities
 
+## Layer 5: Delivery and Publication
+
+Purpose:
+- keep validation, release, and demo publication repeatable
+- produce a clean static artifact surface for public demos
+
+Main components:
+- reusable Python quality workflow
+- PR validation workflow
+- Pages build workflow + reusable deployment workflow
+- release packaging workflow
+- scheduled assessment workflow
+- CodeQL + dependency review security workflows
+
+Outputs:
+- validated pull requests
+- `dist/site` static bundle for GitHub Pages
+- build metadata manifest with provenance fields
+- release archives attached to semantic version tags
+
 ## Data and Policy Governance
 
 CRIS-SME governs control behavior through:

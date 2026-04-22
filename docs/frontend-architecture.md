@@ -8,6 +8,7 @@ CRIS-SME currently ships a generated interactive dashboard HTML, not a separate 
 - HTML dashboard generated with embedded payload
 - Client-side filtering and rendering via vanilla JavaScript
 - No API server required for local usage
+- Static site bundling for GitHub Pages publication
 
 ## Files
 
@@ -15,6 +16,8 @@ CRIS-SME currently ships a generated interactive dashboard HTML, not a separate 
   - payload builder
   - dashboard HTML builder
   - dashboard writers
+- `scripts/build_pages_site.py`
+  - assembles `dist/site` with landing page, dashboard page, report page, and data assets
 
 ## Why This Approach
 
@@ -23,6 +26,7 @@ Benefits for home-lab and research workflows:
 - zero backend deployment overhead
 - deterministic, reproducible report-to-dashboard rendering
 - easy artifact sharing and archiving
+- GitHub-native publication path for public demo usage
 
 ## Future Expansion Path
 

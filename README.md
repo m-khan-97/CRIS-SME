@@ -1,118 +1,100 @@
 # CRIS-SME
 
-**Cloud Risk Intelligence System for Small & Medium Enterprises**
+**Evidence-Driven Cloud Risk Decision Engine for SMEs**
 
-CRIS-SME is an evidence-driven cloud risk decision engine for SMEs.  
-It combines deterministic control evaluation, explainable scoring, lifecycle-aware findings, lightweight graph-context prioritization, compliance crosswalks, historical drift analysis, and budget-aware remediation planning.
+CRIS-SME is a deterministic, explainable cloud governance risk platform built for small and medium enterprises.
+It turns cloud posture evidence into traceable control decisions, prioritized findings, lifecycle-aware governance actions, and stakeholder-ready outputs.
 
-The system is Azure-first in live collection, provider-neutral in core modeling, and designed to be runnable in a home lab.
-
----
-
-## Why This Project Exists
-
-Most SME cloud estates sit between two bad options:
-
-- heavyweight enterprise security platforms that are often too expensive/complex
-- lightweight scanners that produce raw findings without enough decision context
-
-CRIS-SME is built to close that gap with:
-
-- deterministic and explainable risk logic
-- explicit evidence lineage and observability boundaries
-- practical action planning constrained by SME budgets
-- executive- and insurer-friendly outputs in the same pipeline
+The platform is intentionally **Azure-first in active live collection**, **provider-neutral in core modeling**, and **home-lab runnable by default**.
 
 ---
 
-## Product Positioning
+## Why CRIS-SME
 
-CRIS-SME is not just "a scanner that exports reports."
+Many SME cloud teams are stuck between:
 
-It is a **cloud risk decision platform** that turns posture evidence into:
+- enterprise-grade platforms that are expensive and operationally heavy
+- basic scanners that produce findings without enough decision context
 
-1. traceable control decisions
-2. prioritized findings with rationale and confidence
-3. compliance/readiness interpretation
-4. actionable remediation plans
-5. trend and drift intelligence over time
+CRIS-SME is designed to bridge that gap with deterministic scoring, explicit evidence boundaries, and practical remediation planning.
 
 ---
 
 ## Key Capabilities
 
-- Provider-normalized posture ingestion (`mock`, `azure`)
+- Evidence collection via `mock` and `azure` collectors
+- Provider-normalized posture modeling and adapter strategy
 - Deterministic control evaluation across 6 domains / 26 controls
-- Deterministic scoring with confidence calibration
-- Evidence lineage fields (`finding_id`, `rule_version`, trace, observation class)
-- Finding lifecycle support (`open`, `accepted_risk`, `suppressed`, etc.)
-- Exception registry support with expiry awareness
-- Graph-context reasoning:
-  - blast-radius estimate
+- Confidence calibration with explicit rationale and metadata
+- Finding lineage with stable finding IDs and trace objects
+- Finding lifecycle tracking (`open`, `in_progress`, `accepted_risk`, `resolved`, `suppressed`, `expired_exception`)
+- Exception registry support with expiry-aware governance
+- Policy governance via control specs and versioned policy-pack metadata
+- Lightweight graph-context prioritization:
+  - blast radius estimation
   - toxic combination detection
   - exposure chain summaries
-- Compliance mapping across 13 frameworks
-- UK-facing readiness outputs (Cyber Essentials, UK profile summary)
-- Budget-aware remediation packs and 30-day action plan
-- Historical drift analysis:
-  - score deltas
-  - new/resolved findings
-  - recurring regressions
-- Rich output artifacts:
-  - JSON / HTML / text summary
-  - appendix markdown + CSV
-  - SVG/PNG figures
-  - executive pack
-  - cyber insurance evidence pack
-  - benchmark scaffold exports
-  - dashboard payload + interactive dashboard HTML
-- Optional narrator for plain-language translation (non-authoritative)
+- Compliance/readiness mapping across multiple frameworks
+- Historical drift analytics (new/resolved findings, regressions, score trends)
+- Executive and technical outputs:
+  - JSON/HTML reports
+  - interactive dashboard HTML + payload
+  - appendix, benchmark, action-plan, insurance, and executive exports
+- GitHub Actions delivery with GitHub Pages publication
 
 ---
 
-## Architecture Overview
+## Architecture
 
-CRIS-SME is organized into three internal layers plus export surfaces:
+```mermaid
+flowchart LR
+    A[Collectors\nmock / azure] --> B[Normalization\nCloudProfile + adapters]
+    B --> C[Controls + Policy Specs\nDeterministic evaluators]
+    C --> D[Scoring + Confidence + Compliance]
+    D --> E[Lineage + Lifecycle + Exceptions\nGraph Context]
+    E --> F[Reporting Layer\nJSON/HTML/Summary/Figures]
+    F --> G[Dashboard Layer\nPayload + Interactive HTML]
+    G --> H[Site Bundler\ndist/site]
+    H --> I[GitHub Pages\nPublic demo surface]
+```
 
-1. **Evidence Layer**
-   - Raw and normalized evidence records
-   - Collector coverage and observability boundaries
+High-level architecture layers:
 
-2. **Asset/Context Layer**
-   - Normalized assets and relationships
-   - Lightweight graph-context model for risk chains
-
-3. **Decision Layer**
-   - Control decisions, findings, confidence, lifecycle, exceptions
-   - Compliance mappings, action items, historical snapshots
-
-4. **Reporting & Experience Layer**
-   - Technical artifacts, executive artifacts, and interactive dashboard
+1. Evidence layer: collection, provenance, observability bounds
+2. Asset/context layer: normalized assets + relationships
+3. Decision layer: deterministic controls, scoring, lifecycle, compliance
+4. Experience layer: reports, dashboard, artifact exports
+5. Delivery layer: CI validation, release packaging, Pages publication
 
 ---
 
-## Dashboard Experience
+## High-Level Implementation Flow
 
-The pipeline now generates:
+```mermaid
+flowchart TD
+    A[Collect Evidence] --> B[Normalize Profiles and Assets]
+    B --> C[Evaluate Deterministic Controls]
+    C --> D[Score Risk + Calibrate Confidence]
+    D --> E[Apply Lineage + Lifecycle + Exceptions + Graph Context]
+    E --> F[Generate Reports and Dashboard Artifacts]
+    F --> G[Assemble dist/site Bundle]
+    G --> H[Publish via GitHub Actions to GitHub Pages]
+```
 
-- `outputs/reports/cris_sme_dashboard_payload.json`
-- `outputs/reports/cris_sme_dashboard.html`
+---
 
-The dashboard includes:
+## CI/CD and Pages Flow
 
-- executive risk overview
-- domain score breakdown
-- trend and drift panel
-- filterable finding explorer
-- compliance and readiness view
-- confidence/evidence quality section
-- graph-context risk section
-- remediation and exceptions summary
-
-If you do not have screenshots checked in yet, use these placeholders in docs/slides:
-
-- `docs/assets/dashboard-overview-placeholder.png`
-- `docs/assets/dashboard-explorer-placeholder.png`
+```mermaid
+flowchart TD
+    PR[Pull Request] --> PRV[pr-validation.yml\nLint + Type + Test + Mock Run]
+    MAIN[Push to main] --> BUILD[build-pages-artifacts.yml\nBuild Reports + dist/site]
+    BUILD --> DEPLOY[deploy-pages.yml\nPublish to GitHub Pages]
+    TAG[Tag v*.*.*] --> REL[release.yml\nPackage + GitHub Release]
+    SCHED[Schedule/Dispatch] --> SCH[scheduled-assessment.yml\nPeriodic Assessment Artifacts]
+    PR --> DEPREV[dependency-review.yml]
+    MAIN --> CODEQL[codeql.yml]
+```
 
 ---
 
@@ -120,29 +102,27 @@ If you do not have screenshots checked in yet, use these placeholders in docs/sl
 
 ```text
 CRIS-SME/
-├── data/
-├── docs/
-├── notebooks/
-├── outputs/
-├── scripts/
+├── .github/workflows/         # CI/CD, security, pages, release automation
+├── data/                      # Control catalog, overrides, exception registry
+├── docs/                      # Architecture, methodology, lifecycle, dashboard, CI/CD docs
+├── scripts/                   # Repeatable run helpers + site bundler
 ├── src/cris_sme/
-│   ├── collectors/
-│   ├── controls/
-│   ├── engine/
-│   ├── models/
-│   ├── policies/
-│   ├── reporting/
-│   └── main.py
-├── tests/
-├── requirements.txt
-└── pyproject.toml
+│   ├── collectors/            # Evidence collectors and provider adapters
+│   ├── controls/              # Deterministic control evaluators
+│   ├── engine/                # Scoring, lifecycle, lineage, graph context, compliance
+│   ├── models/                # Typed schemas (cloud profile + platform entities)
+│   ├── policies/              # Control governance metadata
+│   ├── reporting/             # Report and dashboard builders/exporters
+│   └── main.py                # End-to-end pipeline entrypoint
+├── tests/                     # Unit and integration tests
+└── requirements.txt           # Runtime + test dependencies
 ```
 
 ---
 
 ## Quickstart
 
-### 1) Setup
+### 1. Environment setup
 
 ```bash
 git clone https://github.com/m-khan-97/CRIS-SME.git
@@ -152,174 +132,184 @@ source .venv/bin/activate
 pip install -r requirements.txt
 ```
 
-### 2) Run Mock Mode (default)
+### 2. Run mock assessment (default)
 
 ```bash
 PYTHONPATH=src python3 -m cris_sme.main
 ```
 
-### 3) Run Azure Mode
+### 3. Run Azure assessment (when authenticated)
 
 ```bash
 export CRIS_SME_COLLECTOR=azure
-export AZURE_SUBSCRIPTION_ID=<your-subscription-id>   # optional filter
+export AZURE_SUBSCRIPTION_ID=<your-subscription-id>   # optional scoping
 PYTHONPATH=src python3 -m cris_sme.main
 ```
 
-### 4) Run Optional Narrator (never changes deterministic scoring)
+### 4. Run tests
 
 ```bash
-export CRIS_SME_ENABLE_NARRATOR=true
-export ANTHROPIC_API_KEY=<key>
-PYTHONPATH=src python3 -m cris_sme.main
-```
-
-### 5) Run Tests
-
-```bash
-PYTHONPATH=src pytest
+PYTHONPATH=src pytest -q
 ```
 
 ---
 
-## Scripted Runs
+## Running the Local Pipeline End-to-End
 
-Repeatable snapshot:
-
-```bash
-python3 scripts/run_assessment_snapshot.py --collector mock
-```
-
-AzureGoat-tagged run metadata:
+1. Generate assessment outputs:
 
 ```bash
-python3 scripts/run_azuregoat_assessment.py
+PYTHONPATH=src python3 scripts/run_assessment_snapshot.py --collector mock
 ```
+
+2. Build a Pages-ready static bundle:
+
+```bash
+python3 scripts/build_pages_site.py --reports-dir outputs/reports --figures-dir outputs/figures --dist-dir dist
+```
+
+3. Preview locally:
+
+```bash
+python3 -m http.server 8080 --directory dist/site
+```
+
+Then open:
+
+- `http://127.0.0.1:8080/` (landing page)
+- `http://127.0.0.1:8080/dashboard.html`
+- `http://127.0.0.1:8080/report.html`
 
 ---
 
-## Output Artifacts
+## Dashboard and Output Experience
 
-Main report outputs:
+Primary generated outputs:
 
 - `outputs/reports/cris_sme_report.json`
 - `outputs/reports/cris_sme_report.html`
-- `outputs/reports/cris_sme_summary.txt`
 - `outputs/reports/cris_sme_dashboard_payload.json`
 - `outputs/reports/cris_sme_dashboard.html`
+- `outputs/reports/cris_sme_summary.txt`
 
-Actionability and governance:
+Pages bundle outputs:
 
-- `outputs/reports/cris_sme_30_day_action_plan.{md,json}`
-- `outputs/reports/cris_sme_executive_pack.{md,json}`
-- `outputs/reports/cris_sme_cyber_insurance_evidence.{md,json}`
-
-Research and appendix artifacts:
-
-- `outputs/reports/results_appendix.md`
-- `outputs/reports/prioritized_risks.csv`
-- `outputs/reports/cris_sme_benchmark_observation.json`
-- `outputs/reports/cris_sme_benchmark_comparison.md`
-- `outputs/reports/history/*.json`
-
-Figures:
-
-- `outputs/figures/live_category_scores.{svg,png}`
-- `outputs/figures/live_priority_distribution.{svg,png}`
-- `outputs/figures/risk_trend.{svg,png}`
-- `outputs/figures/run_comparison.{svg,png}`
+- `dist/site/index.html`
+- `dist/site/dashboard.html`
+- `dist/site/report.html`
+- `dist/site/data/*.json`
+- `dist/site/assets/figures/*`
+- `dist/manifests/build-metadata.json`
 
 ---
 
-## Deterministic Scoring Principles
+## GitHub Actions and GitHub Pages
 
-CRIS-SME keeps scoring deterministic and explainable.
+Implemented workflows:
 
-- Severity weights are fixed and explicit.
-- Modifiers are formula-driven (exposure, data sensitivity, confidence, remediation effort).
-- Confidence calibration is transparent and recorded.
-- Narrator output is optional translation only; it is not scoring authority.
+- `pr-validation.yml`: pull request quality gate
+- `build-pages-artifacts.yml`: build report/dashboard/site bundle on `main`
+- `deploy-pages.yml`: reusable GitHub Pages deploy workflow
+- `release.yml`: tag-driven release packaging and GitHub Release publication
+- `scheduled-assessment.yml`: periodic or manual assessment generation with safe fallback behavior
+- `codeql.yml`: CodeQL security analysis
+- `dependency-review.yml`: dependency risk review for PRs
+- `reusable-python-quality.yml`: reusable lint/type/test pipeline
 
-See: [docs/scoring-model.md](/Users/vishnuajith/Downloads/CRIS-SME/docs/scoring-model.md)
+To enable publishing:
 
----
-
-## Current Provider Coverage
-
-- **Azure**: active (mock + live collection path)
-- **AWS**: planned (adapter scaffolding only)
-- **GCP**: planned (adapter scaffolding only)
-
-CRIS-SME does not claim live multicloud parity yet.
-
-See: [docs/provider-capability-matrix.md](/Users/vishnuajith/Downloads/CRIS-SME/docs/provider-capability-matrix.md)
+1. In repository settings, open **Pages**.
+2. Set source to **GitHub Actions**.
+3. Push to `main` (or manually dispatch `build-pages-artifacts.yml`).
 
 ---
 
-## Current Maturity and Known Limits
+## Output Artifact Map
 
-Strong today:
-
-- deterministic control/scoring pipeline
-- evidence lineage fields and lifecycle model
-- rich output and dashboard surfaces
-- historical drift comparisons
-- robust automated tests
-
-Still conservative/partial:
-
-- full tenant-wide identity observability in all environments
-- some budget/governance live evidence paths
-- AWS/GCP live collectors
-- full attack-path simulation (graph context is lightweight and explicit about scope)
+| Artifact | Path | Purpose |
+| --- | --- | --- |
+| Technical JSON report | `outputs/reports/cris_sme_report.json` | Machine-readable decision output |
+| Technical HTML report | `outputs/reports/cris_sme_report.html` | Human-readable technical report |
+| Dashboard payload | `outputs/reports/cris_sme_dashboard_payload.json` | Structured dashboard data |
+| Dashboard HTML | `outputs/reports/cris_sme_dashboard.html` | Interactive console view |
+| History snapshots | `outputs/reports/history/*.json` | Drift and trend baselines |
+| Figures | `outputs/figures/*` | Chart-ready visuals for reporting |
+| Pages landing page | `dist/site/index.html` | Public demo entrypoint |
+| Pages metadata manifest | `dist/manifests/build-metadata.json` | Build provenance and checksums |
 
 ---
 
-## Design Principles
+## Current Scope and Honest Limitations
+
+Active provider maturity:
+
+- Azure: active (mock + live path)
+- AWS: planned/partial (adapter scaffolding)
+- GCP: planned/partial (adapter scaffolding)
+
+Important boundaries:
+
+- deterministic scoring is authoritative
+- optional narrator is non-authoritative and does not alter score math
+- graph-context logic is prioritization support, not full attack-path simulation
+- some evidence domains remain intentionally conservative/partially observable depending on collector scope and permissions
+
+---
+
+## Engineering Principles
 
 - Deterministic before probabilistic
-- Evidence-backed before narrative
-- Honest about observability boundaries
-- Provider-neutral core, Azure-first execution
-- Actionability over alert volume
-- Home-lab runnable by default
+- Evidence-backed before narrative-backed
+- Explicit observability boundaries over false certainty
+- Extensible architecture without fake enterprise complexity
+- Outputs that serve engineers, executives, and auditors/researchers
+- Home-lab first: local execution should stay practical
 
 ---
 
 ## Documentation Index
 
-Core:
+Core platform docs:
 
-- [docs/project-overview.md](/Users/vishnuajith/Downloads/CRIS-SME/docs/project-overview.md)
-- [docs/architecture.md](/Users/vishnuajith/Downloads/CRIS-SME/docs/architecture.md)
-- [docs/methodology.md](/Users/vishnuajith/Downloads/CRIS-SME/docs/methodology.md)
-- [docs/scoring-model.md](/Users/vishnuajith/Downloads/CRIS-SME/docs/scoring-model.md)
-- [docs/compliance-mapping.md](/Users/vishnuajith/Downloads/CRIS-SME/docs/compliance-mapping.md)
-- [docs/dashboard.md](/Users/vishnuajith/Downloads/CRIS-SME/docs/dashboard.md)
+- [Project Overview](docs/project-overview.md)
+- [Architecture](docs/architecture.md)
+- [Methodology](docs/methodology.md)
+- [Scoring Model](docs/scoring-model.md)
+- [Compliance Mapping](docs/compliance-mapping.md)
+- [Dashboard](docs/dashboard.md)
 
-Platform internals:
+Data/decision model docs:
 
-- [docs/data-model.md](/Users/vishnuajith/Downloads/CRIS-SME/docs/data-model.md)
-- [docs/evidence-lineage.md](/Users/vishnuajith/Downloads/CRIS-SME/docs/evidence-lineage.md)
-- [docs/control-lifecycle.md](/Users/vishnuajith/Downloads/CRIS-SME/docs/control-lifecycle.md)
-- [docs/finding-lifecycle.md](/Users/vishnuajith/Downloads/CRIS-SME/docs/finding-lifecycle.md)
-- [docs/history-and-drift.md](/Users/vishnuajith/Downloads/CRIS-SME/docs/history-and-drift.md)
-- [docs/frontend-architecture.md](/Users/vishnuajith/Downloads/CRIS-SME/docs/frontend-architecture.md)
-- [docs/provider-capability-matrix.md](/Users/vishnuajith/Downloads/CRIS-SME/docs/provider-capability-matrix.md)
+- [Data Model](docs/data-model.md)
+- [Evidence Lineage](docs/evidence-lineage.md)
+- [Control Lifecycle](docs/control-lifecycle.md)
+- [Finding Lifecycle](docs/finding-lifecycle.md)
+- [History and Drift](docs/history-and-drift.md)
+- [Frontend Architecture](docs/frontend-architecture.md)
+- [Provider Capability Matrix](docs/provider-capability-matrix.md)
 
-Roadmap:
+Delivery docs:
 
-- [docs/multi-cloud-expansion.md](/Users/vishnuajith/Downloads/CRIS-SME/docs/multi-cloud-expansion.md)
-- [docs/roadmap.md](/Users/vishnuajith/Downloads/CRIS-SME/docs/roadmap.md)
+- [CI/CD and GitHub Pages Delivery](docs/ci-cd-and-pages.md)
+- [Multi-cloud Expansion Strategy](docs/multi-cloud-expansion.md)
+- [Roadmap](docs/roadmap.md)
 
 ---
 
-## Contribution Notes
+## Roadmap (Practical Next Steps)
 
-- Keep control logic deterministic and reviewable.
-- Do not hide missing evidence as compliant.
-- Update docs when behavior changes.
-- Add/adjust tests for any scoring, lifecycle, or reporting contract change.
+1. Expand active provider support beyond Azure while keeping evidence parity standards.
+2. Add richer exception workflows and governance audit trails.
+3. Increase graph-context depth with asset-level evidence relationships.
+4. Add API-mode serving for dashboard payloads while preserving static artifact mode.
+5. Strengthen signed artifact provenance for audit-focused deployments.
+
+---
+
+## Maturity Statement
+
+CRIS-SME is production-shaped in architecture and release engineering, with honest scope limits.
+It is suitable for home-lab demos, portfolio presentation, engineering research artifacts, and SME-focused cloud governance experimentation.
 
 ---
 
