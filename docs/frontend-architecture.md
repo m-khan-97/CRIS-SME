@@ -8,7 +8,7 @@ CRIS-SME currently ships a generated interactive dashboard HTML, not a separate 
 - HTML dashboard generated with embedded payload
 - Client-side filtering and rendering via vanilla JavaScript
 - No API server required for local usage
-- Static site bundling for GitHub Pages publication
+- Static site bundling for platform-neutral publication (Vercel-ready)
 
 ## Files
 
@@ -26,7 +26,7 @@ Benefits for home-lab and research workflows:
 - zero backend deployment overhead
 - deterministic, reproducible report-to-dashboard rendering
 - easy artifact sharing and archiving
-- GitHub-native publication path for public demo usage
+- simple static hosting path for public demo usage
 
 ## Future Expansion Path
 

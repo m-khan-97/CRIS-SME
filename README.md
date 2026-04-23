@@ -2,21 +2,21 @@
 
 **Evidence-Driven Cloud Risk Decision Engine for SMEs**
 
-CRIS-SME is a deterministic, explainable cloud governance risk platform built for small and medium enterprises.
-It turns cloud posture evidence into traceable control decisions, prioritized findings, lifecycle-aware governance actions, and stakeholder-ready outputs.
+CRIS-SME is a deterministic, explainable cloud governance risk platform for small and medium enterprises.
+It converts cloud posture evidence into traceable control decisions, prioritized findings, lifecycle-aware governance outputs, and stakeholder-ready reporting artifacts.
 
-The platform is intentionally **Azure-first in active live collection**, **provider-neutral in core modeling**, and **home-lab runnable by default**.
+The project is **Azure-first in active live collection**, **provider-neutral in core architecture**, and **home-lab runnable by default**.
 
 ---
 
 ## Why CRIS-SME
 
-Many SME cloud teams are stuck between:
+SME cloud teams are often forced between two poor options:
 
-- enterprise-grade platforms that are expensive and operationally heavy
-- basic scanners that produce findings without enough decision context
+- enterprise platforms that are too expensive or operationally heavy
+- lightweight scanners that create alerts without enough decision context
 
-CRIS-SME is designed to bridge that gap with deterministic scoring, explicit evidence boundaries, and practical remediation planning.
+CRIS-SME focuses on deterministic, evidence-backed risk intelligence that remains practical to run and explain.
 
 ---
 
@@ -25,22 +25,23 @@ CRIS-SME is designed to bridge that gap with deterministic scoring, explicit evi
 - Evidence collection via `mock` and `azure` collectors
 - Provider-normalized posture modeling and adapter strategy
 - Deterministic control evaluation across 6 domains / 26 controls
-- Confidence calibration with explicit rationale and metadata
-- Finding lineage with stable finding IDs and trace objects
-- Finding lifecycle tracking (`open`, `in_progress`, `accepted_risk`, `resolved`, `suppressed`, `expired_exception`)
-- Exception registry support with expiry-aware governance
-- Policy governance via control specs and versioned policy-pack metadata
+- Confidence calibration with explicit rationale metadata
+- Stable finding lineage (`finding_id`, trace, evidence refs, rule version)
+- Finding lifecycle support (`open`, `in_progress`, `accepted_risk`, `resolved`, `suppressed`, `expired_exception`)
+- Exception registry with expiry-aware handling
+- Governed control metadata via policy-pack control specs
 - Lightweight graph-context prioritization:
   - blast radius estimation
   - toxic combination detection
   - exposure chain summaries
 - Compliance/readiness mapping across multiple frameworks
-- Historical drift analytics (new/resolved findings, regressions, score trends)
-- Executive and technical outputs:
-  - JSON/HTML reports
+- Historical drift analysis (score trends, new/resolved findings, recurring regressions)
+- Rich outputs for technical and executive audiences:
+  - JSON + HTML reports
   - interactive dashboard HTML + payload
-  - appendix, benchmark, action-plan, insurance, and executive exports
-- GitHub Actions delivery with GitHub Pages publication
+  - action plans, executive and insurance packs, appendix/benchmark exports
+- GitHub Actions validation and release engineering
+- Vercel-ready static hosting bundle in `dist/site/`
 
 ---
 
@@ -54,17 +55,17 @@ flowchart LR
     D --> E[Lineage + Lifecycle + Exceptions\nGraph Context]
     E --> F[Reporting Layer\nJSON/HTML/Summary/Figures]
     F --> G[Dashboard Layer\nPayload + Interactive HTML]
-    G --> H[Site Bundler\ndist/site]
-    H --> I[GitHub Pages\nPublic demo surface]
+    G --> H[Static Site Bundler\ndist/site]
+    H --> I[Vercel Hosting\nDirect Git Integration]
 ```
 
-High-level architecture layers:
+Layer summary:
 
-1. Evidence layer: collection, provenance, observability bounds
-2. Asset/context layer: normalized assets + relationships
-3. Decision layer: deterministic controls, scoring, lifecycle, compliance
-4. Experience layer: reports, dashboard, artifact exports
-5. Delivery layer: CI validation, release packaging, Pages publication
+1. Evidence: collection, provenance, observability boundaries
+2. Asset/context: normalized entities and relationship context
+3. Decision: deterministic controls, scoring, lifecycle, compliance
+4. Experience: reports, dashboard, and artifact exports
+5. Delivery: CI quality gates, release packaging, static-hosting readiness
 
 ---
 
@@ -78,22 +79,22 @@ flowchart TD
     D --> E[Apply Lineage + Lifecycle + Exceptions + Graph Context]
     E --> F[Generate Reports and Dashboard Artifacts]
     F --> G[Assemble dist/site Bundle]
-    G --> H[Publish via GitHub Actions to GitHub Pages]
+    G --> H[Deploy via Vercel Option 1]
 ```
 
 ---
 
-## CI/CD and Pages Flow
+## CI/CD and Hosting Flow
 
 ```mermaid
 flowchart TD
     PR[Pull Request] --> PRV[pr-validation.yml\nLint + Type + Test + Mock Run]
-    MAIN[Push to main] --> BUILD[build-pages-artifacts.yml\nBuild Reports + dist/site]
-    BUILD --> DEPLOY[deploy-pages.yml\nPublish to GitHub Pages]
+    MAIN[Push to main] --> BUILD[build-static-site-artifacts.yml\nBuild + Upload dist bundle]
     TAG[Tag v*.*.*] --> REL[release.yml\nPackage + GitHub Release]
     SCHED[Schedule/Dispatch] --> SCH[scheduled-assessment.yml\nPeriodic Assessment Artifacts]
     PR --> DEPREV[dependency-review.yml]
     MAIN --> CODEQL[codeql.yml]
+    BUILD --> VERCEL[Vercel Option 1\nDirect Git deployment]
 ```
 
 ---
@@ -102,20 +103,21 @@ flowchart TD
 
 ```text
 CRIS-SME/
-├── .github/workflows/         # CI/CD, security, pages, release automation
+├── .github/workflows/         # CI, security, release, static artifact automation
 ├── data/                      # Control catalog, overrides, exception registry
-├── docs/                      # Architecture, methodology, lifecycle, dashboard, CI/CD docs
-├── scripts/                   # Repeatable run helpers + site bundler
+├── docs/                      # Architecture, methodology, lifecycle, delivery docs
+├── scripts/                   # Assessment runners and static bundle builders
 ├── src/cris_sme/
-│   ├── collectors/            # Evidence collectors and provider adapters
+│   ├── collectors/            # Evidence collectors + provider adapters
 │   ├── controls/              # Deterministic control evaluators
-│   ├── engine/                # Scoring, lifecycle, lineage, graph context, compliance
-│   ├── models/                # Typed schemas (cloud profile + platform entities)
+│   ├── engine/                # Scoring, lineage, lifecycle, graph context, compliance
+│   ├── models/                # Typed schemas
 │   ├── policies/              # Control governance metadata
-│   ├── reporting/             # Report and dashboard builders/exporters
+│   ├── reporting/             # Report/dashboard builders
 │   └── main.py                # End-to-end pipeline entrypoint
 ├── tests/                     # Unit and integration tests
-└── requirements.txt           # Runtime + test dependencies
+├── vercel.json                # Vercel Option 1 project defaults
+└── requirements.txt
 ```
 
 ---
@@ -142,7 +144,7 @@ PYTHONPATH=src python3 -m cris_sme.main
 
 ```bash
 export CRIS_SME_COLLECTOR=azure
-export AZURE_SUBSCRIPTION_ID=<your-subscription-id>   # optional scoping
+export AZURE_SUBSCRIPTION_ID=<your-subscription-id>
 PYTHONPATH=src python3 -m cris_sme.main
 ```
 
@@ -154,73 +156,68 @@ PYTHONPATH=src pytest -q
 
 ---
 
-## Running the Local Pipeline End-to-End
+## Build the Static Bundle Locally
 
-1. Generate assessment outputs:
-
-```bash
-PYTHONPATH=src python3 scripts/run_assessment_snapshot.py --collector mock
-```
-
-2. Build a Pages-ready static bundle:
+Single standardized command:
 
 ```bash
-python3 scripts/build_pages_site.py --reports-dir outputs/reports --figures-dir outputs/figures --dist-dir dist
+python3 scripts/build_static_site_bundle.py --collector mock --reports-dir outputs/reports --figures-dir outputs/figures --dist-dir dist
 ```
 
-3. Preview locally:
+What it does:
+
+1. runs deterministic assessment generation
+2. creates dashboard/report artifacts
+3. assembles deployable static files into `dist/site/`
+4. writes build metadata at `dist/manifests/build-metadata.json`
+
+Local preview:
 
 ```bash
 python3 -m http.server 8080 --directory dist/site
 ```
 
-Then open:
+Open:
 
-- `http://127.0.0.1:8080/` (landing page)
+- `http://127.0.0.1:8080/`
 - `http://127.0.0.1:8080/dashboard.html`
 - `http://127.0.0.1:8080/report.html`
 
 ---
 
-## Dashboard and Output Experience
+## Vercel Deployment (Option 1: Direct Git Integration)
 
-Primary generated outputs:
+This repository is prepared for Vercel direct Git deployment.
 
-- `outputs/reports/cris_sme_report.json`
-- `outputs/reports/cris_sme_report.html`
-- `outputs/reports/cris_sme_dashboard_payload.json`
-- `outputs/reports/cris_sme_dashboard.html`
-- `outputs/reports/cris_sme_summary.txt`
+### Recommended Vercel settings
 
-Pages bundle outputs:
+- Framework Preset: `Other`
+- Install Command: `pip install -r requirements.txt`
+- Build Command: `python scripts/build_static_site_bundle.py --collector mock --reports-dir outputs/reports --figures-dir outputs/figures --dist-dir dist`
+- Output Directory: `dist/site`
 
-- `dist/site/index.html`
-- `dist/site/dashboard.html`
-- `dist/site/report.html`
-- `dist/site/data/*.json`
-- `dist/site/assets/figures/*`
-- `dist/manifests/build-metadata.json`
+`vercel.json` already includes these defaults.
+
+### Manual Vercel dashboard steps
+
+1. Import this GitHub repository into Vercel.
+2. Confirm production branch (`main`).
+3. Verify build/output settings (or keep `vercel.json` values).
+4. Trigger deployment.
+
+Note: repository-side readiness is implemented here; the actual Vercel project connection is completed in the Vercel dashboard.
 
 ---
 
-## GitHub Actions and GitHub Pages
-
-Implemented workflows:
+## GitHub Actions Workflows
 
 - `pr-validation.yml`: pull request quality gate
-- `build-pages-artifacts.yml`: build report/dashboard/site bundle on `main`
-- `deploy-pages.yml`: reusable GitHub Pages deploy workflow
-- `release.yml`: tag-driven release packaging and GitHub Release publication
-- `scheduled-assessment.yml`: periodic or manual assessment generation with safe fallback behavior
-- `codeql.yml`: CodeQL security analysis
-- `dependency-review.yml`: dependency risk review for PRs
-- `reusable-python-quality.yml`: reusable lint/type/test pipeline
-
-To enable publishing:
-
-1. In repository settings, open **Pages**.
-2. Set source to **GitHub Actions**.
-3. Push to `main` (or manually dispatch `build-pages-artifacts.yml`).
+- `build-static-site-artifacts.yml`: build deterministic static bundle and upload artifacts
+- `release.yml`: semver tag release packaging and GitHub Release publication
+- `scheduled-assessment.yml`: periodic/manual assessments with safe collector fallback
+- `codeql.yml`: security static analysis
+- `dependency-review.yml`: dependency change risk checks
+- `reusable-python-quality.yml`: shared lint/type/test/pipeline validation workflow
 
 ---
 
@@ -232,10 +229,12 @@ To enable publishing:
 | Technical HTML report | `outputs/reports/cris_sme_report.html` | Human-readable technical report |
 | Dashboard payload | `outputs/reports/cris_sme_dashboard_payload.json` | Structured dashboard data |
 | Dashboard HTML | `outputs/reports/cris_sme_dashboard.html` | Interactive console view |
-| History snapshots | `outputs/reports/history/*.json` | Drift and trend baselines |
-| Figures | `outputs/figures/*` | Chart-ready visuals for reporting |
-| Pages landing page | `dist/site/index.html` | Public demo entrypoint |
-| Pages metadata manifest | `dist/manifests/build-metadata.json` | Build provenance and checksums |
+| History snapshots | `outputs/reports/history/*.json` | Drift and trend baseline data |
+| Figures | `outputs/figures/*` | Chart assets for reporting |
+| Static entrypoint | `dist/site/index.html` | Deployable demo landing page |
+| Static dashboard | `dist/site/dashboard.html` | Deployable dashboard view |
+| Static technical report | `dist/site/report.html` | Deployable report view |
+| Build metadata | `dist/manifests/build-metadata.json` | Build provenance and checksums |
 
 ---
 
@@ -249,10 +248,10 @@ Active provider maturity:
 
 Important boundaries:
 
-- deterministic scoring is authoritative
-- optional narrator is non-authoritative and does not alter score math
-- graph-context logic is prioritization support, not full attack-path simulation
-- some evidence domains remain intentionally conservative/partially observable depending on collector scope and permissions
+- deterministic scoring remains the authoritative decision path
+- optional narrator is non-authoritative and never alters score math
+- graph-context logic improves prioritization but is not full attack-path simulation
+- some evidence domains are intentionally conservative or partially observable based on collector scope and permissions
 
 ---
 
@@ -262,8 +261,8 @@ Important boundaries:
 - Evidence-backed before narrative-backed
 - Explicit observability boundaries over false certainty
 - Extensible architecture without fake enterprise complexity
-- Outputs that serve engineers, executives, and auditors/researchers
-- Home-lab first: local execution should stay practical
+- Outputs for engineers, executives, auditors, and research workflows
+- Home-lab-first operational model
 
 ---
 
@@ -278,7 +277,7 @@ Core platform docs:
 - [Compliance Mapping](docs/compliance-mapping.md)
 - [Dashboard](docs/dashboard.md)
 
-Data/decision model docs:
+Data/decision docs:
 
 - [Data Model](docs/data-model.md)
 - [Evidence Lineage](docs/evidence-lineage.md)
@@ -290,26 +289,26 @@ Data/decision model docs:
 
 Delivery docs:
 
-- [CI/CD and GitHub Pages Delivery](docs/ci-cd-and-pages.md)
+- [CI/CD and Vercel Delivery](docs/ci-cd-and-vercel.md)
 - [Multi-cloud Expansion Strategy](docs/multi-cloud-expansion.md)
 - [Roadmap](docs/roadmap.md)
 
 ---
 
-## Roadmap (Practical Next Steps)
+## Roadmap (Practical)
 
-1. Expand active provider support beyond Azure while keeping evidence parity standards.
-2. Add richer exception workflows and governance audit trails.
-3. Increase graph-context depth with asset-level evidence relationships.
-4. Add API-mode serving for dashboard payloads while preserving static artifact mode.
-5. Strengthen signed artifact provenance for audit-focused deployments.
+1. Expand active provider coverage beyond Azure while keeping evidence parity standards.
+2. Add richer exception governance workflows and audit trails.
+3. Deepen graph context with higher-fidelity relationship evidence.
+4. Add optional API delivery mode while preserving static artifact mode.
+5. Improve provenance and signed artifact attestations for audit-heavy use cases.
 
 ---
 
 ## Maturity Statement
 
-CRIS-SME is production-shaped in architecture and release engineering, with honest scope limits.
-It is suitable for home-lab demos, portfolio presentation, engineering research artifacts, and SME-focused cloud governance experimentation.
+CRIS-SME is production-shaped in architecture and release engineering, with explicit scope boundaries.
+It is suitable for home-lab demos, portfolio presentation, engineering/research artifacts, and SME governance experimentation.
 
 ---
 

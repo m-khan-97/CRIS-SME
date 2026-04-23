@@ -11,7 +11,7 @@
 - finding lifecycle and exception model
 - dashboard payload + interactive dashboard HTML
 - control-spec governance metadata pack
-- GitHub Actions CI/CD + GitHub Pages publication pipeline
+- GitHub Actions CI/CD + Vercel-ready static publication pipeline
 
 ## Near-Term Priorities
 

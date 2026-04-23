@@ -39,7 +39,7 @@ CRIS-SME focuses on:
 - Lightweight graph-context prioritization
 - Historical drift outputs
 - Interactive dashboard output and technical export suite
-- GitHub Actions CI/CD with GitHub Pages publication path
+- GitHub Actions CI/CD with Vercel-ready static hosting path
 
 ## Current Maturity
 

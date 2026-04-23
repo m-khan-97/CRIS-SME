@@ -80,7 +80,8 @@ jobs:
           grep -q '```mermaid' README.md
           test -f docs/architecture.md
           test -f docs/methodology.md
-          test -f docs/ci-cd-and-pages.md
+          test -f docs/ci-cd-and-vercel.md
+          test -f vercel.json
           if rg -n '/Users/|/home/' README.md docs; then
             echo "Found machine-specific absolute links in docs/readme."
             exit 1

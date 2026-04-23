@@ -5,7 +5,7 @@ CRIS-SME produces a premium interactive local dashboard:
 - `outputs/reports/cris_sme_dashboard_payload.json`
 - `outputs/reports/cris_sme_dashboard.html`
 
-For publication and demos, the same outputs are assembled into a GitHub Pages-ready bundle:
+For publication and demos, the same outputs are assembled into a deployable static bundle:
 
 - `dist/site/index.html`
 - `dist/site/dashboard.html`
