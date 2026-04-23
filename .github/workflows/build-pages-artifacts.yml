@@ -1,4 +1,4 @@
-name: Build Pages Artifacts
+name: Build Static Site Artifacts
 
 on:
   push:
@@ -9,7 +9,7 @@ permissions:
   contents: read
 
 concurrency:
-  group: pages-build-${{ github.ref }}
+  group: static-site-build-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
@@ -50,14 +50,14 @@ jobs:
         run: |
           PYTHONPATH=src python scripts/run_assessment_snapshot.py --collector mock > /tmp/cris_sme_pages_build.json
 
-      - name: Assemble Pages-ready site bundle
+      - name: Assemble deployable static site bundle
         run: |
           python scripts/build_pages_site.py --reports-dir outputs/reports --figures-dir outputs/figures --dist-dir dist
 
       - name: Upload build bundle
         uses: actions/upload-artifact@v4
         with:
-          name: pages-site-bundle
+          name: static-site-bundle
           path: dist
           retention-days: 14
 
@@ -70,7 +70,7 @@ jobs:
           manifest = json.loads(Path("dist/manifests/build-metadata.json").read_text(encoding="utf-8"))
           build = manifest.get("build", {})
           summary = [
-            "## Pages Build Bundle",
+            "## Static Site Build Bundle",
             "",
             f"- Commit: `{build.get('commit_sha', 'unknown')}`",
             f"- Ref: `{build.get('ref', 'unknown')}`",
@@ -79,20 +79,10 @@ jobs:
             f"- Project version: `{manifest.get('project_version', 'unknown')}`",
             "- Bundle root: `dist/site/`",
             "- Key pages: `index.html`, `dashboard.html`, `report.html`",
+            "- Deployment target: `Vercel (Option 1 direct Git integration)`",
           ]
           summary_path = Path(os.environ["GITHUB_STEP_SUMMARY"])
           with summary_path.open("a", encoding="utf-8") as handle:
             handle.write("\n".join(summary) + "\n")
           PY
         shell: bash
-
-  deploy:
-    name: Deploy to GitHub Pages
-    needs: build-site
-    permissions:
-      contents: read
-      pages: write
-      id-token: write
-    uses: ./.github/workflows/deploy-pages.yml
-    with:
-      artifact-name: pages-site-bundle
