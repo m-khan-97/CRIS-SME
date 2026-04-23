@@ -4,6 +4,15 @@ on:
   push:
     branches: ["main"]
   workflow_dispatch:
+    inputs:
+      collector_mode:
+        description: Collector mode (`mock` or `azure`).
+        required: true
+        default: mock
+        type: choice
+        options:
+          - mock
+          - azure
 
 permissions:
   contents: read
@@ -27,6 +36,9 @@ jobs:
     needs: validate
     permissions:
       contents: read
+    env:
+      REQUESTED_COLLECTOR_MODE: ${{ github.event.inputs.collector_mode || 'mock' }}
+      AZURE_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
     steps:
       - name: Check out repository
@@ -46,9 +58,27 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
+      - name: Resolve collector mode
+        id: collector
+        shell: bash
+        run: |
+          requested="${REQUESTED_COLLECTOR_MODE:-mock}"
+          selected="mock"
+
+          if [ "$requested" = "azure" ]; then
+            if [ -n "${AZURE_SUBSCRIPTION_ID:-}" ]; then
+              selected="azure"
+            else
+              echo "::warning::Azure collector requested but Azure credentials were not configured. Falling back to mock mode."
+              selected="mock"
+            fi
+          fi
+
+          echo "selected=$selected" >> "$GITHUB_OUTPUT"
+
       - name: Build deterministic static site bundle
         run: |
-          python scripts/build_static_site_bundle.py --collector mock --reports-dir outputs/reports --figures-dir outputs/figures --dist-dir dist
+          python scripts/build_static_site_bundle.py --collector "${{ steps.collector.outputs.selected }}" --reports-dir outputs/reports --figures-dir outputs/figures --dist-dir dist
 
       - name: Upload build bundle
         uses: actions/upload-artifact@v4
@@ -76,6 +106,7 @@ jobs:
             "- Bundle root: `dist/site/`",
             "- Key pages: `index.html`, `dashboard.html`, `report.html`",
             "- Deployment target: `Vercel (Option 1 direct Git integration)`",
+            f"- Collector mode used: `${{ steps.collector.outputs.selected }}`",
           ]
           summary_path = Path(os.environ["GITHUB_STEP_SUMMARY"])
           with summary_path.open("a", encoding="utf-8") as handle:

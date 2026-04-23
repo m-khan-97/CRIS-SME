@@ -95,6 +95,41 @@ jobs:
             dist/manifests/build-metadata.json
           retention-days: 30
 
+      - name: Upload static site preview artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: cris-sme-site-preview-${{ steps.meta.outputs.tag }}
+          path: dist/site
+          retention-days: 30
+
+      - name: Release bundle summary
+        shell: bash
+        run: |
+          python - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+
+          tag = os.environ.get("RELEASE_TAG", "unknown")
+          manifest = json.loads(Path("dist/manifests/build-metadata.json").read_text(encoding="utf-8"))
+          lines = [
+              "## Release Bundle Summary",
+              "",
+              f"- Release tag: `{tag}`",
+              f"- Project version: `{manifest.get('project_version', 'unknown')}`",
+              "- Included archives:",
+              f"  - `cris-sme-site-{tag}.tar.gz`",
+              f"  - `cris-sme-site-{tag}.zip`",
+              f"  - `cris-sme-reports-{tag}.tar.gz`",
+              "- Included preview artifact: `dist/site`",
+              "- Included manifest: `dist/manifests/build-metadata.json`",
+          ]
+          with open(os.environ["GITHUB_STEP_SUMMARY"], "a", encoding="utf-8") as handle:
+              handle.write("\n".join(lines) + "\n")
+          PY
+        env:
+          RELEASE_TAG: ${{ steps.meta.outputs.tag }}
+
       - name: Publish GitHub release
         uses: softprops/action-gh-release@v2
         with:
