@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Build a GitHub Pages-ready static site bundle from CRIS-SME outputs."""
+"""Build a deployable static site bundle from CRIS-SME outputs."""
 from __future__ import annotations
 
 import argparse

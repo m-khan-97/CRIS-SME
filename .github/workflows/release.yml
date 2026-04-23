@@ -73,13 +73,9 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      - name: Run deterministic mock assessment
+      - name: Build deterministic static site bundle
         run: |
-          PYTHONPATH=src python scripts/run_assessment_snapshot.py --collector mock > /tmp/cris_sme_release_run.json
-
-      - name: Build Pages site bundle
-        run: |
-          python scripts/build_pages_site.py --reports-dir outputs/reports --figures-dir outputs/figures --dist-dir dist
+          python scripts/build_static_site_bundle.py --collector mock --reports-dir outputs/reports --figures-dir outputs/figures --dist-dir dist
 
       - name: Package release archives
         shell: bash
