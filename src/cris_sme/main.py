@@ -35,23 +35,24 @@ from cris_sme.engine.benchmark import (
     build_benchmark_observation,
     load_benchmark_dataset,
 )
-from cris_sme.engine.uk_readiness import build_cyber_essentials_readiness
 from cris_sme.engine.scoring import score_findings
+from cris_sme.engine.uk_readiness import build_cyber_essentials_readiness
 from cris_sme.policies import load_policy_pack_metadata
 from cris_sme.reporting import (
     archive_report_snapshot,
+    build_cyber_insurance_evidence_pack,
     build_dashboard_html,
     build_dashboard_payload,
-    build_history_comparison,
-    build_cyber_insurance_evidence_pack,
+    build_evaluation_mode_summary,
     build_executive_pack,
+    build_history_comparison,
     build_html_report,
     build_json_report,
     build_summary_report,
     load_report_history,
     maybe_generate_plain_language_narrative,
-    write_appendix_tables,
     write_action_plan_outputs,
+    write_appendix_tables,
     write_benchmark_outputs,
     write_cyber_insurance_evidence_pack,
     write_dashboard_html,
@@ -95,16 +96,17 @@ def main() -> None:
     generated_at = datetime.now(UTC)
     output["generated_at"] = generated_at.isoformat().replace("+00:00", "Z")
     output["collector_mode"] = collector_mode
+
     summary = build_summary_report(
         profiles=profiles,
         scoring_result=result,
     )
     output["executive_summary"] = summary
+
     output_dir = Path(os.getenv("CRIS_SME_OUTPUT_DIR", DEFAULT_OUTPUT_DIR))
     figure_dir = Path(os.getenv("CRIS_SME_FIGURE_DIR", DEFAULT_FIGURE_DIR))
     history_reports_before = load_report_history(output_dir / "history")
 
-    # Refresh benchmark outputs now that run metadata fields are finalized.
     benchmark_dataset = load_benchmark_dataset()
     output["benchmark_observation"] = build_benchmark_observation(output).model_dump()
     output["benchmark_comparison"] = build_benchmark_comparison(
@@ -112,11 +114,9 @@ def main() -> None:
         benchmark_dataset,
     )
 
-    # Build history comparison using existing snapshots plus the current in-memory run.
     comparison_reports = [*history_reports_before, output]
     output["history_comparison"] = build_history_comparison(comparison_reports)
 
-    # Attach finding lifecycle state from historical snapshots and approved exceptions.
     output["finding_lifecycle_summary"] = enrich_report_finding_lifecycle(
         output,
         history_reports_before,
@@ -147,21 +147,6 @@ def main() -> None:
     ).model_dump()
     output["executive_pack"] = build_executive_pack(output)
 
-    # Build dashboard bundle after lifecycle, trend, and remediation layers are fully populated.
-    dashboard_payload = build_dashboard_payload(output, comparison_reports)
-    dashboard_payload_path = write_dashboard_payload(dashboard_payload, output_dir)
-    dashboard_html_path = write_dashboard_html(
-        build_dashboard_html(dashboard_payload),
-        output_dir / "cris_sme_dashboard.html",
-    )
-
-    json_report_path = write_json_report(output, output_dir / "cris_sme_report.json")
-    summary_report_path = write_summary_report(
-        summary, output_dir / "cris_sme_summary.txt"
-    )
-    html_report = build_html_report(output)
-    html_report_path = write_html_report(html_report, output_dir / "cris_sme_report.html")
-    figure_paths = write_report_figures(output, figure_dir)
     history_snapshot_path = archive_report_snapshot(
         output,
         output_dir,
@@ -169,12 +154,30 @@ def main() -> None:
     )
     history_reports = load_report_history(output_dir / "history")
     output["history_comparison"] = build_history_comparison(history_reports)
+    output["evaluation_mode_summary"] = build_evaluation_mode_summary(history_reports)
+
+    dashboard_payload = build_dashboard_payload(output, history_reports)
+    dashboard_payload_path = write_dashboard_payload(dashboard_payload, output_dir)
+    dashboard_html_path = write_dashboard_html(
+        build_dashboard_html(dashboard_payload),
+        output_dir / "cris_sme_dashboard.html",
+    )
+
+    json_report_path = output_dir / "cris_sme_report.json"
+    summary_report_path = write_summary_report(summary, output_dir / "cris_sme_summary.txt")
+    html_report_path = write_html_report(
+        build_html_report(output),
+        output_dir / "cris_sme_report.html",
+    )
+    figure_paths = write_report_figures(output, figure_dir)
     history_figure_paths = write_history_figures(history_reports, figure_dir)
     appendix_paths = write_appendix_tables(output, output_dir)
     insurance_paths = write_cyber_insurance_evidence_pack(
         output["cyber_insurance_evidence"], output_dir
     )
-    action_plan_paths = write_action_plan_outputs(output["action_plan_30_day"], output_dir)
+    action_plan_paths = write_action_plan_outputs(
+        output["action_plan_30_day"], output_dir
+    )
     benchmark_paths = write_benchmark_outputs(
         output["benchmark_observation"],
         output["benchmark_comparison"],
@@ -186,6 +189,7 @@ def main() -> None:
         if narrator_output is not None
         else {}
     )
+
     output["report_artifacts"] = {
         "json_report": str(json_report_path),
         "html_report": str(html_report_path),

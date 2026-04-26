@@ -17,6 +17,7 @@ def build_html_report(report: dict[str, object]) -> str:
     organizations = report.get("organizations", [])
     prioritized_risks = report.get("prioritized_risks", [])
     history_comparison = report.get("history_comparison", {})
+    evaluation_mode_summary = report.get("evaluation_mode_summary", {})
     compliance = report.get("compliance", {})
     budget_aware_remediation = report.get("budget_aware_remediation", {})
     action_plan_30_day = report.get("action_plan_30_day", {})
@@ -57,6 +58,7 @@ def build_html_report(report: dict[str, object]) -> str:
     )
 
     comparison_card = _build_history_comparison_card(history_comparison)
+    evaluation_modes_card = _build_evaluation_modes_card(evaluation_mode_summary)
     confidence_card = _build_confidence_calibration_card(confidence_calibration)
     native_validation_card = _build_native_validation_card(native_validation)
     uk_regulatory_card = _build_uk_regulatory_card(compliance)
@@ -1150,9 +1152,10 @@ def build_html_report(report: dict[str, object]) -> str:
             <div>
               <span class="section-kicker">Longitudinal Tracking</span>
               <h2>Run Comparison</h2>
-              <p>Modern governance tools stand out when they show movement over time. This section highlights posture drift and progress, not just a one-off scan.</p>
+              <p>Modern governance tools stand out when they show movement over time and across evidence classes. This section highlights posture drift, mode coverage, and progress rather than only a one-off scan.</p>
             </div>
           </div>
+          {evaluation_modes_card}
           {comparison_card}
         </section>
 
@@ -1775,6 +1778,50 @@ def _build_finding_lifecycle_card(lifecycle_summary: object) -> str:
         if detail_markup
         else "<p>No lifecycle summary is available yet.</p>"
     )
+
+
+def _build_evaluation_modes_card(evaluation_mode_summary: object) -> str:
+    """Build compact HTML for the paper-facing three-mode evaluation summary."""
+    if not isinstance(evaluation_mode_summary, dict):
+        return ""
+
+    modes = evaluation_mode_summary.get("modes", [])
+    if not isinstance(modes, list) or not modes:
+        return ""
+
+    cards = []
+    for mode in modes:
+        if not isinstance(mode, dict):
+            continue
+        label = escape(str(mode.get("label", "Assessment Mode")))
+        evidence_class = escape(str(mode.get("evidence_class", "Archived evidence")))
+        overall_risk = float(mode.get("overall_risk_score", 0.0))
+        generated_findings = escape(str(mode.get("generated_findings", 0)))
+        non_compliant_findings = escape(str(mode.get("non_compliant_findings", 0)))
+        collector_mode = escape(str(mode.get("collector_mode", "unknown")))
+        cards.append(
+            f"""
+            <div class="metric-card">
+              <h3>{label}</h3>
+              <p class="metric-value">{overall_risk:.2f}</p>
+              <p class="metric-meta">{evidence_class}</p>
+              <p class="metric-footnote">Findings {generated_findings} | Non-compliant {non_compliant_findings} | Collector {collector_mode}</p>
+            </div>
+            """
+        )
+
+    if not cards:
+        return ""
+
+    return f"""
+    <div class="metric-grid" style="margin-bottom: 16px;">
+      <div class="metric-card" style="grid-column: 1 / -1;">
+        <h3>Three-Mode Evaluation Summary</h3>
+        <p class="metric-meta">Synthetic, live Azure, and vulnerable-lab evidence are treated as equal first-class evaluation modes in the paper-facing output.</p>
+      </div>
+      {''.join(cards)}
+    </div>
+    """
 
 
 def _build_confidence_calibration_card(calibration: object) -> str:

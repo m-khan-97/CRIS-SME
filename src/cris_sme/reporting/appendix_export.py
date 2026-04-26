@@ -29,6 +29,7 @@ def write_appendix_tables(
 def build_results_appendix_markdown(report: dict[str, Any]) -> str:
     """Build a compact markdown appendix from the current report."""
     category_scores = report.get("category_scores", {})
+    evaluation_mode_summary = report.get("evaluation_mode_summary", {})
     history_comparison = report.get("history_comparison", {})
     prioritized_risks = report.get("prioritized_risks", [])
     remediation = report.get("budget_aware_remediation", {})
@@ -40,6 +41,29 @@ def build_results_appendix_markdown(report: dict[str, Any]) -> str:
     if isinstance(category_scores, dict):
         for category, score in category_scores.items():
             category_lines.append(f"| {category} | {float(score):.2f} |")
+
+    evaluation_mode_lines = [
+        "| Mode | Evidence Class | Overall Risk | Generated Findings | Non-Compliant Findings | Collector |",
+        "| --- | --- | ---: | ---: | ---: | --- |",
+    ]
+    modes = (
+        evaluation_mode_summary.get("modes", [])
+        if isinstance(evaluation_mode_summary, dict)
+        else []
+    )
+    if isinstance(modes, list):
+        for mode in modes:
+            if not isinstance(mode, dict):
+                continue
+            evaluation_mode_lines.append(
+                "| "
+                f"{mode.get('label', '')} | "
+                f"{mode.get('evidence_class', '')} | "
+                f"{float(mode.get('overall_risk_score', 0.0)):.2f} | "
+                f"{int(mode.get('generated_findings', 0))} | "
+                f"{int(mode.get('non_compliant_findings', 0))} | "
+                f"{mode.get('collector_mode', '')} |"
+            )
 
     comparison_lines = ["| Metric | Value |", "| --- | --- |"]
     if isinstance(history_comparison, dict):
@@ -129,6 +153,10 @@ def build_results_appendix_markdown(report: dict[str, Any]) -> str:
             "## Category Scores",
             "",
             *category_lines,
+            "",
+            "## Three-Mode Evaluation Summary",
+            "",
+            *evaluation_mode_lines,
             "",
             "## Archived Run Comparison",
             "",

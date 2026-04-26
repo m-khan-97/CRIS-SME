@@ -140,9 +140,9 @@ Purpose:
 
 Current reference live snapshot:
 
-- Azure-backed run with overall risk score `33.23`
+- Azure-backed run with overall risk score `32.79`
 - `18` non-compliant findings
-- Defender comparison showing `7` mapped controls, `2` agreements, `4` CRIS-only findings, and `0` native-only findings in the selected reference snapshot
+- Defender comparison showing `7` mapped controls, `0` agreements, `6` CRIS-only findings, and `0` native-only findings in the selected reference snapshot
 
 Limitations:
 

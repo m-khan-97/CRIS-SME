@@ -155,12 +155,157 @@ def build_history_comparison(
     return comparison
 
 
+def build_evaluation_mode_summary(
+    reports: list[dict[str, Any]],
+) -> dict[str, Any]:
+    """Summarize the latest archived report for each major evaluation mode."""
+    if not reports:
+        return {"mode_count": 0, "modes": []}
+
+    latest_by_mode: dict[str, dict[str, Any]] = {}
+    for report in reports:
+        latest_by_mode[_classify_evaluation_mode(report)] = report
+
+    modes: list[dict[str, Any]] = []
+    for mode_key in ("synthetic_baseline", "live_azure", "vulnerable_lab", "other"):
+        report = latest_by_mode.get(mode_key)
+        if report is None:
+            continue
+        context = report.get("evaluation_context", {})
+        modes.append(
+            {
+                "mode_key": mode_key,
+                "label": _mode_label(mode_key),
+                "evidence_class": _evidence_class(mode_key),
+                "generated_at": report.get("generated_at"),
+                "collector_mode": report.get("collector_mode"),
+                "overall_risk_score": round(
+                    _safe_float(report.get("overall_risk_score")),
+                    2,
+                ),
+                "generated_findings": int(context.get("generated_findings", 0))
+                if isinstance(context, dict)
+                else 0,
+                "non_compliant_findings": int(
+                    context.get("non_compliant_findings", 0)
+                )
+                if isinstance(context, dict)
+                else 0,
+                "category_scores": {
+                    str(category): round(_safe_float(score), 2)
+                    for category, score in (
+                        report.get("category_scores", {}) or {}
+                    ).items()
+                }
+                if isinstance(report.get("category_scores"), dict)
+                else {},
+            }
+        )
+
+    return {"mode_count": len(modes), "modes": modes}
+
+
 def _safe_float(value: Any) -> float:
     """Return a float-like value or zero when conversion fails."""
     try:
         return float(value)
     except (TypeError, ValueError):
         return 0.0
+
+
+def _classify_evaluation_mode(report: dict[str, Any]) -> str:
+    """Classify a report into a paper-facing evaluation mode."""
+    dataset = report.get("evaluation_dataset", {})
+    source_types = set()
+    authorization_bases = set()
+    if isinstance(dataset, dict):
+        source_types = {
+            str(item).strip().lower()
+            for item in dataset.get("source_types", [])
+            if str(item).strip()
+        }
+        authorization_bases = {
+            str(item).strip().lower()
+            for item in dataset.get("authorization_bases", [])
+            if str(item).strip()
+        }
+
+    details = _collect_organization_details(report)
+    profile_sources = {
+        str(item.get("profile_source", "")).strip().lower()
+        for item in details
+        if str(item.get("profile_source", "")).strip()
+    }
+    detail_source_types = {
+        str(item.get("dataset_source_type", "")).strip().lower()
+        for item in details
+        if str(item.get("dataset_source_type", "")).strip()
+    }
+    detail_authorization_bases = {
+        str(item.get("authorization_basis", "")).strip().lower()
+        for item in details
+        if str(item.get("authorization_basis", "")).strip()
+    }
+
+    all_source_types = source_types | detail_source_types
+    all_authorization_bases = authorization_bases | detail_authorization_bases
+
+    if (
+        "vulnerable_lab" in all_source_types
+        or "intentionally_vulnerable_lab" in all_authorization_bases
+    ):
+        return "vulnerable_lab"
+
+    if (
+        "synthetic_dataset" in all_source_types
+        or "synthetic_dataset" in all_authorization_bases
+        or "synthetic" in profile_sources
+        or report.get("collector_mode") == "mock"
+    ):
+        return "synthetic_baseline"
+
+    if report.get("collector_mode") == "azure":
+        return "live_azure"
+
+    return "other"
+
+
+def _collect_organization_details(report: dict[str, Any]) -> list[dict[str, Any]]:
+    """Collect per-organization collection detail dictionaries from a report."""
+    organizations = report.get("organizations", [])
+    if not isinstance(organizations, list):
+        return []
+
+    details: list[dict[str, Any]] = []
+    for organization in organizations:
+        if not isinstance(organization, dict):
+            continue
+        collection_details = organization.get("collection_details", {})
+        if isinstance(collection_details, dict):
+            details.append(collection_details)
+    return details
+
+
+def _mode_label(mode_key: str) -> str:
+    """Return the paper-facing label for an evaluation mode."""
+    labels = {
+        "synthetic_baseline": "Synthetic Baseline",
+        "live_azure": "Live Azure Case Study",
+        "vulnerable_lab": "AzureGoat Vulnerable Lab",
+        "other": "Other Assessment Mode",
+    }
+    return labels.get(mode_key, "Other Assessment Mode")
+
+
+def _evidence_class(mode_key: str) -> str:
+    """Return a short evidence-class description for an evaluation mode."""
+    classes = {
+        "synthetic_baseline": "Controlled synthetic profiles",
+        "live_azure": "Authorized live Azure evidence",
+        "vulnerable_lab": "Intentionally vulnerable lab evidence",
+        "other": "Other archived assessment evidence",
+    }
+    return classes.get(mode_key, "Other archived assessment evidence")
 
 
 def _find_previous_distinct_mode_report(

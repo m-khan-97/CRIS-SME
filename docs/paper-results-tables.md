@@ -5,7 +5,7 @@
 
 This document consolidates the current CRIS-SME results into a paper-friendly form. It is intended to support the evaluation and results sections of the first manuscript.
 
-The tables below deliberately separate:
+The tables below deliberately separate and then recombine:
 
 - the current synthetic SME baseline
 - the latest live Azure case-study baseline used for research discussion
@@ -15,58 +15,45 @@ The tables below deliberately separate:
 
 | Mode | Source | Purpose | Current Role in Paper |
 | --- | --- | --- | --- |
-| Synthetic / mock | `data/synthetic_sme_profiles.json` | Repeatable control and scoring validation | Baseline for controlled comparison |
-| Live Azure | Archived Azure-backed assessment snapshot | Case-study evaluation with real cloud evidence | Main empirical case study |
-| AzureGoat vulnerable lab | Constrained AzureGoat deployment in an authorized subscription | Control-stress test with intentionally vulnerable resources | Secondary empirical stress track |
+| Synthetic / mock | `data/synthetic_sme_profiles.json` | Repeatable control and scoring validation | Equal first-class evaluation mode |
+| Live Azure | Archived Azure-backed assessment snapshot | Real-cloud feasibility with authorized tenant evidence | Equal first-class evaluation mode |
+| AzureGoat vulnerable lab | Constrained AzureGoat deployment in an authorized subscription | Control-stress test with intentionally vulnerable resources | Equal first-class evaluation mode |
 
-## Table 2. Headline Outcome Comparison: Synthetic Baseline vs Live Azure
+## Table 2. Headline Outcome Comparison Across the Three Modes
 
-| Metric | Synthetic Baseline | Live Azure Case Study |
-| --- | ---: | ---: |
-| Overall risk score | 39.84 | 33.23 |
-| Evaluated profiles | 3 | 1 |
-| Generated findings | 50 | 19 |
-| Non-compliant findings | 49 | 18 |
-| Collector mode | mock | azure |
-
-Notes:
-
-- Synthetic data currently produces a broader and more numerous finding set because it covers multiple deliberately stressed SME profiles.
-- The live Azure case study is narrower but grounded in real subscription evidence.
-
-## Table 2a. AzureGoat Vulnerable-Lab Snapshot
-
-| Metric | AzureGoat Lab Track |
-| --- | ---: |
-| Overall risk score | 32.79 |
-| Evaluated profiles | 1 |
-| Non-compliant findings | 18 |
-| Collector mode | azure |
-| Dataset source type | vulnerable_lab |
-| Authorization basis | intentionally_vulnerable_lab |
+| Metric | Synthetic Baseline | Live Azure Case Study | AzureGoat Vulnerable Lab |
+| --- | ---: | ---: | ---: |
+| Overall risk score | 39.84 | 32.79 | 32.79 |
+| Evaluated profiles | 3 | 1 | 1 |
+| Generated findings | 50 | 19 | 18 |
+| Non-compliant findings | 49 | 18 | 18 |
+| Collector mode | mock | azure | azure |
+| Dataset source type | synthetic_dataset | live_real | vulnerable_lab |
+| Authorization basis | synthetic_dataset | authorized_tenant_access | intentionally_vulnerable_lab |
 
 Interpretation:
 
-- The AzureGoat-derived run gives CRIS-SME a third evaluation mode between synthetic profiles and the live production-adjacent case study.
-- This track is especially useful for stressing exposed storage, function-app, network, and data-governance controls in an authorized environment.
-- The current AzureGoat snapshot was collected from a constrained deployment variant because subscription policy and regional capacity prevented a full stock-lab rollout.
+- Synthetic data currently produces the broadest and most numerous finding set because it covers multiple deliberately stressed SME profiles.
+- The live Azure run contributes real subscription evidence and Azure-native comparison hooks.
+- The AzureGoat-derived run contributes a lawful vulnerable-lab stress track that reaches different control paths from the live tenant.
+- Together, the three modes form the main evaluation story rather than a primary-plus-secondary hierarchy.
 
 ## Table 3. Category Score Comparison
 
-| Category | Synthetic Baseline | Live Azure Case Study | Delta (Live - Synthetic) |
+| Category | Synthetic Baseline | Live Azure Case Study | AzureGoat Vulnerable Lab |
 | --- | ---: | ---: | ---: |
-| IAM | 34.00 | 14.78 | -19.22 |
-| Network | 51.62 | 47.59 | -4.03 |
-| Data | 42.05 | 39.75 | -2.30 |
-| Monitoring/Logging | 37.61 | 36.38 | -1.23 |
-| Compute/Workloads | 42.69 | 39.02 | -3.67 |
-| Cost/Governance Hygiene | 26.91 | 27.11 | +0.20 |
+| IAM | 34.00 | 14.78 | 14.78 |
+| Network | 51.62 | 38.02 | 38.02 |
+| Data | 42.05 | 48.65 | 48.65 |
+| Monitoring/Logging | 37.61 | 36.38 | 36.38 |
+| Compute/Workloads | 42.69 | 38.29 | 38.29 |
+| Cost/Governance Hygiene | 26.91 | 24.80 | 24.80 |
 
 Interpretation:
 
-- Network remains the highest-risk domain in both settings.
-- IAM is substantially lower in the live case-study snapshot than in the synthetic baseline, which suggests the synthetic baseline still stresses identity governance more aggressively than the current live tenant.
-- Governance hygiene is broadly comparable across both modes.
+- Network remains a dominant risk domain across all three settings.
+- IAM is substantially lower in both Azure-backed runs than in the synthetic baseline, which suggests the synthetic baseline still stresses identity governance more aggressively than the current observed Azure environments.
+- Data risk is highest in the vulnerable-lab track, showing that the three-mode framing surfaces domain-specific variation rather than only overall-score variation.
 
 ## Table 4. Native Recommendation Validation in the Live Azure Case Study
 
@@ -74,23 +61,23 @@ Interpretation:
 | --- | ---: |
 | Framework | Microsoft Defender for Cloud |
 | Controls mapped | 7 |
-| Native unhealthy recommendations | 10 |
-| Agreement count | 2 |
-| CRIS-only count | 4 |
+| Native unhealthy recommendations | 0 |
+| Agreement count | 0 |
+| CRIS-only count | 6 |
 | Native-only count | 0 |
 
 Interpretation:
 
-- CRIS-SME and Defender aligned on two mapped control areas in the reference live snapshot.
-- Four mapped controls were CRIS-only, which supports the argument that CRIS-SME adds distinct governance interpretation rather than merely reproducing Azure-native output.
+- In the latest live snapshot, no mapped control was visible as an active unhealthy Defender recommendation.
+- Six mapped controls were CRIS-only, which supports the argument that CRIS-SME adds distinct governance interpretation rather than merely reproducing Azure-native output.
 - No mapped control was native-only in this reference live comparison.
 
 ## Table 5. Live Azure Control-Level Agreement Snapshot
 
 | Control | Comparison Status | CRIS-SME Score | Native Recommendation Count |
 | --- | --- | ---: | ---: |
-| IAM-002 | agreement | 24.98 | 1 |
-| NET-002 | agreement | 44.71 | 3 |
+| IAM-002 | cris_only | 24.98 | 0 |
+| NET-002 | cris_only | 25.55 | 0 |
 | NET-001 | cris_only | 50.48 | 0 |
 | CMP-002 | cris_only | 39.53 | 0 |
 | CMP-003 | cris_only | 38.49 | 0 |
@@ -99,8 +86,8 @@ Interpretation:
 
 Interpretation:
 
-- Agreement is strongest in subscription ownership hygiene and permissive network exposure.
-- CRIS-SME identifies several workload and monitoring governance concerns that were not surfaced in the visible unhealthy Defender recommendations of this snapshot.
+- The latest live snapshot is currently a CRIS-dominant comparison rather than an agreement-heavy one.
+- CRIS-SME identifies several workload, network, and monitoring governance concerns that were not surfaced in the visible unhealthy Defender recommendations of this snapshot.
 
 ## Table 6. Synthetic Baseline Top Risks
 
@@ -167,8 +154,8 @@ The cleanest paper structure is:
 
 These tables were prepared from:
 
-- the current synthetic report in `outputs/reports/cris_sme_report.json`
-- the live Azure historical snapshot `outputs/reports/history/cris_sme_report_20260418T004604Z.json`
+- the synthetic baseline report lineage represented in `outputs/reports/history/`
+- the live Azure historical snapshot `outputs/reports/history/cris_sme_report_20260422T123539Z.json`
 - the AzureGoat vulnerable-lab run collected on `2026-04-22`
 
 If newer live snapshots are used in the paper, this document should be refreshed to keep the manuscript numerically consistent.

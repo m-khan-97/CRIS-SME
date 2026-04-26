@@ -27,14 +27,14 @@ The current evaluation is not framed as a benchmark against commercial CSPM tool
 
 Archived runs currently include:
 
-- a mock assessment snapshot with an overall score of `39.90`
-- a frozen live Azure case-study snapshot with an overall score of `33.23`
+- a mock assessment snapshot with an overall score of `39.84`
+- a latest live Azure case-study snapshot with an overall score of `32.79`
 - an AzureGoat vulnerable-lab snapshot with an overall score of `32.79`
 
-For the frozen live Azure case-study snapshot:
+For the latest live Azure case-study snapshot:
 
 - delta versus previous Azure run: `0.0`
-- delta versus previous distinct mock run: `-6.61`
+- delta versus previous distinct mock run: `-7.05`
 
 This is useful because it separates two forms of comparison:
 
@@ -45,25 +45,36 @@ It also creates a third evaluation lens:
 
 - stress testing against an intentionally vulnerable Azure lab in an explicitly authorized environment
 
-## Latest Live Azure Results
+Taken together, these runs should now be presented as a three-mode evaluation rather than as one primary case study plus supporting runs.
 
-The frozen live Azure assessment produced:
+## Three-Mode Headline Results
 
-- overall risk score: `33.23/100`
+The current three-mode comparison is:
+
+- synthetic SME baseline: `39.84/100`, `50` generated findings, `49` non-compliant findings
+- latest live Azure case-study snapshot: `32.79/100`, `19` generated findings, `18` non-compliant findings
+- AzureGoat-derived vulnerable-lab snapshot: `32.79/100`, `18` generated findings, `18` non-compliant findings
+
+This framing is stronger than a single-primary narrative because it shows that CRIS-SME has been exercised across controlled synthetic evidence, authorized live cloud evidence, and an intentionally stressed but lawful lab environment.
+
+## Live Azure Results
+
+The latest live Azure assessment produced:
+
+- overall risk score: `32.79/100`
 - non-compliant findings: `18`
 - IAM score: `14.78`
-- Network score: `47.59`
-- Data score: `39.75`
+- Network score: `38.02`
+- Data score: `48.65`
 - Monitoring/Logging score: `36.38`
-- Compute/Workloads score: `39.02`
-- Cost/Governance Hygiene score: `27.11`
+- Compute/Workloads score: `38.29`
+- Cost/Governance Hygiene score: `24.80`
 
 The most significant live findings remain concentrated in:
 
+- public storage exposure
 - public administrative service exposure
-- permissive network rule posture
-- workload hardening gaps
-- incomplete endpoint and backup coverage
+- endpoint protection and workload hardening gaps
 - data/key-management weaknesses
 
 ## AzureGoat Vulnerable-Lab Results
@@ -89,7 +100,7 @@ One important methodological note is that this was not a fully stock AzureGoat r
 
 The identity layer is now stronger than the earlier MVP, but still intentionally conservative.
 
-Observed identity context in the frozen live Azure case-study snapshot:
+Observed identity context in the latest live Azure case-study snapshot:
 
 - `2` privileged assignments
 - `1` privileged principal
@@ -103,17 +114,17 @@ This means CRIS-SME can now report richer Entra-aware context than before, while
 
 The archived-run comparison now includes control-level deltas versus the most recent distinct-mode baseline. Some of the strongest differences between the live Azure run and the mock baseline are:
 
-- `NET-002`: `+16.68`
-- `CMP-005`: `+15.46`
-- `DATA-004`: `+14.83`
 - `CMP-002`: `+14.83`
+- `DATA-004`: `+14.73`
 - `MON-002`: `+14.37`
+- `DATA-003`: `+14.09`
+- `CMP-004`: `+13.82`
 
 These shifts suggest that the live environment surfaces stronger externally exposed and workload-level issues than the synthetic baseline did in those areas.
 
 One notable negative delta is:
 
-- `MON-001`: `-7.82`
+- `DATA-001`: `-10.14`
 
 This is useful because it shows the comparison layer can highlight not only stronger live risks, but also areas where the live environment is less severe than the mock baseline.
 
@@ -141,9 +152,10 @@ The present evaluation still has several boundaries:
 
 This draft can serve as the backbone for a results section in a conference paper:
 
-- use the archived mock run as the baseline
-- use the live Azure run as the primary case study
-- use the AzureGoat lab run as the secondary stress-test case
+- present the three modes together in a single headline table
+- treat synthetic, live Azure, and AzureGoat as equal first-class evidence classes
+- use the live Azure subsection for real-tenant feasibility and native-tool comparison
+- use the AzureGoat subsection for lawful stress behavior and control-path coverage
 - embed the SVG or PNG figures from `outputs/figures/`
 - cite the appendix tables from `outputs/reports/results_appendix.md`
 - use the control delta section to discuss why live evidence changes risk interpretation

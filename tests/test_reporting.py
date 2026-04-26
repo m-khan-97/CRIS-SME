@@ -21,6 +21,7 @@ from cris_sme.models.cloud_profile import (
 )
 from cris_sme.reporting import (
     archive_report_snapshot,
+    build_evaluation_mode_summary,
     build_html_report,
     build_cyber_insurance_evidence_pack,
     build_history_comparison,
@@ -370,11 +371,34 @@ def test_report_history_archive_and_history_figures_work(tmp_path) -> None:
         "generated_at": "2026-04-14T10:00:00Z",
         "collector_mode": "mock",
         "overall_risk_score": 41.2,
+        "evaluation_context": {"generated_findings": 50, "non_compliant_findings": 49},
+        "organizations": [
+            {
+                "collection_details": {
+                    "profile_source": "synthetic",
+                }
+            }
+        ],
     }
     report_two = {
         "generated_at": "2026-04-15T10:00:00Z",
         "collector_mode": "azure",
         "overall_risk_score": 33.12,
+        "evaluation_context": {"generated_findings": 19, "non_compliant_findings": 18},
+        "evaluation_dataset": {
+            "source_types": ["authorized_tenant"],
+            "authorization_bases": ["authorized_tenant_access"],
+        },
+    }
+    report_three = {
+        "generated_at": "2026-04-16T10:00:00Z",
+        "collector_mode": "azure",
+        "overall_risk_score": 32.79,
+        "evaluation_context": {"generated_findings": 18, "non_compliant_findings": 18},
+        "evaluation_dataset": {
+            "source_types": ["vulnerable_lab"],
+            "authorization_bases": ["intentionally_vulnerable_lab"],
+        },
     }
 
     archive_report_snapshot(
@@ -387,15 +411,21 @@ def test_report_history_archive_and_history_figures_work(tmp_path) -> None:
         tmp_path / "reports",
         timestamp=datetime(2026, 4, 15, 10, 0, tzinfo=UTC),
     )
+    archive_report_snapshot(
+        report_three,
+        tmp_path / "reports",
+        timestamp=datetime(2026, 4, 16, 10, 0, tzinfo=UTC),
+    )
 
     history = load_report_history(tmp_path / "reports" / "history")
     comparison = build_history_comparison(history)
+    evaluation_mode_summary = build_evaluation_mode_summary(history)
     figure_paths = write_history_figures(history, tmp_path / "figures")
     appendix_paths = write_appendix_tables(
         {
-            "generated_at": "2026-04-15T10:00:00Z",
-            "overall_risk_score": 33.12,
-            "summary": "Overall risk score: 33.12/100 across 16 non-compliant findings.",
+            "generated_at": "2026-04-16T10:00:00Z",
+            "overall_risk_score": 32.79,
+            "summary": "Overall risk score: 32.79/100 across 18 non-compliant findings.",
             "category_scores": {"IAM": 14.64, "Network": 47.41},
             "prioritized_risks": [
                 {
@@ -408,6 +438,7 @@ def test_report_history_archive_and_history_figures_work(tmp_path) -> None:
                     "organization": "Azure SME Tenant",
                 }
             ],
+            "evaluation_mode_summary": evaluation_mode_summary,
             "history_comparison": comparison,
         },
         tmp_path / "reports",
@@ -419,14 +450,17 @@ def test_report_history_archive_and_history_figures_work(tmp_path) -> None:
     appendix_md = appendix_paths["results_appendix_markdown"].read_text(encoding="utf-8")
     appendix_csv = appendix_paths["prioritized_risks_csv"].read_text(encoding="utf-8")
 
-    assert len(history) == 2
-    assert comparison["overall_risk_delta"] == -8.08
+    assert len(history) == 3
+    assert comparison["overall_risk_delta"] == -0.33
     assert comparison["previous_distinct_mode"] == "mock"
-    assert comparison["overall_risk_delta_vs_distinct_mode"] == -8.08
+    assert comparison["overall_risk_delta_vs_distinct_mode"] == -8.41
+    assert evaluation_mode_summary["mode_count"] == 3
     assert "CRIS-SME Overall Risk Trend" in trend_svg
     assert "CRIS-SME Run Comparison" in comparison_svg
     assert trend_png.exists()
     assert "CRIS-SME Results Appendix" in appendix_md
+    assert "Three-Mode Evaluation Summary" in appendix_md
+    assert "AzureGoat Vulnerable Lab" in appendix_md
     assert (
         "control_id,title,category,priority,severity,score,organization,remediation_cost_tier,remediation_value_score,budget_fit_profiles,remediation_summary"
         in appendix_csv

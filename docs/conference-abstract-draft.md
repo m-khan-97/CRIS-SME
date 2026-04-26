@@ -13,7 +13,7 @@ Small and medium enterprises (SMEs) adopting cloud infrastructure frequently fac
 
 CRIS-SME uses a provider-neutral core architecture with an Azure-first implementation. The framework evaluates cloud posture across identity and access management, network exposure, data protection, monitoring and logging, compute/workload hardening, and governance hygiene. Findings are translated into normalized risk objects, scored using a deterministic model, and aggregated into category-level and overall risk views. To support research transparency, CRIS-SME records collection provenance, explicit observability boundaries, archived run history, and appendix-ready outputs for downstream analysis.
 
-The current implementation was validated using three evidence modes: synthetic SME profiles, repeated live Azure-backed assessment runs, and an AzureGoat-derived intentionally vulnerable lab track. In the frozen live Azure case-study snapshot used as the main empirical reference, CRIS-SME observed `18` non-compliant findings and produced an overall risk score of `33.23/100`. In the AzureGoat vulnerable-lab snapshot, CRIS-SME also observed `18` non-compliant findings with an overall risk score of `32.79/100`. Across these empirical modes, the most significant risks related to public administrative network exposure, broadly permissive network rules, Linux password-based SSH access, incomplete key-management protections, and weak endpoint/workload protection coverage. Identity evidence was strengthened through subscription-scoped privileged role assessment and Entra-adjacent directory-role visibility, while still explicitly marking tenant-wide conditional-access observability as partial where access was constrained.
+The current implementation was validated using three evidence modes: synthetic SME profiles, repeated live Azure-backed assessment runs, and an AzureGoat-derived intentionally vulnerable lab track. In the current three-mode evaluation, the synthetic baseline produced an overall risk score of `39.84/100`, the latest live Azure snapshot produced `32.79/100`, and the AzureGoat vulnerable-lab snapshot produced `32.79/100`. Across these evidence modes, the most significant risks related to public administrative network exposure, public storage exposure, incomplete key-management protections, and weak endpoint/workload protection coverage. Identity evidence was strengthened through subscription-scoped privileged role assessment and Entra-adjacent directory-role visibility, while still explicitly marking tenant-wide conditional-access observability as partial where access was constrained.
 
 The contribution of CRIS-SME is not a claim of fully autonomous security intelligence, but a research-backed, explainable, and iteratively extensible governance assessment framework that is practical for SMEs. The framework demonstrates how deterministic risk analytics, provenance-aware reporting, archived-run comparison, and lightweight research artifacts can form a credible bridge between engineering implementation and publishable cloud governance research.
 
@@ -21,13 +21,13 @@ The contribution of CRIS-SME is not a claim of fully autonomous security intelli
 
 Current empirical points available for a paper or poster draft:
 
-- mock archived run overall risk: `39.90`
-- frozen live Azure case-study overall risk: `33.23`
+- mock archived run overall risk: `39.84`
+- latest live Azure case-study overall risk: `32.79`
 - AzureGoat vulnerable-lab overall risk: `32.79`
-- live Azure versus mock delta: `-6.61`
+- live Azure versus mock delta: `-7.05`
 - live Azure case-study IAM observability state: `broad`
 - live Azure case-study mapped Defender controls: `7`
-- live Azure case-study agreement count: `2`
+- live Azure case-study agreement count: `0`
 
 ## Candidate Contribution Framing
 
