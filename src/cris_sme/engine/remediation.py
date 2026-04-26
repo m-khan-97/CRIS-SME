@@ -1,8 +1,6 @@
 # Deterministic budget-aware remediation planning for SME-oriented action packs.
 from __future__ import annotations
 
-from typing import Any
-
 from pydantic import BaseModel, Field
 
 from cris_sme.engine.scoring import ScoredFinding

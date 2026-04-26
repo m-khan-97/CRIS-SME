@@ -1,9 +1,9 @@
 # IAM governance controls that convert synthetic Azure posture into explainable findings.
 from __future__ import annotations
 
+from cris_sme.controls.common import build_control_finding
 from cris_sme.models.cloud_profile import CloudProfile
 from cris_sme.models.finding import Finding, FindingSeverity
-from cris_sme.controls.common import build_control_finding, sector_data_sensitivity, base_metadata
 
 
 def evaluate_iam_controls(profiles: list[CloudProfile]) -> list[Finding]:

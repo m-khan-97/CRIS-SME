@@ -923,61 +923,6 @@ def test_azure_collector_enriches_data_profile_from_sql_inventory() -> None:
 def test_azure_collector_enriches_compute_profile_from_vm_inventory(
     monkeypatch,
 ) -> None:
-    subscriptions = [
-        SimpleNamespace(
-            subscription_id="sub-123",
-            display_name="Compute Subscription",
-            tenant_id="tenant-001",
-            state="Enabled",
-        )
-    ]
-    virtual_machines = [
-        SimpleNamespace(
-            id="/subscriptions/sub-123/resourceGroups/rg-a/providers/Microsoft.Compute/virtualMachines/vm-a",
-            name="vm-a",
-            diagnostics_profile=SimpleNamespace(
-                boot_diagnostics=SimpleNamespace(enabled=True)
-            ),
-            security_profile=SimpleNamespace(
-                security_type="TrustedLaunch",
-                encryption_at_host=True,
-            ),
-            os_profile=SimpleNamespace(
-                windows_configuration=SimpleNamespace(
-                    enable_automatic_updates=True,
-                    patch_settings=SimpleNamespace(patch_mode="AutomaticByPlatform"),
-                ),
-                linux_configuration=None,
-            ),
-        ),
-        SimpleNamespace(
-            id="/subscriptions/sub-123/resourceGroups/rg-b/providers/Microsoft.Compute/virtualMachines/vm-b",
-            name="vm-b",
-            diagnostics_profile=SimpleNamespace(
-                boot_diagnostics=SimpleNamespace(enabled=False)
-            ),
-            security_profile=SimpleNamespace(
-                security_type="",
-                encryption_at_host=False,
-            ),
-            os_profile=SimpleNamespace(
-                windows_configuration=None,
-                linux_configuration=SimpleNamespace(
-                    patch_settings=SimpleNamespace(patch_mode="Manual")
-                ),
-            ),
-        ),
-    ]
-    extensions_by_vm = {
-        ("rg-a", "vm-a"): [
-            SimpleNamespace(
-                publisher="Microsoft.Azure.Security",
-                type="IaaSAntimalware",
-            )
-        ],
-        ("rg-b", "vm-b"): [],
-    }
-
     class FakeCompletedProcess:
         def __init__(self, stdout: str) -> None:
             self.stdout = stdout

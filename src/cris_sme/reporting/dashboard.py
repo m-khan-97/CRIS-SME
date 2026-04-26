@@ -2,7 +2,6 @@
 from __future__ import annotations
 
 import json
-from html import escape
 from pathlib import Path
 from statistics import mean
 from typing import Any
