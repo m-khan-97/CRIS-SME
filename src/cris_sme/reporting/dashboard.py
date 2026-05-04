@@ -141,6 +141,9 @@ def build_dashboard_payload(
         "decision_provenance_graph": _decision_provenance_graph_summary(
             report.get("decision_provenance_graph", {})
         ),
+        "claim_verification_pack": _claim_verification_pack_summary(
+            report.get("claim_verification_pack", {})
+        ),
         "control_drift_attribution": _control_drift_attribution_summary(
             report.get("control_drift_attribution", {})
         ),
@@ -926,6 +929,29 @@ def _decision_provenance_graph_summary(raw_graph: object) -> dict[str, Any]:
         "edge_type_counts": raw_graph.get("edge_type_counts", {}),
         "top_decision_paths": raw_graph.get("top_decision_paths", [])[:10]
         if isinstance(raw_graph.get("top_decision_paths"), list)
+        else [],
+    }
+
+
+def _claim_verification_pack_summary(raw_pack: object) -> dict[str, Any]:
+    """Build compact dashboard metadata from the Claim Verification Pack."""
+    if not isinstance(raw_pack, dict):
+        return {
+            "claim_count": 0,
+            "verified_claim_count": 0,
+            "caveated_claim_count": 0,
+            "claim_type_counts": {},
+            "top_claims": [],
+        }
+    return {
+        "pack_schema_version": raw_pack.get("pack_schema_version"),
+        "pack_name": raw_pack.get("pack_name"),
+        "claim_count": int(raw_pack.get("claim_count", 0)),
+        "verified_claim_count": int(raw_pack.get("verified_claim_count", 0)),
+        "caveated_claim_count": int(raw_pack.get("caveated_claim_count", 0)),
+        "claim_type_counts": raw_pack.get("claim_type_counts", {}),
+        "top_claims": raw_pack.get("claims", [])[:15]
+        if isinstance(raw_pack.get("claims"), list)
         else [],
     }
 

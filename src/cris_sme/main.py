@@ -25,6 +25,7 @@ from cris_sme.engine import (
     assess_compliance_mappings,
     build_30_day_action_plan,
     build_assessment_assurance,
+    build_claim_verification_pack,
     build_collector_coverage,
     build_control_drift_attribution,
     build_decision_ledger,
@@ -40,6 +41,7 @@ from cris_sme.engine import (
     load_compliance_mappings,
     load_exception_registry,
     write_risk_bill_of_materials,
+    write_claim_verification_pack,
     write_decision_provenance_graph,
 )
 from cris_sme.engine.benchmark import (
@@ -272,6 +274,12 @@ def main() -> None:
     output["decision_provenance_graph"] = provenance_graph.model_dump(mode="json")
     output["report_artifacts"]["decision_provenance_graph"] = str(
         write_decision_provenance_graph(provenance_graph, provenance_graph_path)
+    )
+    claim_pack = build_claim_verification_pack(output)
+    claim_pack_path = output_dir / "cris_sme_claim_verification_pack.json"
+    output["claim_verification_pack"] = claim_pack.model_dump(mode="json")
+    output["report_artifacts"]["claim_verification_pack"] = str(
+        write_claim_verification_pack(claim_pack, claim_pack_path)
     )
     rbom = build_risk_bill_of_materials(
         output,

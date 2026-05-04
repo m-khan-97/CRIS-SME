@@ -8,6 +8,10 @@ from .assessment_replay import (
     replay_evidence_snapshot,
 )
 from .assessment_assurance import build_assessment_assurance
+from .claim_verification import (
+    build_claim_verification_pack,
+    write_claim_verification_pack,
+)
 from .compliance import assess_compliance_mappings, load_compliance_mappings
 from .control_drift import build_control_drift_attribution
 from .decision_ledger import build_decision_ledger, summarize_decision_ledger
@@ -74,6 +78,7 @@ __all__ = [
     "build_decision_provenance_graph",
     "build_decision_review_queue",
     "build_assessment_assurance",
+    "build_claim_verification_pack",
     "build_evidence_diff_result",
     "build_evidence_gap_backlog",
     "build_evidence_snapshot",
@@ -109,6 +114,7 @@ __all__ = [
     "write_risk_bill_of_materials",
     "write_risk_bill_of_materials_signature",
     "write_decision_provenance_graph",
+    "write_claim_verification_pack",
     "summarize_decision_ledger",
     "summarize_policy_pack_changelog",
     "summarize_provider_contract_conformance",

@@ -74,6 +74,7 @@ The next product stage is to add:
 - Control Drift Attribution
 - Policy Pack Changelog
 - Decision Provenance Graph
+- Claim Verification Packs
 - remediation simulator
 - evidence sufficiency model
 - signed report manifests

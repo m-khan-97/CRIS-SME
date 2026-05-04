@@ -636,3 +636,35 @@ class DecisionProvenanceGraph(BaseModel):
     nodes: list[DecisionProvenanceNode] = Field(default_factory=list)
     edges: list[DecisionProvenanceEdge] = Field(default_factory=list)
     top_decision_paths: list[DecisionProvenancePath] = Field(default_factory=list)
+
+
+class ClaimVerification(BaseModel):
+    """One stakeholder-facing claim with verification metadata."""
+
+    claim_id: str = Field(..., min_length=6)
+    claim_type: str = Field(..., min_length=3)
+    audience: str = Field(..., min_length=3)
+    statement: str = Field(..., min_length=8)
+    verification_status: str = Field(..., min_length=3)
+    confidence: float = Field(..., ge=0.0, le=1.0)
+    source_sections: list[str] = Field(default_factory=list)
+    evidence_refs: list[str] = Field(default_factory=list)
+    control_ids: list[str] = Field(default_factory=list)
+    finding_ids: list[str] = Field(default_factory=list)
+    provenance_node_ids: list[str] = Field(default_factory=list)
+    rbom_artifact_refs: list[str] = Field(default_factory=list)
+    caveats: list[str] = Field(default_factory=list)
+    deterministic_score_impact: str = Field(..., min_length=8)
+
+
+class ClaimVerificationPack(BaseModel):
+    """Machine-readable pack of verifiable report claims."""
+
+    pack_schema_version: str = Field(default="1.0.0", min_length=3)
+    pack_name: str = Field(default="CRIS-SME Claim Verification Pack", min_length=3)
+    generated_at: str | None = None
+    claim_count: int = Field(..., ge=0)
+    verified_claim_count: int = Field(..., ge=0)
+    caveated_claim_count: int = Field(..., ge=0)
+    claim_type_counts: dict[str, int] = Field(default_factory=dict)
+    claims: list[ClaimVerification] = Field(default_factory=list)
