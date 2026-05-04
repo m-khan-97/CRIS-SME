@@ -491,3 +491,38 @@ class EvidenceGapBacklog(BaseModel):
     provider_counts: dict[str, int] = Field(default_factory=dict)
     domain_counts: dict[str, int] = Field(default_factory=dict)
     items: list[EvidenceGapBacklogItem] = Field(default_factory=list)
+
+
+class ControlDriftAttributionItem(BaseModel):
+    """Attribution for one control-level score or state movement."""
+
+    control_id: str = Field(..., min_length=3)
+    title: str | None = None
+    category: str | None = None
+    current_score: float = Field(..., ge=0.0, le=100.0)
+    previous_score: float = Field(..., ge=0.0, le=100.0)
+    delta: float
+    direction: str = Field(..., min_length=3)
+    attribution: str = Field(..., min_length=3)
+    contributing_factors: list[str] = Field(default_factory=list)
+    current_priority: str | None = None
+    previous_priority: str | None = None
+
+
+class ControlDriftAttributionReport(BaseModel):
+    """Explain whether score movement came from evidence, policy, collector, or lifecycle drift."""
+
+    attribution_schema_version: str = Field(default="1.0.0", min_length=3)
+    comparable: bool
+    current_generated_at: str | None = None
+    previous_generated_at: str | None = None
+    overall_risk_delta: float | None = None
+    primary_attribution: str = Field(..., min_length=3)
+    attribution_counts: dict[str, int] = Field(default_factory=dict)
+    evidence_changed: bool = False
+    policy_pack_changed: bool = False
+    collector_mode_changed: bool = False
+    lifecycle_changed: bool = False
+    exception_state_changed: bool = False
+    items: list[ControlDriftAttributionItem] = Field(default_factory=list)
+    explanation: str = Field(..., min_length=8)

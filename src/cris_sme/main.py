@@ -26,6 +26,7 @@ from cris_sme.engine import (
     build_30_day_action_plan,
     build_assessment_assurance,
     build_collector_coverage,
+    build_control_drift_attribution,
     build_decision_ledger,
     build_evidence_snapshot,
     build_report_replay_summary,
@@ -181,6 +182,10 @@ def main() -> None:
     )
     history_reports = load_report_history(output_dir / "history")
     output["history_comparison"] = build_history_comparison(history_reports)
+    output["control_drift_attribution"] = build_control_drift_attribution(
+        output,
+        history_reports_before[-1] if history_reports_before else None,
+    ).model_dump(mode="json")
     output["evaluation_mode_summary"] = build_evaluation_mode_summary(history_reports)
 
     dashboard_payload = build_dashboard_payload(output, history_reports)

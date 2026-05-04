@@ -132,6 +132,9 @@ def build_dashboard_payload(
             "exception_rows": _exception_rows(prioritized),
         },
         "decision_ledger": _decision_ledger_summary(report.get("decision_ledger", {})),
+        "control_drift_attribution": _control_drift_attribution_summary(
+            report.get("control_drift_attribution", {})
+        ),
         "assessment_assurance": _assessment_assurance_summary(
             report.get("assessment_assurance", {})
         ),
@@ -814,6 +817,32 @@ def _assessment_assurance_summary(raw_assurance: object) -> dict[str, Any]:
         "gap_count": len(raw_assurance.get("gaps", []))
         if isinstance(raw_assurance.get("gaps"), list)
         else 0,
+    }
+
+
+def _control_drift_attribution_summary(raw_attribution: object) -> dict[str, Any]:
+    """Build compact dashboard metadata from control drift attribution."""
+    if not isinstance(raw_attribution, dict):
+        return {
+            "comparable": False,
+            "primary_attribution": "unknown",
+            "overall_risk_delta": None,
+            "attribution_counts": {},
+        }
+    return {
+        "attribution_schema_version": raw_attribution.get("attribution_schema_version"),
+        "comparable": bool(raw_attribution.get("comparable", False)),
+        "primary_attribution": raw_attribution.get("primary_attribution", "unknown"),
+        "overall_risk_delta": raw_attribution.get("overall_risk_delta"),
+        "attribution_counts": raw_attribution.get("attribution_counts", {}),
+        "evidence_changed": bool(raw_attribution.get("evidence_changed", False)),
+        "policy_pack_changed": bool(raw_attribution.get("policy_pack_changed", False)),
+        "collector_mode_changed": bool(raw_attribution.get("collector_mode_changed", False)),
+        "lifecycle_changed": bool(raw_attribution.get("lifecycle_changed", False)),
+        "exception_state_changed": bool(raw_attribution.get("exception_state_changed", False)),
+        "top_items": raw_attribution.get("items", [])[:10]
+        if isinstance(raw_attribution.get("items"), list)
+        else [],
     }
 
 

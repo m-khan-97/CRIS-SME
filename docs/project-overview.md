@@ -71,6 +71,7 @@ The next product stage is to add:
 - Assessment Replay and Evidence Diff
 - Assessment Assurance
 - Evidence Gap Backlog
+- Control Drift Attribution
 - remediation simulator
 - evidence sufficiency model
 - signed report manifests
