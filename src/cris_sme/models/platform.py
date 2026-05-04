@@ -701,3 +701,26 @@ class AssuranceCase(BaseModel):
     open_caveats: list[str] = Field(default_factory=list)
     residual_gaps: list[str] = Field(default_factory=list)
     deterministic_score_impact: str = Field(..., min_length=8)
+
+
+class ClaimBoundNarrativeSection(BaseModel):
+    """One narrative section constrained to cited claim IDs."""
+
+    section_id: str = Field(..., min_length=3)
+    heading: str = Field(..., min_length=3)
+    text: str = Field(..., min_length=8)
+    cited_claim_ids: list[str] = Field(default_factory=list)
+    caveats: list[str] = Field(default_factory=list)
+
+
+class ClaimBoundNarrative(BaseModel):
+    """Deterministic narrative generated only from verified/caveated claim objects."""
+
+    narrative_schema_version: str = Field(default="1.0.0", min_length=3)
+    generated_at: str | None = None
+    narrative_model: str = Field(default="cris_sme_claim_bound_narrative_v1", min_length=3)
+    section_count: int = Field(..., ge=0)
+    cited_claim_count: int = Field(..., ge=0)
+    sections: list[ClaimBoundNarrativeSection] = Field(default_factory=list)
+    guardrails: list[str] = Field(default_factory=list)
+    deterministic_score_impact: str = Field(..., min_length=8)

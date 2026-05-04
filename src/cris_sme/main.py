@@ -26,6 +26,7 @@ from cris_sme.engine import (
     build_30_day_action_plan,
     build_assessment_assurance,
     build_assurance_case,
+    build_claim_bound_narrative,
     build_claim_verification_pack,
     build_collector_coverage,
     build_control_drift_attribution,
@@ -44,6 +45,7 @@ from cris_sme.engine import (
     write_risk_bill_of_materials,
     write_claim_verification_pack,
     write_assurance_case,
+    write_claim_bound_narrative,
     write_decision_provenance_graph,
 )
 from cris_sme.engine.benchmark import (
@@ -289,6 +291,15 @@ def main() -> None:
     output["report_artifacts"]["assurance_case"] = str(
         write_assurance_case(assurance_case, assurance_case_path)
     )
+    claim_bound_narrative = build_claim_bound_narrative(output)
+    output["claim_bound_narrative"] = claim_bound_narrative.model_dump(mode="json")
+    output["report_artifacts"]["claim_bound_narrative"] = {
+        key: str(value)
+        for key, value in write_claim_bound_narrative(
+            claim_bound_narrative,
+            output_dir,
+        ).items()
+    }
     rbom = build_risk_bill_of_materials(
         output,
         artifact_paths=_flatten_artifact_paths(output["report_artifacts"]),

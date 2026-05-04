@@ -147,6 +147,9 @@ def build_dashboard_payload(
         "assurance_case": _assurance_case_summary(
             report.get("assurance_case", {})
         ),
+        "claim_bound_narrative": _claim_bound_narrative_summary(
+            report.get("claim_bound_narrative", {})
+        ),
         "control_drift_attribution": _control_drift_attribution_summary(
             report.get("control_drift_attribution", {})
         ),
@@ -985,6 +988,26 @@ def _assurance_case_summary(raw_case: object) -> dict[str, Any]:
         else 0,
         "arguments": raw_case.get("arguments", [])[:10]
         if isinstance(raw_case.get("arguments"), list)
+        else [],
+    }
+
+
+def _claim_bound_narrative_summary(raw_narrative: object) -> dict[str, Any]:
+    """Build compact dashboard metadata from the claim-bound narrative."""
+    if not isinstance(raw_narrative, dict):
+        return {
+            "section_count": 0,
+            "cited_claim_count": 0,
+            "sections": [],
+        }
+    return {
+        "narrative_schema_version": raw_narrative.get("narrative_schema_version"),
+        "narrative_model": raw_narrative.get("narrative_model"),
+        "section_count": int(raw_narrative.get("section_count", 0)),
+        "cited_claim_count": int(raw_narrative.get("cited_claim_count", 0)),
+        "guardrails": raw_narrative.get("guardrails", []),
+        "sections": raw_narrative.get("sections", [])[:10]
+        if isinstance(raw_narrative.get("sections"), list)
         else [],
     }
 

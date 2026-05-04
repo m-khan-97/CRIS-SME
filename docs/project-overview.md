@@ -76,6 +76,7 @@ The next product stage is to add:
 - Decision Provenance Graph
 - Claim Verification Packs
 - Assurance Case Builder
+- Claim-Bound Narrative
 - remediation simulator
 - evidence sufficiency model
 - signed report manifests
