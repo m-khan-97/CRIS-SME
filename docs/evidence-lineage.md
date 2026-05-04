@@ -14,6 +14,12 @@ Each prioritized finding includes:
   - `failed_conditions`
   - `observation_class`
   - evidence count split (direct/inferred/unavailable)
+- `evidence_sufficiency`
+  - sufficiency label
+  - provider support state
+  - declared evidence requirements
+  - satisfied and missing requirements
+  - known limitation notes
 - `confidence_calibration`
 - `decision_rationale`
 
@@ -24,6 +30,23 @@ Each prioritized finding includes:
 - `unavailable`: required evidence not observable
 
 This distinction is used to prevent false certainty.
+
+## Evidence Sufficiency
+
+CRIS-SME separates observation class from evidence sufficiency.
+
+Observation class describes how the evidence was obtained. Evidence sufficiency describes whether the available evidence is strong enough for the control decision.
+
+Supported sufficiency states:
+
+- `sufficient`: direct evidence satisfies the current control evidence requirements
+- `partial`: some direct evidence exists, but declared requirements are incomplete
+- `inferred`: the decision depends on partial evidence or scope context
+- `unavailable`: required evidence is not observable in the current scope
+- `stale`: evidence exists but is older than the expected freshness window
+- `unsupported`: the provider path is not actively supported for this control
+
+This model is central to CRIS-SME's innovation direction because it prevents partial observability from being hidden inside a single confidence score.
 
 ## Collector Coverage
 

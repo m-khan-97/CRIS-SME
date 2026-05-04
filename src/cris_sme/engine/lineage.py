@@ -11,11 +11,14 @@ from cris_sme.models.finding import Finding
 from cris_sme.models.platform import (
     CollectorCoverage,
     ConfidenceAssessment,
+    EvidenceSufficiency,
+    EvidenceSufficiencyAssessment,
     FindingTrace,
     ObservationClass,
     PolicyPackMetadata,
     RunMetadata,
 )
+from cris_sme.policies.control_specs import get_control_spec
 
 
 def build_stable_finding_id(finding: Finding) -> str:
@@ -70,6 +73,54 @@ def build_confidence_assessment(item: ScoredFinding) -> ConfidenceAssessment:
         confidence_explanation=(
             "Calibrated confidence blends observed control confidence with control-level "
             "empirical agreement metadata according to calibration maturity."
+        ),
+    )
+
+
+def build_evidence_sufficiency_assessment(
+    item: ScoredFinding,
+    trace: FindingTrace | None = None,
+) -> EvidenceSufficiencyAssessment:
+    """Assess whether available evidence is sufficient for the control decision."""
+    finding = item.finding
+    finding_trace = trace or build_finding_trace(item)
+    spec = get_control_spec(finding.control_id)
+    provider = str(finding.metadata.get("provider", "azure")).lower()
+    provider_support = str(spec.provider_support.get(provider, "unsupported")).lower()
+    requirements = list(spec.evidence_requirements)
+    direct_count = finding_trace.direct_evidence_count
+    inferred_count = finding_trace.inferred_evidence_count
+    unavailable_count = finding_trace.unavailable_evidence_count
+
+    if provider_support not in {"active", "supported"}:
+        sufficiency = EvidenceSufficiency.UNSUPPORTED
+    elif unavailable_count > 0:
+        sufficiency = EvidenceSufficiency.UNAVAILABLE
+    elif finding_trace.observation_class == ObservationClass.INFERRED or inferred_count > 0:
+        sufficiency = EvidenceSufficiency.INFERRED
+    elif direct_count >= len(requirements):
+        sufficiency = EvidenceSufficiency.SUFFICIENT
+    else:
+        sufficiency = EvidenceSufficiency.PARTIAL
+
+    satisfied_requirements = requirements[:direct_count]
+    missing_requirements = requirements[direct_count:]
+    if sufficiency == EvidenceSufficiency.UNSUPPORTED:
+        satisfied_requirements = []
+        missing_requirements = requirements
+
+    return EvidenceSufficiencyAssessment(
+        sufficiency=sufficiency,
+        provider_support=provider_support,
+        evidence_requirements=requirements,
+        satisfied_requirements=satisfied_requirements,
+        missing_requirements=missing_requirements,
+        limitation_notes=list(spec.known_limitations),
+        explanation=_evidence_sufficiency_explanation(
+            sufficiency=sufficiency,
+            provider=provider,
+            provider_support=provider_support,
+            finding_trace=finding_trace,
         ),
     )
 
@@ -156,6 +207,46 @@ def _failed_conditions_for_finding(finding: Finding) -> list[str]:
     if finding.evidence:
         return [str(item) for item in finding.evidence]
     return ["Control marked non-compliant without explicit evidence text."]
+
+
+def _evidence_sufficiency_explanation(
+    *,
+    sufficiency: EvidenceSufficiency,
+    provider: str,
+    provider_support: str,
+    finding_trace: FindingTrace,
+) -> str:
+    if sufficiency == EvidenceSufficiency.UNSUPPORTED:
+        return (
+            f"The control is not actively supported for provider '{provider}' "
+            f"because provider support is marked '{provider_support}'."
+        )
+    if sufficiency == EvidenceSufficiency.UNAVAILABLE:
+        return (
+            "Required evidence is unavailable in the current assessment scope, so the "
+            "decision is retained with an explicit observability boundary."
+        )
+    if sufficiency == EvidenceSufficiency.INFERRED:
+        return (
+            "The finding is derived from partial evidence or scope context rather than "
+            "a complete direct evidence set."
+        )
+    if sufficiency == EvidenceSufficiency.SUFFICIENT:
+        return (
+            "Direct evidence satisfies the currently declared control evidence "
+            "requirements for this provider path."
+        )
+    if sufficiency == EvidenceSufficiency.STALE:
+        return (
+            "Evidence exists but is older than the expected freshness window for this "
+            "control decision."
+        )
+    return (
+        "Some direct evidence is available, but not all declared evidence requirements "
+        f"are satisfied. Direct={finding_trace.direct_evidence_count}, "
+        f"inferred={finding_trace.inferred_evidence_count}, "
+        f"unavailable={finding_trace.unavailable_evidence_count}."
+    )
 
 
 def now_iso_utc() -> str:

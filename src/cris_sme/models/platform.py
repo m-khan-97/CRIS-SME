@@ -15,6 +15,17 @@ class ObservationClass(str, Enum):
     UNAVAILABLE = "unavailable"
 
 
+class EvidenceSufficiency(str, Enum):
+    """Classify whether evidence is strong enough to support a control decision."""
+
+    SUFFICIENT = "sufficient"
+    PARTIAL = "partial"
+    INFERRED = "inferred"
+    UNAVAILABLE = "unavailable"
+    STALE = "stale"
+    UNSUPPORTED = "unsupported"
+
+
 class FindingStatus(str, Enum):
     """Lifecycle status for governance findings."""
 
@@ -24,6 +35,19 @@ class FindingStatus(str, Enum):
     RESOLVED = "resolved"
     SUPPRESSED = "suppressed"
     EXPIRED_EXCEPTION = "expired_exception"
+
+
+class DecisionLedgerEventType(str, Enum):
+    """Supported append-only governance events for the Decision Ledger."""
+
+    ASSESSMENT_RECORDED = "assessment_recorded"
+    FINDING_OPENED = "finding_opened"
+    FINDING_RECURRED = "finding_recurred"
+    FINDING_RESOLVED = "finding_resolved"
+    SCORE_CHANGED = "score_changed"
+    LIFECYCLE_STATUS_CHANGED = "lifecycle_status_changed"
+    EXCEPTION_APPLIED = "exception_applied"
+    EXCEPTION_EXPIRED = "exception_expired"
 
 
 class EvidenceRecord(BaseModel):
@@ -97,6 +121,18 @@ class ConfidenceAssessment(BaseModel):
     calibrated_confidence: float = Field(..., ge=0.0, le=1.0)
     calibration_status: str = Field(..., min_length=3)
     confidence_explanation: str = Field(..., min_length=8)
+
+
+class EvidenceSufficiencyAssessment(BaseModel):
+    """Explain whether available evidence is enough to support a finding decision."""
+
+    sufficiency: EvidenceSufficiency
+    provider_support: str = Field(..., min_length=3)
+    evidence_requirements: list[str] = Field(default_factory=list)
+    satisfied_requirements: list[str] = Field(default_factory=list)
+    missing_requirements: list[str] = Field(default_factory=list)
+    limitation_notes: list[str] = Field(default_factory=list)
+    explanation: str = Field(..., min_length=8)
 
 
 class FrameworkMapping(BaseModel):
@@ -174,3 +210,167 @@ class RunMetadata(BaseModel):
     providers_in_scope: list[str] = Field(default_factory=list)
     policy_pack: PolicyPackMetadata
     collector_coverage: list[CollectorCoverage] = Field(default_factory=list)
+
+
+class DecisionLedgerEvent(BaseModel):
+    """One append-only governance event derived from assessment and finding history."""
+
+    event_id: str = Field(..., min_length=8)
+    event_type: DecisionLedgerEventType
+    event_time: str = Field(..., min_length=10)
+    run_id: str = Field(..., min_length=8)
+    finding_id: str | None = None
+    control_id: str | None = None
+    provider: str | None = None
+    organization: str | None = None
+    resource_scope: str | None = None
+    previous_score: float | None = Field(default=None, ge=0.0, le=100.0)
+    current_score: float | None = Field(default=None, ge=0.0, le=100.0)
+    previous_status: str | None = None
+    current_status: str | None = None
+    summary: str = Field(..., min_length=8)
+    evidence_refs: list[str] = Field(default_factory=list)
+    metadata: dict[str, Any] = Field(default_factory=dict)
+
+
+class DecisionLedger(BaseModel):
+    """Append-only governance-memory view for one assessment run."""
+
+    ledger_schema_version: str = Field(default="1.0.0", min_length=3)
+    generated_at: str = Field(..., min_length=10)
+    current_run_id: str = Field(..., min_length=8)
+    previous_run_id: str | None = None
+    current_evaluation_mode: str = Field(..., min_length=3)
+    previous_evaluation_mode: str | None = None
+    comparison_basis: str = Field(default="same_evaluation_mode", min_length=3)
+    event_count: int = Field(..., ge=0)
+    events: list[DecisionLedgerEvent] = Field(default_factory=list)
+
+
+class RiskBillOfMaterialsArtifact(BaseModel):
+    """One hashed artifact included in the Risk Bill of Materials."""
+
+    artifact_name: str = Field(..., min_length=2)
+    path: str = Field(..., min_length=1)
+    sha256: str = Field(..., min_length=64, max_length=64)
+    size_bytes: int = Field(..., ge=0)
+
+
+class RiskBillOfMaterials(BaseModel):
+    """Integrity and provenance manifest for one CRIS-SME assessment."""
+
+    rbom_schema_version: str = Field(default="1.0.0", min_length=3)
+    generated_at: str = Field(..., min_length=10)
+    run_id: str = Field(..., min_length=8)
+    report_schema_version: str = Field(..., min_length=3)
+    engine_version: str = Field(..., min_length=3)
+    scoring_model: str = Field(..., min_length=3)
+    policy_pack_version: str = Field(..., min_length=3)
+    collector_mode: str = Field(..., min_length=2)
+    providers_in_scope: list[str] = Field(default_factory=list)
+    canonical_report_sha256: str = Field(..., min_length=64, max_length=64)
+    control_ids: list[str] = Field(default_factory=list)
+    finding_ids: list[str] = Field(default_factory=list)
+    evidence_refs: list[str] = Field(default_factory=list)
+    evidence_sufficiency_counts: dict[str, int] = Field(default_factory=dict)
+    decision_ledger_event_counts: dict[str, int] = Field(default_factory=dict)
+    artifacts: list[RiskBillOfMaterialsArtifact] = Field(default_factory=list)
+    integrity_algorithm: str = Field(default="sha256", min_length=3)
+    signature_note: str = Field(..., min_length=8)
+
+
+class RiskBillOfMaterialsSignature(BaseModel):
+    """Detached cryptographic signature metadata for a CRIS-SME RBOM."""
+
+    signature_schema_version: str = Field(default="1.0.0", min_length=3)
+    signed_at: str = Field(..., min_length=10)
+    algorithm: str = Field(default="hmac-sha256", min_length=3)
+    key_id: str = Field(..., min_length=2)
+    rbom_sha256: str = Field(..., min_length=64, max_length=64)
+    signature: str = Field(..., min_length=64)
+    signature_note: str = Field(..., min_length=8)
+
+
+class RiskBillOfMaterialsVerificationResult(BaseModel):
+    """Verification result for a CRIS-SME Risk Bill of Materials."""
+
+    verified: bool
+    report_hash_verified: bool
+    artifact_hashes_verified: bool
+    signature_verified: bool | None = None
+    signature_algorithm: str | None = None
+    signature_key_id: str | None = None
+    checked_artifact_count: int = Field(..., ge=0)
+    missing_artifacts: list[str] = Field(default_factory=list)
+    mismatched_artifacts: list[str] = Field(default_factory=list)
+    errors: list[str] = Field(default_factory=list)
+
+
+class ProviderEvidenceContract(BaseModel):
+    """Per-provider evidence contract for one CRIS-SME control."""
+
+    contract_id: str = Field(..., min_length=6)
+    provider: str = Field(..., min_length=2)
+    control_id: str = Field(..., min_length=3)
+    control_version: str = Field(..., min_length=3)
+    domain: str = Field(..., min_length=2)
+    support_status: str = Field(..., min_length=3)
+    evidence_requirements: list[str] = Field(default_factory=list)
+    freshness_hours: int | None = Field(default=None, ge=0)
+    sufficiency_policy: str = Field(..., min_length=8)
+    confidence_penalty_rules: list[str] = Field(default_factory=list)
+    known_limitations: list[str] = Field(default_factory=list)
+    activation_gate: str = Field(..., min_length=8)
+
+
+class ProviderEvidenceContractCatalog(BaseModel):
+    """Provider evidence contract catalog for the active policy pack."""
+
+    contract_schema_version: str = Field(default="1.0.0", min_length=3)
+    policy_pack_version: str = Field(..., min_length=3)
+    provider_count: int = Field(..., ge=0)
+    control_count: int = Field(..., ge=0)
+    contract_count: int = Field(..., ge=0)
+    support_status_counts: dict[str, int] = Field(default_factory=dict)
+    contracts: list[ProviderEvidenceContract] = Field(default_factory=list)
+
+
+class ProviderImplementationSignal(BaseModel):
+    """Implementation evidence used to validate provider support claims."""
+
+    provider: str = Field(..., min_length=2)
+    adapter_registered: bool = False
+    live_collector_present: bool = False
+    collector_tests_present: bool = False
+    docs_present: bool = False
+    status: str = Field(..., min_length=3)
+    notes: list[str] = Field(default_factory=list)
+
+
+class ProviderContractConformanceCheck(BaseModel):
+    """One executable conformance check for a provider evidence contract."""
+
+    contract_id: str = Field(..., min_length=6)
+    provider: str = Field(..., min_length=2)
+    control_id: str = Field(..., min_length=3)
+    support_status: str = Field(..., min_length=3)
+    passed: bool
+    required_signals: list[str] = Field(default_factory=list)
+    satisfied_signals: list[str] = Field(default_factory=list)
+    findings: list[str] = Field(default_factory=list)
+
+
+class ProviderContractConformanceReport(BaseModel):
+    """Executable conformance result for provider evidence contracts."""
+
+    conformance_schema_version: str = Field(default="1.0.0", min_length=3)
+    policy_pack_version: str = Field(..., min_length=3)
+    provider_count: int = Field(..., ge=0)
+    control_count: int = Field(..., ge=0)
+    active_contract_count: int = Field(..., ge=0)
+    planned_contract_count: int = Field(..., ge=0)
+    passed_contract_count: int = Field(..., ge=0)
+    failed_contract_count: int = Field(..., ge=0)
+    passed: bool
+    provider_signals: list[ProviderImplementationSignal] = Field(default_factory=list)
+    checks: list[ProviderContractConformanceCheck] = Field(default_factory=list)

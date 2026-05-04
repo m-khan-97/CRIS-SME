@@ -25,10 +25,14 @@ from cris_sme.engine import (
     assess_compliance_mappings,
     build_30_day_action_plan,
     build_collector_coverage,
+    build_decision_ledger,
+    build_risk_bill_of_materials,
+    build_remediation_simulation,
     build_run_metadata,
     enrich_report_finding_lifecycle,
     load_compliance_mappings,
     load_exception_registry,
+    write_risk_bill_of_materials,
 )
 from cris_sme.engine.benchmark import (
     build_benchmark_comparison,
@@ -139,11 +143,18 @@ def main() -> None:
         policy_pack=load_policy_pack_metadata(),
         collector_coverage=build_collector_coverage(profiles),
     ).model_dump()
+    output["decision_ledger"] = build_decision_ledger(
+        output,
+        history_reports_before,
+    ).model_dump(mode="json")
 
     output["cyber_essentials_readiness"] = build_cyber_essentials_readiness(findings)
     output["cyber_insurance_evidence"] = build_cyber_insurance_evidence_pack(output)
     output["action_plan_30_day"] = build_30_day_action_plan(
         result.prioritized_findings
+    ).model_dump()
+    output["remediation_simulation"] = build_remediation_simulation(
+        result,
     ).model_dump()
     output["executive_pack"] = build_executive_pack(output)
 
@@ -210,6 +221,15 @@ def main() -> None:
         "figures": {key: str(value) for key, value in figure_paths.items()},
         "history_figures": {key: str(value) for key, value in history_figure_paths.items()},
     }
+    rbom_path = output_dir / "cris_sme_risk_bill_of_materials.json"
+    rbom = build_risk_bill_of_materials(
+        output,
+        artifact_paths=_flatten_artifact_paths(output["report_artifacts"]),
+    )
+    output["risk_bill_of_materials"] = rbom.model_dump(mode="json")
+    output["report_artifacts"]["risk_bill_of_materials"] = str(
+        write_risk_bill_of_materials(rbom, rbom_path)
+    )
     write_json_report(output, json_report_path)
 
     print(json.dumps(output, indent=2))
@@ -230,6 +250,24 @@ def _collect_profiles() -> list:
     raise ValueError(
         f"Unsupported collector mode '{collector_mode}'. Use 'mock' or 'azure'."
     )
+
+
+def _flatten_artifact_paths(artifacts: dict[str, object]) -> dict[str, Path]:
+    """Flatten nested artifact dictionaries into RBOM hash inputs."""
+    flattened: dict[str, Path] = {}
+
+    def walk(prefix: str, value: object) -> None:
+        if isinstance(value, dict):
+            for key, child in value.items():
+                walk(f"{prefix}.{key}" if prefix else str(key), child)
+            return
+        if isinstance(value, str) and value:
+            if prefix == "json_report":
+                return
+            flattened[prefix] = Path(value)
+
+    walk("", artifacts)
+    return flattened
 
 
 if __name__ == "__main__":

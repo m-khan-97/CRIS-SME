@@ -99,7 +99,14 @@ def build_dashboard_payload(
         "confidence_and_evidence": {
             "confidence_calibration": report.get("confidence_calibration", {}),
             "direct_vs_inferred": _direct_inferred_unavailable_counts(prioritized),
+            "evidence_sufficiency_counts": _evidence_sufficiency_counts(prioritized),
             "collector_coverage": report.get("collector_coverage", []),
+            "provider_evidence_contract_summary": _provider_contract_summary(
+                report.get("provider_evidence_contracts", {})
+            ),
+            "provider_contract_conformance": _provider_contract_conformance_summary(
+                report.get("provider_contract_conformance", {})
+            ),
         },
         "graph_context": {
             "blast_radius": graph_context.get("blast_radius", {}),
@@ -111,12 +118,14 @@ def build_dashboard_payload(
         "remediation": {
             "budget_profiles": (report.get("budget_aware_remediation", {}) or {}).get("budget_profiles", []),
             "action_plan": report.get("action_plan_30_day", {}),
+            "simulation": report.get("remediation_simulation", {}),
             "quick_wins": _quick_wins(report),
         },
         "exceptions_and_governance": {
             "status_counts": status_counts,
             "exception_rows": _exception_rows(prioritized),
         },
+        "decision_ledger": _decision_ledger_summary(report.get("decision_ledger", {})),
         "native_validation": report.get("native_validation", {}),
         "artifacts": report.get("report_artifacts", {}),
     }
@@ -654,6 +663,61 @@ def _direct_inferred_unavailable_counts(
     return counts
 
 
+def _evidence_sufficiency_counts(prioritized: list[object]) -> dict[str, int]:
+    """Count evidence sufficiency labels across prioritized findings."""
+    counts: dict[str, int] = {}
+    for item in prioritized:
+        if not isinstance(item, dict):
+            continue
+        quality = item.get("evidence_quality", {})
+        if not isinstance(quality, dict):
+            continue
+        sufficiency = str(quality.get("sufficiency", "unknown"))
+        counts[sufficiency] = counts.get(sufficiency, 0) + 1
+    return counts
+
+
+def _provider_contract_summary(raw_contracts: object) -> dict[str, Any]:
+    """Build compact dashboard metadata from provider evidence contracts."""
+    if not isinstance(raw_contracts, dict):
+        return {
+            "provider_count": 0,
+            "control_count": 0,
+            "contract_count": 0,
+            "support_status_counts": {},
+        }
+    return {
+        "contract_schema_version": raw_contracts.get("contract_schema_version"),
+        "policy_pack_version": raw_contracts.get("policy_pack_version"),
+        "provider_count": int(raw_contracts.get("provider_count", 0)),
+        "control_count": int(raw_contracts.get("control_count", 0)),
+        "contract_count": int(raw_contracts.get("contract_count", 0)),
+        "support_status_counts": raw_contracts.get("support_status_counts", {}),
+    }
+
+
+def _provider_contract_conformance_summary(raw_conformance: object) -> dict[str, Any]:
+    """Build compact dashboard metadata from provider contract conformance."""
+    if not isinstance(raw_conformance, dict):
+        return {
+            "passed": False,
+            "provider_count": 0,
+            "control_count": 0,
+            "failed_contract_count": 0,
+        }
+    return {
+        "conformance_schema_version": raw_conformance.get("conformance_schema_version"),
+        "policy_pack_version": raw_conformance.get("policy_pack_version"),
+        "passed": bool(raw_conformance.get("passed", False)),
+        "provider_count": int(raw_conformance.get("provider_count", 0)),
+        "control_count": int(raw_conformance.get("control_count", 0)),
+        "active_contract_count": int(raw_conformance.get("active_contract_count", 0)),
+        "planned_contract_count": int(raw_conformance.get("planned_contract_count", 0)),
+        "passed_contract_count": int(raw_conformance.get("passed_contract_count", 0)),
+        "failed_contract_count": int(raw_conformance.get("failed_contract_count", 0)),
+    }
+
+
 def _quick_wins(report: dict[str, Any]) -> dict[str, Any]:
     remediation = report.get("budget_aware_remediation", {})
     if not isinstance(remediation, dict):
@@ -696,6 +760,37 @@ def _exception_rows(prioritized: list[object]) -> list[dict[str, Any]]:
             }
         )
     return rows
+
+
+def _decision_ledger_summary(raw_ledger: object) -> dict[str, Any]:
+    """Build a compact dashboard view from the report Decision Ledger."""
+    if not isinstance(raw_ledger, dict):
+        return {
+            "event_count": 0,
+            "event_type_counts": {},
+            "latest_events": [],
+        }
+    events = raw_ledger.get("events", [])
+    if not isinstance(events, list):
+        events = []
+    counts: dict[str, int] = {}
+    for event in events:
+        if not isinstance(event, dict):
+            continue
+        event_type = str(event.get("event_type", "unknown"))
+        counts[event_type] = counts.get(event_type, 0) + 1
+    return {
+        "ledger_schema_version": raw_ledger.get("ledger_schema_version"),
+        "generated_at": raw_ledger.get("generated_at"),
+        "current_run_id": raw_ledger.get("current_run_id"),
+        "previous_run_id": raw_ledger.get("previous_run_id"),
+        "current_evaluation_mode": raw_ledger.get("current_evaluation_mode"),
+        "previous_evaluation_mode": raw_ledger.get("previous_evaluation_mode"),
+        "comparison_basis": raw_ledger.get("comparison_basis"),
+        "event_count": int(raw_ledger.get("event_count", len(events))),
+        "event_type_counts": counts,
+        "latest_events": events[:12],
+    }
 
 
 def _fallback_overall_trend(

@@ -7,6 +7,12 @@ from cris_sme.controls.monitoring_controls import evaluate_monitoring_controls
 from cris_sme.controls.network_controls import evaluate_network_controls
 from cris_sme.engine.action_plan import build_30_day_action_plan
 from cris_sme.engine.remediation import build_budget_aware_remediation_plan
+from cris_sme.engine.remediation_simulator import (
+    RemediationSimulationRequest,
+    build_custom_remediation_simulation,
+    build_custom_report_remediation_simulation,
+    build_remediation_simulation,
+)
 from cris_sme.engine.scoring import score_findings
 from cris_sme.models.cloud_profile import (
     CloudProfile,
@@ -126,3 +132,105 @@ def test_30_day_action_plan_phases_free_and_low_effort_work_first() -> None:
     assert phases["days_1_7"].total_actions >= 1
     assert all(action.remediation_cost_tier == "free" for action in phases["days_1_7"].actions)
     assert phases["days_8_30"].total_actions >= 1
+
+
+def test_remediation_simulation_builds_before_after_scenarios() -> None:
+    profiles = [make_profile()]
+    findings = [
+        *evaluate_iam_controls(profiles),
+        *evaluate_network_controls(profiles),
+        *evaluate_data_controls(profiles),
+        *evaluate_monitoring_controls(profiles),
+        *evaluate_compute_controls(profiles),
+        *evaluate_governance_controls(profiles),
+    ]
+    scoring_result = score_findings(findings)
+
+    simulation = build_remediation_simulation(scoring_result)
+    scenarios = {scenario.scenario_id: scenario for scenario in simulation.scenarios}
+
+    assert simulation.simulation_model == "cris_sme_deterministic_remediation_simulator_v1"
+    assert set(scenarios) == {
+        "fix_free_this_week",
+        "fix_under_200_month",
+        "fix_under_750_month",
+        "fix_top_5_risks",
+    }
+    assert scenarios["fix_free_this_week"].selected_action_count >= 1
+    assert scenarios["fix_free_this_week"].simulated_overall_risk_score <= (
+        scoring_result.overall_risk_score
+    )
+    assert scenarios["fix_under_750_month"].expected_risk_reduction >= (
+        scenarios["fix_free_this_week"].expected_risk_reduction
+    )
+    assert scenarios["fix_top_5_risks"].selected_action_count == 5
+    assert scenarios["fix_top_5_risks"].selected_actions[0].finding_id.startswith("fdg_")
+
+
+def test_custom_remediation_simulation_selects_control_ids() -> None:
+    profiles = [make_profile()]
+    findings = [
+        *evaluate_iam_controls(profiles),
+        *evaluate_network_controls(profiles),
+        *evaluate_data_controls(profiles),
+        *evaluate_monitoring_controls(profiles),
+        *evaluate_compute_controls(profiles),
+        *evaluate_governance_controls(profiles),
+    ]
+    scoring_result = score_findings(findings)
+    request = RemediationSimulationRequest(
+        scenario_id="fix_net_001",
+        label="Fix internet admin exposure",
+        control_ids=["NET-001"],
+    )
+
+    scenario = build_custom_remediation_simulation(scoring_result, request)
+
+    assert scenario.scenario_id == "fix_net_001"
+    assert scenario.selected_action_count >= 1
+    assert scenario.expected_risk_reduction > 0
+    assert all(action.control_id == "NET-001" for action in scenario.selected_actions)
+
+
+def test_custom_report_remediation_simulation_selects_categories() -> None:
+    report = {
+        "overall_risk_score": 50.0,
+        "category_scores": {
+            "IAM": 60.0,
+            "Network": 40.0,
+        },
+        "prioritized_risks": [
+            {
+                "finding_id": "fdg_iam",
+                "control_id": "IAM-001",
+                "category": "IAM",
+                "title": "IAM issue",
+                "organization": "SME",
+                "score": 60.0,
+                "remediation_cost_tier": "free",
+                "remediation_value_score": 60.0,
+            },
+            {
+                "finding_id": "fdg_net",
+                "control_id": "NET-001",
+                "category": "Network",
+                "title": "Network issue",
+                "organization": "SME",
+                "score": 40.0,
+                "remediation_cost_tier": "medium",
+                "remediation_value_score": 21.62,
+            },
+        ],
+    }
+    request = RemediationSimulationRequest(
+        scenario_id="fix_iam",
+        label="Fix IAM",
+        categories=["IAM"],
+    )
+
+    scenario = build_custom_report_remediation_simulation(report, request)
+
+    assert scenario["selected_action_count"] == 1
+    assert scenario["simulated_non_compliant_findings"] == 1
+    assert scenario["selected_actions"][0]["finding_id"] == "fdg_iam"
+    assert scenario["expected_risk_reduction"] > 0

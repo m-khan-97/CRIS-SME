@@ -8,6 +8,7 @@ from cris_sme.engine.graph_context import build_graph_context_summary
 from cris_sme.engine.lineage import (
     build_collector_coverage,
     build_confidence_assessment,
+    build_evidence_sufficiency_assessment,
     build_finding_trace,
     build_run_metadata,
     build_stable_finding_id,
@@ -17,6 +18,7 @@ from cris_sme.engine.remediation import (
     build_budget_aware_remediation_plan,
     budget_fit_profile_ids,
 )
+from cris_sme.engine.remediation_simulator import build_remediation_simulation
 from cris_sme.engine.action_plan import build_30_day_action_plan
 from cris_sme.engine.benchmark import (
     build_benchmark_comparison,
@@ -25,6 +27,10 @@ from cris_sme.engine.benchmark import (
 )
 from cris_sme.engine.confidence import summarize_confidence_calibration
 from cris_sme.engine.native_validation import build_native_validation_summary
+from cris_sme.engine.provider_conformance import (
+    build_provider_contract_conformance_report,
+)
+from cris_sme.engine.provider_contracts import build_provider_evidence_contract_catalog
 from cris_sme.engine.uk_readiness import build_cyber_essentials_readiness
 from cris_sme.models.compliance_result import ComplianceAssessmentResult
 from cris_sme.engine.scoring import ScoredFinding, ScoringResult
@@ -47,12 +53,17 @@ def build_json_report(
         scoring_result.prioritized_findings
     )
     collector_coverage = build_collector_coverage(profiles)
+    provider_evidence_contracts = build_provider_evidence_contract_catalog()
     report: dict[str, object] = {
         "report_schema_version": "2.0.0",
         "summary": scoring_result.summary,
         "overall_risk_score": scoring_result.overall_risk_score,
         "category_scores": scoring_result.category_scores,
         "collector_coverage": [item.model_dump() for item in collector_coverage],
+        "provider_evidence_contracts": provider_evidence_contracts.model_dump(),
+        "provider_contract_conformance": build_provider_contract_conformance_report(
+            provider_evidence_contracts
+        ).model_dump(),
         "evaluation_dataset": _build_evaluation_dataset_summary(profiles),
         "confidence_calibration": summarize_confidence_calibration(
             scoring_result.prioritized_findings
@@ -82,6 +93,9 @@ def build_json_report(
             for item in scoring_result.prioritized_findings
         ],
         "budget_aware_remediation": remediation_plan.model_dump(),
+        "remediation_simulation": build_remediation_simulation(
+            scoring_result
+        ).model_dump(),
         "action_plan_30_day": build_30_day_action_plan(
             scoring_result.prioritized_findings
         ).model_dump(),
@@ -120,6 +134,7 @@ def _prioritized_risk_item(item: ScoredFinding) -> dict[str, object]:
     """Build a traceable prioritized-risk record from one scored finding."""
     trace = build_finding_trace(item)
     confidence = build_confidence_assessment(item)
+    evidence_sufficiency = build_evidence_sufficiency_assessment(item, trace)
     finding_id = build_stable_finding_id(item.finding)
     return {
         "finding_id": finding_id,
@@ -137,11 +152,15 @@ def _prioritized_risk_item(item: ScoredFinding) -> dict[str, object]:
         "evidence": item.finding.evidence,
         "evidence_quality": {
             "observation_class": trace.observation_class.value,
+            "sufficiency": evidence_sufficiency.sufficiency.value,
             "direct_evidence_count": trace.direct_evidence_count,
             "inferred_evidence_count": trace.inferred_evidence_count,
             "unavailable_evidence_count": trace.unavailable_evidence_count,
+            "provider_support": evidence_sufficiency.provider_support,
+            "missing_requirements": evidence_sufficiency.missing_requirements,
         },
         "finding_trace": trace.model_dump(),
+        "evidence_sufficiency": evidence_sufficiency.model_dump(),
         "confidence_calibration": confidence.model_dump(),
         "remediation_summary": item.finding.remediation_summary,
         "remediation_cost_tier": (

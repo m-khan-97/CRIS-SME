@@ -160,6 +160,11 @@ def test_build_json_report_includes_context_and_prioritized_risks() -> None:
     assert report["overall_risk_score"] == scoring_result.overall_risk_score
     assert report["report_schema_version"] == "2.0.0"
     assert report["collector_coverage"]
+    assert report["provider_evidence_contracts"]["contract_count"] == 78
+    assert report["provider_evidence_contracts"]["support_status_counts"]["active"] == 26
+    assert report["provider_contract_conformance"]["passed"] is True
+    assert report["provider_contract_conformance"]["active_contract_count"] == 26
+    assert report["provider_contract_conformance"]["planned_contract_count"] == 52
     assert report["graph_context"]["graph_model"] == "cris_sme_lightweight_asset_context_v1"
     assert report["evaluation_dataset"]["source_types"] == ["live_real"]
     assert report["evaluation_dataset"]["authorization_bases"] == [
