@@ -463,3 +463,31 @@ class AssessmentAssuranceResult(BaseModel):
     signals: list[AssessmentAssuranceSignal] = Field(default_factory=list)
     strengths: list[str] = Field(default_factory=list)
     gaps: list[str] = Field(default_factory=list)
+
+
+class EvidenceGapBacklogItem(BaseModel):
+    """One actionable evidence gap for improving assessment assurance or provider support."""
+
+    gap_id: str = Field(..., min_length=6)
+    gap_type: str = Field(..., min_length=3)
+    provider: str = Field(..., min_length=2)
+    domain: str = Field(..., min_length=2)
+    control_id: str = Field(..., min_length=3)
+    title: str = Field(..., min_length=5)
+    priority: str = Field(..., min_length=3)
+    evidence_gap: str = Field(..., min_length=3)
+    recommended_action: str = Field(..., min_length=8)
+    linked_finding_id: str | None = None
+    support_status: str | None = None
+    assurance_impact: str = Field(..., min_length=3)
+
+
+class EvidenceGapBacklog(BaseModel):
+    """Actionable backlog of evidence and provider-activation gaps."""
+
+    backlog_schema_version: str = Field(default="1.0.0", min_length=3)
+    item_count: int = Field(..., ge=0)
+    high_priority_count: int = Field(..., ge=0)
+    provider_counts: dict[str, int] = Field(default_factory=dict)
+    domain_counts: dict[str, int] = Field(default_factory=dict)
+    items: list[EvidenceGapBacklogItem] = Field(default_factory=list)

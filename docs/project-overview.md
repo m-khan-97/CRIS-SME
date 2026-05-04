@@ -70,6 +70,7 @@ The next product stage is to add:
 - Risk Bill of Materials
 - Assessment Replay and Evidence Diff
 - Assessment Assurance
+- Evidence Gap Backlog
 - remediation simulator
 - evidence sufficiency model
 - signed report manifests

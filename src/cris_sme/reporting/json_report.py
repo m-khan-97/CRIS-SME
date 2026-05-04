@@ -26,6 +26,7 @@ from cris_sme.engine.benchmark import (
     load_benchmark_dataset,
 )
 from cris_sme.engine.confidence import summarize_confidence_calibration
+from cris_sme.engine.evidence_gap_backlog import build_evidence_gap_backlog
 from cris_sme.engine.native_validation import build_native_validation_summary
 from cris_sme.engine.provider_conformance import (
     build_provider_contract_conformance_report,
@@ -105,6 +106,7 @@ def build_json_report(
             scoring_result.prioritized_findings,
         ),
     }
+    report["evidence_gap_backlog"] = build_evidence_gap_backlog(report).model_dump()
 
     if compliance_result is not None:
         report["compliance"] = compliance_result.model_dump()

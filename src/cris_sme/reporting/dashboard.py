@@ -110,6 +110,9 @@ def build_dashboard_payload(
             "assessment_replay": _assessment_replay_summary(
                 report.get("assessment_replay", {})
             ),
+            "evidence_gap_backlog": _evidence_gap_backlog_summary(
+                report.get("evidence_gap_backlog", {})
+            ),
         },
         "graph_context": {
             "blast_radius": graph_context.get("blast_radius", {}),
@@ -750,6 +753,27 @@ def _assessment_replay_summary(raw_replay: object) -> dict[str, Any]:
         "policy_pack_changed": bool(diff.get("policy_pack_changed", False)),
         "collector_mode_changed": bool(diff.get("collector_mode_changed", False)),
         "score_delta_reason": diff.get("score_delta_reason"),
+    }
+
+
+def _evidence_gap_backlog_summary(raw_backlog: object) -> dict[str, Any]:
+    """Build compact dashboard metadata from the evidence gap backlog."""
+    if not isinstance(raw_backlog, dict):
+        return {
+            "item_count": 0,
+            "high_priority_count": 0,
+            "provider_counts": {},
+            "domain_counts": {},
+        }
+    return {
+        "backlog_schema_version": raw_backlog.get("backlog_schema_version"),
+        "item_count": int(raw_backlog.get("item_count", 0)),
+        "high_priority_count": int(raw_backlog.get("high_priority_count", 0)),
+        "provider_counts": raw_backlog.get("provider_counts", {}),
+        "domain_counts": raw_backlog.get("domain_counts", {}),
+        "top_items": raw_backlog.get("items", [])[:10]
+        if isinstance(raw_backlog.get("items"), list)
+        else [],
     }
 
 
