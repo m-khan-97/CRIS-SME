@@ -30,6 +30,7 @@ from cris_sme.engine import (
     build_decision_ledger,
     build_evidence_snapshot,
     build_report_replay_summary,
+    build_report_trust_badge,
     build_risk_bill_of_materials,
     build_remediation_simulation,
     build_run_metadata,
@@ -255,6 +256,9 @@ def main() -> None:
     )
     output["risk_bill_of_materials"] = rbom.model_dump(mode="json")
     output["assessment_assurance"] = build_assessment_assurance(output).model_dump(
+        mode="json"
+    )
+    output["report_trust_badge"] = build_report_trust_badge(output).model_dump(
         mode="json"
     )
     rbom = build_risk_bill_of_materials(

@@ -141,6 +141,7 @@ def build_dashboard_payload(
         "assessment_assurance": _assessment_assurance_summary(
             report.get("assessment_assurance", {})
         ),
+        "report_trust_badge": report.get("report_trust_badge", {}),
         "native_validation": report.get("native_validation", {}),
         "artifacts": report.get("report_artifacts", {}),
     }

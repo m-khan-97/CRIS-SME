@@ -56,6 +56,7 @@ from .scoring import (
     ScoringResult,
     score_findings,
 )
+from .trust_badge import build_report_trust_badge
 
 __all__ = [
     "assess_compliance_mappings",
@@ -81,6 +82,7 @@ __all__ = [
     "build_custom_report_remediation_simulation",
     "build_remediation_simulation",
     "build_report_replay_summary",
+    "build_report_trust_badge",
     "enrich_report_finding_lifecycle",
     "evaluate_profiles",
     "load_exception_registry",

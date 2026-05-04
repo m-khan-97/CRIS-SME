@@ -548,3 +548,19 @@ class PolicyPackChangelog(BaseModel):
     active_policy_pack_version: str = Field(..., min_length=3)
     entry_count: int = Field(..., ge=0)
     entries: list[PolicyPackChangelogEntry] = Field(default_factory=list)
+
+
+class ReportTrustBadge(BaseModel):
+    """Compact stakeholder-facing trust label for a CRIS-SME report."""
+
+    badge_schema_version: str = Field(default="1.0.0", min_length=3)
+    label: str = Field(..., min_length=3)
+    level: str = Field(..., min_length=3)
+    assurance_score: float = Field(..., ge=0.0, le=100.0)
+    replay_verified: bool
+    rbom_present: bool
+    provider_conformance_passed: bool
+    high_priority_evidence_gaps: int = Field(..., ge=0)
+    statement: str = Field(..., min_length=8)
+    caveats: list[str] = Field(default_factory=list)
+    risk_score_impact: str = Field(..., min_length=8)
