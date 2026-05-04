@@ -11,6 +11,7 @@ from .assessment_assurance import build_assessment_assurance
 from .compliance import assess_compliance_mappings, load_compliance_mappings
 from .control_drift import build_control_drift_attribution
 from .decision_ledger import build_decision_ledger, summarize_decision_ledger
+from .decision_review import build_decision_review_queue
 from .evidence_gap_backlog import build_evidence_gap_backlog
 from .graph_context import build_graph_context_summary
 from .lifecycle import enrich_report_finding_lifecycle, load_exception_registry
@@ -66,6 +67,7 @@ __all__ = [
     "build_confidence_assessment",
     "build_control_drift_attribution",
     "build_decision_ledger",
+    "build_decision_review_queue",
     "build_assessment_assurance",
     "build_evidence_diff_result",
     "build_evidence_gap_backlog",

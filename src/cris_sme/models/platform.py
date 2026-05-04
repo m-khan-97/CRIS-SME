@@ -564,3 +564,30 @@ class ReportTrustBadge(BaseModel):
     statement: str = Field(..., min_length=8)
     caveats: list[str] = Field(default_factory=list)
     risk_score_impact: str = Field(..., min_length=8)
+
+
+class DecisionReviewQueueItem(BaseModel):
+    """One stakeholder review item derived from risk, evidence, and lifecycle context."""
+
+    review_id: str = Field(..., min_length=6)
+    decision_type: str = Field(..., min_length=3)
+    control_id: str = Field(..., min_length=3)
+    finding_id: str | None = None
+    title: str = Field(..., min_length=5)
+    provider: str = Field(..., min_length=2)
+    priority: str = Field(..., min_length=3)
+    recommended_decision: str = Field(..., min_length=5)
+    rationale: str = Field(..., min_length=8)
+    evidence_sufficiency: str | None = None
+    lifecycle_status: str | None = None
+    owner_hint: str = Field(..., min_length=3)
+
+
+class DecisionReviewQueue(BaseModel):
+    """Governance review queue for explicit risk, evidence, and exception decisions."""
+
+    queue_schema_version: str = Field(default="1.0.0", min_length=3)
+    item_count: int = Field(..., ge=0)
+    decision_type_counts: dict[str, int] = Field(default_factory=dict)
+    priority_counts: dict[str, int] = Field(default_factory=dict)
+    items: list[DecisionReviewQueueItem] = Field(default_factory=list)

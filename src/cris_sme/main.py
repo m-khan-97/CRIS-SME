@@ -28,6 +28,7 @@ from cris_sme.engine import (
     build_collector_coverage,
     build_control_drift_attribution,
     build_decision_ledger,
+    build_decision_review_queue,
     build_evidence_snapshot,
     build_report_replay_summary,
     build_report_trust_badge,
@@ -175,6 +176,9 @@ def main() -> None:
         result,
     ).model_dump()
     output["executive_pack"] = build_executive_pack(output)
+    output["decision_review_queue"] = build_decision_review_queue(output).model_dump(
+        mode="json"
+    )
 
     history_snapshot_path = archive_report_snapshot(
         output,

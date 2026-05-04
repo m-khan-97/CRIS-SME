@@ -135,6 +135,9 @@ def build_dashboard_payload(
             "exception_rows": _exception_rows(prioritized),
         },
         "decision_ledger": _decision_ledger_summary(report.get("decision_ledger", {})),
+        "decision_review_queue": _decision_review_queue_summary(
+            report.get("decision_review_queue", {})
+        ),
         "control_drift_attribution": _control_drift_attribution_summary(
             report.get("control_drift_attribution", {})
         ),
@@ -876,6 +879,26 @@ def _control_drift_attribution_summary(raw_attribution: object) -> dict[str, Any
         "exception_state_changed": bool(raw_attribution.get("exception_state_changed", False)),
         "top_items": raw_attribution.get("items", [])[:10]
         if isinstance(raw_attribution.get("items"), list)
+        else [],
+    }
+
+
+def _decision_review_queue_summary(raw_queue: object) -> dict[str, Any]:
+    """Build compact dashboard metadata from the decision review queue."""
+    if not isinstance(raw_queue, dict):
+        return {
+            "item_count": 0,
+            "decision_type_counts": {},
+            "priority_counts": {},
+            "top_items": [],
+        }
+    return {
+        "queue_schema_version": raw_queue.get("queue_schema_version"),
+        "item_count": int(raw_queue.get("item_count", 0)),
+        "decision_type_counts": raw_queue.get("decision_type_counts", {}),
+        "priority_counts": raw_queue.get("priority_counts", {}),
+        "top_items": raw_queue.get("items", [])[:15]
+        if isinstance(raw_queue.get("items"), list)
         else [],
     }
 
