@@ -61,9 +61,12 @@ def main() -> None:
     manifest_dir = dist_dir / "manifests"
     site_data_dir = site_dir / "data"
     site_assets_figures_dir = site_dir / "assets" / "figures"
+    demo_source_dir = repo_root / "frontend" / "demo-console"
+    demo_site_dir = site_dir / "demo"
 
     _prepare_directories(dist_dir, site_dir, manifest_dir, site_data_dir, site_assets_figures_dir)
     _assert_required_reports_exist(reports_dir)
+    _assert_demo_console_exists(demo_source_dir)
 
     _copy_file(reports_dir / "cris_sme_dashboard.html", site_dir / "dashboard.html")
     _copy_file(reports_dir / "cris_sme_assurance_portal.html", site_dir / "assurance.html")
@@ -79,6 +82,7 @@ def main() -> None:
         site_data_dir / "cris_sme_selective_disclosure.json",
     )
     _copy_file(reports_dir / "cris_sme_summary.txt", site_data_dir / "cris_sme_summary.txt")
+    _copy_demo_console(demo_source_dir, demo_site_dir)
 
     for figure in sorted(figures_dir.glob("*")):
         if figure.is_file() and figure.suffix.lower() in {".svg", ".png"}:
@@ -121,9 +125,28 @@ def _assert_required_reports_exist(reports_dir: Path) -> None:
         )
 
 
+def _assert_demo_console_exists(demo_source_dir: Path) -> None:
+    missing = [
+        name
+        for name in ("index.html", "styles.css", "app.js")
+        if not (demo_source_dir / name).exists()
+    ]
+    if missing:
+        joined = ", ".join(missing)
+        raise FileNotFoundError(
+            f"Missing demo console assets in {demo_source_dir}: {joined}."
+        )
+
+
 def _copy_file(src: Path, dst: Path) -> None:
     dst.parent.mkdir(parents=True, exist_ok=True)
     shutil.copy2(src, dst)
+
+
+def _copy_demo_console(src_dir: Path, dst_dir: Path) -> None:
+    dst_dir.mkdir(parents=True, exist_ok=True)
+    for name in ("index.html", "styles.css", "app.js"):
+        _copy_file(src_dir / name, dst_dir / name)
 
 
 def _build_manifest(*, repo_root: Path, site_dir: Path) -> dict[str, object]:
@@ -139,6 +162,9 @@ def _build_manifest(*, repo_root: Path, site_dir: Path) -> dict[str, object]:
     checksums = {}
     for relative_path in [
         Path("dashboard.html"),
+        Path("demo/index.html"),
+        Path("demo/styles.css"),
+        Path("demo/app.js"),
         Path("assurance.html"),
         Path("evidence-room.html"),
         Path("report.html"),
@@ -166,6 +192,7 @@ def _build_manifest(*, repo_root: Path, site_dir: Path) -> dict[str, object]:
         },
         "artifacts": {
             "site_entrypoint": "index.html",
+            "demo_console": "demo/index.html",
             "dashboard": "dashboard.html",
             "assurance_portal": "assurance.html",
             "evidence_room": "evidence-room.html",
@@ -243,18 +270,19 @@ def _build_index_html(manifest: dict[str, object]) -> str:
         font-family: "IBM Plex Sans", "Segoe UI", sans-serif;
         color: var(--ink);
         background:
-          radial-gradient(circle at 12% 12%, rgba(29, 201, 183, 0.18), transparent 30%),
-          radial-gradient(circle at 84% 18%, rgba(93, 163, 255, 0.16), transparent 32%),
+          linear-gradient(rgba(149, 171, 193, 0.045) 1px, transparent 1px),
+          linear-gradient(90deg, rgba(149, 171, 193, 0.045) 1px, transparent 1px),
           var(--bg);
+        background-size: 32px 32px, 32px 32px, auto;
       }}
       .wrap {{ max-width: 1100px; margin: 0 auto; padding: 28px 18px 42px; }}
       .hero {{
         background: linear-gradient(140deg, rgba(15, 29, 45, 0.95), rgba(10, 21, 34, 0.95));
         border: 1px solid var(--line);
-        border-radius: 18px;
+        border-radius: 8px;
         padding: 24px;
       }}
-      h1 {{ margin: 0; letter-spacing: -0.02em; font-size: clamp(1.8rem, 3vw, 2.6rem); }}
+      h1 {{ margin: 0; font-size: clamp(1.8rem, 3vw, 2.6rem); }}
       .sub {{ color: var(--muted); margin: 10px 0 0; max-width: 80ch; line-height: 1.55; }}
       .grid {{
         margin-top: 18px;
@@ -265,7 +293,7 @@ def _build_index_html(manifest: dict[str, object]) -> str:
       .card {{
         background: linear-gradient(180deg, rgba(17, 33, 51, 0.9), rgba(10, 20, 33, 0.96));
         border: 1px solid var(--line);
-        border-radius: 14px;
+        border-radius: 8px;
         padding: 14px;
       }}
       .card h2 {{ margin: 0 0 8px; font-size: 1.04rem; }}
@@ -276,7 +304,7 @@ def _build_index_html(manifest: dict[str, object]) -> str:
         color: #03131f;
         background: linear-gradient(120deg, var(--accent), var(--accent2));
         padding: 8px 12px;
-        border-radius: 10px;
+        border-radius: 8px;
         font-weight: 700;
       }}
       .meta {{
@@ -285,7 +313,7 @@ def _build_index_html(manifest: dict[str, object]) -> str:
         color: var(--muted);
         background: rgba(8, 16, 26, 0.75);
         border: 1px solid var(--line);
-        border-radius: 12px;
+        border-radius: 8px;
         padding: 12px;
       }}
       code {{
@@ -305,6 +333,11 @@ def _build_index_html(manifest: dict[str, object]) -> str:
           lifecycle-aware governance, and graph-context prioritization.
         </p>
         <div class="grid">
+          <article class="card">
+            <h2>Demo Console</h2>
+            <p>Interactive product workspace for assessment overview, findings, provenance, assurance, disclosure, and remediation.</p>
+            <a class="link" href="./demo/">Open Demo Console</a>
+          </article>
           <article class="card">
             <h2>Interactive Dashboard</h2>
             <p>Executive and technical console with filtering, trend signals, confidence cues, and graph context.</p>

@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>CRIS-SME Demo Console</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <aside class="side-nav" aria-label="Primary navigation">
+        <div class="brand-lockup">
+          <div class="brand-mark">CR</div>
+          <div>
+            <strong>CRIS-SME</strong>
+            <span>Decision Engine</span>
+          </div>
+        </div>
+        <nav>
+          <button class="nav-item active" data-view="overview" type="button">Overview</button>
+          <button class="nav-item" data-view="workbench" type="button">Decision Workbench</button>
+          <button class="nav-item" data-view="provenance" type="button">Provenance</button>
+          <button class="nav-item" data-view="assurance" type="button">Assurance Center</button>
+          <button class="nav-item" data-view="disclosure" type="button">Disclosure Room</button>
+          <button class="nav-item" data-view="remediation" type="button">Remediation</button>
+        </nav>
+        <div class="side-card">
+          <span class="eyebrow">Demo mode</span>
+          <p>Static console powered by CRIS-SME generated artifacts.</p>
+          <a href="../assurance.html">Assurance Portal</a>
+          <a href="../evidence-room.html">Evidence Room</a>
+        </div>
+      </aside>
+
+      <main class="workspace">
+        <header class="topbar">
+          <div>
+            <span class="eyebrow">Cloud Risk Decision Console</span>
+            <h1>Evidence-driven assurance, ready for a live demo.</h1>
+          </div>
+          <div class="top-actions">
+            <label class="search-box">
+              <span>Search</span>
+              <input id="finding-search" type="search" placeholder="Control, title, priority..." />
+            </label>
+            <a class="ghost-link" href="../report.html">Technical Report</a>
+          </div>
+        </header>
+
+        <section class="view active" id="view-overview" aria-labelledby="overview-title">
+          <div class="hero-panel">
+            <div>
+              <span class="eyebrow">Assessment overview</span>
+              <h2 id="overview-title">One assessment, many stakeholder views.</h2>
+              <p id="assessment-summary">Loading CRIS-SME artifacts...</p>
+            </div>
+            <div class="risk-orbit" aria-label="Overall risk score">
+              <svg viewBox="0 0 160 160" role="img">
+                <circle cx="80" cy="80" r="62" class="ring-bg"></circle>
+                <circle cx="80" cy="80" r="62" class="ring-value" id="risk-ring"></circle>
+              </svg>
+              <div>
+                <strong id="risk-score">--</strong>
+                <span id="risk-band">risk band</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="metric-grid" id="overview-metrics"></div>
+
+          <div class="content-grid two">
+            <section class="panel">
+              <div class="panel-head">
+                <h3>Domain posture</h3>
+                <span>Risk contribution</span>
+              </div>
+              <div class="bar-list" id="domain-bars"></div>
+            </section>
+            <section class="panel">
+              <div class="panel-head">
+                <h3>Top business risks</h3>
+                <span>Highest priority controls</span>
+              </div>
+              <div class="risk-list" id="top-risks"></div>
+            </section>
+          </div>
+        </section>
+
+        <section class="view" id="view-workbench" aria-labelledby="workbench-title">
+          <div class="section-title">
+            <div>
+              <span class="eyebrow">Decision workbench</span>
+              <h2 id="workbench-title">Prioritized findings with evidence quality.</h2>
+            </div>
+            <div class="segmented" id="priority-filter"></div>
+          </div>
+          <div class="workbench-layout">
+            <section class="panel finding-table-panel">
+              <div class="finding-table" id="finding-table"></div>
+            </section>
+            <aside class="panel detail-panel" id="finding-detail"></aside>
+          </div>
+        </section>
+
+        <section class="view" id="view-provenance" aria-labelledby="provenance-title">
+          <div class="section-title">
+            <div>
+              <span class="eyebrow">Provenance explorer</span>
+              <h2 id="provenance-title">Trace evidence to controls, scores, claims, and assurance.</h2>
+            </div>
+          </div>
+          <div class="content-grid two">
+            <section class="panel">
+              <div class="panel-head">
+                <h3>Decision path</h3>
+                <span id="selected-path-label">Selected finding</span>
+              </div>
+              <div class="decision-path" id="decision-path"></div>
+            </section>
+            <section class="panel">
+              <div class="panel-head">
+                <h3>Graph signals</h3>
+                <span>Context prioritization</span>
+              </div>
+              <div class="graph-canvas" id="graph-canvas"></div>
+            </section>
+          </div>
+        </section>
+
+        <section class="view" id="view-assurance" aria-labelledby="assurance-title">
+          <div class="section-title">
+            <div>
+              <span class="eyebrow">Assurance center</span>
+              <h2 id="assurance-title">Claims, case arguments, replay, RBOM, and trust badge.</h2>
+            </div>
+          </div>
+          <div class="metric-grid" id="assurance-metrics"></div>
+          <div class="content-grid two">
+            <section class="panel">
+              <div class="panel-head">
+                <h3>Verified claims</h3>
+                <span>Stakeholder statements</span>
+              </div>
+              <div class="claim-list" id="claim-list"></div>
+            </section>
+            <section class="panel">
+              <div class="panel-head">
+                <h3>Assurance case</h3>
+                <span>Trust argument</span>
+              </div>
+              <div class="argument-list" id="argument-list"></div>
+            </section>
+          </div>
+        </section>
+
+        <section class="view" id="view-disclosure" aria-labelledby="disclosure-title">
+          <div class="section-title">
+            <div>
+              <span class="eyebrow">Selective disclosure</span>
+              <h2 id="disclosure-title">Switch stakeholder view without leaking raw cloud internals.</h2>
+            </div>
+            <div class="segmented" id="disclosure-tabs"></div>
+          </div>
+          <div class="content-grid two">
+            <section class="panel" id="disclosure-room"></section>
+            <section class="panel">
+              <div class="panel-head">
+                <h3>Redaction and withheld evidence</h3>
+                <span>Share manifest</span>
+              </div>
+              <div id="redaction-register"></div>
+            </section>
+          </div>
+        </section>
+
+        <section class="view" id="view-remediation" aria-labelledby="remediation-title">
+          <div class="section-title">
+            <div>
+              <span class="eyebrow">Remediation simulator</span>
+              <h2 id="remediation-title">Show how risk changes when controls are addressed.</h2>
+            </div>
+          </div>
+          <div class="content-grid two">
+            <section class="panel">
+              <div class="panel-head">
+                <h3>Risk reduction candidates</h3>
+                <span>Select controls</span>
+              </div>
+              <div class="simulator-list" id="simulator-list"></div>
+            </section>
+            <section class="panel simulator-result">
+              <span class="eyebrow">Projected result</span>
+              <strong id="simulated-score">--</strong>
+              <p id="simulated-summary">Select remediation candidates to model risk reduction.</p>
+              <div class="impact-bars" id="impact-bars"></div>
+            </section>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <script src="./app.js"></script>
+  </body>
+</html>

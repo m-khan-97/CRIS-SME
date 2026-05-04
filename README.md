@@ -59,6 +59,7 @@ The product wedge is:
 
 CRIS-SME is evolving toward a state-of-the-art cloud risk decision methodology:
 
+- **Demo Console**: professional interactive frontend for live demos across overview, findings, provenance, assurance, disclosure, and remediation
 - **Decision Ledger**: append-only history of findings, exceptions, score movement, evidence references, and approvals
 - **Risk Bill of Materials**: signed evidence/control/report manifest for assurance and customer trust
 - **Assessment Replay**: saved normalized evidence snapshots that replay deterministic decisions without recollecting cloud data
@@ -80,7 +81,7 @@ CRIS-SME is evolving toward a state-of-the-art cloud risk decision methodology:
 - **SaaS/API Plane**: assessment, finding, exception, report, and policy-pack APIs
 - **AI Risk Narrator**: optional plain-language translation that never changes deterministic scores
 
-See [transformation strategy](docs/product-strategy.md), [innovation and UKRI readiness](docs/innovation-and-ukri-readiness.md), [assessment replay](docs/assessment-replay.md), [assessment assurance](docs/assessment-assurance.md), [evidence gap backlog](docs/evidence-gap-backlog.md), [control drift attribution](docs/control-drift-attribution.md), [policy pack changelog](docs/policy-pack-changelog.md), [report trust badge](docs/report-trust-badge.md), [decision review queue](docs/decision-review-queue.md), [decision provenance graph](docs/decision-provenance-graph.md), [claim verification pack](docs/claim-verification-pack.md), [assurance case](docs/assurance-case.md), [claim-bound narrative](docs/claim-bound-narrative.md), [assurance portal](docs/assurance-portal.md), [selective disclosure evidence room](docs/selective-disclosure-evidence-room.md), [provider evidence contracts](docs/provider-evidence-contracts.md), [remediation simulator](docs/remediation-simulator.md), [SaaS and API evolution](docs/saas-api-evolution.md), and [security and trust model](docs/security-trust-model.md) for the professional roadmap.
+See [transformation strategy](docs/product-strategy.md), [innovation and UKRI readiness](docs/innovation-and-ukri-readiness.md), [demo console](docs/demo-console.md), [assessment replay](docs/assessment-replay.md), [assessment assurance](docs/assessment-assurance.md), [evidence gap backlog](docs/evidence-gap-backlog.md), [control drift attribution](docs/control-drift-attribution.md), [policy pack changelog](docs/policy-pack-changelog.md), [report trust badge](docs/report-trust-badge.md), [decision review queue](docs/decision-review-queue.md), [decision provenance graph](docs/decision-provenance-graph.md), [claim verification pack](docs/claim-verification-pack.md), [assurance case](docs/assurance-case.md), [claim-bound narrative](docs/claim-bound-narrative.md), [assurance portal](docs/assurance-portal.md), [selective disclosure evidence room](docs/selective-disclosure-evidence-room.md), [provider evidence contracts](docs/provider-evidence-contracts.md), [remediation simulator](docs/remediation-simulator.md), [SaaS and API evolution](docs/saas-api-evolution.md), and [security and trust model](docs/security-trust-model.md) for the professional roadmap.
 
 ---
 
@@ -320,6 +321,7 @@ Data/decision docs:
 
 - [Data Model](docs/data-model.md)
 - [Evidence Lineage](docs/evidence-lineage.md)
+- [Demo Console](docs/demo-console.md)
 - [Assessment Replay](docs/assessment-replay.md)
 - [Assessment Assurance](docs/assessment-assurance.md)
 - [Evidence Gap Backlog](docs/evidence-gap-backlog.md)

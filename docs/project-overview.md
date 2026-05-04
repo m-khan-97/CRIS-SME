@@ -66,6 +66,7 @@ CRIS-SME should become the cloud risk decision system of record for SMEs and MSP
 
 The next product stage is to add:
 
+- Demo Console
 - Decision Ledger
 - Risk Bill of Materials
 - Assessment Replay and Evidence Diff
