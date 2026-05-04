@@ -591,3 +591,48 @@ class DecisionReviewQueue(BaseModel):
     decision_type_counts: dict[str, int] = Field(default_factory=dict)
     priority_counts: dict[str, int] = Field(default_factory=dict)
     items: list[DecisionReviewQueueItem] = Field(default_factory=list)
+
+
+class DecisionProvenanceNode(BaseModel):
+    """One node in the CRIS-SME decision provenance graph."""
+
+    node_id: str = Field(..., min_length=3)
+    node_type: str = Field(..., min_length=3)
+    label: str = Field(..., min_length=3)
+    summary: str = Field(..., min_length=3)
+    metadata: dict[str, Any] = Field(default_factory=dict)
+
+
+class DecisionProvenanceEdge(BaseModel):
+    """Directed provenance relationship between two decision graph nodes."""
+
+    edge_id: str = Field(..., min_length=6)
+    source_node_id: str = Field(..., min_length=3)
+    target_node_id: str = Field(..., min_length=3)
+    relationship: str = Field(..., min_length=3)
+    explanation: str = Field(..., min_length=8)
+
+
+class DecisionProvenancePath(BaseModel):
+    """Compact path showing how evidence becomes a decision."""
+
+    path_id: str = Field(..., min_length=6)
+    finding_id: str | None = None
+    control_id: str = Field(..., min_length=3)
+    node_ids: list[str] = Field(default_factory=list)
+    summary: str = Field(..., min_length=8)
+
+
+class DecisionProvenanceGraph(BaseModel):
+    """Traceable graph linking evidence, controls, findings, scores, assurance, and decisions."""
+
+    graph_schema_version: str = Field(default="1.0.0", min_length=3)
+    graph_model: str = Field(default="cris_sme_decision_provenance_graph_v1", min_length=3)
+    node_count: int = Field(..., ge=0)
+    edge_count: int = Field(..., ge=0)
+    path_count: int = Field(..., ge=0)
+    node_type_counts: dict[str, int] = Field(default_factory=dict)
+    edge_type_counts: dict[str, int] = Field(default_factory=dict)
+    nodes: list[DecisionProvenanceNode] = Field(default_factory=list)
+    edges: list[DecisionProvenanceEdge] = Field(default_factory=list)
+    top_decision_paths: list[DecisionProvenancePath] = Field(default_factory=list)

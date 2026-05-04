@@ -68,13 +68,14 @@ CRIS-SME is evolving toward a state-of-the-art cloud risk decision methodology:
 - **Policy Pack Changelog**: machine-readable policy change trail for policy drift explanation
 - **Report Trust Badge**: compact stakeholder-facing assurance label backed by replay, RBOM, conformance, and evidence-gap signals
 - **Decision Review Queue**: explicit governance queue for remediation, evidence review, exception review, and monitoring decisions
+- **Decision Provenance Graph**: graph of evidence, policy, finding, score, replay, RBOM, assurance, and review decision relationships
 - **Remediation Simulator**: deterministic "fix these controls, reduce this risk" planning
 - **Insurance Evidence Gateway**: insurer-questionnaire answers backed by confidence and proof references
 - **Provider Evidence Contracts**: explicit per-provider coverage, freshness, and evidence sufficiency rules
 - **SaaS/API Plane**: assessment, finding, exception, report, and policy-pack APIs
 - **AI Risk Narrator**: optional plain-language translation that never changes deterministic scores
 
-See [transformation strategy](docs/product-strategy.md), [innovation and UKRI readiness](docs/innovation-and-ukri-readiness.md), [assessment replay](docs/assessment-replay.md), [assessment assurance](docs/assessment-assurance.md), [evidence gap backlog](docs/evidence-gap-backlog.md), [control drift attribution](docs/control-drift-attribution.md), [policy pack changelog](docs/policy-pack-changelog.md), [report trust badge](docs/report-trust-badge.md), [decision review queue](docs/decision-review-queue.md), [provider evidence contracts](docs/provider-evidence-contracts.md), [remediation simulator](docs/remediation-simulator.md), [SaaS and API evolution](docs/saas-api-evolution.md), and [security and trust model](docs/security-trust-model.md) for the professional roadmap.
+See [transformation strategy](docs/product-strategy.md), [innovation and UKRI readiness](docs/innovation-and-ukri-readiness.md), [assessment replay](docs/assessment-replay.md), [assessment assurance](docs/assessment-assurance.md), [evidence gap backlog](docs/evidence-gap-backlog.md), [control drift attribution](docs/control-drift-attribution.md), [policy pack changelog](docs/policy-pack-changelog.md), [report trust badge](docs/report-trust-badge.md), [decision review queue](docs/decision-review-queue.md), [decision provenance graph](docs/decision-provenance-graph.md), [provider evidence contracts](docs/provider-evidence-contracts.md), [remediation simulator](docs/remediation-simulator.md), [SaaS and API evolution](docs/saas-api-evolution.md), and [security and trust model](docs/security-trust-model.md) for the professional roadmap.
 
 ---
 
@@ -321,6 +322,7 @@ Data/decision docs:
 - [Policy Pack Changelog](docs/policy-pack-changelog.md)
 - [Report Trust Badge](docs/report-trust-badge.md)
 - [Decision Review Queue](docs/decision-review-queue.md)
+- [Decision Provenance Graph](docs/decision-provenance-graph.md)
 - [Control Lifecycle](docs/control-lifecycle.md)
 - [Finding Lifecycle](docs/finding-lifecycle.md)
 - [History and Drift](docs/history-and-drift.md)

@@ -138,6 +138,9 @@ def build_dashboard_payload(
         "decision_review_queue": _decision_review_queue_summary(
             report.get("decision_review_queue", {})
         ),
+        "decision_provenance_graph": _decision_provenance_graph_summary(
+            report.get("decision_provenance_graph", {})
+        ),
         "control_drift_attribution": _control_drift_attribution_summary(
             report.get("control_drift_attribution", {})
         ),
@@ -899,6 +902,30 @@ def _decision_review_queue_summary(raw_queue: object) -> dict[str, Any]:
         "priority_counts": raw_queue.get("priority_counts", {}),
         "top_items": raw_queue.get("items", [])[:15]
         if isinstance(raw_queue.get("items"), list)
+        else [],
+    }
+
+
+def _decision_provenance_graph_summary(raw_graph: object) -> dict[str, Any]:
+    """Build compact dashboard metadata from the decision provenance graph."""
+    if not isinstance(raw_graph, dict):
+        return {
+            "node_count": 0,
+            "edge_count": 0,
+            "path_count": 0,
+            "node_type_counts": {},
+            "edge_type_counts": {},
+        }
+    return {
+        "graph_schema_version": raw_graph.get("graph_schema_version"),
+        "graph_model": raw_graph.get("graph_model"),
+        "node_count": int(raw_graph.get("node_count", 0)),
+        "edge_count": int(raw_graph.get("edge_count", 0)),
+        "path_count": int(raw_graph.get("path_count", 0)),
+        "node_type_counts": raw_graph.get("node_type_counts", {}),
+        "edge_type_counts": raw_graph.get("edge_type_counts", {}),
+        "top_decision_paths": raw_graph.get("top_decision_paths", [])[:10]
+        if isinstance(raw_graph.get("top_decision_paths"), list)
         else [],
     }
 

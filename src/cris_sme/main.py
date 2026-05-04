@@ -28,6 +28,7 @@ from cris_sme.engine import (
     build_collector_coverage,
     build_control_drift_attribution,
     build_decision_ledger,
+    build_decision_provenance_graph,
     build_decision_review_queue,
     build_evidence_snapshot,
     build_report_replay_summary,
@@ -39,6 +40,7 @@ from cris_sme.engine import (
     load_compliance_mappings,
     load_exception_registry,
     write_risk_bill_of_materials,
+    write_decision_provenance_graph,
 )
 from cris_sme.engine.benchmark import (
     build_benchmark_comparison,
@@ -264,6 +266,12 @@ def main() -> None:
     )
     output["report_trust_badge"] = build_report_trust_badge(output).model_dump(
         mode="json"
+    )
+    provenance_graph = build_decision_provenance_graph(output)
+    provenance_graph_path = output_dir / "cris_sme_decision_provenance_graph.json"
+    output["decision_provenance_graph"] = provenance_graph.model_dump(mode="json")
+    output["report_artifacts"]["decision_provenance_graph"] = str(
+        write_decision_provenance_graph(provenance_graph, provenance_graph_path)
     )
     rbom = build_risk_bill_of_materials(
         output,

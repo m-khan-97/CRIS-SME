@@ -73,6 +73,7 @@ The next product stage is to add:
 - Evidence Gap Backlog
 - Control Drift Attribution
 - Policy Pack Changelog
+- Decision Provenance Graph
 - remediation simulator
 - evidence sufficiency model
 - signed report manifests
