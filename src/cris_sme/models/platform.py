@@ -668,3 +668,36 @@ class ClaimVerificationPack(BaseModel):
     caveated_claim_count: int = Field(..., ge=0)
     claim_type_counts: dict[str, int] = Field(default_factory=dict)
     claims: list[ClaimVerification] = Field(default_factory=list)
+
+
+class AssuranceCaseArgument(BaseModel):
+    """One structured assurance argument with linked supporting claims and evidence."""
+
+    argument_id: str = Field(..., min_length=6)
+    top_claim: str = Field(..., min_length=8)
+    conclusion: str = Field(..., min_length=3)
+    confidence: float = Field(..., ge=0.0, le=1.0)
+    supporting_claim_ids: list[str] = Field(default_factory=list)
+    evidence_refs: list[str] = Field(default_factory=list)
+    provenance_node_ids: list[str] = Field(default_factory=list)
+    rbom_artifact_refs: list[str] = Field(default_factory=list)
+    caveats: list[str] = Field(default_factory=list)
+    residual_gaps: list[str] = Field(default_factory=list)
+    reasoning: str = Field(..., min_length=8)
+
+
+class AssuranceCase(BaseModel):
+    """Structured assurance case for CRIS-SME report trustworthiness."""
+
+    case_schema_version: str = Field(default="1.0.0", min_length=3)
+    case_name: str = Field(default="CRIS-SME Assessment Assurance Case", min_length=3)
+    generated_at: str | None = None
+    overall_conclusion: str = Field(..., min_length=3)
+    assurance_score: float = Field(..., ge=0.0, le=100.0)
+    argument_count: int = Field(..., ge=0)
+    supported_argument_count: int = Field(..., ge=0)
+    caveated_argument_count: int = Field(..., ge=0)
+    arguments: list[AssuranceCaseArgument] = Field(default_factory=list)
+    open_caveats: list[str] = Field(default_factory=list)
+    residual_gaps: list[str] = Field(default_factory=list)
+    deterministic_score_impact: str = Field(..., min_length=8)

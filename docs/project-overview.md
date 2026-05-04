@@ -75,6 +75,7 @@ The next product stage is to add:
 - Policy Pack Changelog
 - Decision Provenance Graph
 - Claim Verification Packs
+- Assurance Case Builder
 - remediation simulator
 - evidence sufficiency model
 - signed report manifests

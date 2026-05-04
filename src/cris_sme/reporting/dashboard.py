@@ -144,6 +144,9 @@ def build_dashboard_payload(
         "claim_verification_pack": _claim_verification_pack_summary(
             report.get("claim_verification_pack", {})
         ),
+        "assurance_case": _assurance_case_summary(
+            report.get("assurance_case", {})
+        ),
         "control_drift_attribution": _control_drift_attribution_summary(
             report.get("control_drift_attribution", {})
         ),
@@ -952,6 +955,36 @@ def _claim_verification_pack_summary(raw_pack: object) -> dict[str, Any]:
         "claim_type_counts": raw_pack.get("claim_type_counts", {}),
         "top_claims": raw_pack.get("claims", [])[:15]
         if isinstance(raw_pack.get("claims"), list)
+        else [],
+    }
+
+
+def _assurance_case_summary(raw_case: object) -> dict[str, Any]:
+    """Build compact dashboard metadata from the Assurance Case."""
+    if not isinstance(raw_case, dict):
+        return {
+            "overall_conclusion": "unknown",
+            "argument_count": 0,
+            "supported_argument_count": 0,
+            "caveated_argument_count": 0,
+            "open_caveat_count": 0,
+        }
+    return {
+        "case_schema_version": raw_case.get("case_schema_version"),
+        "case_name": raw_case.get("case_name"),
+        "overall_conclusion": raw_case.get("overall_conclusion", "unknown"),
+        "assurance_score": float(raw_case.get("assurance_score", 0.0)),
+        "argument_count": int(raw_case.get("argument_count", 0)),
+        "supported_argument_count": int(raw_case.get("supported_argument_count", 0)),
+        "caveated_argument_count": int(raw_case.get("caveated_argument_count", 0)),
+        "open_caveat_count": len(raw_case.get("open_caveats", []))
+        if isinstance(raw_case.get("open_caveats"), list)
+        else 0,
+        "residual_gap_count": len(raw_case.get("residual_gaps", []))
+        if isinstance(raw_case.get("residual_gaps"), list)
+        else 0,
+        "arguments": raw_case.get("arguments", [])[:10]
+        if isinstance(raw_case.get("arguments"), list)
         else [],
     }
 

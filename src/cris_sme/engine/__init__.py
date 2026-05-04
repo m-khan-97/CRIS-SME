@@ -8,6 +8,7 @@ from .assessment_replay import (
     replay_evidence_snapshot,
 )
 from .assessment_assurance import build_assessment_assurance
+from .assurance_case import build_assurance_case, write_assurance_case
 from .claim_verification import (
     build_claim_verification_pack,
     write_claim_verification_pack,
@@ -78,6 +79,7 @@ __all__ = [
     "build_decision_provenance_graph",
     "build_decision_review_queue",
     "build_assessment_assurance",
+    "build_assurance_case",
     "build_claim_verification_pack",
     "build_evidence_diff_result",
     "build_evidence_gap_backlog",
@@ -115,6 +117,7 @@ __all__ = [
     "write_risk_bill_of_materials_signature",
     "write_decision_provenance_graph",
     "write_claim_verification_pack",
+    "write_assurance_case",
     "summarize_decision_ledger",
     "summarize_policy_pack_changelog",
     "summarize_provider_contract_conformance",
