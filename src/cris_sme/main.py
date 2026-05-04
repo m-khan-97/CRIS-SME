@@ -39,6 +39,7 @@ from cris_sme.engine import (
     build_risk_bill_of_materials,
     build_remediation_simulation,
     build_run_metadata,
+    build_selective_disclosure_package,
     enrich_report_finding_lifecycle,
     load_compliance_mappings,
     load_exception_registry,
@@ -47,6 +48,7 @@ from cris_sme.engine import (
     write_assurance_case,
     write_claim_bound_narrative,
     write_decision_provenance_graph,
+    write_selective_disclosure_package,
 )
 from cris_sme.engine.benchmark import (
     build_benchmark_comparison,
@@ -64,6 +66,7 @@ from cris_sme.reporting import (
     build_dashboard_payload,
     build_evaluation_mode_summary,
     build_executive_pack,
+    build_evidence_room_html,
     build_history_comparison,
     build_html_report,
     build_json_report,
@@ -78,6 +81,7 @@ from cris_sme.reporting import (
     write_dashboard_html,
     write_dashboard_payload,
     write_executive_pack,
+    write_evidence_room_html,
     write_history_figures,
     write_html_report,
     write_json_report,
@@ -309,6 +313,24 @@ def main() -> None:
             assurance_portal_path,
         )
     )
+    selective_disclosure = build_selective_disclosure_package(output)
+    output["selective_disclosure"] = selective_disclosure.model_dump(mode="json")
+    selective_disclosure_path = output_dir / "cris_sme_selective_disclosure.json"
+    evidence_room_path = output_dir / "cris_sme_evidence_room.html"
+    output["report_artifacts"]["selective_disclosure"] = {
+        "selective_disclosure_json": str(
+            write_selective_disclosure_package(
+                selective_disclosure,
+                selective_disclosure_path,
+            )
+        ),
+        "evidence_room_html": str(
+            write_evidence_room_html(
+                build_evidence_room_html(output["selective_disclosure"]),
+                evidence_room_path,
+            )
+        ),
+    }
     rbom = build_risk_bill_of_materials(
         output,
         artifact_paths=_flatten_artifact_paths(output["report_artifacts"]),

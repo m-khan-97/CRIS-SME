@@ -78,6 +78,7 @@ The next product stage is to add:
 - Assurance Case Builder
 - Claim-Bound Narrative
 - Customer-Facing Assurance Portal
+- Selective Disclosure Evidence Room
 - remediation simulator
 - evidence sufficiency model
 - signed report manifests

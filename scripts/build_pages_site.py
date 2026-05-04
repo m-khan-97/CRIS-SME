@@ -20,9 +20,11 @@ except ModuleNotFoundError:  # pragma: no cover - Python <3.11 fallback
 REQUIRED_REPORT_FILES = [
     "cris_sme_dashboard.html",
     "cris_sme_assurance_portal.html",
+    "cris_sme_evidence_room.html",
     "cris_sme_report.html",
     "cris_sme_dashboard_payload.json",
     "cris_sme_report.json",
+    "cris_sme_selective_disclosure.json",
     "cris_sme_summary.txt",
 ]
 
@@ -65,12 +67,17 @@ def main() -> None:
 
     _copy_file(reports_dir / "cris_sme_dashboard.html", site_dir / "dashboard.html")
     _copy_file(reports_dir / "cris_sme_assurance_portal.html", site_dir / "assurance.html")
+    _copy_file(reports_dir / "cris_sme_evidence_room.html", site_dir / "evidence-room.html")
     _copy_file(reports_dir / "cris_sme_report.html", site_dir / "report.html")
     _copy_file(
         reports_dir / "cris_sme_dashboard_payload.json",
         site_data_dir / "cris_sme_dashboard_payload.json",
     )
     _copy_file(reports_dir / "cris_sme_report.json", site_data_dir / "cris_sme_report.json")
+    _copy_file(
+        reports_dir / "cris_sme_selective_disclosure.json",
+        site_data_dir / "cris_sme_selective_disclosure.json",
+    )
     _copy_file(reports_dir / "cris_sme_summary.txt", site_data_dir / "cris_sme_summary.txt")
 
     for figure in sorted(figures_dir.glob("*")):
@@ -133,9 +140,11 @@ def _build_manifest(*, repo_root: Path, site_dir: Path) -> dict[str, object]:
     for relative_path in [
         Path("dashboard.html"),
         Path("assurance.html"),
+        Path("evidence-room.html"),
         Path("report.html"),
         Path("data/cris_sme_dashboard_payload.json"),
         Path("data/cris_sme_report.json"),
+        Path("data/cris_sme_selective_disclosure.json"),
         Path("data/cris_sme_summary.txt"),
     ]:
         absolute = site_dir / relative_path
@@ -159,10 +168,12 @@ def _build_manifest(*, repo_root: Path, site_dir: Path) -> dict[str, object]:
             "site_entrypoint": "index.html",
             "dashboard": "dashboard.html",
             "assurance_portal": "assurance.html",
+            "evidence_room": "evidence-room.html",
             "technical_report": "report.html",
             "data_bundle": [
                 "data/cris_sme_dashboard_payload.json",
                 "data/cris_sme_report.json",
+                "data/cris_sme_selective_disclosure.json",
                 "data/cris_sme_summary.txt",
                 "data/build-metadata.json",
             ],
@@ -303,6 +314,11 @@ def _build_index_html(manifest: dict[str, object]) -> str:
             <h2>Assurance Portal</h2>
             <p>Customer-facing trust view with claim citations, assurance case, provenance paths, replay, and RBOM signals.</p>
             <a class="link" href="./assurance.html">Open Assurance Portal</a>
+          </article>
+          <article class="card">
+            <h2>Evidence Room</h2>
+            <p>Selective disclosure view with redacted evidence, withheld-evidence reasons, claims, and RBOM references.</p>
+            <a class="link" href="./evidence-room.html">Open Evidence Room</a>
           </article>
           <article class="card">
             <h2>Technical HTML Report</h2>

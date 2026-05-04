@@ -58,6 +58,10 @@ from .rbom import (
     write_risk_bill_of_materials_signature,
     write_risk_bill_of_materials,
 )
+from .selective_disclosure import (
+    build_selective_disclosure_package,
+    write_selective_disclosure_package,
+)
 from .provider_contracts import build_provider_evidence_contract_catalog
 from .provider_conformance import (
     build_provider_contract_conformance_report,
@@ -102,6 +106,7 @@ __all__ = [
     "build_remediation_simulation",
     "build_report_replay_summary",
     "build_report_trust_badge",
+    "build_selective_disclosure_package",
     "enrich_report_finding_lifecycle",
     "evaluate_profiles",
     "load_exception_registry",
@@ -123,6 +128,7 @@ __all__ = [
     "write_decision_provenance_graph",
     "write_claim_verification_pack",
     "write_claim_bound_narrative",
+    "write_selective_disclosure_package",
     "write_assurance_case",
     "summarize_decision_ledger",
     "summarize_policy_pack_changelog",

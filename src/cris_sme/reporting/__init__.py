@@ -8,6 +8,7 @@ from .dashboard import (
     write_dashboard_payload,
 )
 from .executive_pack import build_executive_pack, write_executive_pack
+from .evidence_room import build_evidence_room_html, write_evidence_room_html
 from .action_plan_export import write_action_plan_outputs
 from .appendix_export import write_appendix_tables
 from .figure_export import write_history_figures, write_report_figures
@@ -39,6 +40,7 @@ __all__ = [
     "build_dashboard_html",
     "build_dashboard_payload",
     "build_executive_pack",
+    "build_evidence_room_html",
     "write_benchmark_outputs",
     "write_action_plan_outputs",
     "write_assurance_portal_html",
@@ -49,6 +51,7 @@ __all__ = [
     "write_history_figures",
     "write_report_figures",
     "write_executive_pack",
+    "write_evidence_room_html",
     "build_html_report",
     "build_cyber_insurance_evidence_pack",
     "build_json_report",

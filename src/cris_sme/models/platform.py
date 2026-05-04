@@ -724,3 +724,57 @@ class ClaimBoundNarrative(BaseModel):
     sections: list[ClaimBoundNarrativeSection] = Field(default_factory=list)
     guardrails: list[str] = Field(default_factory=list)
     deterministic_score_impact: str = Field(..., min_length=8)
+
+
+class DisclosureRedaction(BaseModel):
+    """One redaction applied while preparing a stakeholder-safe evidence room."""
+
+    redaction_id: str = Field(..., min_length=6)
+    field_path: str = Field(..., min_length=1)
+    redaction_type: str = Field(..., min_length=3)
+    reason: str = Field(..., min_length=8)
+
+
+class DisclosureWithheldItem(BaseModel):
+    """Evidence intentionally withheld from a disclosure profile."""
+
+    item_id: str = Field(..., min_length=6)
+    source_section: str = Field(..., min_length=3)
+    reason: str = Field(..., min_length=8)
+    replacement_summary: str = Field(..., min_length=8)
+
+
+class DisclosureRoom(BaseModel):
+    """One stakeholder-specific disclosure view with redacted evidence."""
+
+    profile_id: str = Field(..., min_length=3)
+    profile_name: str = Field(..., min_length=3)
+    audience: str = Field(..., min_length=3)
+    disclosure_level: str = Field(..., min_length=3)
+    included_sections: list[str] = Field(default_factory=list)
+    included_claim_count: int = Field(..., ge=0)
+    shared_evidence_count: int = Field(..., ge=0)
+    redaction_count: int = Field(..., ge=0)
+    withheld_count: int = Field(..., ge=0)
+    claims: list[dict[str, Any]] = Field(default_factory=list)
+    assurance_case: dict[str, Any] = Field(default_factory=dict)
+    claim_bound_narrative: dict[str, Any] = Field(default_factory=dict)
+    provenance_paths: list[dict[str, Any]] = Field(default_factory=list)
+    shared_evidence: list[dict[str, Any]] = Field(default_factory=list)
+    withheld_items: list[DisclosureWithheldItem] = Field(default_factory=list)
+    redactions: list[DisclosureRedaction] = Field(default_factory=list)
+    integrity: dict[str, str] = Field(default_factory=dict)
+    deterministic_score_impact: str = Field(..., min_length=8)
+
+
+class SelectiveDisclosurePackage(BaseModel):
+    """Controlled evidence-sharing package for customers, insurers, and auditors."""
+
+    package_schema_version: str = Field(default="1.0.0", min_length=3)
+    package_name: str = Field(default="CRIS-SME Selective Disclosure Evidence Room", min_length=3)
+    generated_at: str | None = None
+    profile_count: int = Field(..., ge=0)
+    rooms: list[DisclosureRoom] = Field(default_factory=list)
+    share_manifest: dict[str, Any] = Field(default_factory=dict)
+    guardrails: list[str] = Field(default_factory=list)
+    deterministic_score_impact: str = Field(..., min_length=8)
