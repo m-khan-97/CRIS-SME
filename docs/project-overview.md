@@ -77,6 +77,7 @@ The next product stage is to add:
 - Claim Verification Packs
 - Assurance Case Builder
 - Claim-Bound Narrative
+- Customer-Facing Assurance Portal
 - remediation simulator
 - evidence sufficiency model
 - signed report manifests

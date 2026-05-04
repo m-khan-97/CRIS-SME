@@ -58,6 +58,7 @@ from cris_sme.engine.uk_readiness import build_cyber_essentials_readiness
 from cris_sme.policies import load_policy_pack_metadata
 from cris_sme.reporting import (
     archive_report_snapshot,
+    build_assurance_portal_html,
     build_cyber_insurance_evidence_pack,
     build_dashboard_html,
     build_dashboard_payload,
@@ -70,6 +71,7 @@ from cris_sme.reporting import (
     load_report_history,
     maybe_generate_plain_language_narrative,
     write_action_plan_outputs,
+    write_assurance_portal_html,
     write_appendix_tables,
     write_benchmark_outputs,
     write_cyber_insurance_evidence_pack,
@@ -300,6 +302,13 @@ def main() -> None:
             output_dir,
         ).items()
     }
+    assurance_portal_path = output_dir / "cris_sme_assurance_portal.html"
+    output["report_artifacts"]["assurance_portal"] = str(
+        write_assurance_portal_html(
+            build_assurance_portal_html(output),
+            assurance_portal_path,
+        )
+    )
     rbom = build_risk_bill_of_materials(
         output,
         artifact_paths=_flatten_artifact_paths(output["report_artifacts"]),

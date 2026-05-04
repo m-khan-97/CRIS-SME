@@ -19,6 +19,7 @@ except ModuleNotFoundError:  # pragma: no cover - Python <3.11 fallback
 
 REQUIRED_REPORT_FILES = [
     "cris_sme_dashboard.html",
+    "cris_sme_assurance_portal.html",
     "cris_sme_report.html",
     "cris_sme_dashboard_payload.json",
     "cris_sme_report.json",
@@ -63,6 +64,7 @@ def main() -> None:
     _assert_required_reports_exist(reports_dir)
 
     _copy_file(reports_dir / "cris_sme_dashboard.html", site_dir / "dashboard.html")
+    _copy_file(reports_dir / "cris_sme_assurance_portal.html", site_dir / "assurance.html")
     _copy_file(reports_dir / "cris_sme_report.html", site_dir / "report.html")
     _copy_file(
         reports_dir / "cris_sme_dashboard_payload.json",
@@ -130,6 +132,7 @@ def _build_manifest(*, repo_root: Path, site_dir: Path) -> dict[str, object]:
     checksums = {}
     for relative_path in [
         Path("dashboard.html"),
+        Path("assurance.html"),
         Path("report.html"),
         Path("data/cris_sme_dashboard_payload.json"),
         Path("data/cris_sme_report.json"),
@@ -155,6 +158,7 @@ def _build_manifest(*, repo_root: Path, site_dir: Path) -> dict[str, object]:
         "artifacts": {
             "site_entrypoint": "index.html",
             "dashboard": "dashboard.html",
+            "assurance_portal": "assurance.html",
             "technical_report": "report.html",
             "data_bundle": [
                 "data/cris_sme_dashboard_payload.json",
@@ -294,6 +298,11 @@ def _build_index_html(manifest: dict[str, object]) -> str:
             <h2>Interactive Dashboard</h2>
             <p>Executive and technical console with filtering, trend signals, confidence cues, and graph context.</p>
             <a class="link" href="./dashboard.html">Open Dashboard</a>
+          </article>
+          <article class="card">
+            <h2>Assurance Portal</h2>
+            <p>Customer-facing trust view with claim citations, assurance case, provenance paths, replay, and RBOM signals.</p>
+            <a class="link" href="./assurance.html">Open Assurance Portal</a>
           </article>
           <article class="card">
             <h2>Technical HTML Report</h2>
