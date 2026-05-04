@@ -28,6 +28,7 @@ from cris_sme.engine.benchmark import (
 from cris_sme.engine.confidence import summarize_confidence_calibration
 from cris_sme.engine.evidence_gap_backlog import build_evidence_gap_backlog
 from cris_sme.engine.native_validation import build_native_validation_summary
+from cris_sme.engine.policy_changelog import load_policy_pack_changelog
 from cris_sme.engine.provider_conformance import (
     build_provider_contract_conformance_report,
 )
@@ -61,6 +62,7 @@ def build_json_report(
         "overall_risk_score": scoring_result.overall_risk_score,
         "category_scores": scoring_result.category_scores,
         "collector_coverage": [item.model_dump() for item in collector_coverage],
+        "policy_pack_changelog": load_policy_pack_changelog().model_dump(mode="json"),
         "provider_evidence_contracts": provider_evidence_contracts.model_dump(),
         "provider_contract_conformance": build_provider_contract_conformance_report(
             provider_evidence_contracts

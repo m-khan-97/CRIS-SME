@@ -526,3 +526,25 @@ class ControlDriftAttributionReport(BaseModel):
     exception_state_changed: bool = False
     items: list[ControlDriftAttributionItem] = Field(default_factory=list)
     explanation: str = Field(..., min_length=8)
+
+
+class PolicyPackChangelogEntry(BaseModel):
+    """One policy-pack change entry for reproducible policy drift explanation."""
+
+    version: str = Field(..., min_length=3)
+    released_at: str = Field(..., min_length=10)
+    change_type: str = Field(..., min_length=3)
+    control_ids: list[str] = Field(default_factory=list)
+    title: str = Field(..., min_length=5)
+    summary: str = Field(..., min_length=8)
+    risk_score_impact: str = Field(..., min_length=3)
+    evidence_impact: str = Field(..., min_length=3)
+
+
+class PolicyPackChangelog(BaseModel):
+    """Machine-readable changelog for the active CRIS-SME policy pack."""
+
+    changelog_schema_version: str = Field(default="1.0.0", min_length=3)
+    active_policy_pack_version: str = Field(..., min_length=3)
+    entry_count: int = Field(..., ge=0)
+    entries: list[PolicyPackChangelogEntry] = Field(default_factory=list)

@@ -21,6 +21,10 @@ from .lineage import (
     build_run_metadata,
     build_stable_finding_id,
 )
+from .policy_changelog import (
+    load_policy_pack_changelog,
+    summarize_policy_pack_changelog,
+)
 from .remediation import (
     RemediationPlanResult,
     build_budget_aware_remediation_plan,
@@ -81,6 +85,7 @@ __all__ = [
     "evaluate_profiles",
     "load_exception_registry",
     "load_compliance_mappings",
+    "load_policy_pack_changelog",
     "RemediationPlanResult",
     "RemediationSimulationRequest",
     "RemediationSimulationResult",
@@ -95,6 +100,7 @@ __all__ = [
     "write_risk_bill_of_materials",
     "write_risk_bill_of_materials_signature",
     "summarize_decision_ledger",
+    "summarize_policy_pack_changelog",
     "summarize_provider_contract_conformance",
     "score_findings",
 ]

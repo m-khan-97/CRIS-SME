@@ -72,6 +72,7 @@ The next product stage is to add:
 - Assessment Assurance
 - Evidence Gap Backlog
 - Control Drift Attribution
+- Policy Pack Changelog
 - remediation simulator
 - evidence sufficiency model
 - signed report manifests

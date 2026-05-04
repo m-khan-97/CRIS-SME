@@ -1,0 +1,59 @@
+[
+  {
+    "version": "2026.04.0",
+    "released_at": "2026-04-23T00:00:00Z",
+    "change_type": "baseline",
+    "control_ids": [
+      "IAM-001",
+      "IAM-002",
+      "IAM-003",
+      "IAM-004",
+      "IAM-005",
+      "NET-001",
+      "NET-002",
+      "NET-003",
+      "NET-004",
+      "DATA-001",
+      "DATA-002",
+      "DATA-003",
+      "DATA-004",
+      "MON-001",
+      "MON-002",
+      "MON-003",
+      "MON-004",
+      "CMP-001",
+      "CMP-002",
+      "CMP-003",
+      "CMP-004",
+      "CMP-005",
+      "GOV-001",
+      "GOV-002",
+      "GOV-003",
+      "GOV-004"
+    ],
+    "title": "Initial deterministic SME cloud governance policy pack",
+    "summary": "Defines 26 deterministic controls across IAM, Network, Data, Monitoring, Compute, and Governance with Azure active support and AWS/GCP planned support.",
+    "risk_score_impact": "baseline",
+    "evidence_impact": "establishes initial evidence requirements, confidence penalties, known limitations, and provider support metadata"
+  },
+  {
+    "version": "2026.04.0",
+    "released_at": "2026-04-23T00:00:00Z",
+    "change_type": "observability_boundary",
+    "control_ids": ["IAM-005"],
+    "title": "Identity governance observability boundary",
+    "summary": "Adds an explicit IAM observability control so partial tenant-level identity visibility is represented as evidence quality rather than silently treated as compliance.",
+    "risk_score_impact": "can add an IAM finding when identity observability is partial",
+    "evidence_impact": "makes Conditional Access and tenant-wide identity limitations visible in evidence sufficiency outputs"
+  },
+  {
+    "version": "2026.04.0",
+    "released_at": "2026-04-23T00:00:00Z",
+    "change_type": "limitation_metadata",
+    "control_ids": ["CMP-001", "GOV-002"],
+    "title": "Conservative live collector limitation metadata",
+    "summary": "Documents conservative interpretation boundaries for patch posture and budget-alert evidence in live collection contexts.",
+    "risk_score_impact": "no direct score formula change",
+    "evidence_impact": "improves explanation of partial or proxy evidence for compute patching and governance cost controls"
+  }
+]

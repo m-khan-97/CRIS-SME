@@ -113,6 +113,9 @@ def build_dashboard_payload(
             "evidence_gap_backlog": _evidence_gap_backlog_summary(
                 report.get("evidence_gap_backlog", {})
             ),
+            "policy_pack_changelog": _policy_pack_changelog_summary(
+                report.get("policy_pack_changelog", {})
+            ),
         },
         "graph_context": {
             "blast_radius": graph_context.get("blast_radius", {}),
@@ -777,6 +780,36 @@ def _evidence_gap_backlog_summary(raw_backlog: object) -> dict[str, Any]:
         "top_items": raw_backlog.get("items", [])[:10]
         if isinstance(raw_backlog.get("items"), list)
         else [],
+    }
+
+
+def _policy_pack_changelog_summary(raw_changelog: object) -> dict[str, Any]:
+    """Build compact dashboard metadata from the policy-pack changelog."""
+    if not isinstance(raw_changelog, dict):
+        return {
+            "active_policy_pack_version": None,
+            "entry_count": 0,
+            "touched_control_count": 0,
+            "change_type_counts": {},
+        }
+    entries = raw_changelog.get("entries", [])
+    touched_controls: set[str] = set()
+    change_type_counts: dict[str, int] = {}
+    if isinstance(entries, list):
+        for entry in entries:
+            if not isinstance(entry, dict):
+                continue
+            change_type = str(entry.get("change_type", "unknown"))
+            change_type_counts[change_type] = change_type_counts.get(change_type, 0) + 1
+            for control_id in entry.get("control_ids", []):
+                if str(control_id).strip():
+                    touched_controls.add(str(control_id))
+    return {
+        "changelog_schema_version": raw_changelog.get("changelog_schema_version"),
+        "active_policy_pack_version": raw_changelog.get("active_policy_pack_version"),
+        "entry_count": int(raw_changelog.get("entry_count", 0)),
+        "touched_control_count": len(touched_controls),
+        "change_type_counts": change_type_counts,
     }
 
 
