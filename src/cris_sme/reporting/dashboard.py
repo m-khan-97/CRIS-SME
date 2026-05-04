@@ -107,6 +107,9 @@ def build_dashboard_payload(
             "provider_contract_conformance": _provider_contract_conformance_summary(
                 report.get("provider_contract_conformance", {})
             ),
+            "assessment_replay": _assessment_replay_summary(
+                report.get("assessment_replay", {})
+            ),
         },
         "graph_context": {
             "blast_radius": graph_context.get("blast_radius", {}),
@@ -126,6 +129,9 @@ def build_dashboard_payload(
             "exception_rows": _exception_rows(prioritized),
         },
         "decision_ledger": _decision_ledger_summary(report.get("decision_ledger", {})),
+        "assessment_assurance": _assessment_assurance_summary(
+            report.get("assessment_assurance", {})
+        ),
         "native_validation": report.get("native_validation", {}),
         "artifacts": report.get("report_artifacts", {}),
     }
@@ -718,6 +724,35 @@ def _provider_contract_conformance_summary(raw_conformance: object) -> dict[str,
     }
 
 
+def _assessment_replay_summary(raw_replay: object) -> dict[str, Any]:
+    """Build compact dashboard metadata from assessment replay output."""
+    if not isinstance(raw_replay, dict):
+        return {
+            "replayable": False,
+            "deterministic_match": False,
+            "evidence_changed": False,
+            "policy_pack_changed": False,
+        }
+    replay = raw_replay.get("replay", {})
+    diff = raw_replay.get("evidence_diff", {})
+    if not isinstance(replay, dict):
+        replay = {}
+    if not isinstance(diff, dict):
+        diff = {}
+    return {
+        "snapshot_id": replay.get("snapshot_id"),
+        "replayable": bool(replay.get("replayable", False)),
+        "deterministic_match": bool(replay.get("deterministic_match", False)),
+        "overall_risk_delta": float(replay.get("overall_risk_delta", 0.0)),
+        "profile_hash_verified": bool(replay.get("profile_hash_verified", False)),
+        "finding_hash_verified": bool(replay.get("finding_hash_verified", False)),
+        "evidence_changed": bool(diff.get("evidence_changed", False)),
+        "policy_pack_changed": bool(diff.get("policy_pack_changed", False)),
+        "collector_mode_changed": bool(diff.get("collector_mode_changed", False)),
+        "score_delta_reason": diff.get("score_delta_reason"),
+    }
+
+
 def _quick_wins(report: dict[str, Any]) -> dict[str, Any]:
     remediation = report.get("budget_aware_remediation", {})
     if not isinstance(remediation, dict):
@@ -734,6 +769,28 @@ def _quick_wins(report: dict[str, Any]) -> dict[str, Any]:
                 "quick_win_risk_total": float(profile.get("cumulative_risk_score", 0.0)),
             }
     return {"quick_win_count": 0, "quick_win_risk_total": 0.0}
+
+
+def _assessment_assurance_summary(raw_assurance: object) -> dict[str, Any]:
+    """Build compact dashboard metadata from assessment assurance output."""
+    if not isinstance(raw_assurance, dict):
+        return {
+            "assurance_score": 0.0,
+            "assurance_level": "unknown",
+            "risk_score_impact": "Assessment assurance is unavailable.",
+        }
+    return {
+        "assurance_schema_version": raw_assurance.get("assurance_schema_version"),
+        "assurance_score": float(raw_assurance.get("assurance_score", 0.0)),
+        "assurance_level": raw_assurance.get("assurance_level", "unknown"),
+        "risk_score_impact": raw_assurance.get("risk_score_impact"),
+        "strength_count": len(raw_assurance.get("strengths", []))
+        if isinstance(raw_assurance.get("strengths"), list)
+        else 0,
+        "gap_count": len(raw_assurance.get("gaps", []))
+        if isinstance(raw_assurance.get("gaps"), list)
+        else 0,
+    }
 
 
 def _exception_rows(prioritized: list[object]) -> list[dict[str, Any]]:

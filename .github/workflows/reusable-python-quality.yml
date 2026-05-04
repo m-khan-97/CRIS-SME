@@ -74,6 +74,12 @@ jobs:
           test -f outputs/reports/cris_sme_dashboard.html
           test -f outputs/reports/cris_sme_dashboard_payload.json
           test -f outputs/reports/cris_sme_summary.txt
+          test -f outputs/reports/cris_sme_evidence_snapshot.json
+
+      - name: Verify deterministic assessment replay
+        if: ${{ inputs.run-mock-pipeline }}
+        run: |
+          PYTHONPATH=src python scripts/check_replay_determinism.py --snapshot outputs/reports/cris_sme_evidence_snapshot.json
 
       - name: Docs sanity checks
         run: |
@@ -109,6 +115,7 @@ jobs:
             if [ "${{ inputs.run-mock-pipeline }}" = "true" ]; then
               echo "- Pipeline run: mock assessment executed"
               echo "- Output verification: report + dashboard bundle verified"
+              echo "- Replay verification: evidence snapshot replay matched deterministic outputs"
             else
               echo "- Pipeline run: skipped for this caller"
             fi

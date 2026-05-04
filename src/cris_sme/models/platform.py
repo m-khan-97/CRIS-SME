@@ -374,3 +374,92 @@ class ProviderContractConformanceReport(BaseModel):
     passed: bool
     provider_signals: list[ProviderImplementationSignal] = Field(default_factory=list)
     checks: list[ProviderContractConformanceCheck] = Field(default_factory=list)
+
+
+class EvidenceSnapshot(BaseModel):
+    """Replayable normalized evidence snapshot for one CRIS-SME assessment."""
+
+    snapshot_schema_version: str = Field(default="1.0.0", min_length=3)
+    snapshot_id: str = Field(..., min_length=8)
+    generated_at: str = Field(..., min_length=10)
+    collector_mode: str = Field(..., min_length=2)
+    policy_pack_version: str = Field(..., min_length=3)
+    profile_count: int = Field(..., ge=0)
+    finding_count: int = Field(..., ge=0)
+    non_compliant_finding_count: int = Field(..., ge=0)
+    providers_in_scope: list[str] = Field(default_factory=list)
+    control_ids: list[str] = Field(default_factory=list)
+    profile_sha256: str = Field(..., min_length=64, max_length=64)
+    finding_sha256: str = Field(..., min_length=64, max_length=64)
+    snapshot_sha256: str = Field(..., min_length=64, max_length=64)
+    profiles: list[dict[str, Any]] = Field(default_factory=list)
+    findings: list[dict[str, Any]] = Field(default_factory=list)
+    notes: list[str] = Field(default_factory=list)
+
+
+class AssessmentReplayResult(BaseModel):
+    """Result of replaying a saved evidence snapshot through the current engine."""
+
+    replay_schema_version: str = Field(default="1.0.0", min_length=3)
+    snapshot_id: str = Field(..., min_length=8)
+    replayed_at: str = Field(..., min_length=10)
+    replayable: bool
+    deterministic_match: bool
+    policy_pack_version_at_capture: str = Field(..., min_length=3)
+    policy_pack_version_at_replay: str = Field(..., min_length=3)
+    collector_mode: str = Field(..., min_length=2)
+    profile_hash_verified: bool
+    finding_hash_verified: bool
+    original_profile_sha256: str = Field(..., min_length=64, max_length=64)
+    replay_profile_sha256: str = Field(..., min_length=64, max_length=64)
+    original_finding_sha256: str = Field(..., min_length=64, max_length=64)
+    replay_finding_sha256: str = Field(..., min_length=64, max_length=64)
+    original_overall_risk_score: float = Field(..., ge=0.0, le=100.0)
+    replayed_overall_risk_score: float = Field(..., ge=0.0, le=100.0)
+    overall_risk_delta: float
+    original_non_compliant_findings: int = Field(..., ge=0)
+    replayed_non_compliant_findings: int = Field(..., ge=0)
+    category_score_deltas: dict[str, float] = Field(default_factory=dict)
+    change_reasons: list[str] = Field(default_factory=list)
+    errors: list[str] = Field(default_factory=list)
+
+
+class EvidenceDiffResult(BaseModel):
+    """Compare two evidence snapshots and classify what changed."""
+
+    diff_schema_version: str = Field(default="1.0.0", min_length=3)
+    current_snapshot_id: str = Field(..., min_length=8)
+    previous_snapshot_id: str | None = None
+    comparable: bool
+    evidence_changed: bool
+    policy_pack_changed: bool
+    collector_mode_changed: bool
+    profile_count_delta: int = 0
+    finding_count_delta: int = 0
+    non_compliant_finding_count_delta: int = 0
+    added_control_ids: list[str] = Field(default_factory=list)
+    removed_control_ids: list[str] = Field(default_factory=list)
+    score_delta_reason: str = Field(..., min_length=8)
+
+
+class AssessmentAssuranceSignal(BaseModel):
+    """One non-risk assurance signal for an assessment artifact."""
+
+    signal_id: str = Field(..., min_length=3)
+    label: str = Field(..., min_length=3)
+    score: float = Field(..., ge=0.0, le=100.0)
+    weight: float = Field(..., ge=0.0, le=1.0)
+    passed: bool
+    explanation: str = Field(..., min_length=8)
+
+
+class AssessmentAssuranceResult(BaseModel):
+    """Trustworthiness score for the assessment artifact, separate from risk score."""
+
+    assurance_schema_version: str = Field(default="1.0.0", min_length=3)
+    assurance_score: float = Field(..., ge=0.0, le=100.0)
+    assurance_level: str = Field(..., min_length=3)
+    risk_score_impact: str = Field(..., min_length=8)
+    signals: list[AssessmentAssuranceSignal] = Field(default_factory=list)
+    strengths: list[str] = Field(default_factory=list)
+    gaps: list[str] = Field(default_factory=list)

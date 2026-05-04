@@ -68,6 +68,8 @@ The next product stage is to add:
 
 - Decision Ledger
 - Risk Bill of Materials
+- Assessment Replay and Evidence Diff
+- Assessment Assurance
 - remediation simulator
 - evidence sufficiency model
 - signed report manifests

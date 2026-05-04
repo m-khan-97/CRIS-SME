@@ -1,5 +1,13 @@
 # Risk engine components for scoring and aggregating CRIS-SME findings.
 from .action_plan import ActionPlan30DayResult, build_30_day_action_plan
+from .assessment_replay import (
+    build_evidence_diff_result,
+    build_evidence_snapshot,
+    build_report_replay_summary,
+    evaluate_profiles,
+    replay_evidence_snapshot,
+)
+from .assessment_assurance import build_assessment_assurance
 from .compliance import assess_compliance_mappings, load_compliance_mappings
 from .decision_ledger import build_decision_ledger, summarize_decision_ledger
 from .graph_context import build_graph_context_summary
@@ -50,6 +58,9 @@ __all__ = [
     "build_collector_coverage",
     "build_confidence_assessment",
     "build_decision_ledger",
+    "build_assessment_assurance",
+    "build_evidence_diff_result",
+    "build_evidence_snapshot",
     "build_finding_trace",
     "build_graph_context_summary",
     "build_provider_contract_conformance_report",
@@ -61,7 +72,9 @@ __all__ = [
     "build_custom_remediation_simulation",
     "build_custom_report_remediation_simulation",
     "build_remediation_simulation",
+    "build_report_replay_summary",
     "enrich_report_finding_lifecycle",
+    "evaluate_profiles",
     "load_exception_registry",
     "load_compliance_mappings",
     "RemediationPlanResult",
@@ -73,6 +86,7 @@ __all__ = [
     "build_budget_aware_remediation_plan",
     "budget_fit_profile_ids",
     "sign_risk_bill_of_materials",
+    "replay_evidence_snapshot",
     "verify_risk_bill_of_materials",
     "write_risk_bill_of_materials",
     "write_risk_bill_of_materials_signature",

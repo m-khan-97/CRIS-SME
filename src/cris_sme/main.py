@@ -24,8 +24,11 @@ from cris_sme.controls import (
 from cris_sme.engine import (
     assess_compliance_mappings,
     build_30_day_action_plan,
+    build_assessment_assurance,
     build_collector_coverage,
     build_decision_ledger,
+    build_evidence_snapshot,
+    build_report_replay_summary,
     build_risk_bill_of_materials,
     build_remediation_simulation,
     build_run_metadata,
@@ -110,6 +113,19 @@ def main() -> None:
     output_dir = Path(os.getenv("CRIS_SME_OUTPUT_DIR", DEFAULT_OUTPUT_DIR))
     figure_dir = Path(os.getenv("CRIS_SME_FIGURE_DIR", DEFAULT_FIGURE_DIR))
     history_reports_before = load_report_history(output_dir / "history")
+    policy_pack_metadata = load_policy_pack_metadata()
+    evidence_snapshot = build_evidence_snapshot(
+        profiles=profiles,
+        findings=findings,
+        collector_mode=collector_mode,
+        generated_at=output["generated_at"],
+        policy_pack_version=str(policy_pack_metadata.get("policy_pack_version", "unknown")),
+    )
+    output["evidence_snapshot"] = evidence_snapshot.model_dump(mode="json")
+    output["assessment_replay"] = build_report_replay_summary(
+        current_snapshot=evidence_snapshot,
+        previous_report=history_reports_before[-1] if history_reports_before else None,
+    )
 
     benchmark_dataset = load_benchmark_dataset()
     output["benchmark_observation"] = build_benchmark_observation(output).model_dump()
@@ -175,6 +191,11 @@ def main() -> None:
     )
 
     json_report_path = output_dir / "cris_sme_report.json"
+    evidence_snapshot_path = output_dir / "cris_sme_evidence_snapshot.json"
+    evidence_snapshot_path.write_text(
+        json.dumps(output["evidence_snapshot"], indent=2),
+        encoding="utf-8",
+    )
     summary_report_path = write_summary_report(summary, output_dir / "cris_sme_summary.txt")
     html_report_path = write_html_report(
         build_html_report(output),
@@ -203,6 +224,7 @@ def main() -> None:
 
     output["report_artifacts"] = {
         "json_report": str(json_report_path),
+        "evidence_snapshot": str(evidence_snapshot_path),
         "html_report": str(html_report_path),
         "summary_report": str(summary_report_path),
         "history_snapshot": str(history_snapshot_path),
@@ -222,6 +244,14 @@ def main() -> None:
         "history_figures": {key: str(value) for key, value in history_figure_paths.items()},
     }
     rbom_path = output_dir / "cris_sme_risk_bill_of_materials.json"
+    rbom = build_risk_bill_of_materials(
+        output,
+        artifact_paths=_flatten_artifact_paths(output["report_artifacts"]),
+    )
+    output["risk_bill_of_materials"] = rbom.model_dump(mode="json")
+    output["assessment_assurance"] = build_assessment_assurance(output).model_dump(
+        mode="json"
+    )
     rbom = build_risk_bill_of_materials(
         output,
         artifact_paths=_flatten_artifact_paths(output["report_artifacts"]),
