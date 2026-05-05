@@ -56,6 +56,8 @@ def test_evidence_room_html_renders_profiles_and_escapes_claim_text() -> None:
     assert "Customer Assurance" in html
     assert "Withheld Evidence" in html
     assert "Redaction Register" in html
+    assert "overflow-wrap: anywhere" in html
+    assert "word-break: break-word" in html
     assert "&lt;script&gt;alert(&#x27;x&#x27;)&lt;/script&gt;" in html
     assert "<script>alert" not in html
 

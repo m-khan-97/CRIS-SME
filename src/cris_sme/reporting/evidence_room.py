@@ -46,7 +46,8 @@ def build_evidence_room_html(package: dict[str, Any]) -> str:
       h1 {{ margin: 0; font-size: 2rem; }}
       h2 {{ margin: 0 0 10px; font-size: 1.15rem; }}
       h3 {{ margin: 0 0 8px; font-size: 0.98rem; }}
-      p {{ line-height: 1.55; }}
+      h1, h2, h3, p, div {{ min-width: 0; }}
+      p {{ line-height: 1.55; overflow-wrap: anywhere; }}
       .muted {{ color: var(--muted); }}
       .tabs {{ display: flex; flex-wrap: wrap; gap: 8px; margin: 14px 0; }}
       .tabs a {{
@@ -60,7 +61,7 @@ def build_evidence_room_html(package: dict[str, Any]) -> str:
       }}
       .grid {{
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+        grid-template-columns: repeat(auto-fit, minmax(min(100%, 230px), 1fr));
         gap: 12px;
       }}
       .panel {{
@@ -69,19 +70,33 @@ def build_evidence_room_html(package: dict[str, Any]) -> str:
         border-radius: 8px;
         padding: 13px;
         margin-bottom: 14px;
+        min-width: 0;
+        overflow: hidden;
       }}
-      .metric {{ font-size: 1.45rem; font-weight: 800; margin: 2px 0; }}
+      .metric {{
+        font-size: clamp(0.92rem, 2.5vw, 1.45rem);
+        font-weight: 800;
+        line-height: 1.16;
+        margin: 2px 0;
+        max-width: 100%;
+        overflow-wrap: anywhere;
+        word-break: break-word;
+      }}
       .list {{ display: grid; gap: 10px; }}
       .item {{
         border: 1px solid var(--line);
         border-radius: 8px;
         background: #fbfdff;
         padding: 10px;
+        min-width: 0;
+        overflow: hidden;
       }}
       .mono {{
         font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
         font-size: 0.82rem;
+        line-height: 1.45;
         overflow-wrap: anywhere;
+        word-break: break-word;
       }}
       .status-verified {{ color: var(--accent); font-weight: 800; }}
       .status-caveated, .status-unverified {{ color: var(--warn); font-weight: 800; }}
