@@ -9,6 +9,8 @@ It is not a generic scanner. CRIS-SME is the decision layer between cloud eviden
 
 The project is **Azure-first in active live collection**, **provider-neutral in core architecture**, **home-lab runnable by default**, and shaped for deeper R&D into evidence-based cloud risk governance.
 
+Recent live validation: CRIS-SME has been run against an authorized Azure subscription and a controlled Azure lab with public admin exposure, permissive NSG rules, and public storage evidence. The live run produced traceable `NET-001`, `NET-002`, and `DATA-001` findings, passed RBOM verification, and refreshed the static demo artifacts from live Azure evidence. See [Live Azure Case Study](docs/live-azure-case-study.md).
+
 ---
 
 ## Why CRIS-SME

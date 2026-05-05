@@ -5,6 +5,75 @@
 
 This document captures a real CRIS-SME assessment run against an authenticated Azure subscription. Its purpose is to preserve the live-Azure branch of the current three-mode evaluation rather than to position the live run as the sole primary paper case study.
 
+## May 2026 Controlled Live-Lab Validation
+
+On May 5, 2026, CRIS-SME was validated against a controlled Azure lab created inside the authenticated `Azure for Students` subscription. This was not a mock run and did not use unauthorized infrastructure. The lab was created deliberately to exercise live evidence paths for public administration exposure, permissive network rules, storage exposure, provider inventory, RBOM verification, and frontend demo refresh.
+
+The lab was created in an allowed subscription region because the subscription policy restricted deployments to selected regions. CRIS-SME used `germanywestcentral` for the live resources.
+
+Live validation environment:
+
+- subscription: `Azure for Students`
+- tenant: `Ulster University`
+- collection mode: `CRIS_SME_COLLECTOR=azure`
+- dataset source type: `owned_lab`
+- authorization basis: `authorized_subscription_owner`
+- dataset use: `live_collector_validation`
+- resource group: `rg-cris-sme-live-lab-gwc`
+- location: `germanywestcentral`
+
+Controlled resources created for evidence generation:
+
+- storage account: `crissmelab609d`
+- public blob container: `public-evidence`
+- network security group: `nsg-cris-sme-open-admin`
+- virtual network: `vnet-cris-sme-lab`
+- public inbound SSH rule from Internet on port `22`
+- public inbound RDP rule from Internet on port `3389`
+
+The intentionally exposed resources should be treated as a validation lab, not as a recommended production posture. They are useful for demos, but should be removed when live validation is complete.
+
+The post-lab live collector run produced:
+
+- overall risk score: `35.28/100`
+- non-compliant findings: `17`
+- IAM score: `14.78`
+- Network score: `58.42`
+- Data score: `41.74`
+- Monitoring/Logging score: `36.38`
+- Compute/Workloads score: `38.29`
+- Cost/Governance Hygiene score: `22.67`
+
+The strongest live findings were:
+
+1. `NET-001` Administrative services are exposed to the public internet
+2. `DATA-001` Public storage access increases data exposure risk
+3. `NET-002` Network security group rules are broader than expected
+4. `CMP-002` Endpoint protection coverage is below the expected workload baseline
+5. `DATA-004` Key management protections are incomplete for sensitive secrets
+
+Observed collector coverage for this run:
+
+- `azure_role_assignments_and_graph`
+- `azure_network_cli_inventory`
+- `azure_storage_cli_inventory`
+- `azure_monitor_cli_inventory`
+- `azure_compute_inventory_no_vms`
+- `azure_resource_inventory`
+
+Partial or unavailable evidence boundaries were recorded explicitly:
+
+- partial: `tenant_identity_controls`
+- unavailable: `conditional_access_tenant_scope`
+
+Validation checks completed after the live run:
+
+- RBOM verification passed with `36` artifacts checked
+- static demo site rebuilt from the live Azure evidence
+- local test suite passed with `111` tests
+
+This run is important because it demonstrates that CRIS-SME's deterministic pipeline responds to actual cloud posture changes: an initially empty subscription produced a lower network/data signal, then the controlled live lab produced direct public-admin, permissive-NSG, and public-storage findings with traceable evidence.
+
 ## Purpose
 
 This case study supports three goals inside the broader three-mode evaluation:

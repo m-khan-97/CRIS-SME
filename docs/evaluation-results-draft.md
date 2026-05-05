@@ -31,6 +31,8 @@ Archived runs currently include:
 - a latest live Azure case-study snapshot with an overall score of `32.79`
 - an AzureGoat vulnerable-lab snapshot with an overall score of `32.79`
 
+The latest controlled live-lab validation run, executed on May 5, 2026, produced an overall score of `35.28/100` from live Azure evidence after CRIS-SME created a small authorized lab in `germanywestcentral`. This run is operational validation rather than a frozen manuscript baseline, but it strengthens the evidence that CRIS-SME responds to real cloud changes rather than only synthetic fixtures.
+
 For the latest live Azure case-study snapshot:
 
 - delta versus previous Azure run: `0.0`
@@ -61,21 +63,24 @@ This framing is stronger than a single-primary narrative because it shows that C
 
 The latest live Azure assessment produced:
 
-- overall risk score: `32.79/100`
-- non-compliant findings: `18`
+- overall risk score: `35.28/100`
+- non-compliant findings: `17`
 - IAM score: `14.78`
-- Network score: `38.02`
-- Data score: `48.65`
+- Network score: `58.42`
+- Data score: `41.74`
 - Monitoring/Logging score: `36.38`
 - Compute/Workloads score: `38.29`
-- Cost/Governance Hygiene score: `24.80`
+- Cost/Governance Hygiene score: `22.67`
 
 The most significant live findings remain concentrated in:
 
-- public storage exposure
 - public administrative service exposure
+- public storage exposure
+- broad network security group rules
 - endpoint protection and workload hardening gaps
 - data/key-management weaknesses
+
+The May 2026 run exercised a deliberately small owned lab rather than a broad production estate. The created resources included an NSG with public SSH/RDP exposure, a public blob container, and a VNet/subnet association. CRIS-SME detected those as `NET-001`, `NET-002`, and `DATA-001` without changing deterministic scoring logic.
 
 ## AzureGoat Vulnerable-Lab Results
 
