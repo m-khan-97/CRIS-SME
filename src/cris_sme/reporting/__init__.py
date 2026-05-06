@@ -1,6 +1,10 @@
 # Reporting components for JSON, HTML, and summary outputs.
 from .benchmark_export import write_benchmark_outputs
 from .assurance_portal import build_assurance_portal_html, write_assurance_portal_html
+from .ce_questionnaire_report import (
+    build_ce_self_assessment_html,
+    write_ce_self_assessment_html,
+)
 from .dashboard import (
     build_dashboard_html,
     build_dashboard_payload,
@@ -35,6 +39,7 @@ from .summary_report import build_summary_report, write_summary_report
 __all__ = [
     "archive_report_snapshot",
     "build_assurance_portal_html",
+    "build_ce_self_assessment_html",
     "build_evaluation_mode_summary",
     "build_history_comparison",
     "build_dashboard_html",
@@ -44,6 +49,7 @@ __all__ = [
     "write_benchmark_outputs",
     "write_action_plan_outputs",
     "write_assurance_portal_html",
+    "write_ce_self_assessment_html",
     "load_report_history",
     "write_appendix_tables",
     "write_dashboard_html",

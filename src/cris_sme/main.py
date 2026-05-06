@@ -28,6 +28,7 @@ from cris_sme.engine import (
     build_assurance_case,
     build_claim_bound_narrative,
     build_claim_verification_pack,
+    build_ce_self_assessment_pack,
     build_collector_coverage,
     build_control_drift_attribution,
     build_decision_ledger,
@@ -46,6 +47,7 @@ from cris_sme.engine import (
     write_risk_bill_of_materials,
     write_claim_verification_pack,
     write_assurance_case,
+    write_ce_self_assessment_pack,
     write_claim_bound_narrative,
     write_decision_provenance_graph,
     write_selective_disclosure_package,
@@ -62,6 +64,7 @@ from cris_sme.reporting import (
     archive_report_snapshot,
     build_assurance_portal_html,
     build_cyber_insurance_evidence_pack,
+    build_ce_self_assessment_html,
     build_dashboard_html,
     build_dashboard_payload,
     build_evaluation_mode_summary,
@@ -78,6 +81,7 @@ from cris_sme.reporting import (
     write_appendix_tables,
     write_benchmark_outputs,
     write_cyber_insurance_evidence_pack,
+    write_ce_self_assessment_html,
     write_dashboard_html,
     write_dashboard_payload,
     write_executive_pack,
@@ -182,6 +186,7 @@ def main() -> None:
     ).model_dump(mode="json")
 
     output["cyber_essentials_readiness"] = build_cyber_essentials_readiness(findings)
+    output["cyber_essentials_self_assessment"] = build_ce_self_assessment_pack(output)
     output["cyber_insurance_evidence"] = build_cyber_insurance_evidence_pack(output)
     output["action_plan_30_day"] = build_30_day_action_plan(
         result.prioritized_findings
@@ -261,6 +266,7 @@ def main() -> None:
             "dashboard_payload_json": str(dashboard_payload_path),
             "dashboard_html": str(dashboard_html_path),
         },
+        "cyber_essentials_self_assessment": {},
         "plain_language_outputs": {
             key: str(value) for key, value in narrator_paths.items()
         },
@@ -313,6 +319,24 @@ def main() -> None:
             assurance_portal_path,
         )
     )
+    ce_self_assessment_json_path = output_dir / "cris_sme_ce_self_assessment.json"
+    ce_self_assessment_html_path = output_dir / "cris_sme_ce_self_assessment.html"
+    output["report_artifacts"]["cyber_essentials_self_assessment"] = {
+        "json": str(
+            write_ce_self_assessment_pack(
+                output["cyber_essentials_self_assessment"],
+                ce_self_assessment_json_path,
+            )
+        ),
+        "html": str(
+            write_ce_self_assessment_html(
+                build_ce_self_assessment_html(
+                    output["cyber_essentials_self_assessment"]
+                ),
+                ce_self_assessment_html_path,
+            )
+        ),
+    }
     selective_disclosure = build_selective_disclosure_package(output)
     output["selective_disclosure"] = selective_disclosure.model_dump(mode="json")
     selective_disclosure_path = output_dir / "cris_sme_selective_disclosure.json"
