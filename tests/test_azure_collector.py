@@ -476,14 +476,13 @@ def test_azure_collector_enriches_iam_profile_from_role_assignments_and_graph(
                     '{"principalId":"sp-1","principalType":"ServicePrincipal","roleDefinitionName":"User Access Administrator"}]'
                 )
             )
-        if command[:6] == [
+        if command[:5] == [
             "az",
             "rest",
             "--method",
             "get",
             "--url",
-            "https://graph.microsoft.com/v1.0/policies/conditionalAccessPolicies",
-        ]:
+        ] and "identity/conditionalAccess/policies" in command[5]:
             return FakeCompletedProcess(
                 '{"error":{"code":"AccessDenied"}}',
                 returncode=1,
@@ -566,9 +565,10 @@ def test_azure_collector_enriches_iam_profile_from_role_assignments_and_graph(
     assert profile.iam.visible_directory_role_catalog_entries == 2
     assert profile.iam.directory_role_catalog_visible is True
     assert profile.iam.identity_observability == "broad"
-    assert profile.iam.conditional_access_enforced_for_admins is True
+    assert profile.iam.conditional_access_enforced_for_admins is False
     assert profile.metadata["iam_collection_mode"] == "azure_role_assignments_and_graph"
     assert profile.metadata["conditional_access_accessible"] is False
+    assert profile.metadata["conditional_access_enforced_for_admins"] is False
     assert profile.metadata["privileged_assignment_count"] == 3
     assert profile.metadata["privileged_principal_count"] == 2
     assert profile.metadata["privileged_user_assignment_count"] == 2
@@ -579,6 +579,71 @@ def test_azure_collector_enriches_iam_profile_from_role_assignments_and_graph(
     assert profile.metadata["visible_directory_role_catalog_count"] == 2
     assert profile.metadata["directory_role_catalog_visible"] is True
     assert profile.metadata["identity_observability"] == "broad"
+
+
+def test_azure_collector_reads_enabled_admin_conditional_access_policy(
+    monkeypatch,
+) -> None:
+    def fake_run_cli_command_allow_failure(
+        command: list[str],
+        timeout: int,
+    ) -> subprocess.CompletedProcess[str]:
+        _ = timeout
+        assert "identity/conditionalAccess/policies" in command[5]
+        return subprocess.CompletedProcess(
+            args=command,
+            returncode=0,
+            stdout=(
+                '{"value":[{"displayName":"Require MFA for admins","state":"enabled",'
+                '"conditions":{"users":{"includeRoles":["role-admin"],"excludeRoles":[]}}}]}'
+            ),
+            stderr="",
+        )
+
+    monkeypatch.setattr(
+        AzureCollector,
+        "_run_cli_command_allow_failure",
+        staticmethod(fake_run_cli_command_allow_failure),
+    )
+
+    collector = AzureCollector()
+
+    enforced, accessible, policy_count = collector._collect_conditional_access_signal()
+
+    assert enforced is True
+    assert accessible is True
+    assert policy_count == 1
+
+
+def test_azure_collector_treats_inaccessible_conditional_access_as_unmet(
+    monkeypatch,
+) -> None:
+    def fake_run_cli_command_allow_failure(
+        command: list[str],
+        timeout: int,
+    ) -> subprocess.CompletedProcess[str]:
+        _ = command
+        _ = timeout
+        return subprocess.CompletedProcess(
+            args=[],
+            returncode=1,
+            stdout='{"error":{"code":"Authorization_RequestDenied"}}',
+            stderr="Authorization_RequestDenied",
+        )
+
+    monkeypatch.setattr(
+        AzureCollector,
+        "_run_cli_command_allow_failure",
+        staticmethod(fake_run_cli_command_allow_failure),
+    )
+
+    collector = AzureCollector()
+
+    enforced, accessible, policy_count = collector._collect_conditional_access_signal()
+
+    assert enforced is False
+    assert accessible is False
+    assert policy_count == 0
 
 
 def test_azure_collector_enriches_governance_profile_from_resource_inventory(

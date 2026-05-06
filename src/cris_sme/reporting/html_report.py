@@ -777,6 +777,27 @@ def build_html_report(report: dict[str, object]) -> str:
         padding-left: 18px;
       }}
 
+      .score-breakdown {{
+        margin-top: 8px;
+        color: var(--muted);
+        font-size: 0.84rem;
+      }}
+
+      .score-breakdown summary {{
+        cursor: pointer;
+        color: var(--accent);
+        font-weight: 700;
+      }}
+
+      .score-breakdown ul {{
+        margin: 8px 0 0;
+        padding-left: 18px;
+      }}
+
+      .score-breakdown li {{
+        margin-bottom: 4px;
+      }}
+
       .footnote {{
         margin-top: 22px;
         color: var(--muted);
@@ -1658,6 +1679,10 @@ def _build_risk_row(risk: dict[str, object]) -> str:
             "<br />Budget fits: "
             f"{escape(', '.join(str(item) for item in budget_fit_profiles))}"
         )
+    score_markup = (
+        f"{float(risk.get('score', 0.0)):.2f}"
+        f"{_build_score_breakdown_details(risk.get('score_breakdown'))}"
+    )
 
     return f"""
     <tr>
@@ -1665,13 +1690,46 @@ def _build_risk_row(risk: dict[str, object]) -> str:
       <td>{escape(str(risk.get("category", "Unknown")))}</td>
       <td>{escape(str(risk.get("severity", "Unknown")))}</td>
       <td><span class="pill {priority_class}">{escape(priority)}</span></td>
-      <td>{float(risk.get("score", 0.0)):.2f}</td>
+      <td>{score_markup}</td>
       <td>{escape(str(risk.get("organization", "Unknown organization")))}</td>
       <td><ul class="evidence">{evidence_markup}</ul></td>
       <td>{remediation_markup}</td>
       <td><ul class="mapping">{mapping_markup}</ul></td>
     </tr>
     """
+
+
+def _build_score_breakdown_details(score_breakdown: object) -> str:
+    """Build an inspectable deterministic score equation for a risk row."""
+    if not isinstance(score_breakdown, dict):
+        return ""
+
+    rows = [
+        ("Severity weight", score_breakdown.get("base_severity")),
+        ("Likelihood factor", score_breakdown.get("likelihood_factor")),
+        ("Data factor", score_breakdown.get("data_factor")),
+        ("Confidence factor", score_breakdown.get("confidence_factor")),
+        ("Remediation factor", score_breakdown.get("remediation_factor")),
+        ("Observed confidence", score_breakdown.get("observed_confidence")),
+        ("Calibrated confidence", score_breakdown.get("calibrated_confidence")),
+        ("Calibration status", score_breakdown.get("calibration_status")),
+        ("Raw score", score_breakdown.get("raw_score")),
+        ("Normalized score", score_breakdown.get("normalized_score")),
+    ]
+    items = "".join(
+        f"<li><strong>{escape(label)}:</strong> {escape(str(value))}</li>"
+        for label, value in rows
+        if value is not None
+    )
+    if not items:
+        return ""
+
+    return (
+        '<details class="score-breakdown">'
+        "<summary>Score breakdown</summary>"
+        f"<ul>{items}</ul>"
+        "</details>"
+    )
 
 
 def _build_history_comparison_card(history_comparison: object) -> str:

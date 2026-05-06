@@ -23,6 +23,17 @@ def evaluate_iam_controls(profiles: list[CloudProfile]) -> list[Finding]:
 def _evaluate_privileged_mfa(profile: CloudProfile) -> list[Finding]:
     """Check whether privileged identities are protected with MFA and admin CA."""
     iam = profile.iam
+    conditional_access_accessible = profile.metadata.get("conditional_access_accessible")
+    conditional_access_unobservable = conditional_access_accessible is False
+    conditional_access_metadata = {
+        "conditional_access_accessible": conditional_access_accessible,
+        "conditional_access_policy_count": profile.metadata.get(
+            "conditional_access_policy_count"
+        ),
+        "conditional_access_enforced_for_admins": (
+            iam.conditional_access_enforced_for_admins
+        ),
+    }
 
     if (
         iam.privileged_accounts_without_mfa == 0
@@ -42,6 +53,7 @@ def _evaluate_privileged_mfa(profile: CloudProfile) -> list[Finding]:
                 exposure=0.35,
                 remediation_effort=0.2,
                 generated_by="iam_controls",
+                metadata=conditional_access_metadata,
                 title_override="Privileged role assignments are protected with MFA enforcement",
             )
         ]
@@ -51,7 +63,11 @@ def _evaluate_privileged_mfa(profile: CloudProfile) -> list[Finding]:
         evidence.append(
             f"{iam.privileged_accounts_without_mfa} privileged account(s) do not have MFA enabled"
         )
-    if not iam.conditional_access_enforced_for_admins:
+    if conditional_access_unobservable:
+        evidence.append(
+            "Conditional access for privileged administrators was not observable and is treated as unmet for deterministic scoring"
+        )
+    elif not iam.conditional_access_enforced_for_admins:
         evidence.append("Conditional access is not enforced for privileged administrators")
 
     severity = (
@@ -72,6 +88,7 @@ def _evaluate_privileged_mfa(profile: CloudProfile) -> list[Finding]:
             exposure=0.9,
             remediation_effort=0.35,
             generated_by="iam_controls",
+            metadata=conditional_access_metadata,
         )
     ]
 

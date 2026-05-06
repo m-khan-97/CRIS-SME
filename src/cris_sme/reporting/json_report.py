@@ -273,6 +273,10 @@ def _build_collection_details(profile: CloudProfile) -> dict[str, object]:
         details["conditional_access_accessible"] = metadata[
             "conditional_access_accessible"
         ]
+    if "conditional_access_enforced_for_admins" in metadata:
+        details["conditional_access_enforced_for_admins"] = metadata[
+            "conditional_access_enforced_for_admins"
+        ]
     if "signed_in_user_is_directory_admin" in metadata:
         details["signed_in_user_is_directory_admin"] = metadata[
             "signed_in_user_is_directory_admin"

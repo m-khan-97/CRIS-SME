@@ -117,6 +117,22 @@ def test_evaluate_iam_controls_flags_missing_mfa_as_high_priority_risk() -> None
     assert mfa_finding.severity == FindingSeverity.CRITICAL
 
 
+def test_evaluate_iam_controls_treats_unobservable_conditional_access_as_unmet() -> None:
+    profile = make_profile(
+        privileged_accounts_without_mfa=0,
+        conditional_access_enforced_for_admins=False,
+    )
+    profile.metadata["conditional_access_accessible"] = False
+    profile.metadata["conditional_access_policy_count"] = 0
+
+    findings = evaluate_iam_controls([profile])
+
+    mfa_finding = next(item for item in findings if item.control_id == "IAM-001")
+    assert mfa_finding.is_compliant is False
+    assert mfa_finding.metadata["conditional_access_accessible"] is False
+    assert any("not observable" in item for item in mfa_finding.evidence)
+
+
 def test_evaluate_iam_controls_generates_multiple_findings_for_broader_iam_weakness() -> None:
     findings = evaluate_iam_controls(
         [

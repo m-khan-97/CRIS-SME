@@ -115,6 +115,11 @@ def make_profile(
             "dataset_use": "live_case_study",
             "iam_collection_mode": "azure_role_assignments_and_graph",
             "identity_observability": "partial",
+            "conditional_access_accessible": False,
+            "conditional_access_enforced_for_admins": (
+                conditional_access_enforced_for_admins
+            ),
+            "conditional_access_policy_count": 0,
             "privileged_assignment_count": 3,
             "privileged_principal_count": 2,
             "privileged_user_assignment_count": 2,
@@ -186,6 +191,8 @@ def test_build_json_report_includes_context_and_prioritized_risks() -> None:
     assert organization["collection_details"]["authorization_basis"] == "authorized_tenant_access"
     assert organization["collection_details"]["compute_collection_mode"] == "azure_compute_cli_inventory"
     assert organization["collection_details"]["identity_observability"] == "partial"
+    assert organization["collection_details"]["conditional_access_accessible"] is False
+    assert organization["collection_details"]["conditional_access_enforced_for_admins"] is True
     assert organization["collection_details"]["evidence_counts"]["virtual_machine_count"] == 3
     assert organization["collection_details"]["evidence_counts"]["privileged_assignment_count"] == 3
     assert organization["collection_details"]["evidence_counts"]["signed_in_user_directory_role_count"] == 2
@@ -276,6 +283,9 @@ def test_build_html_report_includes_risk_and_provenance_content() -> None:
     assert "Cyber Essentials" in html
     assert "Access security" in html
     assert "azure_compute_cli_inventory" in html
+    assert "Score breakdown" in html
+    assert "Severity weight" in html
+    assert "Likelihood factor" in html
 
 
 def test_cyber_insurance_pack_builds_and_writes_artifacts(tmp_path) -> None:

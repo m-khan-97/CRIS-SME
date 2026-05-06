@@ -260,6 +260,9 @@ class AzureCollector:
                 "conditional_access_policy_count": iam_metadata[
                     "conditional_access_policy_count"
                 ],
+                "conditional_access_enforced_for_admins": iam_metadata[
+                    "conditional_access_enforced_for_admins"
+                ],
                 "identity_observability": iam_metadata["identity_observability"],
                 "service_principal_role_assignment_count": iam_metadata[
                     "service_principal_role_assignment_count"
@@ -450,11 +453,7 @@ class AzureCollector:
                 overprivileged_accounts=overprivileged_accounts,
                 stale_service_principals=stale_service_principals,
                 rbac_review_age_days=0,
-                conditional_access_enforced_for_admins=(
-                    conditional_access_enforced_for_admins
-                    if conditional_access_accessible
-                    else True
-                ),
+                conditional_access_enforced_for_admins=conditional_access_enforced_for_admins,
                 privileged_user_assignments=privileged_user_assignments,
                 privileged_service_principal_assignments=(
                     privileged_service_principal_assignments
@@ -478,6 +477,9 @@ class AzureCollector:
                 "privileged_principal_count": privileged_principal_count,
                 "conditional_access_accessible": conditional_access_accessible,
                 "conditional_access_policy_count": conditional_access_policy_count,
+                "conditional_access_enforced_for_admins": (
+                    conditional_access_enforced_for_admins
+                ),
                 "service_principal_role_assignment_count": len(
                     service_principal_assignment_ids
                 ),
@@ -1459,10 +1461,65 @@ class AzureCollector:
 
     def _collect_conditional_access_signal(self) -> tuple[bool, bool, int]:
         """Return whether admin conditional access is observable and appears present."""
-        # Conditional Access is tenant-wide Entra posture rather than subscription-scoped
-        # Azure inventory. In the current assessment mode we treat it as not observable
-        # unless a future Entra-focused collector is added with stable tenant permissions.
-        return (False, False, 0)
+        completed = self._run_cli_command_allow_failure(
+            [
+                "az",
+                "rest",
+                "--method",
+                "get",
+                "--url",
+                (
+                    "https://graph.microsoft.com/v1.0/identity/conditionalAccess/"
+                    "policies?$select=id,displayName,state,conditions"
+                ),
+            ],
+            timeout=20,
+        )
+        if completed is None or completed.returncode != 0:
+            return (False, False, 0)
+
+        try:
+            payload = json.loads(completed.stdout)
+        except json.JSONDecodeError:
+            return (False, False, 0)
+
+        policies = payload.get("value", [])
+        if not isinstance(policies, list):
+            return (False, False, 0)
+
+        enabled_policies = [
+            policy
+            for policy in policies
+            if isinstance(policy, dict) and policy.get("state") == "enabled"
+        ]
+        admin_enforced = any(
+            self._conditional_access_policy_targets_admins(policy)
+            for policy in enabled_policies
+        )
+        return (admin_enforced, True, len(enabled_policies))
+
+    @staticmethod
+    def _conditional_access_policy_targets_admins(policy: dict[str, Any]) -> bool:
+        """Return whether an enabled CA policy appears to include admin identities."""
+        conditions = policy.get("conditions", {})
+        if not isinstance(conditions, dict):
+            return False
+        users = conditions.get("users", {})
+        if not isinstance(users, dict):
+            return False
+
+        include_roles = users.get("includeRoles", [])
+        if isinstance(include_roles, list) and include_roles:
+            return True
+
+        include_users = users.get("includeUsers", [])
+        exclude_roles = users.get("excludeRoles", [])
+        all_users_included = (
+            isinstance(include_users, list)
+            and any(str(item).lower() == "all" for item in include_users)
+        )
+        admin_roles_excluded = isinstance(exclude_roles, list) and bool(exclude_roles)
+        return all_users_included and not admin_roles_excluded
 
     def _collect_signed_in_user_directory_roles(self) -> tuple[int, bool, bool]:
         """Return visible directory-role context for the signed-in assessment identity."""
