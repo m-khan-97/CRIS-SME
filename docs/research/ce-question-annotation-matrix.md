@@ -31,16 +31,27 @@ Evidence classes:
 
 ## Coverage Summary
 
-Fill these counts after the question-by-question pass.
+First-pass counts from `data/ce_question_mapping.json`, derived from the current Danzell question set using paraphrased local descriptions.
 
 | Evidence class | Count | Notes |
 | --- | ---: | --- |
-| `direct_cloud` | TBD | Questions answerable from Azure control-plane evidence. |
-| `inferred_cloud` | TBD | Questions with useful cloud evidence but incomplete answer support. |
-| `endpoint_required` | TBD | Requires Intune, Defender for Endpoint, Jamf, MDM, EDR, or local device inventory. |
-| `policy_required` | TBD | Requires policy, process, contract, approval, or business-need evidence. |
-| `manual_required` | TBD | Requires human scoping or final assertion. |
-| `not_observable` | TBD | Not supported by current CRIS-SME evidence paths. |
+| `direct_cloud` | `5` | Questions answerable from Azure control-plane evidence. |
+| `inferred_cloud` | `23` | Questions with useful cloud evidence but incomplete answer support. |
+| `endpoint_required` | `24` | Requires Intune, Defender for Endpoint, Jamf, MDM, EDR, or local device inventory. |
+| `policy_required` | `19` | Requires policy, process, contract, approval, or business-need evidence. |
+| `manual_required` | `35` | Requires human scoping or final assertion. |
+| `not_observable` | `0` | Not used in the first-pass mapping because unsupported areas were classified by the evidence source required next. |
+
+Technical-control-only counts:
+
+| Evidence class | Count |
+| --- | ---: |
+| `direct_cloud` | `5` |
+| `inferred_cloud` | `17` |
+| `endpoint_required` | `21` |
+| `policy_required` | `18` |
+| `manual_required` | `1` |
+| `not_observable` | `0` |
 
 ## Firewall Questions
 
@@ -111,4 +122,3 @@ Fill these counts after the question-by-question pass.
 4. Identify which questions can be backed by current CRIS-SME controls.
 5. Identify which questions require new Azure Graph, Defender, Intune, or policy evidence.
 6. Convert the final paraphrased mapping into `data/ce_question_mapping.json`.
-

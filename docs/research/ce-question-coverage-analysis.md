@@ -16,7 +16,10 @@ The goal is not to automate certification. The goal is to determine which Cyber 
 Primary public sources:
 
 - NCSC Cyber Essentials overview: https://www.ncsc.gov.uk/cyberessentials/overview
-- NCSC Cyber Essentials: Requirements for IT infrastructure v3.1, April 2023: https://www.ncsc.gov.uk/files/Cyber-Essentials-Requirements-for-Infrastructure-v3-1-January-2023.pdf
+- IASME Cyber Essentials self-assessment question preview page: https://iasme.co.uk/cyber-essentials/preview-the-self-assessment-questions-for-cyber-essentials/
+- Current question set used for the first mapping pass: Cyber Essentials Danzell, version `16.2`, April 2026
+- Current requirements version referenced by IASME for Danzell: NCSC Requirements for IT Infrastructure v3.3
+- Historical source used during initial scoping: NCSC Cyber Essentials Requirements for IT infrastructure v3.1, April 2023: https://www.ncsc.gov.uk/files/Cyber-Essentials-Requirements-for-Infrastructure-v3-1-January-2023.pdf
 - Microsoft Defender for Cloud regulatory compliance standards: https://learn.microsoft.com/en-us/azure/defender-for-cloud/concept-regulatory-compliance-standards
 
 Important source note:
@@ -25,6 +28,7 @@ Important source note:
 - The IASME question text may have reuse restrictions.
 - CRIS-SME should not publish verbatim question text until the licence position is confirmed.
 - The implementation should use stable internal question IDs, paraphrased descriptions, and source references rather than copying full question wording.
+- The machine-readable mapping in `data/ce_question_mapping.json` is paraphrased and records evidence classes only.
 
 ## Research Claim
 
@@ -61,11 +65,25 @@ The central empirical result should be a coverage table:
 
 | Coverage category | Count | Percentage |
 | --- | ---: | ---: |
-| Directly observable from Azure cloud telemetry | TBD | TBD |
-| Inferable from Azure cloud telemetry with caveats | TBD | TBD |
-| Requires endpoint / MDM / EDR telemetry | TBD | TBD |
-| Requires organisational or policy confirmation | TBD | TBD |
-| Not observable in current CRIS-SME scope | TBD | TBD |
+| Directly observable from Azure cloud telemetry | `5` | `4.7%` |
+| Inferable from Azure cloud telemetry with caveats | `23` | `21.7%` |
+| Requires endpoint / MDM / EDR telemetry | `24` | `22.6%` |
+| Requires organisational or policy confirmation | `54` | `50.9%` |
+| Not observable in current CRIS-SME scope | `0` | `0.0%` |
+
+First-pass mapping scope:
+
+- total Danzell entries mapped: `106`
+- technical-control entries mapped: `62`
+- technical-control entries classified as `direct_cloud`: `5`
+- technical-control entries classified as `inferred_cloud`: `17`
+- technical-control entries classified as `endpoint_required`: `21`
+- technical-control entries classified as `policy_required`: `18`
+- technical-control entries classified as `manual_required`: `1`
+
+Interpretation:
+
+The current question set contains more than the often-quoted 56 technical questions because it includes organisation, scope, insurance, conditional, and free-text preparation entries. The research paper should report both all-question coverage and technical-control-only coverage.
 
 ## Preliminary Requirement-Level Coverage
 
@@ -99,7 +117,7 @@ Use this template for each IASME question after licence terms are checked.
 
 ```text
 question_id:
-ce_version: v3.1
+ce_version: Danzell 16.2 / Requirements v3.3
 pillar:
 short_paraphrase:
 asset_scope:
@@ -145,7 +163,7 @@ Suggested JSON shape:
 ```json
 {
   "question_id": "CE-FW-001",
-  "ce_version": "v3.1",
+  "ce_version": "Danzell 16.2 / Requirements v3.3",
   "pillar": "Firewalls",
   "short_paraphrase": "Internet-facing administrative access is restricted and protected.",
   "evidence_class": "direct_cloud",
@@ -181,7 +199,7 @@ Time-saving should be measured carefully. Prefer evidence retrieval time over to
 
 These must be checked before any novelty claim is made:
 
-- Microsoft Defender for Cloud regulatory compliance Cyber Essentials v3.1 support.
+- Microsoft Defender for Cloud regulatory compliance Cyber Essentials support.
 - IASME portal and readiness tool.
 - JumpCloud Cyber Essentials readiness material.
 - Axonius compliance mapping.
@@ -197,7 +215,6 @@ Working novelty statement:
 
 1. Download the current IASME question set through the official NCSC/IASME route.
 2. Confirm whether the question text can be used in academic notes, private repo files, and public open-source mappings.
-3. Complete the 56-question annotation using paraphrases and stable local IDs.
-4. Count the evidence classes before writing code.
-5. Build the first `ce_question_mapping.json` only after the coverage counts are known.
-
+3. Review `data/ce_question_mapping.json` against the official Danzell question set using paraphrases and stable local IDs.
+4. Re-count evidence classes after expert review.
+5. Build the first answer-pack generator only after the mapping is reviewed.
