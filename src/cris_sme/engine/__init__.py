@@ -22,6 +22,10 @@ from .ce_questionnaire import (
     load_ce_question_mapping,
     write_ce_self_assessment_pack,
 )
+from .ce_evaluation import (
+    build_ce_evaluation_metrics,
+    write_ce_evaluation_metrics,
+)
 from .ce_review import (
     build_ce_review_console,
     write_ce_review_console,
@@ -100,6 +104,7 @@ __all__ = [
     "build_claim_verification_pack",
     "build_claim_bound_narrative",
     "build_ce_self_assessment_pack",
+    "build_ce_evaluation_metrics",
     "build_ce_review_console",
     "build_evidence_diff_result",
     "build_evidence_gap_backlog",
@@ -141,6 +146,7 @@ __all__ = [
     "write_claim_verification_pack",
     "write_claim_bound_narrative",
     "write_ce_self_assessment_pack",
+    "write_ce_evaluation_metrics",
     "write_ce_review_console",
     "write_selective_disclosure_package",
     "write_assurance_case",

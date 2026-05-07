@@ -5,6 +5,10 @@ from .ce_questionnaire_report import (
     build_ce_self_assessment_html,
     write_ce_self_assessment_html,
 )
+from .ce_evaluation_report import (
+    build_ce_evaluation_metrics_html,
+    write_ce_evaluation_metrics_html,
+)
 from .ce_review_console import (
     build_ce_review_console_html,
     write_ce_review_console_html,
@@ -44,6 +48,7 @@ __all__ = [
     "archive_report_snapshot",
     "build_assurance_portal_html",
     "build_ce_self_assessment_html",
+    "build_ce_evaluation_metrics_html",
     "build_ce_review_console_html",
     "build_evaluation_mode_summary",
     "build_history_comparison",
@@ -55,6 +60,7 @@ __all__ = [
     "write_action_plan_outputs",
     "write_assurance_portal_html",
     "write_ce_self_assessment_html",
+    "write_ce_evaluation_metrics_html",
     "write_ce_review_console_html",
     "load_report_history",
     "write_appendix_tables",

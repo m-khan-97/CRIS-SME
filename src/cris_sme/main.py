@@ -28,6 +28,7 @@ from cris_sme.engine import (
     build_assurance_case,
     build_claim_bound_narrative,
     build_claim_verification_pack,
+    build_ce_evaluation_metrics,
     build_ce_review_console,
     build_ce_self_assessment_pack,
     build_collector_coverage,
@@ -48,6 +49,7 @@ from cris_sme.engine import (
     write_risk_bill_of_materials,
     write_claim_verification_pack,
     write_assurance_case,
+    write_ce_evaluation_metrics,
     write_ce_review_console,
     write_ce_self_assessment_pack,
     write_claim_bound_narrative,
@@ -66,6 +68,7 @@ from cris_sme.reporting import (
     archive_report_snapshot,
     build_assurance_portal_html,
     build_cyber_insurance_evidence_pack,
+    build_ce_evaluation_metrics_html,
     build_ce_review_console_html,
     build_ce_self_assessment_html,
     build_dashboard_html,
@@ -84,6 +87,7 @@ from cris_sme.reporting import (
     write_appendix_tables,
     write_benchmark_outputs,
     write_cyber_insurance_evidence_pack,
+    write_ce_evaluation_metrics_html,
     write_ce_review_console_html,
     write_ce_self_assessment_html,
     write_dashboard_html,
@@ -195,6 +199,10 @@ def main() -> None:
         output["cyber_essentials_self_assessment"],
         generated_at=output["generated_at"],
     )
+    output["cyber_essentials_evaluation_metrics"] = build_ce_evaluation_metrics(
+        output["cyber_essentials_self_assessment"],
+        output["cyber_essentials_review_console"],
+    )
     output["cyber_insurance_evidence"] = build_cyber_insurance_evidence_pack(output)
     output["action_plan_30_day"] = build_30_day_action_plan(
         result.prioritized_findings
@@ -276,6 +284,7 @@ def main() -> None:
         },
         "cyber_essentials_self_assessment": {},
         "cyber_essentials_review_console": {},
+        "cyber_essentials_evaluation_metrics": {},
         "plain_language_outputs": {
             key: str(value) for key, value in narrator_paths.items()
         },
@@ -361,6 +370,24 @@ def main() -> None:
                     output["cyber_essentials_review_console"]
                 ),
                 ce_review_console_html_path,
+            )
+        ),
+    }
+    ce_evaluation_json_path = output_dir / "cris_sme_ce_evaluation_metrics.json"
+    ce_evaluation_html_path = output_dir / "cris_sme_ce_evaluation_metrics.html"
+    output["report_artifacts"]["cyber_essentials_evaluation_metrics"] = {
+        "json": str(
+            write_ce_evaluation_metrics(
+                output["cyber_essentials_evaluation_metrics"],
+                ce_evaluation_json_path,
+            )
+        ),
+        "html": str(
+            write_ce_evaluation_metrics_html(
+                build_ce_evaluation_metrics_html(
+                    output["cyber_essentials_evaluation_metrics"]
+                ),
+                ce_evaluation_html_path,
             )
         ),
     }
