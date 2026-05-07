@@ -163,7 +163,35 @@ Evidence gap counts:
 - manual required: `35`
 - not observable: `0`
 
-Reviewer agreement is currently `0%` because no completed human review ledger has been imported yet. This is correct for the pre-review baseline and should be reported as pending rather than as disagreement.
+The pre-review console still initializes all entries as pending. For internal pilot analysis, CRIS-SME can also generate an AI-assisted draft review ledger. In the controlled Azure vulnerable-lab run on 2026-05-07, the draft ledger reviewed the 28 cloud-supported entries, accepted 23 conservative answer-impact decisions, marked 5 as `needs_evidence`, and left the 78 non-cloud entries pending.
+
+This pilot ledger is useful for checking the review workflow and paper-table plumbing. It must not be reported as independent human expert agreement unless a CE-knowledgeable reviewer validates the decisions.
+
+## Controlled Azure Lab Result
+
+The current controlled Azure lab was deliberately small and safe: an NSG with public SSH/RDP rules but no attached VM, plus an empty storage account with public network/blob access enabled.
+
+CRIS-SME output:
+
+- overall risk score: `40.16/100`
+- non-compliant findings: `18`
+- network category score: `58.42`
+- data category score: `41.74`
+- detected public RDP and SSH exposure signals
+- detected public storage access
+- detected 2 permissive NSG rules
+
+Cyber Essentials output for this lab:
+
+- mapped entries: `106`
+- technical-control entries: `62`
+- cloud-supported entries: `28` (`26.42%`)
+- technical cloud-supported entries: `22` (`35.48%`)
+- proposed answer Yes: `5`
+- proposed answer No: `23`
+- proposed answer Cannot determine: `78`
+
+See `docs/research/controlled-azure-lab-run-2026-05-07.md`.
 
 ## Threats To Validity
 
@@ -201,3 +229,6 @@ Less realistic as a first target:
 - `outputs/reports/cris_sme_ce_paper_tables.md`
 - `outputs/reports/cris_sme_ce_paper_tables.csv`
 - `outputs/reports/cris_sme_ce_chart_data.json`
+- `outputs/reports/azure_controlled_lab/cris_sme_ce_self_assessment.json`
+- `outputs/reports/azure_controlled_lab/ce_review_draft/cris_sme_ce_evaluation_metrics_reviewed_draft.json`
+- `docs/research/controlled-azure-lab-run-2026-05-07.md`

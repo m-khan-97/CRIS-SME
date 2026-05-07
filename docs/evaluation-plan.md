@@ -140,8 +140,8 @@ Purpose:
 
 Current reference live snapshot:
 
-- Azure-backed run with overall risk score `32.79`
-- `18` non-compliant findings
+- Azure-backed run with overall risk score `27.81`
+- `15` non-compliant findings
 - Defender comparison showing `7` mapped controls, `0` agreements, `6` CRIS-only findings, and `0` native-only findings in the selected reference snapshot
 
 Limitations:
@@ -153,7 +153,7 @@ Limitations:
 
 Source:
 
-- AzureGoat-derived assessment runs executed in an isolated, explicitly authorized subscription context
+- controlled Azure vulnerable-lab assessment runs executed in an isolated, explicitly authorized subscription context
 
 Purpose:
 
@@ -163,16 +163,16 @@ Purpose:
 
 Current reference vulnerable-lab snapshot:
 
-- Azure-backed vulnerable-lab run with overall risk score `32.79`
+- Azure-backed vulnerable-lab run with overall risk score `40.16`
 - `18` non-compliant findings
 - dataset source type `vulnerable_lab`
 - authorization basis `intentionally_vulnerable_lab`
 
 Important methodological note:
 
-- the current AzureGoat deployment is a constrained variant, not a stock lab rollout
-- tenant location policy, Automation Account restrictions, and regional VM-capacity limits prevented a full unmodified deployment
-- this is still a valid research dataset because the environment remains intentionally vulnerable and explicitly authorized, but the deployment constraints should be disclosed
+- the current vulnerable-lab deployment is a controlled lab, not a full AzureGoat rollout
+- public SSH/RDP NSG rules were created without attaching a reachable VM workload
+- this is still a valid research dataset because the environment remains intentionally vulnerable and explicitly authorized, but the controlled-lab boundary should be disclosed
 
 ### D. Historical Comparison Dataset
 

@@ -22,9 +22,9 @@ This checklist is intended to help move CRIS-SME from a strong research repo int
 - verify the latest archived live run under [outputs/reports/history](../outputs/reports/history)
 - document whether the live Azure result is stable across repeated runs
 - confirm the main results section presents the three-mode comparison as the default framing
-- confirm the live Azure and AzureGoat subsections are supporting branches of that shared framing rather than primary-versus-supplementary case studies
+- confirm the live Azure and controlled vulnerable-lab subsections are supporting branches of that shared framing rather than primary-versus-supplementary case studies
 - explicitly state IAM and Entra observability limits
-- explicitly state AzureGoat deployment constraints in the threats-to-validity section
+- explicitly state the controlled vulnerable-lab boundary in the threats-to-validity section
 
 ## Repository and Reproducibility
 

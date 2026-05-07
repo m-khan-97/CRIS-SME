@@ -11,7 +11,7 @@ CRIS-SME has been evaluated across three complementary modes:
 
 - synthetic SME posture assessment using controlled mock profiles
 - live Azure-backed assessment using an authenticated subscription context
-- AzureGoat-derived vulnerable-lab assessment using an intentionally vulnerable Azure environment
+- controlled Azure vulnerable-lab assessment using intentionally weak cloud-control-plane signals
 
 This three-mode strategy is important because it allows the framework to support repeatable engineering tests, live-cloud case-study evidence, and intentionally stressed cloud posture without relying on unauthorized public infrastructure.
 
@@ -28,10 +28,10 @@ The current evaluation is not framed as a benchmark against commercial CSPM tool
 Archived runs currently include:
 
 - a mock assessment snapshot with an overall score of `39.84`
-- a latest live Azure case-study snapshot with an overall score of `32.79`
-- an AzureGoat vulnerable-lab snapshot with an overall score of `32.79`
+- a latest live Azure case-study snapshot with an overall score of `27.81`
+- a controlled Azure vulnerable-lab snapshot with an overall score of `40.16`
 
-The latest controlled live-lab validation run, executed on May 5, 2026, produced an overall score of `35.28/100` from live Azure evidence after CRIS-SME created a small authorized lab in `germanywestcentral`. This run is operational validation rather than a frozen manuscript baseline, but it strengthens the evidence that CRIS-SME responds to real cloud changes rather than only synthetic fixtures.
+The latest controlled vulnerable-lab validation run, executed on May 7, 2026, produced an overall score of `40.16/100` from live Azure evidence after CRIS-SME created a small authorized lab in `germanywestcentral`. This run is now the preferred vulnerable-lab baseline for manuscript drafting because it is documented, bounded, and was cleaned up after the assessment.
 
 For the latest live Azure case-study snapshot:
 
@@ -54,8 +54,8 @@ Taken together, these runs should now be presented as a three-mode evaluation ra
 The current three-mode comparison is:
 
 - synthetic SME baseline: `39.84/100`, `50` generated findings, `49` non-compliant findings
-- latest live Azure case-study snapshot: `32.79/100`, `19` generated findings, `18` non-compliant findings
-- AzureGoat-derived vulnerable-lab snapshot: `32.79/100`, `18` generated findings, `18` non-compliant findings
+- latest live Azure case-study snapshot: `27.81/100`, `15` generated findings, `15` non-compliant findings
+- controlled Azure vulnerable-lab snapshot: `40.16/100`, `18` generated findings, `18` non-compliant findings
 
 This framing is stronger than a single-primary narrative because it shows that CRIS-SME has been exercised across controlled synthetic evidence, authorized live cloud evidence, and an intentionally stressed but lawful lab environment.
 
@@ -63,43 +63,42 @@ This framing is stronger than a single-primary narrative because it shows that C
 
 The latest live Azure assessment produced:
 
-- overall risk score: `35.28/100`
-- non-compliant findings: `17`
-- IAM score: `14.78`
-- Network score: `58.42`
-- Data score: `41.74`
+- overall risk score: `27.81/100`
+- non-compliant findings: `15`
+- IAM score: `32.51`
+- Network score: `0.00`
+- Data score: `38.44`
 - Monitoring/Logging score: `36.38`
 - Compute/Workloads score: `38.29`
-- Cost/Governance Hygiene score: `22.67`
+- Cost/Governance Hygiene score: `27.11`
 
 The most significant live findings remain concentrated in:
 
-- public administrative service exposure
-- public storage exposure
-- broad network security group rules
 - endpoint protection and workload hardening gaps
 - data/key-management weaknesses
+- tenant identity observability boundaries
+- monitoring and governance coverage gaps
 
-The May 2026 run exercised a deliberately small owned lab rather than a broad production estate. The created resources included an NSG with public SSH/RDP exposure, a public blob container, and a VNet/subnet association. CRIS-SME detected those as `NET-001`, `NET-002`, and `DATA-001` without changing deterministic scoring logic.
+The clean live Azure run contained no detected network exposure, which is useful because it provides contrast with the controlled vulnerable-lab track.
 
-## AzureGoat Vulnerable-Lab Results
+## Controlled Azure Vulnerable-Lab Results
 
-The current AzureGoat-derived vulnerable-lab assessment produced:
+The current controlled Azure vulnerable-lab assessment produced:
 
-- overall risk score: `32.79/100`
+- overall risk score: `40.16/100`
 - non-compliant findings: `18`
 - dataset source type: `vulnerable_lab`
 - authorization basis: `intentionally_vulnerable_lab`
 - dataset use: `control_stress_test`
 
-The AzureGoat run is important for the evaluation because it introduces a high-variance but ethically defensible test environment. In the current constrained deployment variant, CRIS-SME still observed substantial risk across:
+The controlled lab is important for the evaluation because it introduces a high-variance but ethically defensible test environment. CRIS-SME observed substantial risk across:
 
 - network exposure and permissive security-group posture
 - public or weakly governed data paths
 - monitoring and workload hardening gaps
-- governance weakness in an intentionally exposed application environment
+- governance weakness in an intentionally exposed cloud-control-plane environment
 
-One important methodological note is that this was not a fully stock AzureGoat rollout. The deployment had to be adapted for subscription-policy constraints, including region restrictions, blocked Automation Account deployment, Basic public-IP restrictions, and repeated VM-capacity failures. Those constraints should be disclosed in the paper, but they do not invalidate the dataset class.
+One important methodological note is that this was a controlled lab, not a fully stock AzureGoat rollout. It used public SSH/RDP NSG rules and an empty public-network storage account; no VM was attached to the public administrative rules.
 
 ## Identity and Entra Interpretation
 
@@ -158,10 +157,10 @@ The present evaluation still has several boundaries:
 This draft can serve as the backbone for a results section in a conference paper:
 
 - present the three modes together in a single headline table
-- treat synthetic, live Azure, and AzureGoat as equal first-class evidence classes
+- treat synthetic, live Azure, and controlled vulnerable lab as equal first-class evidence classes
 - use the live Azure subsection for real-tenant feasibility and native-tool comparison
-- use the AzureGoat subsection for lawful stress behavior and control-path coverage
+- use the controlled-lab subsection for lawful stress behavior and control-path coverage
 - embed the SVG or PNG figures from `outputs/figures/`
 - cite the appendix tables from `outputs/reports/results_appendix.md`
 - use the control delta section to discuss why live evidence changes risk interpretation
-- disclose the constrained AzureGoat deployment adaptation in the threats-to-validity discussion
+- disclose the controlled-lab design and absence of a reachable workload in the threats-to-validity discussion

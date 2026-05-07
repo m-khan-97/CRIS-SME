@@ -30,6 +30,10 @@ from .ce_review import (
     build_ce_review_console,
     write_ce_review_console,
 )
+from .ce_review_draft import (
+    build_ce_review_decision_draft,
+    write_ce_review_decision_draft,
+)
 from .compliance import assess_compliance_mappings, load_compliance_mappings
 from .control_drift import build_control_drift_attribution
 from .decision_ledger import build_decision_ledger, summarize_decision_ledger
@@ -105,6 +109,7 @@ __all__ = [
     "build_claim_bound_narrative",
     "build_ce_self_assessment_pack",
     "build_ce_evaluation_metrics",
+    "build_ce_review_decision_draft",
     "build_ce_review_console",
     "build_evidence_diff_result",
     "build_evidence_gap_backlog",
@@ -147,6 +152,7 @@ __all__ = [
     "write_claim_bound_narrative",
     "write_ce_self_assessment_pack",
     "write_ce_evaluation_metrics",
+    "write_ce_review_decision_draft",
     "write_ce_review_console",
     "write_selective_disclosure_package",
     "write_assurance_case",

@@ -42,7 +42,7 @@ The current paper-facing methodology treats three evidence modes as equal first-
 
 - synthetic baseline profiles for controlled reproducibility
 - live Azure assessment snapshots for authorized real-cloud feasibility
-- AzureGoat-derived vulnerable-lab snapshots for lawful stress testing
+- controlled Azure vulnerable-lab snapshots for lawful stress testing
 
 This framing is deliberate. It avoids overstating any single run as the whole evaluation story and instead separates three different methodological roles:
 

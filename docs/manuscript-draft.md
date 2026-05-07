@@ -7,7 +7,7 @@
 
 ### Abstract
 
-Small and medium enterprises (SMEs) increasingly depend on cloud infrastructure, yet many lack governance capability, compliance automation, and risk tooling suited to their scale. Enterprise cloud security platforms offer broad coverage, but they are often too costly, operationally heavy, or opaque for smaller organizations. This paper presents CRIS-SME, a Cloud Risk Intelligence System designed for SME-oriented cloud governance assessment through deterministic control evaluation, explainable scoring, UK-oriented compliance framing, and provenance-aware reporting. CRIS-SME uses a provider-neutral core architecture with an Azure-first implementation. The framework evaluates posture across identity and access management, network exposure, data protection, monitoring and logging, compute and workload hardening, and governance hygiene. Findings are normalized into a common risk model, scored using deterministic factors, aggregated into category and overall risk views, and exported into report, figure, and appendix-ready artifacts. The current implementation was evaluated across three evidence modes: synthetic SME profiles, a latest live Azure case-study snapshot, and an intentionally vulnerable AzureGoat-derived lab track. In the latest live Azure case study, CRIS-SME identified 18 non-compliant findings and produced an overall risk score of 32.79/100. In the vulnerable-lab track, CRIS-SME also identified 18 non-compliant findings with an overall risk score of 32.79/100. Across the current evidence base, dominant risks relate to public administrative exposure, permissive network rules, incomplete key-management protections, public storage access, and weak endpoint and workload protection coverage. The contribution of CRIS-SME is not a claim of fully autonomous security intelligence, but an explainable and research-defensible framework that bridges practical cloud governance engineering and publishable SME-focused cloud risk research.
+Small and medium enterprises (SMEs) increasingly depend on cloud infrastructure, yet many lack governance capability, compliance automation, and risk tooling suited to their scale. Enterprise cloud security platforms offer broad coverage, but they are often too costly, operationally heavy, or opaque for smaller organizations. This paper presents CRIS-SME, a Cloud Risk Intelligence System designed for SME-oriented cloud governance assessment through deterministic control evaluation, explainable scoring, UK-oriented compliance framing, and provenance-aware reporting. CRIS-SME uses a provider-neutral core architecture with an Azure-first implementation. The framework evaluates posture across identity and access management, network exposure, data protection, monitoring and logging, compute and workload hardening, and governance hygiene. Findings are normalized into a common risk model, scored using deterministic factors, aggregated into category and overall risk views, and exported into report, figure, and appendix-ready artifacts. The current implementation was evaluated across three evidence modes: synthetic SME profiles, a latest live Azure case-study snapshot, and a controlled intentionally vulnerable Azure lab. In the latest live Azure case study, CRIS-SME identified 15 non-compliant findings and produced an overall risk score of 27.81/100. In the controlled vulnerable-lab track, CRIS-SME identified 18 non-compliant findings with an overall risk score of 40.16/100. Across the current evidence base, dominant risks relate to public administrative exposure, permissive network rules, incomplete key-management protections, public storage access, and weak endpoint and workload protection coverage. The contribution of CRIS-SME is not a claim of fully autonomous security intelligence, but an explainable and research-defensible framework that bridges practical cloud governance engineering and publishable SME-focused cloud risk research.
 
 ### 1. Introduction
 
@@ -67,7 +67,7 @@ The methodology follows five principles:
 - iterative validation over premature platform complexity
 - SME suitability over enterprise-only assumptions
 
-The implementation began with synthetic SME posture profiles to validate scoring and control behavior in a repeatable way. Live Azure-backed collection was then added to move the framework beyond mock-only evaluation while preserving explicit provenance. Finally, an intentionally vulnerable AzureGoat-derived lab track was introduced to increase evaluation variance without relying on unauthorized public infrastructure. In the current paper framing, these three modes are treated as equal first-class evidence classes rather than as one primary case study with supplementary support. This is methodologically defensible because it separates controlled reproducibility, real-cloud feasibility, and lawful stress testing into distinct but comparable evaluation lenses.
+The implementation began with synthetic SME posture profiles to validate scoring and control behavior in a repeatable way. Live Azure-backed collection was then added to move the framework beyond mock-only evaluation while preserving explicit provenance. Finally, a controlled intentionally vulnerable Azure lab was introduced to increase evaluation variance without relying on unauthorized public infrastructure. In the current paper framing, these three modes are treated as equal first-class evidence classes rather than as one primary case study with supplementary support. This is methodologically defensible because it separates controlled reproducibility, real-cloud feasibility, and lawful stress testing into distinct but comparable evaluation lenses.
 
 The current pipeline is:
 
@@ -129,7 +129,7 @@ The present evaluation is structured around three complementary modes:
 
 - synthetic SME baseline assessment
 - live Azure-backed case-study assessment
-- AzureGoat-derived vulnerable-lab assessment
+- controlled Azure vulnerable-lab assessment
 
 This evaluation is not framed as a competitive benchmark against commercial CSPM tools. Instead, it addresses three questions:
 
@@ -144,19 +144,19 @@ The archived runs currently include a synthetic baseline, a latest live Azure ca
 The three current headline outcomes are:
 
 - synthetic baseline: overall risk score `39.84`, `50` generated findings, `49` non-compliant findings
-- latest live Azure case-study snapshot: overall risk score `32.79`, `19` generated findings, `18` non-compliant findings
-- AzureGoat-derived vulnerable-lab snapshot: overall risk score `32.79`, `18` generated findings, `18` non-compliant findings
+- latest live Azure case-study snapshot: overall risk score `27.81`, `15` generated findings, `15` non-compliant findings
+- controlled Azure vulnerable-lab snapshot: overall risk score `40.16`, `18` generated findings, `18` non-compliant findings
 
 The latest live Azure assessment produced:
 
-- 18 non-compliant findings
-- overall risk score of 32.79
-- IAM score: 14.78
-- Network score: 38.02
-- Data score: 48.65
+- 15 non-compliant findings
+- overall risk score of 27.81
+- IAM score: 32.51
+- Network score: 0.00
+- Data score: 38.44
 - Monitoring/Logging score: 36.38
 - Compute/Workloads score: 38.29
-- Cost/Governance Hygiene score: 24.80
+- Cost/Governance Hygiene score: 27.11
 
 The most significant live findings were:
 
@@ -166,16 +166,16 @@ The most significant live findings were:
 4. incomplete key-management protections
 5. incomplete workload hardening baseline coverage
 
-The current AzureGoat-derived vulnerable-lab assessment produced:
+The current controlled Azure vulnerable-lab assessment produced:
 
 - 18 non-compliant findings
-- overall risk score of 32.79
+- overall risk score of 40.16
 - dataset source type `vulnerable_lab`
 - authorization basis `intentionally_vulnerable_lab`
 
-This lab-derived run is important because it broadens the evidence base without relying on unauthorized public infrastructure. It also increases evaluation variance by introducing intentionally exposed storage, application, and network conditions. The current deployment was a constrained AzureGoat variant because tenant location policy, Automation Account incompatibility, Basic public-IP restrictions, and live VM-capacity shortages prevented a full stock deployment. This limitation should be disclosed, but it does not negate the value of the environment as an explicitly authorized vulnerable-lab dataset.
+This lab-derived run is important because it broadens the evidence base without relying on unauthorized public infrastructure. It also increases evaluation variance by introducing intentionally exposed storage and network-control-plane conditions. The current deployment was a controlled lab rather than a full AzureGoat rollout: it used public SSH/RDP NSG rules and an empty public-network storage account, with no VM attached to the public administrative rules. This limitation should be disclosed, but it does not negate the value of the environment as an explicitly authorized vulnerable-lab dataset.
 
-Across the three modes, category-level variation is also informative. The synthetic baseline remains the broadest and highest-scoring environment overall. In the latest results, the live Azure snapshot and the vulnerable-lab snapshot share the same overall score, but they remain distinct evidence classes because the live run is grounded in authorized tenant evidence while the lab run remains an intentionally vulnerable stress environment. This demonstrates that the framework can move beyond headline scores and compare evaluation context, provenance, and domain-level posture rather than only raw headline totals.
+Across the three modes, category-level variation is also informative. The synthetic baseline remains the broadest repeatable environment. In the latest results, the live Azure snapshot and the vulnerable-lab snapshot diverge sharply in network score, which shows that CRIS-SME responds to intentionally introduced cloud-control-plane exposure. This demonstrates that the framework can move beyond headline scores and compare evaluation context, provenance, and domain-level posture rather than only raw headline totals.
 
 Control-level comparison against the previous distinct-mode baseline showed notable increases for several live risks, including `NET-002`, `CMP-005`, `DATA-004`, `CMP-002`, and `MON-002`. This remains useful because it shows how specific governance conditions differ across synthetic and live contexts inside the broader three-mode design.
 
@@ -196,7 +196,7 @@ The most important design lesson so far is that transparency matters. Determinis
 The present work has several limitations:
 
 - evaluation currently centers on a single live Azure subscription
-- the current vulnerable-lab track is based on one constrained AzureGoat deployment variant
+- the current vulnerable-lab track is based on one controlled Azure lab
 - repeated live runs currently show stability more than operational drift
 - some Entra-wide controls remain only partially observable
 - AWS and GCP expansion remains at adapter-planning stage
@@ -218,7 +218,7 @@ The framework measures cloud governance posture through observable control evide
 
 #### 13.3 External Validity
 
-The empirical evidence base remains limited. The live case-study track currently reflects one authenticated Azure subscription, and the vulnerable-lab track reflects one constrained AzureGoat deployment variant. These are useful for demonstrating feasibility and stress behavior, but they do not yet constitute a broad UK SME sample.
+The empirical evidence base remains limited. The live case-study track currently reflects one authenticated Azure subscription, and the vulnerable-lab track reflects one controlled Azure lab. These are useful for demonstrating feasibility and stress behavior, but they do not yet constitute a broad UK SME sample.
 
 #### 13.4 Platform Validity
 
@@ -230,7 +230,7 @@ Some control families remain only partially observable in the authenticated envi
 
 #### 13.6 Environment-Constraint Validity
 
-The AzureGoat lab was collected from a constrained deployment variant rather than a completely stock deployment. Tenant region policy, Automation Account restrictions, Basic public-IP incompatibility, and repeated VM-capacity failures required selective adaptation. This does not invalidate the lab as an intentionally vulnerable dataset, but it does mean that some AzureGoat behaviors were not fully represented.
+The vulnerable lab was a controlled Azure lab rather than a complete AzureGoat deployment. It intentionally exposed cloud-control-plane signals while avoiding a reachable VM workload. This does not invalidate the lab as an intentionally vulnerable dataset, but it means the result should be interpreted as a control-plane stress test rather than a full application-layer vulnerable-lab evaluation.
 
 ### 14. Future Work
 

@@ -121,6 +121,27 @@ Reviewer should complete:
 
 Pending entries must remain pending. Do not force a final answer where evidence is incomplete.
 
+### AI-Assisted Pilot Ledger
+
+For internal research iteration, CRIS-SME can generate an AI-assisted pilot review ledger:
+
+```bash
+PYTHONPATH=src python3 scripts/build_ce_review_draft.py
+```
+
+This writes reviewed-draft artifacts under:
+
+`outputs/reports/ce_review_draft/`
+
+The draft ledger is deliberately conservative:
+
+- direct cloud evidence entries are accepted as pilot decisions
+- inferred cloud `No` entries with linked CRIS-SME risks are accepted as conservative answer-impact decisions
+- inferred cloud `Yes` entries are marked `needs_evidence`
+- endpoint, policy, manual, and not-observable entries remain pending
+
+This draft must be labelled as `AI-assisted internal reviewer draft` or equivalent. It is useful for checking the workflow, paper tables, and agreement-metric plumbing, but it is not an independent human expert review. Do not report it as assessor agreement unless a CE-knowledgeable reviewer has checked and signed the decisions.
+
 ## Metrics
 
 ### Observability Metrics

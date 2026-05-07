@@ -7,7 +7,7 @@ This document provides a paper-ready comparison of the three current CRIS-SME ev
 
 - synthetic SME baseline
 - live Azure case study
-- AzureGoat-derived vulnerable-lab track
+- controlled Azure vulnerable-lab track
 
 Its purpose is to make the evaluation story easy to reuse in the manuscript, slides, posters, or proposal materials with all three modes treated as equal first-class evidence.
 
@@ -17,35 +17,35 @@ Its purpose is to make the evaluation story easy to reuse in the manuscript, sli
 | --- | --- | --- | --- | --- | --- |
 | Synthetic SME baseline | Synthetic profiles | `synthetic_dataset` | Controlled baseline and regression testing | Fully reproducible | Not a real cloud estate |
 | Live Azure case study | Production-adjacent live tenant | `authorized_tenant_access` | Real-cloud feasibility and Azure-native comparison | Empirical live evidence | One live subscription |
-| AzureGoat vulnerable lab | Intentionally vulnerable Azure lab | `intentionally_vulnerable_lab` | Control stress testing in an explicitly allowed environment | High-variance lawful stress track | Constrained deployment variant |
+| Controlled Azure vulnerable lab | Intentionally vulnerable Azure control-plane lab | `intentionally_vulnerable_lab` | Control stress testing in an explicitly allowed environment | High-variance lawful stress track | Small lab, no reachable VM workload |
 
 ## Table 2. Headline Outcome Comparison
 
-| Metric | Synthetic Baseline | Live Azure Case Study | AzureGoat Vulnerable Lab |
+| Metric | Synthetic Baseline | Live Azure Case Study | Controlled Azure Vulnerable Lab |
 | --- | ---: | ---: | ---: |
-| Overall risk score | 39.84 | 32.79 | 32.79 |
+| Overall risk score | 39.84 | 27.81 | 40.16 |
 | Evaluated profiles | 3 | 1 | 1 |
-| Generated findings | 50 | 19 | 18 |
-| Non-compliant findings | 49 | 18 | 18 |
+| Generated findings | 50 | 15 | 18 |
+| Non-compliant findings | 49 | 15 | 18 |
 | Collector mode | `mock` | `azure` | `azure` |
 
 ## Table 3. Category Score Comparison
 
-| Category | Synthetic Baseline | Live Azure Case Study | AzureGoat Vulnerable Lab |
+| Category | Synthetic Baseline | Live Azure Case Study | Controlled Azure Vulnerable Lab |
 | --- | ---: | ---: | ---: |
-| IAM | 34.00 | 14.78 | 14.78 |
-| Network | 51.62 | 38.02 | 38.02 |
-| Data | 42.05 | 48.65 | 48.65 |
+| IAM | 34.00 | 32.51 | 32.51 |
+| Network | 51.62 | 0.00 | 58.42 |
+| Data | 42.05 | 38.44 | 41.74 |
 | Monitoring/Logging | 37.61 | 36.38 | 36.38 |
 | Compute/Workloads | 42.69 | 38.29 | 38.29 |
-| Cost/Governance Hygiene | 26.91 | 24.80 | 24.80 |
+| Cost/Governance Hygiene | 26.91 | 27.11 | 27.11 |
 
 ## Interpretation
 
 - The synthetic baseline remains the broadest and most intentionally stressed dataset, which is why it still produces the highest overall score and the largest number of findings.
 - The live Azure case study contributes the real authenticated-tenant lens and Azure-native comparison hooks.
-- The AzureGoat track contributes the explicitly vulnerable, fully authorized stress-test lens without relying on arbitrary public infrastructure.
-- The latest live Azure and AzureGoat snapshots currently share the same overall score, which is useful because it shows that provenance and evidence class still matter even when headline totals converge.
+- The controlled Azure vulnerable lab contributes the explicitly vulnerable, fully authorized stress-test lens without relying on arbitrary public infrastructure.
+- The latest live Azure and controlled vulnerable-lab snapshots diverge sharply in network score, which is useful because it shows that CRIS-SME responds to intentionally introduced cloud-control-plane exposure.
 
 ## Recommended Use in the Paper
 
@@ -55,6 +55,6 @@ Use this comparison in three places:
 2. In the results section as the main headline comparison table.
 3. In the discussion section to explain how controlled, live, and vulnerable-lab evidence each illuminate different aspects of SME cloud governance risk.
 
-## Disclosure Note
+## Controlled Lab Disclosure Note
 
-The current AzureGoat run was collected from a constrained deployment variant rather than a fully stock AzureGoat deployment. Region policy, Automation Account restrictions, Basic public-IP incompatibility, and regional VM-capacity shortages required adaptation. This should be disclosed in the threats-to-validity discussion rather than hidden.
+The current vulnerable-lab run was a controlled Azure lab rather than a full AzureGoat deployment. It used an NSG with public SSH/RDP rules and an empty public-network storage account. No VM was attached to the public administrative rules. This should be disclosed in the threats-to-validity discussion rather than hidden.
