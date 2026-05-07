@@ -88,6 +88,7 @@ from cris_sme.reporting import (
     write_benchmark_outputs,
     write_cyber_insurance_evidence_pack,
     write_ce_evaluation_metrics_html,
+    write_ce_paper_exports,
     write_ce_review_console_html,
     write_ce_self_assessment_html,
     write_dashboard_html,
@@ -285,6 +286,7 @@ def main() -> None:
         "cyber_essentials_self_assessment": {},
         "cyber_essentials_review_console": {},
         "cyber_essentials_evaluation_metrics": {},
+        "cyber_essentials_paper_exports": {},
         "plain_language_outputs": {
             key: str(value) for key, value in narrator_paths.items()
         },
@@ -390,6 +392,13 @@ def main() -> None:
                 ce_evaluation_html_path,
             )
         ),
+    }
+    output["report_artifacts"]["cyber_essentials_paper_exports"] = {
+        key: str(value)
+        for key, value in write_ce_paper_exports(
+            output["cyber_essentials_evaluation_metrics"],
+            output_dir,
+        ).items()
     }
     selective_disclosure = build_selective_disclosure_package(output)
     output["selective_disclosure"] = selective_disclosure.model_dump(mode="json")

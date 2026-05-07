@@ -9,6 +9,11 @@ from .ce_evaluation_report import (
     build_ce_evaluation_metrics_html,
     write_ce_evaluation_metrics_html,
 )
+from .ce_paper_export import (
+    build_ce_chart_data,
+    build_ce_paper_tables_markdown,
+    write_ce_paper_exports,
+)
 from .ce_review_console import (
     build_ce_review_console_html,
     write_ce_review_console_html,
@@ -49,6 +54,8 @@ __all__ = [
     "build_assurance_portal_html",
     "build_ce_self_assessment_html",
     "build_ce_evaluation_metrics_html",
+    "build_ce_chart_data",
+    "build_ce_paper_tables_markdown",
     "build_ce_review_console_html",
     "build_evaluation_mode_summary",
     "build_history_comparison",
@@ -61,6 +68,7 @@ __all__ = [
     "write_assurance_portal_html",
     "write_ce_self_assessment_html",
     "write_ce_evaluation_metrics_html",
+    "write_ce_paper_exports",
     "write_ce_review_console_html",
     "load_report_history",
     "write_appendix_tables",
