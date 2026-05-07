@@ -21,6 +21,7 @@
           <button class="nav-item" data-view="workbench" type="button">Decision Workbench</button>
           <button class="nav-item" data-view="provenance" type="button">Provenance</button>
           <button class="nav-item" data-view="assurance" type="button">Assurance Center</button>
+          <button class="nav-item" data-view="ce-workflow" type="button">CE Workflow</button>
           <button class="nav-item" data-view="disclosure" type="button">Disclosure Room</button>
           <button class="nav-item" data-view="remediation" type="button">Remediation</button>
         </nav>
@@ -29,6 +30,7 @@
           <p>Static console powered by CRIS-SME generated artifacts.</p>
           <a href="../assurance.html">Assurance Portal</a>
           <a href="../evidence-room.html">Evidence Room</a>
+          <a href="../ce-review-console.html">CE Review</a>
         </div>
       </aside>
 
@@ -151,6 +153,64 @@
               <div class="argument-list" id="argument-list"></div>
             </section>
           </div>
+        </section>
+
+        <section class="view" id="view-ce-workflow" aria-labelledby="ce-title">
+          <div class="section-title">
+            <div>
+              <span class="eyebrow">Cyber Essentials workflow</span>
+              <h2 id="ce-title">Question-level pre-population, review, and paper evidence.</h2>
+            </div>
+            <div class="quick-links">
+              <a href="../ce-self-assessment.html">Answer Pack</a>
+              <a href="../ce-review-console.html">Review Console</a>
+              <a href="../ce-evaluation.html">Metrics</a>
+            </div>
+          </div>
+
+          <div class="metric-grid" id="ce-metrics"></div>
+
+          <div class="content-grid two">
+            <section class="panel">
+              <div class="panel-head">
+                <h3>Evidence observability</h3>
+                <span>Question coverage</span>
+              </div>
+              <div class="bar-list" id="ce-observability-bars"></div>
+            </section>
+            <section class="panel">
+              <div class="panel-head">
+                <h3>Evidence gaps</h3>
+                <span>Review workload</span>
+              </div>
+              <div class="risk-list" id="ce-gap-list"></div>
+            </section>
+          </div>
+
+          <div class="content-grid two">
+            <section class="panel">
+              <div class="panel-head">
+                <h3>Review outcomes</h3>
+                <span>Human verification ledger</span>
+              </div>
+              <div class="bar-list" id="ce-review-bars"></div>
+            </section>
+            <section class="panel">
+              <div class="panel-head">
+                <h3>Controls affecting CE answers</h3>
+                <span>Top mapped failures</span>
+              </div>
+              <div class="risk-list" id="ce-control-list"></div>
+            </section>
+          </div>
+
+          <section class="panel">
+            <div class="panel-head">
+              <h3>Paper table preview</h3>
+              <span>Generated from deterministic metrics</span>
+            </div>
+            <div class="paper-preview" id="ce-paper-preview"></div>
+          </section>
         </section>
 
         <section class="view" id="view-disclosure" aria-labelledby="disclosure-title">

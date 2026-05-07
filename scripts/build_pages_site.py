@@ -26,6 +26,14 @@ REQUIRED_REPORT_FILES = [
     "cris_sme_report.json",
     "cris_sme_selective_disclosure.json",
     "cris_sme_summary.txt",
+    "cris_sme_ce_self_assessment.html",
+    "cris_sme_ce_review_console.html",
+    "cris_sme_ce_evaluation_metrics.html",
+    "cris_sme_ce_self_assessment.json",
+    "cris_sme_ce_review_console.json",
+    "cris_sme_ce_evaluation_metrics.json",
+    "cris_sme_ce_paper_tables.md",
+    "cris_sme_ce_chart_data.json",
 ]
 
 
@@ -73,6 +81,18 @@ def main() -> None:
     _copy_file(reports_dir / "cris_sme_evidence_room.html", site_dir / "evidence-room.html")
     _copy_file(reports_dir / "cris_sme_report.html", site_dir / "report.html")
     _copy_file(
+        reports_dir / "cris_sme_ce_self_assessment.html",
+        site_dir / "ce-self-assessment.html",
+    )
+    _copy_file(
+        reports_dir / "cris_sme_ce_review_console.html",
+        site_dir / "ce-review-console.html",
+    )
+    _copy_file(
+        reports_dir / "cris_sme_ce_evaluation_metrics.html",
+        site_dir / "ce-evaluation.html",
+    )
+    _copy_file(
         reports_dir / "cris_sme_dashboard_payload.json",
         site_data_dir / "cris_sme_dashboard_payload.json",
     )
@@ -82,6 +102,26 @@ def main() -> None:
         site_data_dir / "cris_sme_selective_disclosure.json",
     )
     _copy_file(reports_dir / "cris_sme_summary.txt", site_data_dir / "cris_sme_summary.txt")
+    _copy_file(
+        reports_dir / "cris_sme_ce_self_assessment.json",
+        site_data_dir / "cris_sme_ce_self_assessment.json",
+    )
+    _copy_file(
+        reports_dir / "cris_sme_ce_review_console.json",
+        site_data_dir / "cris_sme_ce_review_console.json",
+    )
+    _copy_file(
+        reports_dir / "cris_sme_ce_evaluation_metrics.json",
+        site_data_dir / "cris_sme_ce_evaluation_metrics.json",
+    )
+    _copy_file(
+        reports_dir / "cris_sme_ce_paper_tables.md",
+        site_data_dir / "cris_sme_ce_paper_tables.md",
+    )
+    _copy_file(
+        reports_dir / "cris_sme_ce_chart_data.json",
+        site_data_dir / "cris_sme_ce_chart_data.json",
+    )
     _copy_demo_console(demo_source_dir, demo_site_dir)
 
     for figure in sorted(figures_dir.glob("*")):
@@ -168,10 +208,18 @@ def _build_manifest(*, repo_root: Path, site_dir: Path) -> dict[str, object]:
         Path("assurance.html"),
         Path("evidence-room.html"),
         Path("report.html"),
+        Path("ce-self-assessment.html"),
+        Path("ce-review-console.html"),
+        Path("ce-evaluation.html"),
         Path("data/cris_sme_dashboard_payload.json"),
         Path("data/cris_sme_report.json"),
         Path("data/cris_sme_selective_disclosure.json"),
         Path("data/cris_sme_summary.txt"),
+        Path("data/cris_sme_ce_self_assessment.json"),
+        Path("data/cris_sme_ce_review_console.json"),
+        Path("data/cris_sme_ce_evaluation_metrics.json"),
+        Path("data/cris_sme_ce_paper_tables.md"),
+        Path("data/cris_sme_ce_chart_data.json"),
     ]:
         absolute = site_dir / relative_path
         if absolute.exists():
@@ -197,11 +245,23 @@ def _build_manifest(*, repo_root: Path, site_dir: Path) -> dict[str, object]:
             "assurance_portal": "assurance.html",
             "evidence_room": "evidence-room.html",
             "technical_report": "report.html",
+            "cyber_essentials": {
+                "self_assessment": "ce-self-assessment.html",
+                "review_console": "ce-review-console.html",
+                "evaluation_metrics": "ce-evaluation.html",
+                "paper_tables_markdown": "data/cris_sme_ce_paper_tables.md",
+                "chart_data": "data/cris_sme_ce_chart_data.json",
+            },
             "data_bundle": [
                 "data/cris_sme_dashboard_payload.json",
                 "data/cris_sme_report.json",
                 "data/cris_sme_selective_disclosure.json",
                 "data/cris_sme_summary.txt",
+                "data/cris_sme_ce_self_assessment.json",
+                "data/cris_sme_ce_review_console.json",
+                "data/cris_sme_ce_evaluation_metrics.json",
+                "data/cris_sme_ce_paper_tables.md",
+                "data/cris_sme_ce_chart_data.json",
                 "data/build-metadata.json",
             ],
             "figure_asset_dir": "assets/figures",
@@ -357,6 +417,11 @@ def _build_index_html(manifest: dict[str, object]) -> str:
             <h2>Technical HTML Report</h2>
             <p>Deterministic control outcomes, evidence-backed findings, and compliance mapping details.</p>
             <a class="link" href="./report.html">Open Report</a>
+          </article>
+          <article class="card">
+            <h2>Cyber Essentials Workflow</h2>
+            <p>Question-level CE pre-population, human review, evaluation metrics, and paper-ready evidence tables.</p>
+            <a class="link" href="./demo/#ce-workflow">Open CE Workflow</a>
           </article>
           <article class="card">
             <h2>Machine-Readable Data</h2>

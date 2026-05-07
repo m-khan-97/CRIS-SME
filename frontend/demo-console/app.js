@@ -2,6 +2,10 @@ const state = {
   dashboard: null,
   report: null,
   disclosure: null,
+  ceAssessment: null,
+  ceReview: null,
+  ceMetrics: null,
+  cePaperTables: "",
   findings: [],
   filteredFindings: [],
   selectedFindingId: null,
@@ -14,12 +18,20 @@ const DATA_PATHS = {
   dashboard: "../data/cris_sme_dashboard_payload.json",
   report: "../data/cris_sme_report.json",
   disclosure: "../data/cris_sme_selective_disclosure.json",
+  ceAssessment: "../data/cris_sme_ce_self_assessment.json",
+  ceReview: "../data/cris_sme_ce_review_console.json",
+  ceMetrics: "../data/cris_sme_ce_evaluation_metrics.json",
+  cePaperTables: "../data/cris_sme_ce_paper_tables.md",
 };
 
 const fallbackPaths = {
   dashboard: "../../outputs/reports/cris_sme_dashboard_payload.json",
   report: "../../outputs/reports/cris_sme_report.json",
   disclosure: "../../outputs/reports/cris_sme_selective_disclosure.json",
+  ceAssessment: "../../outputs/reports/cris_sme_ce_self_assessment.json",
+  ceReview: "../../outputs/reports/cris_sme_ce_review_console.json",
+  ceMetrics: "../../outputs/reports/cris_sme_ce_evaluation_metrics.json",
+  cePaperTables: "../../outputs/reports/cris_sme_ce_paper_tables.md",
 };
 
 document.addEventListener("DOMContentLoaded", async () => {
@@ -30,14 +42,22 @@ document.addEventListener("DOMContentLoaded", async () => {
 });
 
 async function loadData() {
-  const [dashboard, report, disclosure] = await Promise.all([
+  const [dashboard, report, disclosure, ceAssessment, ceReview, ceMetrics, cePaperTables] = await Promise.all([
     fetchJson("dashboard"),
     fetchJson("report"),
     fetchJson("disclosure"),
+    fetchJson("ceAssessment"),
+    fetchJson("ceReview"),
+    fetchJson("ceMetrics"),
+    fetchText("cePaperTables"),
   ]);
   state.dashboard = dashboard;
   state.report = report;
   state.disclosure = disclosure;
+  state.ceAssessment = ceAssessment;
+  state.ceReview = ceReview;
+  state.ceMetrics = ceMetrics;
+  state.cePaperTables = cePaperTables;
   state.findings = dashboard?.finding_explorer?.findings || report?.prioritized_risks || [];
   state.filteredFindings = state.findings;
   state.selectedFindingId = state.findings[0]?.finding_id || null;
@@ -55,6 +75,18 @@ async function fetchJson(key) {
   return {};
 }
 
+async function fetchText(key) {
+  for (const path of [DATA_PATHS[key], fallbackPaths[key]]) {
+    try {
+      const response = await fetch(path, { cache: "no-store" });
+      if (response.ok) return response.text();
+    } catch {
+      continue;
+    }
+  }
+  return "";
+}
+
 function hydrate() {
   renderOverview();
   renderPriorityFilter();
@@ -62,6 +94,7 @@ function hydrate() {
   renderFindingDetail();
   renderProvenance();
   renderAssurance();
+  renderCeWorkflow();
   renderDisclosureTabs();
   renderDisclosure();
   renderRemediation();
@@ -75,8 +108,13 @@ function wireNavigation() {
       document.querySelectorAll(".view").forEach((item) => item.classList.remove("active"));
       button.classList.add("active");
       document.querySelector(`#view-${view}`)?.classList.add("active");
+      history.replaceState(null, "", `#${view}`);
     });
   });
+  const initialView = window.location.hash.replace("#", "");
+  if (initialView) {
+    document.querySelector(`.nav-item[data-view="${CSS.escape(initialView)}"]`)?.click();
+  }
 }
 
 function wireSearch() {
@@ -296,6 +334,67 @@ function renderAssurance() {
   `).join(""));
 }
 
+function renderCeWorkflow() {
+  const metrics = state.ceMetrics || {};
+  const observability = metrics.observability_metrics || {};
+  const review = metrics.review_metrics || {};
+  const questionSet = metrics.question_set || {};
+  const gapTaxonomy = metrics.evidence_gap_taxonomy || {};
+  const tables = metrics.paper_tables || {};
+  const headlineMetrics = [
+    ["Question set", `${questionSet.name || "CE"} ${questionSet.version || ""}`.trim(), `requirements ${questionSet.requirements_version || "unknown"}`],
+    ["Mapped entries", metrics.question_count || 0, `${metrics.technical_question_count || 0} technical-control entries`],
+    ["Cloud observable", `${fmtNumber(observability.cloud_supported_rate)}%`, `${observability.cloud_supported_count || 0} total entries`],
+    ["Technical observable", `${fmtNumber(observability.technical_cloud_supported_rate)}%`, `${observability.technical_cloud_supported_count || 0} technical entries`],
+    ["Review state", `${review.pending_count || 0} pending`, `${review.reviewed_count || 0} reviewed entries`],
+    ["Agreement", `${fmtNumber(review.agreement_rate)}%`, `${review.agreement_count || 0} of ${review.agreement_evaluable_count || 0} evaluable`],
+  ];
+  html("#ce-metrics", headlineMetrics.map(metricCard).join(""));
+
+  const observabilityRows = tables.observability_by_evidence_class || [];
+  html("#ce-observability-bars", observabilityRows.map((row) => `
+    <div class="bar-row">
+      <strong>${escapeHtml(labelize(row.label))}</strong>
+      <div class="bar-track"><div class="bar-fill" style="width:${clamp(row.rate)}%"></div></div>
+      <span>${fmtNumber(row.count)}</span>
+    </div>
+  `).join(""));
+
+  html("#ce-gap-list", Object.entries(gapTaxonomy).map(([key, detail]) => `
+    <article class="risk-item">
+      <span class="pill">${escapeHtml(fmtNumber(detail.rate))}%</span>
+      <div>
+        <strong>${escapeHtml(labelize(key))}</strong>
+        <p>${escapeHtml(detail.description || "Evidence gap")}</p>
+      </div>
+      <strong>${escapeHtml(detail.count || 0)}</strong>
+    </article>
+  `).join(""));
+
+  const reviewRows = tables.review_outcomes || [];
+  html("#ce-review-bars", reviewRows.map((row) => `
+    <div class="bar-row">
+      <strong>${escapeHtml(labelize(row.label))}</strong>
+      <div class="bar-track"><div class="bar-fill" style="width:${clamp(row.rate)}%"></div></div>
+      <span>${fmtNumber(row.count)}</span>
+    </div>
+  `).join(""));
+
+  const controls = metrics.top_controls_causing_ce_answer_failures || tables.control_failure_contribution || [];
+  html("#ce-control-list", controls.slice(0, 8).map((control) => `
+    <article class="risk-item">
+      <span class="pill high">${escapeHtml(control.control_id || "control")}</span>
+      <div>
+        <strong>${escapeHtml(control.affected_question_count || 0)} affected questions</strong>
+        <p>${escapeHtml((control.sample_finding_titles || []).join("; ") || "Mapped CE answer impact")}</p>
+      </div>
+      <strong>${fmtNumber(control.max_linked_score)}</strong>
+    </article>
+  `).join(""));
+
+  html("#ce-paper-preview", renderPaperPreview(state.cePaperTables));
+}
+
 function renderDisclosureTabs() {
   const rooms = state.disclosure?.rooms || [];
   html("#disclosure-tabs", rooms.map((room) => `
@@ -400,6 +499,16 @@ function metricCard([label, value, note]) {
       <p>${escapeHtml(note)}</p>
     </article>
   `;
+}
+
+function renderPaperPreview(markdown) {
+  if (!markdown) return '<p class="muted">Paper tables are not available in this bundle.</p>';
+  const lines = markdown.split("\n").slice(0, 42);
+  return `<pre>${escapeHtml(lines.join("\n"))}</pre>`;
+}
+
+function labelize(value) {
+  return String(value || "").replaceAll("_", " ");
 }
 
 function nodeType(node) {

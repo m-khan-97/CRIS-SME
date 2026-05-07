@@ -7,6 +7,66 @@ This document captures a real CRIS-SME assessment run against an authenticated A
 
 ## May 2026 Controlled Live-Lab Validation
 
+## May 7, 2026 Live Azure CE Evidence Run
+
+On May 7, 2026, CRIS-SME was run in live Azure collector mode specifically to validate the Cyber Essentials workflow against the authenticated subscription rather than mock evidence.
+
+Run context:
+
+- subscription: `Azure for Students`
+- tenant: `Ulster University`
+- collector mode: `azure`
+- collector path: `azure_sdk_subscription_inventory`
+- dataset source type: `live_subscription`
+- authorization basis: `authorized_subscription_owner`
+- dataset use: `ce_evidence_validation`
+
+Headline live results:
+
+- overall risk score: `27.81/100`
+- non-compliant findings: `15`
+- IAM score: `32.51`
+- Network score: `0.00`
+- Data score: `38.44`
+- Monitoring/Logging score: `36.38`
+- Compute/Workloads score: `38.29`
+- Cost/Governance Hygiene score: `27.11`
+
+Collector coverage:
+
+- observed: `azure_role_assignments_and_graph`
+- observed: `azure_network_cli_inventory`
+- observed: `default_no_storage_inventory`
+- observed: `azure_monitor_cli_inventory`
+- observed: `azure_compute_inventory_no_vms`
+- observed: `azure_resource_inventory`
+- partial: `tenant_identity_controls`
+- unavailable: `conditional_access_tenant_scope`
+
+Cyber Essentials workflow outputs from this live run:
+
+- mapped CE entries: `106`
+- technical-control entries: `62`
+- cloud-supported entries: `28` (`26.42%`)
+- technical cloud-supported entries: `22` (`35.48%`)
+- entries requiring non-cloud evidence: `78`
+- endpoint-required entries: `24`
+- policy-required entries: `19`
+- manual-required entries: `35`
+- review state: `106` pending, because no human reviewer ledger has been completed yet
+
+The live CE run confirms that the CE workflow is independent of mock fixtures: CRIS-SME generated the answer pack, review console, evaluation metrics, paper tables, and frontend demo artifacts from live Azure control-plane evidence. It also preserved the key research boundary: Conditional Access remained unavailable from the current evidence scope and was represented as an observability limitation rather than assumed compliance.
+
+Generated CE artifacts:
+
+- [cris_sme_ce_self_assessment.json](../outputs/reports/cris_sme_ce_self_assessment.json)
+- [cris_sme_ce_review_console.json](../outputs/reports/cris_sme_ce_review_console.json)
+- [cris_sme_ce_evaluation_metrics.json](../outputs/reports/cris_sme_ce_evaluation_metrics.json)
+- [cris_sme_ce_paper_tables.md](../outputs/reports/cris_sme_ce_paper_tables.md)
+- [cris_sme_ce_chart_data.json](../outputs/reports/cris_sme_ce_chart_data.json)
+
+## Earlier Controlled Live-Lab Validation
+
 On May 5, 2026, CRIS-SME was validated against a controlled Azure lab created inside the authenticated `Azure for Students` subscription. This was not a mock run and did not use unauthorized infrastructure. The lab was created deliberately to exercise live evidence paths for public administration exposure, permissive network rules, storage exposure, provider inventory, RBOM verification, and frontend demo refresh.
 
 The lab was created in an allowed subscription region because the subscription policy restricted deployments to selected regions. CRIS-SME used `germanywestcentral` for the live resources.

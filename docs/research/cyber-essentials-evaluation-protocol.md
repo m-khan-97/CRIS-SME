@@ -1,0 +1,267 @@
+# Cyber Essentials Evaluation Protocol
+
+This protocol defines how to evaluate the CRIS-SME Cyber Essentials workflow without overclaiming certification automation.
+
+## Evaluation Boundary
+
+CRIS-SME is evaluated as a pre-population and evidence support system.
+
+It must not be described as:
+
+- a Cyber Essentials certifier
+- an automated certification submission system
+- a replacement for a human applicant or assessor
+
+It may be described as:
+
+- a deterministic evidence-preparation tool
+- a question-level pre-population workflow
+- an evidence sufficiency classifier
+- a human-review ledger for Cyber Essentials preparation
+
+## Required Inputs
+
+For each evaluation tenant or lab:
+
+1. CRIS-SME report JSON.
+2. CE self-assessment answer pack.
+3. CE review console ledger.
+4. CE evaluation metrics pack.
+5. CE paper tables export.
+6. Authorization statement for live environments.
+
+Required generated files:
+
+- `cris_sme_report.json`
+- `cris_sme_ce_self_assessment.json`
+- `cris_sme_ce_review_console.json`
+- `cris_sme_ce_evaluation_metrics.json`
+- `cris_sme_ce_paper_tables.md`
+- `cris_sme_ce_chart_data.json`
+
+## Dataset Classes
+
+### Synthetic Baseline
+
+Purpose:
+Exercise all deterministic reporting paths with stable mock evidence.
+
+Minimum acceptance:
+
+- pipeline completes
+- CE answer pack generated
+- review console generated
+- metrics generated
+- paper tables generated
+
+### Controlled Live Azure Subscription
+
+Purpose:
+Validate that the CE workflow operates on live Azure control-plane evidence.
+
+Minimum acceptance:
+
+- authenticated Azure collector run completes
+- collector mode is `azure`
+- generated report includes CE artifacts
+- evidence sufficiency boundaries are visible
+- no unauthorized resources are accessed
+
+### Vulnerable Lab
+
+Purpose:
+Stress known evidence paths with intentionally weak posture.
+
+Minimum acceptance:
+
+- lab is owned or explicitly authorized
+- lab evidence is labelled as vulnerable lab
+- findings are not generalized as normal SME posture
+- resources are removed after validation if they incur cost or exposure
+
+### Real SME Tenant
+
+Purpose:
+Measure reviewer agreement and practical evidence retrieval value.
+
+Minimum acceptance:
+
+- written authorization exists
+- no raw sensitive identifiers are published
+- reviewer decisions are exported from the CE review console
+- tenant is anonymized in paper results
+
+## Reviewer Workflow
+
+For each CE entry, reviewer records one of:
+
+- `accepted`
+- `overridden`
+- `needs_evidence`
+- `pending`
+
+Reviewer should complete:
+
+- final status
+- reviewer note
+- evidence reference if external evidence is used
+- override reason if the CRIS-SME proposed status is changed
+
+Pending entries must remain pending. Do not force a final answer where evidence is incomplete.
+
+## Metrics
+
+### Observability Metrics
+
+Report:
+
+- total mapped entries
+- technical-control entries
+- direct cloud count
+- inferred cloud count
+- total cloud-supported count
+- total cloud-supported rate
+- technical cloud-supported count
+- technical cloud-supported rate
+- non-cloud evidence required count
+
+### Evidence Gap Metrics
+
+Report:
+
+- endpoint-required count and rate
+- policy-required count and rate
+- manual-required count and rate
+- not-observable count and rate
+- sample question IDs per gap class
+
+### Review Metrics
+
+Report:
+
+- reviewed count
+- reviewed rate
+- accepted count
+- override count
+- needs-evidence count
+- pending count
+- agreement evaluable count
+- agreement count
+- agreement rate
+
+Agreement denominator:
+Only `accepted` and `overridden` entries are agreement-evaluable.
+
+`needs_evidence` entries are not disagreement. They are evidence gaps.
+
+`pending` entries are not evaluated.
+
+### Control Contribution Metrics
+
+Report:
+
+- top CRIS-SME controls contributing to CE answer-impact findings
+- affected question count
+- max linked score
+- sample finding titles
+
+This metric should be interpreted as answer-impact contribution, not as official CE failure count.
+
+## Agreement Coding
+
+Accepted:
+Reviewer final status matches CRIS-SME proposed status.
+
+Overridden:
+Reviewer final status differs from CRIS-SME proposed status.
+
+Needs evidence:
+Reviewer could not validate the entry without additional evidence.
+
+Pending:
+No review decision has been made.
+
+Agreement rate:
+
+`accepted / (accepted + overridden) * 100`
+
+The generated metrics pack computes this over accepted and overridden entries by comparing `final_status` with `proposed_status`.
+
+## Evidence Retrieval Study Option
+
+If measuring time saved, avoid measuring total CE questionnaire completion time. That depends heavily on participant familiarity.
+
+Measure evidence retrieval time instead:
+
+1. Select a fixed set of CE entries.
+2. Ask reviewer to locate supporting evidence manually.
+3. Ask reviewer to locate supporting evidence using CRIS-SME.
+4. Record time to evidence reference.
+5. Record whether reviewer accepted, overrode, or requested more evidence.
+
+Suggested measures:
+
+- median manual evidence retrieval time
+- median CRIS-SME-assisted retrieval time
+- number of evidence references found
+- reviewer confidence score
+- override rate
+
+## Reporting Rules
+
+Use absolute counts and percentages together.
+
+Good:
+`22 of 62 technical-control entries were cloud-supported (35.48%).`
+
+Avoid:
+`CRIS-SME automates 35.48% of Cyber Essentials.`
+
+Use:
+`cloud-supported`, `pre-populated`, `human-reviewable`, `evidence gap`.
+
+Avoid:
+`certified`, `passed`, `compliant`, unless a qualified certifying authority has made that decision.
+
+## Reproducibility Steps
+
+Run baseline:
+
+```bash
+PYTHONPATH=src python3 -m cris_sme.main
+```
+
+Build static site:
+
+```bash
+python3 scripts/build_pages_site.py --reports-dir outputs/reports --figures-dir outputs/figures --dist-dir dist
+```
+
+Open demo:
+
+```bash
+python3 -m http.server 8000 --directory dist/site
+```
+
+Then visit:
+
+`http://127.0.0.1:8000/demo/#ce-workflow`
+
+## Ethics And Data Handling
+
+Do not publish raw tenant identifiers, subscription IDs, user names, IP addresses, resource group names, storage account names, or internal hostnames from real tenants.
+
+Use selective disclosure and redacted evidence artifacts for sharing.
+
+Keep raw live reports local unless there is explicit permission to publish them.
+
+## Completion Criteria
+
+An evaluation run is complete when:
+
+- CRIS-SME pipeline exits successfully
+- all CE artifacts exist
+- review console is opened and reviewed or explicitly marked as pre-review baseline
+- paper tables export exists
+- metrics are recorded in the evaluation log
+- limitations are documented
