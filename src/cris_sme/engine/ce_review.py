@@ -103,8 +103,10 @@ def _build_review_entry(
     decision: dict[str, Any],
 ) -> dict[str, Any]:
     proposed_status = str(answer.get("proposed_status", "manual_required"))
+    proposed_answer = str(answer.get("proposed_answer", "Cannot determine"))
     decision_state = _review_state(decision)
     final_status = _final_status(proposed_status, decision_state, decision)
+    final_answer = _final_answer(proposed_answer, decision_state, decision)
 
     return {
         "question_id": str(answer.get("question_id", "unknown")),
@@ -112,6 +114,8 @@ def _build_review_entry(
         "short_paraphrase": str(answer.get("short_paraphrase", "")),
         "evidence_class": str(answer.get("evidence_class", "manual_required")),
         "proposed_status": proposed_status,
+        "proposed_answer": proposed_answer,
+        "answer_basis": str(answer.get("answer_basis", "")),
         "supporting_control_ids": list(answer.get("supporting_control_ids", [])),
         "linked_findings": list(answer.get("linked_findings", [])),
         "evidence": list(answer.get("evidence", [])),
@@ -122,6 +126,7 @@ def _build_review_entry(
         "review_decision": {
             "state": decision_state,
             "final_status": final_status,
+            "final_answer": final_answer,
             "reviewer": _clean_text(decision.get("reviewer")),
             "reviewed_at": _clean_text(decision.get("reviewed_at")),
             "reviewer_note": _clean_text(decision.get("reviewer_note")),
@@ -152,6 +157,21 @@ def _final_status(
     if decision_state == "overridden":
         override = _clean_text(decision.get("final_status"))
         return override or "manual_override"
+    return "pending_human_review"
+
+
+def _final_answer(
+    proposed_answer: str,
+    decision_state: str,
+    decision: dict[str, Any],
+) -> str:
+    if decision_state == "accepted":
+        return proposed_answer
+    if decision_state == "needs_evidence":
+        return "Cannot determine"
+    if decision_state == "overridden":
+        override = _clean_text(decision.get("final_answer"))
+        return override or "Cannot determine"
     return "pending_human_review"
 
 

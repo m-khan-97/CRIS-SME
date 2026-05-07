@@ -91,6 +91,8 @@ def build_ce_evaluation_metrics_html(metrics: dict[str, Any]) -> str:
         <h2>Paper Tables</h2>
         {_table("Observability By Evidence Class", paper_tables.get("observability_by_evidence_class", []))}
         {_table("Technical Observability", paper_tables.get("technical_observability_by_evidence_class", []))}
+        {_table("Proposed Answers", paper_tables.get("proposed_answers", []))}
+        {_table("Final Reviewer Answers", paper_tables.get("final_answers", []))}
         {_table("Section Coverage", paper_tables.get("section_coverage", []))}
         {_table("Review Outcomes", paper_tables.get("review_outcomes", []))}
         {_table("Control Failure Contribution", paper_tables.get("control_failure_contribution", []))}

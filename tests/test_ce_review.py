@@ -26,6 +26,7 @@ def test_build_ce_review_console_defaults_entries_to_pending() -> None:
     first_entry = console["entries"][0]
     assert first_entry["review_decision"]["state"] == "pending"
     assert first_entry["review_decision"]["final_status"] == "pending_human_review"
+    assert first_entry["review_decision"]["final_answer"] == "pending_human_review"
     assert "never changes CRIS-SME risk scores" in console["deterministic_score_impact"]
 
 
@@ -67,6 +68,7 @@ def test_build_ce_review_console_applies_accept_and_override_decisions() -> None
             "Q2": {
                 "state": "overridden",
                 "final_status": "requires_policy_exception",
+                "final_answer": "No",
                 "reviewer_note": "Tenant has compensating control evidence.",
                 "override_reason": "External evidence reviewed.",
             },
@@ -79,8 +81,10 @@ def test_build_ce_review_console_applies_accept_and_override_decisions() -> None
     }
     assert decisions["Q1"]["state"] == "accepted"
     assert decisions["Q1"]["final_status"] == "supported_no_issue"
+    assert decisions["Q1"]["final_answer"] == "Yes"
     assert decisions["Q2"]["state"] == "overridden"
     assert decisions["Q2"]["final_status"] == "requires_policy_exception"
+    assert decisions["Q2"]["final_answer"] == "No"
     assert console["review_summary"]["review_state_counts"] == {
         "accepted": 1,
         "overridden": 1,
@@ -106,4 +110,5 @@ def test_ce_review_console_json_and_html_are_written(tmp_path) -> None:
     assert written_console["console_schema_version"] == "0.1.0"
     assert "Cyber Essentials Evidence Review Console" in html
     assert "Export Review Ledger" in html
+    assert "Final answer" in html
     assert html_path.read_text(encoding="utf-8") == html

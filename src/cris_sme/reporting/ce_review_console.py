@@ -230,6 +230,11 @@ def build_ce_review_console_html(console: dict[str, Any]) -> str:
         article.querySelectorAll("[data-review-field]").forEach((field) => {{
           decision[field.dataset.reviewField] = field.value;
         }});
+        if (decision.state === "accepted" && (!decision.final_answer || decision.final_answer === "pending_human_review")) {{
+          decision.final_answer = article.dataset.proposedAnswer || "Cannot determine";
+          const finalAnswer = article.querySelector("[data-review-field='final_answer']");
+          if (finalAnswer) finalAnswer.value = decision.final_answer;
+        }}
         saveDecision(article.dataset.questionId, decision);
         updateStatePill(article);
       }}
@@ -341,16 +346,18 @@ def _entry_html(entry: dict[str, Any]) -> str:
     planned = entry.get("planned_evidence_paths", [])
     controls = ", ".join(str(item) for item in entry.get("supporting_control_ids", []))
     return f"""
-        <article class="entry" data-question-id="{escape(str(entry.get("question_id", "unknown")))}">
+        <article class="entry" data-question-id="{escape(str(entry.get("question_id", "unknown")))}" data-proposed-answer="{escape(str(entry.get("proposed_answer", "Cannot determine")))}">
           <div class="review-grid">
             <div>
               <h3>{escape(str(entry.get("question_id", "unknown")))}: {escape(str(entry.get("short_paraphrase", "")))}</h3>
               <div class="meta">
                 <span class="pill">{escape(str(entry.get("evidence_class", "unknown")))}</span>
                 <span class="pill status-{escape(status)}">{escape(status)}</span>
+                <span class="pill">answer: {escape(str(entry.get("proposed_answer", "Cannot determine")))}</span>
                 <span class="pill" data-review-state-pill>{escape(state)}</span>
                 <span class="pill">controls: {escape(controls or "none")}</span>
               </div>
+              <p><strong>Proposed answer basis:</strong> {escape(str(entry.get("answer_basis", "")))}</p>
               <p class="muted">{escape(str(entry.get("caveat", "")))}</p>
               <details>
                 <summary>Linked findings</summary>
@@ -368,6 +375,7 @@ def _entry_html(entry: dict[str, Any]) -> str:
             <div class="review-fields">
               {_select("Review decision", "state", state, ["pending", "accepted", "overridden", "needs_evidence"])}
               {_input("Final status", "final_status", decision.get("final_status", ""))}
+              {_select("Final answer", "final_answer", decision.get("final_answer", "pending_human_review"), ["pending_human_review", "Yes", "No", "Cannot determine"])}
               {_input("Reviewer", "reviewer", decision.get("reviewer", ""))}
               {_input("Evidence reference", "additional_evidence_reference", decision.get("additional_evidence_reference", ""))}
               {_textarea("Reviewer note", "reviewer_note", decision.get("reviewer_note", ""))}

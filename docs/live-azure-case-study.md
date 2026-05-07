@@ -50,6 +50,9 @@ Cyber Essentials workflow outputs from this live run:
 - cloud-supported entries: `28` (`26.42%`)
 - technical cloud-supported entries: `22` (`35.48%`)
 - entries requiring non-cloud evidence: `78`
+- proposed CE answer `Yes`: `13`
+- proposed CE answer `No`: `15`
+- proposed CE answer `Cannot determine`: `78`
 - endpoint-required entries: `24`
 - policy-required entries: `19`
 - manual-required entries: `35`

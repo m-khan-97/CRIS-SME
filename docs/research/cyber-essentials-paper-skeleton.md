@@ -15,7 +15,7 @@ The defensible contribution is:
 
 Cyber Essentials is a widely used UK baseline security scheme, but SMEs often complete the self-assessment manually despite already operating cloud environments that contain relevant control-plane evidence. Existing cloud security tools report technical misconfigurations or framework-level compliance mappings, but they do not produce question-level Cyber Essentials pre-population with explicit evidence sufficiency boundaries.
 
-This paper presents CRIS-SME, a deterministic cloud risk decision engine extended with a Cyber Essentials pre-assessment workflow. CRIS-SME maps paraphrased Cyber Essentials questions to cloud control evidence, classifies each question as directly cloud-observable, inferred from cloud posture, endpoint-required, policy-required, or manual-required, and emits a human-reviewable answer pack. A review console records accepted answers, overrides, evidence requests, and reviewer notes without changing deterministic risk scores. An evaluation metrics pack reports observability, evidence gaps, review outcomes, and agreement rates.
+This paper presents CRIS-SME, a deterministic cloud risk decision engine extended with a Cyber Essentials pre-assessment workflow. CRIS-SME maps paraphrased Cyber Essentials questions to cloud control evidence, classifies each question as directly cloud-observable, inferred from cloud posture, endpoint-required, policy-required, or manual-required, and emits a human-reviewable answer pack with an explicit proposed answer of `Yes`, `No`, or `Cannot determine`. A review console records accepted answers, overrides, evidence requests, and reviewer notes without changing deterministic risk scores. An evaluation metrics pack reports observability, evidence gaps, review outcomes, and agreement rates.
 
 In the current Azure-first implementation, CRIS-SME maps 106 Cyber Essentials preparation entries, including 62 technical-control entries. From cloud control-plane evidence alone, 28 entries are cloud-supported overall and 22 technical entries are cloud-supported. The remaining entries are explicitly classified as endpoint, policy, or manual evidence gaps rather than silently inferred. These results show that cloud telemetry can materially reduce CE evidence retrieval work while preserving human accountability and certification boundaries.
 
@@ -45,9 +45,10 @@ The CE workflow is a downstream layer:
 
 1. `data/ce_question_mapping.json` defines paraphrased CE entries and evidence classes.
 2. `build_ce_self_assessment_pack()` links mapped entries to CRIS-SME findings.
-3. `build_ce_review_console()` creates a human-verification ledger.
-4. `build_ce_evaluation_metrics()` calculates observability and review metrics.
-5. `write_ce_paper_exports()` emits manuscript-ready Markdown, CSV, and chart JSON artifacts.
+3. `build_ce_self_assessment_pack()` proposes `Yes`, `No`, or `Cannot determine` for each entry.
+4. `build_ce_review_console()` creates a human-verification ledger.
+5. `build_ce_evaluation_metrics()` calculates observability and review metrics.
+6. `write_ce_paper_exports()` emits manuscript-ready Markdown, CSV, and chart JSON artifacts.
 
 ## Method
 
@@ -64,6 +65,14 @@ Each mapped entry includes:
 - current CRIS-SME signals
 - planned evidence paths
 - human review requirement
+
+Each generated answer-pack entry additionally includes:
+
+- `proposed_status`: the evidence-support label, such as `supported_no_issue` or `supported_risk_found`
+- `proposed_answer`: the candidate CE answer, one of `Yes`, `No`, or `Cannot determine`
+- `answer_basis`: a short explanation of why that candidate answer was generated
+
+For direct or inferred cloud entries, `supported_no_issue` maps to candidate answer `Yes` and `supported_risk_found` maps to candidate answer `No`. These are candidate answers only; they remain subject to human verification.
 
 The mapping intentionally paraphrases the official preparation questions and does not reproduce full IASME wording.
 
@@ -126,6 +135,7 @@ Primary metrics:
 - reviewer override count
 - needs-evidence count
 - agreement rate over accepted and overridden entries
+- proposed answer counts: Yes, No, Cannot determine
 
 Secondary metrics:
 
@@ -142,6 +152,9 @@ Generated from the current CRIS-SME pipeline:
 - cloud-supported entries: `28` (`26.42%`)
 - technical cloud-supported entries: `22` (`35.48%`)
 - non-cloud evidence required: `78`
+- proposed answer Yes: `13`
+- proposed answer No: `15`
+- proposed answer Cannot determine: `78`
 
 Evidence gap counts:
 

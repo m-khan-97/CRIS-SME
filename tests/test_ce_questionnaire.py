@@ -49,6 +49,8 @@ def test_build_ce_self_assessment_pack_links_cloud_questions_to_risks() -> None:
         answer for answer in pack["answers"] if answer["question_id"] == "A4.9"
     )
     assert firewall_admin["proposed_status"] == "supported_risk_found"
+    assert firewall_admin["proposed_answer"] == "No"
+    assert "candidate CE answer is No" in firewall_admin["answer_basis"]
     assert firewall_admin["linked_findings"][0]["finding_id"] == "fdg_net_001"
     assert "SSH" in firewall_admin["evidence"][0]
 
@@ -56,6 +58,7 @@ def test_build_ce_self_assessment_pack_links_cloud_questions_to_risks() -> None:
         answer for answer in pack["answers"] if answer["question_id"] == "A8.1"
     )
     assert endpoint_answer["proposed_status"] == "endpoint_required"
+    assert endpoint_answer["proposed_answer"] == "Cannot determine"
     assert endpoint_answer["human_review_required"] is True
 
 
@@ -81,6 +84,7 @@ def test_build_ce_self_assessment_pack_marks_cloud_no_issue_when_no_linked_risk(
     pack = build_ce_self_assessment_pack({"prioritized_risks": []}, mapping=mapping)
 
     assert pack["answers"][0]["proposed_status"] == "supported_no_issue"
+    assert pack["answers"][0]["proposed_answer"] == "Yes"
     assert pack["answers"][0]["linked_findings"] == []
 
 
@@ -109,4 +113,3 @@ def test_load_ce_question_mapping_reads_default_dataset() -> None:
 
     assert mapping["question_set"]["name"] == "Danzell"
     assert len(mapping["questions"]) == 106
-

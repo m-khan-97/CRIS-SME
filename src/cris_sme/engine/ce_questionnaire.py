@@ -42,6 +42,7 @@ def build_ce_self_assessment_pack(
     ]
     evidence_counts = Counter(str(answer["evidence_class"]) for answer in answers)
     status_counts = Counter(str(answer["proposed_status"]) for answer in answers)
+    answer_counts = Counter(str(answer["proposed_answer"]) for answer in answers)
     section_counts = Counter(str(answer["section"]) for answer in answers)
     technical_answers = [
         answer for answer in answers if answer.get("research_scope") == "technical_control"
@@ -65,6 +66,7 @@ def build_ce_self_assessment_pack(
         "coverage_summary": {
             "evidence_class_counts": dict(sorted(evidence_counts.items())),
             "proposed_status_counts": dict(sorted(status_counts.items())),
+            "proposed_answer_counts": dict(sorted(answer_counts.items())),
             "section_counts": dict(sorted(section_counts.items())),
             "technical_evidence_class_counts": dict(sorted(technical_counts.items())),
             "cloud_supported_count": sum(
@@ -117,6 +119,7 @@ def _build_answer_entry(
     ]
     evidence_class = str(question.get("evidence_class", "manual_required"))
     proposed_status = _proposed_status(evidence_class, control_ids, linked_risks)
+    proposed_answer = _proposed_answer(evidence_class, control_ids, linked_risks)
 
     return {
         "question_id": str(question.get("question_id", "unknown")),
@@ -125,6 +128,8 @@ def _build_answer_entry(
         "short_paraphrase": str(question.get("short_paraphrase", "")),
         "evidence_class": evidence_class,
         "proposed_status": proposed_status,
+        "proposed_answer": proposed_answer,
+        "answer_basis": _answer_basis(evidence_class, proposed_status, proposed_answer),
         "supporting_control_ids": control_ids,
         "linked_findings": [_compact_risk(risk) for risk in linked_risks],
         "evidence": _evidence_snippets(linked_risks),
@@ -155,6 +160,43 @@ def _proposed_status(
             return "supported_no_issue"
         return "insufficient_evidence"
     return "manual_required"
+
+
+def _proposed_answer(
+    evidence_class: str,
+    control_ids: list[str],
+    linked_risks: list[dict[str, Any]],
+) -> str:
+    if evidence_class in {"direct_cloud", "inferred_cloud"}:
+        if linked_risks:
+            return "No"
+        if control_ids:
+            return "Yes"
+    return "Cannot determine"
+
+
+def _answer_basis(
+    evidence_class: str,
+    proposed_status: str,
+    proposed_answer: str,
+) -> str:
+    if proposed_answer == "No":
+        return (
+            "A mapped CRIS-SME risk finding is present, so the candidate CE answer "
+            "is No pending human verification."
+        )
+    if proposed_answer == "Yes":
+        return (
+            "No mapped CRIS-SME risk finding is currently present, so the candidate "
+            "CE answer is Yes pending human verification."
+        )
+    if evidence_class == "endpoint_required":
+        return "No CE Yes/No answer is proposed because endpoint evidence is required."
+    if evidence_class == "policy_required":
+        return "No CE Yes/No answer is proposed because policy or process evidence is required."
+    if proposed_status == "insufficient_evidence":
+        return "No CE Yes/No answer is proposed because current evidence is insufficient."
+    return "No CE Yes/No answer is proposed because human context is required."
 
 
 def _risks_by_control(report: dict[str, Any]) -> dict[str, list[dict[str, Any]]]:
@@ -224,4 +266,3 @@ def _caveat(evidence_class: str, proposed_status: str) -> str:
             "attestation."
         )
     return "Current CRIS-SME evidence is insufficient for pre-populating this entry."
-

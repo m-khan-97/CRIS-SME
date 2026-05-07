@@ -93,6 +93,17 @@ Minimum acceptance:
 
 ## Reviewer Workflow
 
+For each CE entry, CRIS-SME now emits both:
+
+- `proposed_status`: evidence-support label, such as `supported_no_issue`, `supported_risk_found`, or `endpoint_required`
+- `proposed_answer`: candidate CE answer: `Yes`, `No`, or `Cannot determine`
+
+For direct and inferred cloud entries:
+
+- mapped risk finding present -> proposed answer `No`
+- mapped controls present with no CRIS-SME risk finding -> proposed answer `Yes`
+- insufficient current evidence -> proposed answer `Cannot determine`
+
 For each CE entry, reviewer records one of:
 
 - `accepted`
@@ -102,10 +113,11 @@ For each CE entry, reviewer records one of:
 
 Reviewer should complete:
 
+- final answer
 - final status
 - reviewer note
 - evidence reference if external evidence is used
-- override reason if the CRIS-SME proposed status is changed
+- override reason if the CRIS-SME proposed answer or proposed status is changed
 
 Pending entries must remain pending. Do not force a final answer where evidence is incomplete.
 
@@ -148,6 +160,8 @@ Report:
 - agreement evaluable count
 - agreement count
 - agreement rate
+- proposed answer counts
+- final answer counts
 
 Agreement denominator:
 Only `accepted` and `overridden` entries are agreement-evaluable.
@@ -170,10 +184,10 @@ This metric should be interpreted as answer-impact contribution, not as official
 ## Agreement Coding
 
 Accepted:
-Reviewer final status matches CRIS-SME proposed status.
+Reviewer final answer matches CRIS-SME proposed answer.
 
 Overridden:
-Reviewer final status differs from CRIS-SME proposed status.
+Reviewer final answer differs from CRIS-SME proposed answer.
 
 Needs evidence:
 Reviewer could not validate the entry without additional evidence.
@@ -183,9 +197,9 @@ No review decision has been made.
 
 Agreement rate:
 
-`accepted / (accepted + overridden) * 100`
+`matching final answers / (accepted + overridden) * 100`
 
-The generated metrics pack computes this over accepted and overridden entries by comparing `final_status` with `proposed_status`.
+The generated metrics pack computes this over accepted and overridden entries by comparing `final_answer` with `proposed_answer`.
 
 ## Evidence Retrieval Study Option
 

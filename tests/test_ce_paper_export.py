@@ -24,8 +24,9 @@ def test_build_ce_paper_tables_markdown_contains_all_manuscript_tables() -> None
     assert "## Table 2. Technical-Question Observability" in markdown
     assert "## Table 3. Evidence Gap Taxonomy" in markdown
     assert "## Table 4. Review Outcomes" in markdown
-    assert "## Table 5. Top Controls Contributing To CE Answer Failures" in markdown
-    assert "## Table 6. Section-Level Coverage" in markdown
+    assert "## Table 5. Proposed CE Answers" in markdown
+    assert "## Table 6. Top Controls Contributing To CE Answer Failures" in markdown
+    assert "## Table 7. Section-Level Coverage" in markdown
     assert "Cloud-supported entries: `28` (`26.42%`)" in markdown
 
 
@@ -36,6 +37,7 @@ def test_build_ce_chart_data_exposes_headline_and_series() -> None:
     assert chart_data["headline"]["question_count"] == 106
     assert chart_data["headline"]["cloud_supported_rate"] == 26.42
     assert "gap_taxonomy" in chart_data["series"]
+    assert "proposed_answers" in chart_data["series"]
     assert chart_data["series"]["technical_observability_by_evidence_class"]
 
 

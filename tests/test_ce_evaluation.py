@@ -30,6 +30,10 @@ def test_build_ce_evaluation_metrics_counts_observability_and_review() -> None:
     assert metrics["observability_metrics"]["technical_cloud_supported_rate"] == 35.48
     assert metrics["review_metrics"]["pending_count"] == 106
     assert metrics["review_metrics"]["agreement_rate"] == 0.0
+    assert metrics["status_counts"]["proposed_answer_counts"] == {
+        "Cannot determine": 78,
+        "Yes": 28,
+    }
     assert metrics["evidence_gap_taxonomy"]["endpoint_required"]["count"] == 24
     assert "never change CRIS-SME deterministic" in metrics["deterministic_score_impact"]
 
@@ -95,6 +99,7 @@ def test_build_ce_evaluation_metrics_calculates_reviewer_agreement() -> None:
             "Q2": {
                 "state": "overridden",
                 "final_status": "manual_override",
+                "final_answer": "No",
             },
             "Q3": {"state": "needs_evidence"},
         },
@@ -106,6 +111,7 @@ def test_build_ce_evaluation_metrics_calculates_reviewer_agreement() -> None:
     assert metrics["review_metrics"]["agreement_evaluable_count"] == 2
     assert metrics["review_metrics"]["agreement_count"] == 1
     assert metrics["review_metrics"]["agreement_rate"] == 50.0
+    assert "proposed_answer" in metrics["review_metrics"]["agreement_basis"]
     assert metrics["review_metrics"]["needs_evidence_count"] == 1
     assert metrics["top_controls_causing_ce_answer_failures"][0]["control_id"] == "NET-001"
     assert metrics["top_controls_causing_ce_answer_failures"][0]["affected_question_count"] == 1

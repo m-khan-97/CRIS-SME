@@ -138,6 +138,13 @@ def build_ce_self_assessment_html(pack: dict[str, Any]) -> str:
         </div>
       </section>
 
+      <section class="panel">
+        <h2>Proposed Answer</h2>
+        <div class="grid">
+          {_count_metrics(summary.get("proposed_answer_counts", {}))}
+        </div>
+      </section>
+
       {section_html}
 
       <footer>{escape(str(pack.get("deterministic_score_impact", "")))}</footer>
@@ -187,8 +194,10 @@ def _answer_html(answer: dict[str, Any]) -> str:
           <div class="meta">
             <span class="pill">{escape(str(answer.get("evidence_class", "unknown")))}</span>
             <span class="pill status-{escape(status)}">{escape(status)}</span>
+            <span class="pill">answer: {escape(str(answer.get("proposed_answer", "Cannot determine")))}</span>
             <span class="pill">controls: {escape(controls or "none")}</span>
           </div>
+          <p><strong>Answer basis:</strong> {escape(str(answer.get("answer_basis", "")))}</p>
           <p class="muted">{escape(str(answer.get("caveat", "")))}</p>
           <details>
             <summary>Linked findings</summary>
@@ -240,4 +249,3 @@ def _list_items(items: object, empty: str) -> str:
     if not values:
         values = [empty]
     return "".join(f"<li>{escape(value)}</li>" for value in values)
-

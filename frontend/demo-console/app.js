@@ -372,13 +372,23 @@ function renderCeWorkflow() {
   `).join(""));
 
   const reviewRows = tables.review_outcomes || [];
-  html("#ce-review-bars", reviewRows.map((row) => `
+  const answerRows = tables.proposed_answers || [];
+  html("#ce-review-bars", [
+    ...answerRows.map((row) => `
     <div class="bar-row">
-      <strong>${escapeHtml(labelize(row.label))}</strong>
+      <strong>Answer ${escapeHtml(row.label)}</strong>
       <div class="bar-track"><div class="bar-fill" style="width:${clamp(row.rate)}%"></div></div>
       <span>${fmtNumber(row.count)}</span>
     </div>
-  `).join(""));
+  `),
+    ...reviewRows.map((row) => `
+    <div class="bar-row">
+      <strong>Review ${escapeHtml(labelize(row.label))}</strong>
+      <div class="bar-track"><div class="bar-fill" style="width:${clamp(row.rate)}%"></div></div>
+      <span>${fmtNumber(row.count)}</span>
+    </div>
+  `),
+  ].join(""));
 
   const controls = metrics.top_controls_causing_ce_answer_failures || tables.control_failure_contribution || [];
   html("#ce-control-list", controls.slice(0, 8).map((control) => `

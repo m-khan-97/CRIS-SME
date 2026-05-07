@@ -44,6 +44,8 @@ def build_ce_evaluation_metrics(
 
     evidence_counts = Counter(str(item["evidence_class"]) for item in merged)
     proposed_counts = Counter(str(item["proposed_status"]) for item in merged)
+    answer_counts = Counter(str(item["proposed_answer"]) for item in merged)
+    final_answer_counts = Counter(str(item["final_answer"]) for item in merged)
     review_counts = Counter(str(item["review_state"]) for item in merged)
     section_counts = Counter(str(item["section"]) for item in merged)
     technical_items = [
@@ -63,7 +65,7 @@ def build_ce_evaluation_metrics(
     agreement_count = sum(
         1
         for item in agreement_items
-        if item.get("final_status") == item.get("proposed_status")
+        if item.get("final_answer") == item.get("proposed_answer")
     )
     cloud_supported_count = _count_evidence(merged, CLOUD_EVIDENCE_CLASSES)
     technical_cloud_supported_count = _count_evidence(
@@ -105,11 +107,17 @@ def build_ce_evaluation_metrics(
             "agreement_evaluable_count": len(agreement_items),
             "agreement_count": agreement_count,
             "agreement_rate": _rate(agreement_count, len(agreement_items)),
+            "agreement_basis": (
+                "Agreement compares reviewer final_answer with CRIS-SME proposed_answer "
+                "over accepted and overridden entries."
+            ),
         },
         "evidence_gap_taxonomy": _gap_taxonomy(merged),
         "status_counts": {
             "evidence_class_counts": dict(sorted(evidence_counts.items())),
             "proposed_status_counts": dict(sorted(proposed_counts.items())),
+            "proposed_answer_counts": dict(sorted(answer_counts.items())),
+            "final_answer_counts": dict(sorted(final_answer_counts.items())),
             "section_counts": dict(sorted(section_counts.items())),
             "technical_evidence_class_counts": dict(
                 sorted(technical_evidence_counts.items())
@@ -122,11 +130,13 @@ def build_ce_evaluation_metrics(
                 technical_evidence_counts
             ),
             "review_outcomes": _table_from_counts(review_counts),
+            "proposed_answers": _table_from_counts(answer_counts),
+            "final_answers": _table_from_counts(final_answer_counts),
             "section_coverage": _section_coverage(merged),
             "control_failure_contribution": _top_controls(merged, limit=12),
         },
         "evaluation_notes": [
-            "Agreement rate excludes pending entries and needs-evidence requests; those are reported separately.",
+            "Agreement rate compares proposed_answer to reviewer final_answer and excludes pending entries and needs-evidence requests.",
             "Cloud observability counts direct_cloud and inferred_cloud evidence classes only.",
             "Endpoint, policy, manual, and not-observable items are evidence gaps, not compliance failures by themselves.",
             "Metrics are derived from CRIS-SME artifacts and reviewer ledger states; they do not certify Cyber Essentials compliance.",
@@ -163,7 +173,9 @@ def _merge_answer_and_review(
         "research_scope": str(source.get("research_scope", "unknown")),
         "evidence_class": str(source.get("evidence_class", "manual_required")),
         "proposed_status": str(source.get("proposed_status", "manual_required")),
+        "proposed_answer": str(source.get("proposed_answer", "Cannot determine")),
         "final_status": str(decision.get("final_status", "pending_human_review")),
+        "final_answer": str(decision.get("final_answer", "pending_human_review")),
         "review_state": str(decision.get("state", "pending")),
         "supporting_control_ids": list(source.get("supporting_control_ids", [])),
         "linked_findings": list(source.get("linked_findings", [])),
