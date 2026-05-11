@@ -108,8 +108,11 @@ def test_draft_review_decisions_feed_evaluation_metrics() -> None:
     metrics = build_ce_evaluation_metrics(pack, console)
 
     assert metrics["review_metrics"]["reviewed_count"] == 28
-    assert metrics["review_metrics"]["agreement_evaluable_count"] == 5
-    assert metrics["review_metrics"]["agreement_rate"] == 100.0
+    assert metrics["review_metrics"]["agreement_evaluable_count"] == 0
+    assert metrics["review_metrics"]["agreement_rate"] == 0.0
+    assert metrics["review_metrics"]["draft_acceptance_evaluable_count"] == 5
+    assert metrics["review_metrics"]["draft_accepted_count"] == 5
+    assert metrics["review_metrics"]["draft_accepted_rate"] == 100.0
     assert metrics["review_metrics"]["needs_evidence_count"] == 23
     assert metrics["review_metrics"]["pending_count"] == 78
 

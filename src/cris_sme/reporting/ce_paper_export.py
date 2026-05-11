@@ -65,7 +65,8 @@ def build_ce_paper_tables_markdown(metrics: dict[str, Any]) -> str:
         f"- Technical-control entries: `{metrics.get('technical_question_count', 0)}`",
         f"- Cloud-supported entries: `{observability.get('cloud_supported_count', 0)}` (`{observability.get('cloud_supported_rate', 0)}%`)",
         f"- Technical cloud-supported entries: `{observability.get('technical_cloud_supported_count', 0)}` (`{observability.get('technical_cloud_supported_rate', 0)}%`)",
-        f"- Reviewer agreement: `{review.get('agreement_count', 0)}` of `{review.get('agreement_evaluable_count', 0)}` (`{review.get('agreement_rate', 0)}%`)",
+        f"- Human reviewer agreement: `{review.get('agreement_count', 0)}` of `{review.get('agreement_evaluable_count', 0)}` (`{review.get('agreement_rate', 0)}%`)",
+        f"- AI-assisted draft acceptance: `{review.get('draft_accepted_count', 0)}` of `{review.get('draft_acceptance_evaluable_count', 0)}` (`{review.get('draft_accepted_rate', 0)}%`)",
         "",
         "## Table 1. CE Question Observability By Evidence Class",
         "",
@@ -166,6 +167,7 @@ def build_ce_chart_data(metrics: dict[str, Any]) -> dict[str, Any]:
                 0,
             ),
             "agreement_rate": review.get("agreement_rate", 0),
+            "draft_accepted_rate": review.get("draft_accepted_rate", 0),
         },
         "series": {
             "observability_by_evidence_class": _paper_table(

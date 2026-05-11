@@ -73,7 +73,8 @@ def build_ce_evaluation_metrics_html(metrics: dict[str, Any]) -> str:
           {_metric("Cloud Observable", f"{observability.get('cloud_supported_rate', 0)}%", f"{observability.get('cloud_supported_count', 0)} entries")}
           {_metric("Technical Cloud Observable", f"{observability.get('technical_cloud_supported_rate', 0)}%", f"{observability.get('technical_cloud_supported_count', 0)} entries")}
           {_metric("Reviewed", f"{review.get('reviewed_rate', 0)}%", f"{review.get('reviewed_count', 0)} entries")}
-          {_metric("Agreement", f"{review.get('agreement_rate', 0)}%", f"{review.get('agreement_count', 0)} of {review.get('agreement_evaluable_count', 0)}")}
+          {_metric("Human Agreement", f"{review.get('agreement_rate', 0)}%", f"{review.get('agreement_count', 0)} of {review.get('agreement_evaluable_count', 0)}")}
+          {_metric("Draft Acceptance", f"{review.get('draft_accepted_rate', 0)}%", f"{review.get('draft_accepted_count', 0)} of {review.get('draft_acceptance_evaluable_count', 0)} AI-assisted")}
         </div>
       </section>
 

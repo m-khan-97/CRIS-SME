@@ -124,6 +124,7 @@ Interpretation:
 
 - The lab gives the CE paper a concrete vulnerable-cloud case study with question-level answer impact.
 - The AI-assisted draft review values are pilot workflow measurements, not independent human assessor agreement.
+- Proposed `Yes` answers mean no mapped cloud-control-plane issue was observed; they should not be described as proof of CE compliance without human corroboration.
 
 ## Table 8. Synthetic Baseline Top Risks
 

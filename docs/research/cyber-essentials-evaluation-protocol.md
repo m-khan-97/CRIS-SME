@@ -104,6 +104,8 @@ For direct and inferred cloud entries:
 - mapped controls present with no CRIS-SME risk finding -> proposed answer `Yes`
 - insufficient current evidence -> proposed answer `Cannot determine`
 
+A proposed `Yes` is intentionally bounded. It means CRIS-SME did not observe a mapped cloud-control-plane finding for that CE entry. It does not prove that every endpoint, application-layer, inherited-rule, business-process, or non-Azure implementation path satisfies the CE requirement.
+
 For each CE entry, reviewer records one of:
 
 - `accepted`
@@ -141,6 +143,8 @@ The draft ledger is deliberately conservative:
 - endpoint, policy, manual, and not-observable entries remain pending
 
 This draft must be labelled as `AI-assisted internal reviewer draft` or equivalent. It is useful for checking the workflow, paper tables, and agreement-metric plumbing, but it is not an independent human expert review. Do not report it as assessor agreement unless a CE-knowledgeable reviewer has checked and signed the decisions.
+
+Evaluation metrics reserve `agreement_count` and `agreement_rate` for non-AI human review decisions. AI-assisted ledgers are reported separately as `draft_accepted_count` and `draft_accepted_rate` to avoid self-validation being mistaken for independent agreement.
 
 ## Metrics
 
@@ -181,11 +185,15 @@ Report:
 - agreement evaluable count
 - agreement count
 - agreement rate
+- draft accepted count
+- draft accepted rate
 - proposed answer counts
 - final answer counts
 
 Agreement denominator:
 Only `accepted` and `overridden` entries are agreement-evaluable.
+
+AI-assisted reviewer entries are excluded from the human agreement denominator and reported as draft acceptance.
 
 `needs_evidence` entries are not disagreement. They are evidence gaps.
 

@@ -74,6 +74,8 @@ Each generated answer-pack entry additionally includes:
 
 For direct or inferred cloud entries, `supported_no_issue` maps to candidate answer `Yes` and `supported_risk_found` maps to candidate answer `No`. These are candidate answers only; they remain subject to human verification.
 
+The `Yes` answer has an explicit false-negative boundary. It means no mapped CRIS-SME cloud-control-plane finding was observed for the relevant controls. It does not prove that all firewall inheritance paths, application-layer controls, endpoint controls, business processes, SaaS settings, or out-of-scope assets satisfy the CE requirement.
+
 The mapping intentionally paraphrases the official preparation questions and does not reproduce full IASME wording.
 
 ### Evidence Classification
@@ -134,7 +136,8 @@ Primary metrics:
 - reviewer accepted count
 - reviewer override count
 - needs-evidence count
-- agreement rate over accepted and overridden entries
+- human agreement rate over accepted and overridden entries from non-AI reviewers
+- AI-assisted draft acceptance rate for pilot ledgers, reported separately from human agreement
 - proposed answer counts: Yes, No, Cannot determine
 
 Secondary metrics:
@@ -165,7 +168,7 @@ Evidence gap counts:
 
 The pre-review console still initializes all entries as pending. For internal pilot analysis, CRIS-SME can also generate an AI-assisted draft review ledger. In the controlled Azure vulnerable-lab run on 2026-05-07, the draft ledger reviewed the 28 cloud-supported entries, accepted 23 conservative answer-impact decisions, marked 5 as `needs_evidence`, and left the 78 non-cloud entries pending.
 
-This pilot ledger is useful for checking the review workflow and paper-table plumbing. It must not be reported as independent human expert agreement unless a CE-knowledgeable reviewer validates the decisions.
+This pilot ledger is useful for checking the review workflow and paper-table plumbing. It must not be reported as independent human expert agreement unless a CE-knowledgeable reviewer validates the decisions. In generated metrics, AI-assisted decisions should be discussed as draft acceptance, while `agreement_count` and `agreement_rate` are reserved for human review.
 
 ## Controlled Azure Lab Result
 

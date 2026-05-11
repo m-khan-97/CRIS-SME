@@ -45,6 +45,8 @@ Important boundary:
 
 The AI-assisted pilot ledger is not independent human assessor agreement. It is an internal research artifact used to validate the workflow and produce pilot metrics. A CE-knowledgeable human reviewer must validate the ledger before the paper claims expert agreement.
 
+The `Yes` answers are also bounded. They mean CRIS-SME observed no mapped cloud-control-plane risk for the relevant controls; they do not prove that all endpoint, application-layer, SaaS, inherited-rule, or business-process aspects of the CE requirement are satisfied.
+
 ## Best Paper Title
 
 **Evidence-Sufficiency-Aware Cyber Essentials Pre-Population From Cloud Control-Plane Telemetry**

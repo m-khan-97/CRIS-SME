@@ -138,10 +138,10 @@ AI-assisted pilot review draft:
 - accepted: `23`
 - needs evidence: `5`
 - pending: `78`
-- agreement-evaluable draft entries: `23`
-- draft agreement: `23/23`
+- draft-acceptance-evaluable entries: `23`
+- draft accepted: `23/23`
 
-This agreement number is internal pilot plumbing only. It must not be reported as independent human expert agreement unless a CE-knowledgeable reviewer validates the ledger.
+This draft acceptance number is internal pilot plumbing only. It must not be reported as independent human expert agreement unless a CE-knowledgeable reviewer validates the ledger. Generated evaluation metrics reserve human `agreement_count` and `agreement_rate` for non-AI reviewer decisions.
 
 ## Cleanup
 
@@ -163,4 +163,5 @@ Threats to validity:
 - This was a controlled lab, not a complete SME production tenant.
 - The lab was intentionally small to avoid cost and avoid exposing a reachable workload.
 - The AI-assisted review ledger is not independent human assessor agreement.
+- Proposed `Yes` answers mean no mapped CRIS-SME cloud-control-plane risk was observed; they are not universal proof that every implementation path satisfies the CE requirement.
 - Conditional Access remained unavailable in this subscription-scoped run and is represented as an explicit observability boundary.

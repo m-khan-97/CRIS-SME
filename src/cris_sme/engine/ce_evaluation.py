@@ -16,6 +16,7 @@ NON_CLOUD_EVIDENCE_CLASSES = {
 }
 REVIEWED_STATES = {"accepted", "overridden", "needs_evidence"}
 AGREEMENT_EVALUABLE_STATES = {"accepted", "overridden"}
+AI_DRAFT_REVIEWER_MARKERS = ("ai-assisted", "pilot reviewer draft")
 
 
 def build_ce_evaluation_metrics(
@@ -57,14 +58,26 @@ def build_ce_evaluation_metrics(
     reviewed_items = [
         item for item in merged if item.get("review_state") in REVIEWED_STATES
     ]
-    agreement_items = [
+    draft_items = [
         item
         for item in merged
         if item.get("review_state") in AGREEMENT_EVALUABLE_STATES
+        and item.get("is_ai_assisted_review")
     ]
-    agreement_count = sum(
+    human_agreement_items = [
+        item
+        for item in merged
+        if item.get("review_state") in AGREEMENT_EVALUABLE_STATES
+        and not item.get("is_ai_assisted_review")
+    ]
+    draft_accepted_count = sum(
         1
-        for item in agreement_items
+        for item in draft_items
+        if item.get("final_answer") == item.get("proposed_answer")
+    )
+    human_agreement_count = sum(
+        1
+        for item in human_agreement_items
         if item.get("final_answer") == item.get("proposed_answer")
     )
     cloud_supported_count = _count_evidence(merged, CLOUD_EVIDENCE_CLASSES)
@@ -104,12 +117,21 @@ def build_ce_evaluation_metrics(
             "override_count": review_counts.get("overridden", 0),
             "needs_evidence_count": review_counts.get("needs_evidence", 0),
             "pending_count": review_counts.get("pending", 0),
-            "agreement_evaluable_count": len(agreement_items),
-            "agreement_count": agreement_count,
-            "agreement_rate": _rate(agreement_count, len(agreement_items)),
+            "agreement_evaluable_count": len(human_agreement_items),
+            "agreement_count": human_agreement_count,
+            "agreement_rate": _rate(human_agreement_count, len(human_agreement_items)),
             "agreement_basis": (
-                "Agreement compares reviewer final_answer with CRIS-SME proposed_answer "
-                "over accepted and overridden entries."
+                "Human agreement compares non-AI reviewer final_answer with CRIS-SME "
+                "proposed_answer over accepted and overridden entries. AI-assisted "
+                "pilot decisions are reported separately as draft acceptance."
+            ),
+            "draft_acceptance_evaluable_count": len(draft_items),
+            "draft_accepted_count": draft_accepted_count,
+            "draft_accepted_rate": _rate(draft_accepted_count, len(draft_items)),
+            "draft_acceptance_basis": (
+                "Draft acceptance is calculated only for AI-assisted pilot reviewer "
+                "entries. It validates workflow plumbing and conservative review "
+                "policy, but it is not independent human agreement."
             ),
         },
         "evidence_gap_taxonomy": _gap_taxonomy(merged),
@@ -136,8 +158,10 @@ def build_ce_evaluation_metrics(
             "control_failure_contribution": _top_controls(merged, limit=12),
         },
         "evaluation_notes": [
-            "Agreement rate compares proposed_answer to reviewer final_answer and excludes pending entries and needs-evidence requests.",
+            "Human agreement rate compares proposed_answer to non-AI reviewer final_answer and excludes pending entries, needs-evidence requests, and AI-assisted pilot decisions.",
+            "AI-assisted pilot decisions are reported as draft acceptance, not reviewer agreement.",
             "Cloud observability counts direct_cloud and inferred_cloud evidence classes only.",
+            "A proposed Yes means no mapped CRIS-SME cloud-control-plane risk was observed; it is not proof that every implementation path for the CE requirement is satisfied.",
             "Endpoint, policy, manual, and not-observable items are evidence gaps, not compliance failures by themselves.",
             "Metrics are derived from CRIS-SME artifacts and reviewer ledger states; they do not certify Cyber Essentials compliance.",
         ],
@@ -177,10 +201,21 @@ def _merge_answer_and_review(
         "final_status": str(decision.get("final_status", "pending_human_review")),
         "final_answer": str(decision.get("final_answer", "pending_human_review")),
         "review_state": str(decision.get("state", "pending")),
+        "reviewer": str(decision.get("reviewer", "")),
+        "is_ai_assisted_review": _is_ai_assisted_reviewer(
+            str(decision.get("reviewer", ""))
+        ),
         "supporting_control_ids": list(source.get("supporting_control_ids", [])),
         "linked_findings": list(source.get("linked_findings", [])),
         "planned_evidence_paths": list(source.get("planned_evidence_paths", [])),
     }
+
+
+def _is_ai_assisted_reviewer(reviewer: str) -> bool:
+    normalized = reviewer.strip().lower()
+    if not normalized:
+        return False
+    return any(marker in normalized for marker in AI_DRAFT_REVIEWER_MARKERS)
 
 
 def _count_evidence(items: list[dict[str, Any]], classes: set[str]) -> int:

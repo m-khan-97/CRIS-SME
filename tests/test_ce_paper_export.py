@@ -57,7 +57,8 @@ def test_write_ce_paper_exports_persists_markdown_csv_and_chart_json(tmp_path) -
         assert path.exists()
 
     markdown = paths["ce_paper_tables_markdown"].read_text(encoding="utf-8")
-    assert "Reviewer agreement" in markdown
+    assert "Human reviewer agreement" in markdown
+    assert "AI-assisted draft acceptance" in markdown
 
     with paths["ce_observability_summary_csv"].open(encoding="utf-8", newline="") as handle:
         rows = list(csv.DictReader(handle))

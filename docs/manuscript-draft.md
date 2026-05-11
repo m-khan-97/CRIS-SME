@@ -189,6 +189,8 @@ This does not imply full tenant-wide identity governance coverage. Conditional A
 
 The current results suggest that CRIS-SME is already capable of supporting credible engineering and research workflows. The framework can transform posture evidence into explainable findings, preserve the distinction between observed evidence and limited visibility, and export outputs that are immediately useful for demonstrations, notebooks, figures, and paper drafting. Importantly, the framework now supports three equal evidence classes within the evaluation design: synthetic baseline profiles, production-adjacent live Azure evidence, and intentionally vulnerable lab evidence.
 
+For the Cyber Essentials workflow, proposed `Yes` answers require particular caution. A `Yes` means that CRIS-SME did not observe a mapped cloud-control-plane finding for the relevant controls. It does not prove that every endpoint, application-layer, inherited configuration, SaaS setting, business process, or out-of-scope asset satisfies the CE requirement. This boundary is important for avoiding false-negative overclaiming.
+
 The most important design lesson so far is that transparency matters. Deterministic scoring, explicit provenance, and archived comparison provide a stronger foundation for both trust and academic communication than a premature move toward opaque “AI risk intelligence” claims.
 
 ### 12. Limitations
@@ -199,6 +201,7 @@ The present work has several limitations:
 - the current vulnerable-lab track is based on one controlled Azure lab
 - repeated live runs currently show stability more than operational drift
 - some Entra-wide controls remain only partially observable
+- proposed `Yes` answers in the Cyber Essentials workflow can still have false-negative risk outside mapped cloud-control-plane evidence
 - AWS and GCP expansion remains at adapter-planning stage
 - the scoring model, while explainable, still requires broader empirical calibration
 
