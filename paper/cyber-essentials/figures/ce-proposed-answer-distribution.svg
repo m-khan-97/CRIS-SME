@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="920" height="360" viewBox="0 0 920 360" role="img" aria-labelledby="title desc">
+  <title id="title">Controlled Lab Proposed Answer Distribution</title>
+  <desc id="desc">Bar chart showing No 23, Yes 5, Cannot determine 78.</desc>
+  <rect width="920" height="360" fill="#ffffff"/>
+  <text x="40" y="48" font-family="Inter, Arial, sans-serif" font-size="24" font-weight="700" fill="#172033">Controlled Lab Proposed CE Answers</text>
+  <text x="40" y="76" font-family="Inter, Arial, sans-serif" font-size="14" fill="#617083">Proposed answers are candidate review states, not certification outcomes</text>
+  <line x1="190" y1="290" x2="860" y2="290" stroke="#d8e2ec" stroke-width="1"/>
+  <line x1="190" y1="110" x2="190" y2="290" stroke="#d8e2ec" stroke-width="1"/>
+  <g stroke="#edf2f7" stroke-width="1">
+    <line x1="190" y1="244" x2="860" y2="244"/>
+    <line x1="190" y1="198" x2="860" y2="198"/>
+    <line x1="190" y1="152" x2="860" y2="152"/>
+    <line x1="190" y1="106" x2="860" y2="106"/>
+  </g>
+  <g font-family="Inter, Arial, sans-serif" font-size="13" fill="#617083">
+    <text x="166" y="294" text-anchor="end">0</text>
+    <text x="166" y="248" text-anchor="end">20</text>
+    <text x="166" y="202" text-anchor="end">40</text>
+    <text x="166" y="156" text-anchor="end">60</text>
+    <text x="166" y="110" text-anchor="end">80</text>
+  </g>
+  <g font-family="Inter, Arial, sans-serif">
+    <rect x="265" y="237" width="115" height="53" fill="#dc2626"/>
+    <text x="322" y="226" font-size="16" font-weight="700" fill="#172033" text-anchor="middle">23</text>
+    <text x="322" y="320" font-size="14" fill="#172033" text-anchor="middle">No</text>
+    <rect x="450" y="278" width="115" height="12" fill="#0f766e"/>
+    <text x="507" y="267" font-size="16" font-weight="700" fill="#172033" text-anchor="middle">5</text>
+    <text x="507" y="320" font-size="14" fill="#172033" text-anchor="middle">Yes</text>
+    <rect x="635" y="111" width="115" height="179" fill="#475569"/>
+    <text x="692" y="100" font-size="16" font-weight="700" fill="#172033" text-anchor="middle">78</text>
+    <text x="692" y="320" font-size="14" fill="#172033" text-anchor="middle">Cannot determine</text>
+  </g>
+  <text x="40" y="348" font-family="Inter, Arial, sans-serif" font-size="12" fill="#617083">Figure 2. Proposed answer distribution in the controlled Azure vulnerable lab. Yes means no mapped cloud-control-plane issue observed, not proof of full CE compliance.</text>
+</svg>

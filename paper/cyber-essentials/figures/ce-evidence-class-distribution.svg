@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="920" height="430" viewBox="0 0 920 430" role="img" aria-labelledby="title desc">
+  <title id="title">Cyber Essentials Evidence Class Distribution</title>
+  <desc id="desc">Bar chart showing direct cloud 5, inferred cloud 23, endpoint required 24, policy required 19, and manual required 35.</desc>
+  <rect width="920" height="430" fill="#ffffff"/>
+  <text x="40" y="48" font-family="Inter, Arial, sans-serif" font-size="24" font-weight="700" fill="#172033">Cyber Essentials Evidence Class Distribution</text>
+  <text x="40" y="76" font-family="Inter, Arial, sans-serif" font-size="14" fill="#617083">106 paraphrased preparation entries; cloud-supported = direct cloud + inferred cloud</text>
+  <line x1="180" y1="342" x2="860" y2="342" stroke="#d8e2ec" stroke-width="1"/>
+  <line x1="180" y1="120" x2="180" y2="342" stroke="#d8e2ec" stroke-width="1"/>
+  <g font-family="Inter, Arial, sans-serif" font-size="13" fill="#617083">
+    <text x="156" y="346" text-anchor="end">0</text>
+    <text x="156" y="290" text-anchor="end">10</text>
+    <text x="156" y="234" text-anchor="end">20</text>
+    <text x="156" y="178" text-anchor="end">30</text>
+    <text x="156" y="122" text-anchor="end">40</text>
+  </g>
+  <g stroke="#edf2f7" stroke-width="1">
+    <line x1="180" y1="286" x2="860" y2="286"/>
+    <line x1="180" y1="230" x2="860" y2="230"/>
+    <line x1="180" y1="174" x2="860" y2="174"/>
+    <line x1="180" y1="118" x2="860" y2="118"/>
+  </g>
+  <g font-family="Inter, Arial, sans-serif">
+    <rect x="215" y="314" width="86" height="28" fill="#2563eb"/>
+    <text x="258" y="304" font-size="15" font-weight="700" fill="#172033" text-anchor="middle">5</text>
+    <text x="258" y="370" font-size="13" fill="#172033" text-anchor="middle">direct cloud</text>
+    <rect x="340" y="213" width="86" height="129" fill="#0f766e"/>
+    <text x="383" y="203" font-size="15" font-weight="700" fill="#172033" text-anchor="middle">23</text>
+    <text x="383" y="370" font-size="13" fill="#172033" text-anchor="middle">inferred cloud</text>
+    <rect x="465" y="208" width="86" height="134" fill="#7c3aed"/>
+    <text x="508" y="198" font-size="15" font-weight="700" fill="#172033" text-anchor="middle">24</text>
+    <text x="508" y="370" font-size="13" fill="#172033" text-anchor="middle">endpoint required</text>
+    <rect x="590" y="236" width="86" height="106" fill="#d97706"/>
+    <text x="633" y="226" font-size="15" font-weight="700" fill="#172033" text-anchor="middle">19</text>
+    <text x="633" y="370" font-size="13" fill="#172033" text-anchor="middle">policy required</text>
+    <rect x="715" y="146" width="86" height="196" fill="#475569"/>
+    <text x="758" y="136" font-size="15" font-weight="700" fill="#172033" text-anchor="middle">35</text>
+    <text x="758" y="370" font-size="13" fill="#172033" text-anchor="middle">manual required</text>
+  </g>
+  <text x="40" y="410" font-family="Inter, Arial, sans-serif" font-size="12" fill="#617083">Figure 1. Evidence-class distribution. Only 28/106 entries are cloud-supported; remaining entries preserve explicit evidence gaps.</text>
+</svg>
