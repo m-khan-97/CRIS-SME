@@ -1,6 +1,6 @@
-# CRIS-SME Demo Console
+# CRIS-SME Assurance Console
 
-The Demo Console is a professional interactive frontend for showing CRIS-SME as a product experience.
+The Assurance Console is a professional interactive frontend for showing CRIS-SME as a unified product experience.
 
 It is intentionally static-first: the deterministic engine still owns assessment generation, scoring, claims, provenance, assurance, and disclosure. The frontend reads generated artifacts and presents them as an interactive SaaS-style workspace.
 
@@ -26,16 +26,32 @@ The console reads:
 - `dist/site/data/cris_sme_ce_evaluation_metrics.json`
 - `dist/site/data/cris_sme_ce_paper_tables.md`
 
-## Demo Views
+## Console Views
 
-- Overview
-- Decision Workbench
+- Command Center
+- Findings
+- Cyber Essentials
+- Human Review
+- Evidence Room
+- Reports & Artifacts
+- Trust Center
 - Provenance
-- Assurance Center
-- Cyber Essentials Workflow
-- CE Review Workbench
-- Disclosure Room
 - Remediation
+
+## Reports & Artifacts Hub
+
+The console now treats the standalone HTML, JSON, and markdown outputs as governed artifacts inside one product shell. The separate files still exist for export, sharing, and static hosting, but the primary demo path is the unified console.
+
+The artifact hub links to:
+
+- executive and technical reports
+- assurance portal
+- evidence room
+- CE answer pack
+- CE review console
+- CE evaluation metrics
+- machine-readable JSON payloads
+- manuscript-ready CE paper tables
 
 ## Cyber Essentials Workflow
 
@@ -66,6 +82,6 @@ For signed assurance artifacts, pass the exported JSON or CSV through `scripts/s
 
 ## Boundary
 
-The Demo Console does not calculate or modify CRIS-SME risk scores.
+The Assurance Console does not calculate or modify CRIS-SME risk scores.
 
 It is a presentation and exploration layer over deterministic backend outputs.

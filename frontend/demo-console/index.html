@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>CRIS-SME Demo Console</title>
+    <title>CRIS-SME Assurance Console</title>
     <link rel="stylesheet" href="./styles.css" />
   </head>
   <body>
@@ -13,40 +13,40 @@
           <div class="brand-mark">CR</div>
           <div>
             <strong>CRIS-SME</strong>
-            <span>Decision Engine</span>
+            <span>Assurance Console</span>
           </div>
         </div>
         <nav>
-          <button class="nav-item active" data-view="overview" type="button">Overview</button>
-          <button class="nav-item" data-view="workbench" type="button">Decision Workbench</button>
+          <button class="nav-item active" data-view="overview" type="button">Command Center</button>
+          <button class="nav-item" data-view="workbench" type="button">Findings</button>
+          <button class="nav-item" data-view="ce-workflow" type="button">Cyber Essentials</button>
+          <button class="nav-item" data-view="ce-review-workbench" type="button">Human Review</button>
+          <button class="nav-item" data-view="disclosure" type="button">Evidence Room</button>
+          <button class="nav-item" data-view="reports" type="button">Reports & Artifacts</button>
+          <button class="nav-item" data-view="assurance" type="button">Trust Center</button>
           <button class="nav-item" data-view="provenance" type="button">Provenance</button>
-          <button class="nav-item" data-view="assurance" type="button">Assurance Center</button>
-          <button class="nav-item" data-view="ce-workflow" type="button">CE Workflow</button>
-          <button class="nav-item" data-view="ce-review-workbench" type="button">CE Review Workbench</button>
-          <button class="nav-item" data-view="disclosure" type="button">Disclosure Room</button>
           <button class="nav-item" data-view="remediation" type="button">Remediation</button>
         </nav>
         <div class="side-card">
-          <span class="eyebrow">Demo mode</span>
-          <p>Static console powered by CRIS-SME generated artifacts.</p>
-          <a href="../assurance.html">Assurance Portal</a>
-          <a href="../evidence-room.html">Evidence Room</a>
-          <a href="../ce-review-console.html">CE Review</a>
+          <span class="eyebrow">Unified platform</span>
+          <p>One product console over deterministic CRIS-SME evidence, decisions, reports, and assurance artifacts.</p>
+          <a href="#reports">Artifact Hub</a>
+          <a href="#ce-review-workbench">Human Review</a>
         </div>
       </aside>
 
       <main class="workspace">
         <header class="topbar">
           <div>
-            <span class="eyebrow">Cloud Risk Decision Console</span>
-            <h1>Evidence-driven assurance, ready for a live demo.</h1>
+            <span class="eyebrow">Cloud Risk Assurance Console</span>
+            <h1>One command center for risk decisions, CE readiness, and evidence sharing.</h1>
           </div>
           <div class="top-actions">
             <label class="search-box">
               <span>Search</span>
               <input id="finding-search" type="search" placeholder="Control, title, priority..." />
             </label>
-            <a class="ghost-link" href="../report.html">Technical Report</a>
+            <a class="ghost-link" href="#reports">Open Artifacts</a>
           </div>
         </header>
 
@@ -54,7 +54,7 @@
           <div class="hero-panel">
             <div>
               <span class="eyebrow">Assessment overview</span>
-              <h2 id="overview-title">One assessment, many stakeholder views.</h2>
+              <h2 id="overview-title">Unified assurance workspace for one assessment.</h2>
               <p id="assessment-summary">Loading CRIS-SME artifacts...</p>
             </div>
             <div class="risk-orbit" aria-label="Overall risk score">
@@ -70,6 +70,8 @@
           </div>
 
           <div class="metric-grid" id="overview-metrics"></div>
+
+          <section class="platform-strip" id="platform-modules" aria-label="Platform modules"></section>
 
           <div class="content-grid two">
             <section class="panel">
@@ -268,6 +270,34 @@
                 <span>Share manifest</span>
               </div>
               <div id="redaction-register"></div>
+            </section>
+          </div>
+        </section>
+
+        <section class="view" id="view-reports" aria-labelledby="reports-title">
+          <div class="section-title">
+            <div>
+              <span class="eyebrow">Reports and artifacts</span>
+              <h2 id="reports-title">All generated outputs in one controlled artifact hub.</h2>
+            </div>
+          </div>
+
+          <div class="metric-grid" id="artifact-metrics"></div>
+
+          <div class="artifact-layout">
+            <section class="panel">
+              <div class="panel-head">
+                <h3>Primary reports</h3>
+                <span>Stakeholder-ready views</span>
+              </div>
+              <div class="artifact-grid" id="primary-artifacts"></div>
+            </section>
+            <section class="panel">
+              <div class="panel-head">
+                <h3>Research and assurance evidence</h3>
+                <span>Traceable paper and trust artifacts</span>
+              </div>
+              <div class="artifact-grid" id="assurance-artifacts"></div>
             </section>
           </div>
         </section>

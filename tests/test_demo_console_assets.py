@@ -11,14 +11,16 @@ def test_demo_console_assets_exist_and_use_generated_data() -> None:
     styles = (DEMO_DIR / "styles.css").read_text(encoding="utf-8")
     app = (DEMO_DIR / "app.js").read_text(encoding="utf-8")
 
-    assert "CRIS-SME Demo Console" in index
+    assert "CRIS-SME Assurance Console" in index
     assert "cris_sme_dashboard_payload.json" in app
     assert "cris_sme_report.json" in app
     assert "cris_sme_selective_disclosure.json" in app
     assert "view-workbench" in index
     assert "view-provenance" in index
     assert "view-disclosure" in index
+    assert "view-reports" in index
     assert "view-ce-review-workbench" in index
+    assert "Reports & Artifacts" in index
     assert "Proposed Yes means" in index
     assert "radial-gradient" not in styles
     assert "CE_REVIEW_STORAGE_KEY" in app
@@ -26,6 +28,8 @@ def test_demo_console_assets_exist_and_use_generated_data() -> None:
     assert "cris_sme_ce_human_review_ledger.json" in app
     assert "canonical_ledger_sha256" in app
     assert "source_review_console_sha256" in app
+    assert "PLATFORM_MODULES" in app
+    assert "ARTIFACT_GROUPS" in app
 
 
 def test_demo_console_does_not_depend_on_remote_assets() -> None:

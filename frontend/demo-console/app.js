@@ -21,6 +21,34 @@ const state = {
 const CE_REVIEW_STORAGE_KEY = "cris_sme_ce_review_decisions_v1";
 const CE_REVIEW_FILTERS = ["Cloud supported", "Pending", "Accepted", "Overridden", "Needs evidence", "All"];
 
+const PLATFORM_MODULES = [
+  ["Findings", "Prioritized cloud risk decisions with evidence quality.", "workbench"],
+  ["Cyber Essentials", "Question-level CE answer impact and observability.", "ce-workflow"],
+  ["Human Review", "Reviewer ledger for CE accept, override, or evidence requests.", "ce-review-workbench"],
+  ["Evidence Room", "Shareable stakeholder assurance with redaction controls.", "disclosure"],
+  ["Reports", "Executive, technical, research, and machine-readable outputs.", "reports"],
+  ["Trust Center", "Claims, replay, RBOM, signatures, and assurance arguments.", "assurance"],
+];
+
+const ARTIFACT_GROUPS = {
+  primary: [
+    ["Executive Report", "../report.html", "HTML", "Technical report with prioritized risks and deterministic score context."],
+    ["Assurance Portal", "../assurance.html", "HTML", "Customer-facing assurance view for trust conversations."],
+    ["Evidence Room", "../evidence-room.html", "HTML", "Selective disclosure room with redactions and share manifest."],
+    ["Dashboard Payload", "../data/cris_sme_dashboard_payload.json", "JSON", "Data backing this unified console."],
+    ["Canonical Report JSON", "../data/cris_sme_report.json", "JSON", "Machine-readable report for API and audit workflows."],
+    ["Selective Disclosure JSON", "../data/cris_sme_selective_disclosure.json", "JSON", "Redacted stakeholder package data."],
+  ],
+  assurance: [
+    ["CE Answer Pack", "../ce-self-assessment.html", "HTML", "Pre-populated Cyber Essentials answer-impact pack."],
+    ["CE Review Console", "../ce-review-console.html", "HTML", "Generated human-review ledger view."],
+    ["CE Evaluation Metrics", "../ce-evaluation.html", "HTML", "Paper and evaluation metrics generated from artifacts."],
+    ["CE Answer Pack JSON", "../data/cris_sme_ce_self_assessment.json", "JSON", "Question-level CE output for research and automation."],
+    ["CE Review JSON", "../data/cris_sme_ce_review_console.json", "JSON", "Review-console ledger source data."],
+    ["CE Paper Tables", "../data/cris_sme_ce_paper_tables.md", "MD", "Manuscript-ready tables derived from metrics JSON."],
+  ],
+};
+
 const DATA_PATHS = {
   dashboard: "../data/cris_sme_dashboard_payload.json",
   report: "../data/cris_sme_report.json",
@@ -107,6 +135,7 @@ function hydrate() {
   renderCeReviewWorkbench();
   renderDisclosureTabs();
   renderDisclosure();
+  renderReportsHub();
   renderRemediation();
 }
 
@@ -119,6 +148,16 @@ function wireNavigation() {
       button.classList.add("active");
       document.querySelector(`#view-${view}`)?.classList.add("active");
       history.replaceState(null, "", `#${view}`);
+    });
+  });
+  document.querySelectorAll('a[href^="#"]').forEach((link) => {
+    link.addEventListener("click", (event) => {
+      const view = link.getAttribute("href")?.replace("#", "");
+      const navButton = view ? document.querySelector(`.nav-item[data-view="${CSS.escape(view)}"]`) : null;
+      if (navButton) {
+        event.preventDefault();
+        navButton.click();
+      }
     });
   });
   const initialView = window.location.hash.replace("#", "");
@@ -186,8 +225,23 @@ function renderOverview() {
     ["Frameworks", overview.framework_coverage_count || 0, "mapped governance references"],
   ];
   html("#overview-metrics", metrics.map(metricCard).join(""));
+  renderPlatformModules();
   renderDomainBars();
   renderTopRisks();
+}
+
+function renderPlatformModules() {
+  html("#platform-modules", PLATFORM_MODULES.map(([title, note, view]) => `
+    <button class="module-card" type="button" data-module-view="${escapeHtml(view)}">
+      <strong>${escapeHtml(title)}</strong>
+      <span>${escapeHtml(note)}</span>
+    </button>
+  `).join(""));
+  document.querySelectorAll(".module-card").forEach((button) => {
+    button.addEventListener("click", () => {
+      document.querySelector(`.nav-item[data-view="${CSS.escape(button.dataset.moduleView)}"]`)?.click();
+    });
+  });
 }
 
 function renderDomainBars() {
@@ -423,6 +477,19 @@ function renderCeWorkflow() {
   `).join(""));
 
   html("#ce-paper-preview", renderPaperPreview(state.cePaperTables));
+}
+
+function renderReportsHub() {
+  const rbom = state.report?.risk_bill_of_materials || {};
+  const metrics = [
+    ["HTML reports", 5, "technical, assurance, evidence, CE, evaluation"],
+    ["Machine JSON", 6, "report, dashboard, CE, review, disclosure, metrics"],
+    ["RBOM", rbom.canonical_report_sha256 ? "Present" : "Missing", `${(rbom.artifacts || []).length} hashed artifacts`],
+    ["CE tables", state.cePaperTables ? "Ready" : "Missing", "generated paper table markdown"],
+  ];
+  html("#artifact-metrics", metrics.map(metricCard).join(""));
+  html("#primary-artifacts", ARTIFACT_GROUPS.primary.map(artifactCard).join(""));
+  html("#assurance-artifacts", ARTIFACT_GROUPS.assurance.map(artifactCard).join(""));
 }
 
 function renderCeReviewWorkbench() {
@@ -929,6 +996,16 @@ function metricCard([label, value, note]) {
       <strong>${escapeHtml(value)}</strong>
       <p>${escapeHtml(note)}</p>
     </article>
+  `;
+}
+
+function artifactCard([title, href, type, note]) {
+  return `
+    <a class="artifact-card" href="${escapeHtml(href)}">
+      <span class="artifact-type">${escapeHtml(type)}</span>
+      <strong>${escapeHtml(title)}</strong>
+      <p>${escapeHtml(note)}</p>
+    </a>
   `;
 }
 
