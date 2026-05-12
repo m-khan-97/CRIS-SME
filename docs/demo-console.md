@@ -33,6 +33,7 @@ The console reads:
 - Provenance
 - Assurance Center
 - Cyber Essentials Workflow
+- CE Review Workbench
 - Disclosure Room
 - Remediation
 
@@ -54,6 +55,14 @@ Linked full artifacts:
 - `dist/site/ce-self-assessment.html`
 - `dist/site/ce-review-console.html`
 - `dist/site/ce-evaluation.html`
+
+## CE Review Workbench
+
+The CE Review Workbench is the interactive human-verification surface for the paper workflow.
+
+It loads the generated CE review-console JSON, lets a reviewer accept, override, request evidence, or leave entries pending, and stores decisions locally in the browser. JSON export includes deterministic SHA-256 metadata for the exported browser ledger. CSV export is compatible with `scripts/import_ce_review_ledger.py`.
+
+For signed assurance artifacts, pass the exported JSON or CSV through `scripts/sign_ce_review_ledger.py` and verify it with `scripts/verify_ce_review_ledger.py`.
 
 ## Boundary
 

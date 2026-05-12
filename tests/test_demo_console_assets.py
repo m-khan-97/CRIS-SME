@@ -24,6 +24,8 @@ def test_demo_console_assets_exist_and_use_generated_data() -> None:
     assert "CE_REVIEW_STORAGE_KEY" in app
     assert "cris_sme_ce_human_review_ledger.csv" in app
     assert "cris_sme_ce_human_review_ledger.json" in app
+    assert "canonical_ledger_sha256" in app
+    assert "source_review_console_sha256" in app
 
 
 def test_demo_console_does_not_depend_on_remote_assets() -> None:

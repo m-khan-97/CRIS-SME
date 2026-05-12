@@ -35,6 +35,13 @@ from .ce_review_draft import (
     write_ce_review_decision_draft,
 )
 from .ce_review_import import load_ce_review_decisions
+from .ce_review_signature import (
+    build_signed_ce_review_ledger,
+    canonical_sha256,
+    sign_ce_review_ledger_body,
+    verify_ce_review_ledger,
+    write_signed_ce_review_ledger,
+)
 from .compliance import assess_compliance_mappings, load_compliance_mappings
 from .control_drift import build_control_drift_attribution
 from .decision_ledger import build_decision_ledger, summarize_decision_ledger
@@ -112,6 +119,7 @@ __all__ = [
     "build_ce_evaluation_metrics",
     "build_ce_review_decision_draft",
     "build_ce_review_console",
+    "build_signed_ce_review_ledger",
     "build_evidence_diff_result",
     "build_evidence_gap_backlog",
     "build_evidence_snapshot",
@@ -145,7 +153,9 @@ __all__ = [
     "build_budget_aware_remediation_plan",
     "budget_fit_profile_ids",
     "sign_risk_bill_of_materials",
+    "sign_ce_review_ledger_body",
     "replay_evidence_snapshot",
+    "verify_ce_review_ledger",
     "verify_risk_bill_of_materials",
     "write_risk_bill_of_materials",
     "write_risk_bill_of_materials_signature",
@@ -156,10 +166,12 @@ __all__ = [
     "write_ce_evaluation_metrics",
     "write_ce_review_decision_draft",
     "write_ce_review_console",
+    "write_signed_ce_review_ledger",
     "write_selective_disclosure_package",
     "write_assurance_case",
     "summarize_decision_ledger",
     "summarize_policy_pack_changelog",
     "summarize_provider_contract_conformance",
     "score_findings",
+    "canonical_sha256",
 ]

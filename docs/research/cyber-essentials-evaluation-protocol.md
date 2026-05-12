@@ -134,6 +134,41 @@ PYTHONPATH=src python3 scripts/import_ce_review_ledger.py \
 
 The importer accepts CSV ledgers, JSON review-decision dictionaries, and exported review-console JSON. Imported human-review decisions contribute to `agreement_count` and `agreement_rate`; AI-assisted draft reviewers remain separated as draft acceptance.
 
+### Integrity and Signature Export
+
+After a reviewer ledger is completed, bind it to the source answer pack before using it in a paper table or customer assurance pack:
+
+```bash
+PYTHONPATH=src python3 scripts/sign_ce_review_ledger.py \
+  --answer-pack outputs/reports/cris_sme_ce_self_assessment.json \
+  --ledger path/to/completed-review-ledger.csv \
+  --output outputs/reports/cris_sme_ce_human_review_ledger.signed.json \
+  --reviewer-name "Reviewer Name" \
+  --reviewer-role "CE-knowledgeable reviewer"
+```
+
+For controlled workflows, add an HMAC signing key:
+
+```bash
+CRIS_SME_CE_REVIEW_SIGNING_KEY="replace-with-managed-secret" \
+PYTHONPATH=src python3 scripts/sign_ce_review_ledger.py \
+  --answer-pack outputs/reports/cris_sme_ce_self_assessment.json \
+  --ledger path/to/completed-review-ledger.csv \
+  --output outputs/reports/cris_sme_ce_human_review_ledger.signed.json \
+  --key-id ce-review-2026
+```
+
+Verify the signed or hash-bound ledger with:
+
+```bash
+CRIS_SME_CE_REVIEW_SIGNING_KEY="replace-with-managed-secret" \
+PYTHONPATH=src python3 scripts/verify_ce_review_ledger.py \
+  --ledger outputs/reports/cris_sme_ce_human_review_ledger.signed.json \
+  --answer-pack outputs/reports/cris_sme_ce_self_assessment.json
+```
+
+Verification checks the canonical reviewer-ledger hash, the canonical decisions hash, the source answer-pack hash, and the optional HMAC signature. Any change to a reviewed decision, reviewer metadata, source binding, or signature payload causes verification to fail.
+
 ### AI-Assisted Pilot Ledger
 
 For internal research iteration, CRIS-SME can generate an AI-assisted pilot review ledger:

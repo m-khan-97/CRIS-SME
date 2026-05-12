@@ -706,14 +706,25 @@ function persistCeReviewDecisions() {
   localStorage.setItem(CE_REVIEW_STORAGE_KEY, JSON.stringify(state.ceReviewDecisions));
 }
 
-function exportCeReviewJson() {
-  const payload = {
+async function exportCeReviewJson() {
+  const body = {
     schema_version: "0.1.0",
+    ledger_type: "cris_sme_ce_human_review_ledger",
     source_console: state.ceReview?.console_name || "CRIS-SME Cyber Essentials Evidence Review Console",
     exported_at: new Date().toISOString(),
     reviewer_model: "human_local_browser",
     note: "Human reviewer decisions only. AI draft acceptance is not counted as human agreement.",
     review_decisions: buildCeReviewExportRows(),
+  };
+  const payload = {
+    ...body,
+    integrity: {
+      hash_algorithm: "sha256",
+      canonical_ledger_sha256: await sha256Stable(body),
+      canonical_decisions_sha256: await sha256Stable(body.review_decisions),
+      source_review_console_sha256: await sha256Stable(state.ceReview || {}),
+      signature_boundary: "Browser export provides deterministic hashes only. Use scripts/sign_ce_review_ledger.py for HMAC signing.",
+    },
   };
   downloadText("cris_sme_ce_human_review_ledger.json", JSON.stringify(payload, null, 2), "application/json");
 }
@@ -795,6 +806,24 @@ function reviewPillClass(value) {
 
 function csvCell(value) {
   return `"${String(value ?? "").replaceAll('"', '""')}"`;
+}
+
+async function sha256Stable(value) {
+  const encoded = new TextEncoder().encode(stableStringify(value));
+  const digest = await crypto.subtle.digest("SHA-256", encoded);
+  return Array.from(new Uint8Array(digest))
+    .map((byte) => byte.toString(16).padStart(2, "0"))
+    .join("");
+}
+
+function stableStringify(value) {
+  if (Array.isArray(value)) {
+    return `[${value.map((item) => stableStringify(item)).join(",")}]`;
+  }
+  if (value && typeof value === "object") {
+    return `{${Object.keys(value).sort().map((key) => `${JSON.stringify(key)}:${stableStringify(value[key])}`).join(",")}}`;
+  }
+  return JSON.stringify(value);
 }
 
 function renderDisclosureTabs() {

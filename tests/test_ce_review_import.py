@@ -9,6 +9,11 @@ from cris_sme.engine.ce_evaluation import build_ce_evaluation_metrics
 from cris_sme.engine.ce_questionnaire import build_ce_self_assessment_pack
 from cris_sme.engine.ce_review import build_ce_review_console
 from cris_sme.engine.ce_review_import import load_ce_review_decisions
+from cris_sme.engine.ce_review_signature import (
+    build_signed_ce_review_ledger,
+    canonical_sha256,
+    verify_ce_review_ledger,
+)
 
 
 def test_load_ce_review_decisions_from_csv_feeds_human_agreement(tmp_path) -> None:
@@ -94,6 +99,84 @@ def test_load_ce_review_decisions_rejects_invalid_rows(tmp_path) -> None:
     assert "unknown question_id 'Q404'" in message
     assert "overridden row for Q1 requires final_answer" in message
     assert "accepted row for Q2 requires reviewer" in message
+
+
+def test_signed_ce_review_ledger_hashes_are_stable_and_verifiable() -> None:
+    pack = build_ce_self_assessment_pack(_report(), mapping=_mapping())
+    decisions = {
+        "Q1": {
+            "state": "accepted",
+            "final_answer": "No",
+            "final_status": "supported_risk_found",
+            "reviewer": "Human Reviewer",
+            "reviewed_at": "2026-05-12T10:00:00Z",
+        },
+        "Q2": {
+            "state": "needs_evidence",
+            "final_answer": "Cannot determine",
+            "final_status": "needs_evidence",
+            "reviewer": "Human Reviewer",
+            "reviewed_at": "2026-05-12T10:05:00Z",
+            "reviewer_note": "Graph evidence required.",
+        },
+    }
+
+    first = build_signed_ce_review_ledger(
+        answer_pack=pack,
+        review_decisions=decisions,
+        reviewer={"name": "Human Reviewer", "role": "CE reviewer"},
+        generated_at="2026-05-12T11:00:00Z",
+        signing_key="secret",
+        key_id="test-key",
+    )
+    second = build_signed_ce_review_ledger(
+        answer_pack=pack,
+        review_decisions=dict(reversed(list(decisions.items()))),
+        reviewer={"role": "CE reviewer", "name": "Human Reviewer"},
+        generated_at="2026-05-12T11:00:00Z",
+        signing_key="secret",
+        key_id="test-key",
+    )
+
+    assert first["integrity"]["canonical_ledger_sha256"] == second["integrity"]["canonical_ledger_sha256"]
+    assert first["integrity"]["canonical_decisions_sha256"] == second["integrity"]["canonical_decisions_sha256"]
+    assert first["integrity"]["source_answer_pack_sha256"] == canonical_sha256(pack)
+    assert first["signature"]["algorithm"] == "hmac-sha256"
+
+    result = verify_ce_review_ledger(first, answer_pack=pack, signing_key="secret")
+
+    assert result["verified"] is True
+    assert result["ledger_hash_verified"] is True
+    assert result["decisions_hash_verified"] is True
+    assert result["answer_pack_hash_verified"] is True
+    assert result["signature_verified"] is True
+
+
+def test_signed_ce_review_ledger_detects_tampering() -> None:
+    pack = build_ce_self_assessment_pack(_report(), mapping=_mapping())
+    ledger = build_signed_ce_review_ledger(
+        answer_pack=pack,
+        review_decisions={
+            "Q1": {
+                "state": "accepted",
+                "final_answer": "No",
+                "final_status": "supported_risk_found",
+                "reviewer": "Human Reviewer",
+            }
+        },
+        generated_at="2026-05-12T11:00:00Z",
+        signing_key="secret",
+        key_id="test-key",
+    )
+    ledger["review_decisions"][0]["final_answer"] = "Yes"
+
+    result = verify_ce_review_ledger(ledger, answer_pack=pack, signing_key="secret")
+
+    assert result["verified"] is False
+    assert result["ledger_hash_verified"] is False
+    assert result["decisions_hash_verified"] is False
+    assert result["signature_verified"] is False
+    assert any("hash mismatch" in error.lower() for error in result["errors"])
 
 
 def _mapping() -> dict:

@@ -37,3 +37,24 @@ PYTHONPATH=src python3 scripts/import_ce_review_ledger.py \
   --ledger paper/cyber-essentials/review-ledger-template.csv \
   --output-dir outputs/reports/azure_controlled_lab/ce_review_import
 ```
+
+Then create a hash-bound reviewer ledger for reproducibility:
+
+```bash
+PYTHONPATH=src python3 scripts/sign_ce_review_ledger.py \
+  --answer-pack outputs/reports/azure_controlled_lab/cris_sme_ce_self_assessment.json \
+  --ledger paper/cyber-essentials/review-ledger-template.csv \
+  --output outputs/reports/azure_controlled_lab/cris_sme_ce_human_review_ledger.signed.json \
+  --reviewer-name "Reviewer Name" \
+  --reviewer-role "CE-knowledgeable reviewer"
+```
+
+Verification:
+
+```bash
+PYTHONPATH=src python3 scripts/verify_ce_review_ledger.py \
+  --ledger outputs/reports/azure_controlled_lab/cris_sme_ce_human_review_ledger.signed.json \
+  --answer-pack outputs/reports/azure_controlled_lab/cris_sme_ce_self_assessment.json
+```
+
+Set `CRIS_SME_CE_REVIEW_SIGNING_KEY` when an HMAC signature is required. Hash-bound ledgers are enough for reproducibility; signed ledgers add shared-secret authenticity for controlled assurance workflows.

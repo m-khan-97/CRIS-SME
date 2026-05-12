@@ -76,6 +76,8 @@ def _load_json_rows(path: Path) -> list[dict[str, Any]]:
         raise ValueError("JSON review ledger must be an object or a list of rows.")
 
     decisions = payload.get("review_decisions")
+    if isinstance(decisions, list):
+        return [row for row in decisions if isinstance(row, dict)]
     if isinstance(decisions, dict):
         rows = []
         for question_id, decision in decisions.items():
