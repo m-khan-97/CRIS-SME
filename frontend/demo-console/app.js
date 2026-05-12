@@ -12,7 +12,14 @@ const state = {
   priorityFilter: "All",
   disclosureProfile: "customer",
   selectedControls: new Set(),
+  ceReviewDecisions: {},
+  ceReviewFilter: "Cloud supported",
+  ceReviewQuery: "",
+  selectedCeQuestionId: null,
 };
+
+const CE_REVIEW_STORAGE_KEY = "cris_sme_ce_review_decisions_v1";
+const CE_REVIEW_FILTERS = ["Cloud supported", "Pending", "Accepted", "Overridden", "Needs evidence", "All"];
 
 const DATA_PATHS = {
   dashboard: "../data/cris_sme_dashboard_payload.json",
@@ -61,6 +68,8 @@ async function loadData() {
   state.findings = dashboard?.finding_explorer?.findings || report?.prioritized_risks || [];
   state.filteredFindings = state.findings;
   state.selectedFindingId = state.findings[0]?.finding_id || null;
+  state.ceReviewDecisions = loadCeReviewDecisions();
+  state.selectedCeQuestionId = filteredCeReviewEntries()[0]?.question_id || ceReview?.entries?.[0]?.question_id || null;
 }
 
 async function fetchJson(key) {
@@ -95,6 +104,7 @@ function hydrate() {
   renderProvenance();
   renderAssurance();
   renderCeWorkflow();
+  renderCeReviewWorkbench();
   renderDisclosureTabs();
   renderDisclosure();
   renderRemediation();
@@ -120,6 +130,16 @@ function wireNavigation() {
 function wireSearch() {
   document.querySelector("#finding-search")?.addEventListener("input", (event) => {
     applyFindingFilters(event.target.value);
+  });
+  document.querySelector("#ce-review-search")?.addEventListener("input", (event) => {
+    state.ceReviewQuery = event.target.value;
+    renderCeReviewWorkbench();
+  });
+  document.querySelector("#ce-export-json")?.addEventListener("click", () => {
+    exportCeReviewJson();
+  });
+  document.querySelector("#ce-export-csv")?.addEventListener("click", () => {
+    exportCeReviewCsv();
   });
 }
 
@@ -403,6 +423,378 @@ function renderCeWorkflow() {
   `).join(""));
 
   html("#ce-paper-preview", renderPaperPreview(state.cePaperTables));
+}
+
+function renderCeReviewWorkbench() {
+  renderCeReviewMetrics();
+  renderCeReviewFilter();
+  renderCeReviewList();
+  renderCeReviewDetail();
+}
+
+function renderCeReviewMetrics() {
+  const entries = state.ceReview?.entries || [];
+  const decisions = entries.map((entry) => entryDecision(entry));
+  const reviewed = decisions.filter((decision) => decision.state && decision.state !== "pending").length;
+  const accepted = decisions.filter((decision) => decision.state === "accepted").length;
+  const overridden = decisions.filter((decision) => decision.state === "overridden").length;
+  const needsEvidence = decisions.filter((decision) => decision.state === "needs_evidence").length;
+  const cloudSupported = entries.filter(isCloudSupported).length;
+  const draftAcceptCandidates = entries.filter((entry) => {
+    const answer = String(entry.proposed_answer || "");
+    return entry.evidence_class === "direct_cloud" || (entry.evidence_class === "inferred_cloud" && answer === "No");
+  }).length;
+  const metrics = [
+    ["Human reviewed", reviewed, `${entries.length - reviewed} pending`],
+    ["Human accepted", accepted, "reviewer-confirmed answers"],
+    ["Overrides", overridden, "human correction ledger"],
+    ["Needs evidence", needsEvidence, "explicit evidence requests"],
+    ["Cloud-supported", cloudSupported, "answerable from cloud telemetry"],
+    ["AI draft candidates", draftAcceptCandidates, "not counted as human agreement"],
+  ];
+  html("#ce-review-workbench-metrics", metrics.map(metricCard).join(""));
+}
+
+function renderCeReviewFilter() {
+  html("#ce-review-filter", CE_REVIEW_FILTERS.map((filter) => `
+    <button class="${filter === state.ceReviewFilter ? "active" : ""}" type="button" data-ce-filter="${escapeHtml(filter)}">${escapeHtml(filter)}</button>
+  `).join(""));
+  document.querySelectorAll("#ce-review-filter button").forEach((button) => {
+    button.addEventListener("click", () => {
+      state.ceReviewFilter = button.dataset.ceFilter;
+      const entries = filteredCeReviewEntries();
+      state.selectedCeQuestionId = entries[0]?.question_id || state.selectedCeQuestionId;
+      renderCeReviewWorkbench();
+    });
+  });
+}
+
+function renderCeReviewList() {
+  const entries = filteredCeReviewEntries();
+  if (!entries.some((entry) => entry.question_id === state.selectedCeQuestionId)) {
+    state.selectedCeQuestionId = entries[0]?.question_id || null;
+  }
+  if (!entries.length) {
+    html("#ce-review-list", '<p class="muted">No review entries match the current filter.</p>');
+    return;
+  }
+  html("#ce-review-list", entries.map((entry) => {
+    const decision = entryDecision(entry);
+    const answerClass = String(entry.proposed_answer || "").toLowerCase().replaceAll(" ", "-");
+    return `
+      <article class="ce-review-row ${entry.question_id === state.selectedCeQuestionId ? "active" : ""}" data-question-id="${escapeHtml(entry.question_id)}">
+        <span class="pill ${reviewPillClass(decision.state)}">${escapeHtml(reviewLabel(decision.state))}</span>
+        <div>
+          <strong>${escapeHtml(entry.question_id)} ${escapeHtml(entry.section || "")}</strong>
+          <p>${escapeHtml(entry.short_paraphrase || "")}</p>
+        </div>
+        <span class="answer-chip ${answerClass}">${escapeHtml(entry.proposed_answer || "Cannot determine")}</span>
+      </article>
+    `;
+  }).join(""));
+  document.querySelectorAll(".ce-review-row").forEach((row) => {
+    row.addEventListener("click", () => {
+      state.selectedCeQuestionId = row.dataset.questionId;
+      renderCeReviewList();
+      renderCeReviewDetail();
+    });
+  });
+}
+
+function renderCeReviewDetail() {
+  const entry = selectedCeReviewEntry();
+  if (!entry) {
+    html("#ce-review-detail", "<h3>No CE review entry selected</h3>");
+    return;
+  }
+  const decision = entryDecision(entry);
+  const linkedFindings = entry.linked_findings || [];
+  const evidenceItems = entry.evidence || [];
+  html("#ce-review-detail", `
+    <div class="ce-detail-heading">
+      <span class="eyebrow">${escapeHtml(entry.question_id)} | ${escapeHtml(labelize(entry.section))}</span>
+      <h3>${escapeHtml(entry.short_paraphrase || "")}</h3>
+    </div>
+    <div class="answer-strip">
+      ${answerBox("Proposed answer", entry.proposed_answer || "Cannot determine")}
+      ${answerBox("Evidence class", labelize(entry.evidence_class))}
+      ${answerBox("Proposed status", labelize(entry.proposed_status))}
+    </div>
+    <div class="detail-block caveat-box">
+      <strong>Answer basis</strong>
+      <p>${escapeHtml(entry.answer_basis || "No answer basis supplied.")}</p>
+      <p>${escapeHtml(entry.caveat || "Human verification remains required.")}</p>
+    </div>
+    <form class="review-form" id="ce-review-form">
+      <label>
+        <span>Review state</span>
+        <select id="ce-review-state-input">
+          ${reviewStateOption("pending", decision.state)}
+          ${reviewStateOption("accepted", decision.state)}
+          ${reviewStateOption("overridden", decision.state)}
+          ${reviewStateOption("needs_evidence", decision.state)}
+        </select>
+      </label>
+      <label>
+        <span>Final answer</span>
+        <select id="ce-final-answer-input">
+          ${answerOption("pending_human_review", decision.final_answer)}
+          ${answerOption("Yes", decision.final_answer)}
+          ${answerOption("No", decision.final_answer)}
+          ${answerOption("Cannot determine", decision.final_answer)}
+        </select>
+      </label>
+      <label>
+        <span>Reviewer</span>
+        <input id="ce-reviewer-input" type="text" value="${escapeHtml(decision.reviewer || "")}" placeholder="Reviewer name or initials" />
+      </label>
+      <label>
+        <span>Evidence reference</span>
+        <input id="ce-evidence-reference-input" type="text" value="${escapeHtml(decision.additional_evidence_reference || "")}" placeholder="Ticket, file, interview note, portal path" />
+      </label>
+      <label class="wide-field">
+        <span>Reviewer note</span>
+        <textarea id="ce-reviewer-note-input" rows="3" placeholder="Why this answer is acceptable or what remains uncertain">${escapeHtml(decision.reviewer_note || "")}</textarea>
+      </label>
+      <label class="wide-field">
+        <span>Override reason</span>
+        <textarea id="ce-override-reason-input" rows="2" placeholder="Required when overriding the proposed answer">${escapeHtml(decision.override_reason || "")}</textarea>
+      </label>
+      <div class="form-actions">
+        <button type="button" id="ce-quick-accept">Accept proposal</button>
+        <button type="button" id="ce-quick-evidence">Needs evidence</button>
+        <button type="submit">Save review</button>
+      </div>
+    </form>
+    <div class="content-grid two compact-grid">
+      <section class="detail-block">
+        <strong>Linked findings</strong>
+        ${linkedFindings.length ? linkedFindings.map((finding) => `
+          <article class="mini-evidence-card">
+            <span class="pill ${priorityClass(finding.priority)}">${escapeHtml(finding.priority || "risk")}</span>
+            <div>
+              <strong>${escapeHtml(finding.control_id || "")} ${escapeHtml(finding.title || "")}</strong>
+              <p>Score ${fmtNumber(finding.score)} | ${escapeHtml(finding.finding_id || "")}</p>
+            </div>
+          </article>
+        `).join("") : '<p class="muted">No mapped CRIS-SME findings are linked to this entry.</p>'}
+      </section>
+      <section class="detail-block">
+        <strong>Evidence and next paths</strong>
+        ${[...evidenceItems, ...(entry.planned_evidence_paths || [])].slice(0, 8).map((item) => `
+          <p class="evidence-line">${escapeHtml(item)}</p>
+        `).join("") || '<p class="muted">No evidence text supplied.</p>'}
+      </section>
+    </div>
+  `);
+  wireCeReviewForm(entry);
+}
+
+function wireCeReviewForm(entry) {
+  document.querySelector("#ce-review-form")?.addEventListener("submit", (event) => {
+    event.preventDefault();
+    saveCeReviewDecision(entry, collectCeReviewFormDecision(entry));
+  });
+  document.querySelector("#ce-quick-accept")?.addEventListener("click", () => {
+    const proposedAnswer = entry.proposed_answer || "Cannot determine";
+    saveCeReviewDecision(entry, {
+      state: "accepted",
+      final_status: entry.proposed_status || "accepted",
+      final_answer: proposedAnswer,
+      reviewer: document.querySelector("#ce-reviewer-input")?.value || "",
+      reviewer_note: document.querySelector("#ce-reviewer-note-input")?.value || "Accepted proposed answer after human review.",
+      override_reason: "",
+      additional_evidence_reference: document.querySelector("#ce-evidence-reference-input")?.value || "",
+    });
+  });
+  document.querySelector("#ce-quick-evidence")?.addEventListener("click", () => {
+    saveCeReviewDecision(entry, {
+      state: "needs_evidence",
+      final_status: "needs_evidence",
+      final_answer: "Cannot determine",
+      reviewer: document.querySelector("#ce-reviewer-input")?.value || "",
+      reviewer_note: document.querySelector("#ce-reviewer-note-input")?.value || "Additional evidence required before this CE answer can be accepted.",
+      override_reason: "",
+      additional_evidence_reference: document.querySelector("#ce-evidence-reference-input")?.value || "",
+    });
+  });
+}
+
+function collectCeReviewFormDecision(entry) {
+  const stateValue = document.querySelector("#ce-review-state-input")?.value || "pending";
+  const finalAnswer = document.querySelector("#ce-final-answer-input")?.value || "pending_human_review";
+  return {
+    state: stateValue,
+    final_status: stateValue === "pending" ? "pending_human_review" : stateValue,
+    final_answer: finalAnswer,
+    reviewer: document.querySelector("#ce-reviewer-input")?.value || "",
+    reviewed_at: new Date().toISOString(),
+    reviewer_note: document.querySelector("#ce-reviewer-note-input")?.value || "",
+    override_reason: document.querySelector("#ce-override-reason-input")?.value || "",
+    additional_evidence_reference: document.querySelector("#ce-evidence-reference-input")?.value || "",
+    proposed_answer: entry.proposed_answer || "Cannot determine",
+    proposed_status: entry.proposed_status || "",
+    evidence_class: entry.evidence_class || "",
+  };
+}
+
+function saveCeReviewDecision(entry, decision) {
+  const current = entryDecision(entry);
+  state.ceReviewDecisions[entry.question_id] = {
+    ...current,
+    ...decision,
+    reviewed_at: decision.reviewed_at || new Date().toISOString(),
+  };
+  persistCeReviewDecisions();
+  renderCeReviewWorkbench();
+}
+
+function filteredCeReviewEntries() {
+  const entries = state.ceReview?.entries || [];
+  const query = state.ceReviewQuery.trim().toLowerCase();
+  return entries.filter((entry) => {
+    const decision = entryDecision(entry);
+    const matchesFilter =
+      state.ceReviewFilter === "All" ||
+      (state.ceReviewFilter === "Cloud supported" && isCloudSupported(entry)) ||
+      (state.ceReviewFilter === "Pending" && decision.state === "pending") ||
+      (state.ceReviewFilter === "Accepted" && decision.state === "accepted") ||
+      (state.ceReviewFilter === "Overridden" && decision.state === "overridden") ||
+      (state.ceReviewFilter === "Needs evidence" && decision.state === "needs_evidence");
+    const haystack = [
+      entry.question_id,
+      entry.section,
+      entry.short_paraphrase,
+      entry.evidence_class,
+      entry.proposed_answer,
+      entry.proposed_status,
+      decision.state,
+    ].join(" ").toLowerCase();
+    return matchesFilter && (!query || haystack.includes(query));
+  });
+}
+
+function selectedCeReviewEntry() {
+  return (state.ceReview?.entries || []).find((entry) => entry.question_id === state.selectedCeQuestionId);
+}
+
+function entryDecision(entry) {
+  const base = entry.review_decision || {};
+  return {
+    state: "pending",
+    final_status: "pending_human_review",
+    final_answer: "pending_human_review",
+    reviewer: "",
+    reviewed_at: "",
+    reviewer_note: "",
+    override_reason: "",
+    additional_evidence_reference: "",
+    ...base,
+    ...(state.ceReviewDecisions[entry.question_id] || {}),
+  };
+}
+
+function loadCeReviewDecisions() {
+  try {
+    return JSON.parse(localStorage.getItem(CE_REVIEW_STORAGE_KEY) || "{}");
+  } catch {
+    return {};
+  }
+}
+
+function persistCeReviewDecisions() {
+  localStorage.setItem(CE_REVIEW_STORAGE_KEY, JSON.stringify(state.ceReviewDecisions));
+}
+
+function exportCeReviewJson() {
+  const payload = {
+    schema_version: "0.1.0",
+    source_console: state.ceReview?.console_name || "CRIS-SME Cyber Essentials Evidence Review Console",
+    exported_at: new Date().toISOString(),
+    reviewer_model: "human_local_browser",
+    note: "Human reviewer decisions only. AI draft acceptance is not counted as human agreement.",
+    review_decisions: buildCeReviewExportRows(),
+  };
+  downloadText("cris_sme_ce_human_review_ledger.json", JSON.stringify(payload, null, 2), "application/json");
+}
+
+function exportCeReviewCsv() {
+  const headers = [
+    "question_id",
+    "review_state",
+    "final_answer",
+    "final_status",
+    "reviewer",
+    "reviewed_at",
+    "reviewer_note",
+    "evidence_reference",
+    "override_reason",
+  ];
+  const rows = buildCeReviewExportRows().map((row) => headers.map((header) => csvCell(row[header] || "")).join(","));
+  downloadText("cris_sme_ce_human_review_ledger.csv", [headers.join(","), ...rows].join("\n"), "text/csv");
+}
+
+function buildCeReviewExportRows() {
+  return (state.ceReview?.entries || []).map((entry) => {
+    const decision = entryDecision(entry);
+    return {
+      question_id: entry.question_id,
+      review_state: decision.state || "pending",
+      final_answer: decision.final_answer || "pending_human_review",
+      final_status: decision.final_status || "pending_human_review",
+      reviewer: decision.reviewer || "",
+      reviewed_at: decision.reviewed_at || "",
+      reviewer_note: decision.reviewer_note || "",
+      evidence_reference: decision.additional_evidence_reference || "",
+      override_reason: decision.override_reason || "",
+    };
+  });
+}
+
+function downloadText(filename, content, type) {
+  const blob = new Blob([content], { type });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = filename;
+  link.click();
+  URL.revokeObjectURL(url);
+}
+
+function isCloudSupported(entry) {
+  return entry.evidence_class === "direct_cloud" || entry.evidence_class === "inferred_cloud";
+}
+
+function answerBox(label, value) {
+  return `
+    <div>
+      <span>${escapeHtml(label)}</span>
+      <strong>${escapeHtml(value)}</strong>
+    </div>
+  `;
+}
+
+function reviewStateOption(value, selected) {
+  return `<option value="${escapeHtml(value)}" ${value === selected ? "selected" : ""}>${escapeHtml(reviewLabel(value))}</option>`;
+}
+
+function answerOption(value, selected) {
+  return `<option value="${escapeHtml(value)}" ${value === selected ? "selected" : ""}>${escapeHtml(value)}</option>`;
+}
+
+function reviewLabel(value) {
+  return labelize(value || "pending");
+}
+
+function reviewPillClass(value) {
+  if (value === "accepted") return "verified";
+  if (value === "overridden") return "high";
+  if (value === "needs_evidence") return "immediate";
+  return "";
+}
+
+function csvCell(value) {
+  return `"${String(value ?? "").replaceAll('"', '""')}"`;
 }
 
 function renderDisclosureTabs() {

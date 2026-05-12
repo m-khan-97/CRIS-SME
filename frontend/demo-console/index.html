@@ -22,6 +22,7 @@
           <button class="nav-item" data-view="provenance" type="button">Provenance</button>
           <button class="nav-item" data-view="assurance" type="button">Assurance Center</button>
           <button class="nav-item" data-view="ce-workflow" type="button">CE Workflow</button>
+          <button class="nav-item" data-view="ce-review-workbench" type="button">CE Review Workbench</button>
           <button class="nav-item" data-view="disclosure" type="button">Disclosure Room</button>
           <button class="nav-item" data-view="remediation" type="button">Remediation</button>
         </nav>
@@ -211,6 +212,44 @@
             </div>
             <div class="paper-preview" id="ce-paper-preview"></div>
           </section>
+        </section>
+
+        <section class="view" id="view-ce-review-workbench" aria-labelledby="ce-review-workbench-title">
+          <div class="section-title">
+            <div>
+              <span class="eyebrow">Human verification workbench</span>
+              <h2 id="ce-review-workbench-title">Accept, override, or request evidence for CE answers.</h2>
+            </div>
+            <div class="quick-links">
+              <button class="ghost-button" id="ce-export-json" type="button">Export JSON</button>
+              <button class="ghost-button" id="ce-export-csv" type="button">Export CSV</button>
+            </div>
+          </div>
+
+          <div class="metric-grid" id="ce-review-workbench-metrics"></div>
+
+          <section class="panel caveat-panel">
+            <strong>Certification boundary</strong>
+            <p>
+              Proposed Yes means CRIS-SME found no mapped cloud risk in the available telemetry. It is not certification,
+              and clean answers still require human verification for scoping, endpoint, policy, and false-negative risk.
+            </p>
+          </section>
+
+          <div class="section-title compact-title">
+            <div class="segmented" id="ce-review-filter"></div>
+            <label class="search-box compact-search">
+              <span>Find question</span>
+              <input id="ce-review-search" type="search" placeholder="Question ID, section, answer..." />
+            </label>
+          </div>
+
+          <div class="ce-review-layout">
+            <section class="panel ce-review-list-panel">
+              <div class="ce-review-list" id="ce-review-list"></div>
+            </section>
+            <aside class="panel ce-review-detail" id="ce-review-detail"></aside>
+          </div>
         </section>
 
         <section class="view" id="view-disclosure" aria-labelledby="disclosure-title">

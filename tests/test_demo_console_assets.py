@@ -18,7 +18,12 @@ def test_demo_console_assets_exist_and_use_generated_data() -> None:
     assert "view-workbench" in index
     assert "view-provenance" in index
     assert "view-disclosure" in index
+    assert "view-ce-review-workbench" in index
+    assert "Proposed Yes means" in index
     assert "radial-gradient" not in styles
+    assert "CE_REVIEW_STORAGE_KEY" in app
+    assert "cris_sme_ce_human_review_ledger.csv" in app
+    assert "cris_sme_ce_human_review_ledger.json" in app
 
 
 def test_demo_console_does_not_depend_on_remote_assets() -> None:
