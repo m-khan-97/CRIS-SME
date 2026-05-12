@@ -123,6 +123,17 @@ Reviewer should complete:
 
 Pending entries must remain pending. Do not force a final answer where evidence is incomplete.
 
+Import a completed reviewer ledger with:
+
+```bash
+PYTHONPATH=src python3 scripts/import_ce_review_ledger.py \
+  --answer-pack outputs/reports/cris_sme_ce_self_assessment.json \
+  --ledger path/to/completed-review-ledger.csv \
+  --output-dir outputs/reports/ce_review_import
+```
+
+The importer accepts CSV ledgers, JSON review-decision dictionaries, and exported review-console JSON. Imported human-review decisions contribute to `agreement_count` and `agreement_rate`; AI-assisted draft reviewers remain separated as draft acceptance.
+
 ### AI-Assisted Pilot Ledger
 
 For internal research iteration, CRIS-SME can generate an AI-assisted pilot review ledger:

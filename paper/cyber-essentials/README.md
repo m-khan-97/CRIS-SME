@@ -28,3 +28,12 @@ Do not claim independent reviewer agreement yet. The AI-assisted ledger is repor
 Ask one CE-knowledgeable reviewer to complete `review-ledger-template.csv`.
 
 That single review pass turns the evaluation section from pilot-only to empirically reportable.
+
+Import the completed ledger with:
+
+```bash
+PYTHONPATH=src python3 scripts/import_ce_review_ledger.py \
+  --answer-pack outputs/reports/azure_controlled_lab/cris_sme_ce_self_assessment.json \
+  --ledger paper/cyber-essentials/review-ledger-template.csv \
+  --output-dir outputs/reports/azure_controlled_lab/ce_review_import
+```

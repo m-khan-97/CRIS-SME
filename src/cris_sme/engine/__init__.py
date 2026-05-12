@@ -34,6 +34,7 @@ from .ce_review_draft import (
     build_ce_review_decision_draft,
     write_ce_review_decision_draft,
 )
+from .ce_review_import import load_ce_review_decisions
 from .compliance import assess_compliance_mappings, load_compliance_mappings
 from .control_drift import build_control_drift_attribution
 from .decision_ledger import build_decision_ledger, summarize_decision_ledger
@@ -133,6 +134,7 @@ __all__ = [
     "load_exception_registry",
     "load_compliance_mappings",
     "load_ce_question_mapping",
+    "load_ce_review_decisions",
     "load_policy_pack_changelog",
     "RemediationPlanResult",
     "RemediationSimulationRequest",
