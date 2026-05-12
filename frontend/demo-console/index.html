@@ -7,7 +7,11 @@
     <link rel="stylesheet" href="./styles.css" />
   </head>
   <body>
+    <!-- Toast notifications -->
+    <div class="toast-shelf" id="toast-shelf" aria-live="polite"></div>
+
     <div class="app-shell">
+      <!-- ── Sidebar ──────────────────────────────────────────────────── -->
       <aside class="side-nav" aria-label="Primary navigation">
         <div class="brand-lockup">
           <div class="brand-mark">CR</div>
@@ -16,317 +20,510 @@
             <span>Assurance Console</span>
           </div>
         </div>
+
         <nav>
-          <button class="nav-item active" data-view="overview" type="button">Command Center</button>
-          <button class="nav-item" data-view="workbench" type="button">Findings</button>
-          <button class="nav-item" data-view="ce-workflow" type="button">Cyber Essentials</button>
-          <button class="nav-item" data-view="ce-review-workbench" type="button">Human Review</button>
-          <button class="nav-item" data-view="disclosure" type="button">Evidence Room</button>
-          <button class="nav-item" data-view="reports" type="button">Reports & Artifacts</button>
-          <button class="nav-item" data-view="assurance" type="button">Trust Center</button>
-          <button class="nav-item" data-view="provenance" type="button">Provenance</button>
-          <button class="nav-item" data-view="remediation" type="button">Remediation</button>
+          <span class="nav-section-label">Platform</span>
+
+          <button class="nav-item active" data-view="overview" type="button">
+            <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <rect x="2" y="2" width="6" height="6" rx="1.5"/>
+              <rect x="12" y="2" width="6" height="6" rx="1.5"/>
+              <rect x="2" y="12" width="6" height="6" rx="1.5"/>
+              <rect x="12" y="12" width="6" height="6" rx="1.5"/>
+            </svg>
+            Command Center
+          </button>
+
+          <button class="nav-item" data-view="assessment" type="button">
+            <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M4 14.5V6a2 2 0 012-2h8a2 2 0 012 2v8.5"/>
+              <path d="M2.5 14.5h15l-1.5 2h-12l-1.5-2z"/>
+              <path d="M8 8h4M8 11h4"/>
+            </svg>
+            New Assessment
+          </button>
+
+          <button class="nav-item" data-view="workbench" type="button">
+            <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M10 2.5l1.8 3.7 4 .58-2.9 2.83.69 4-3.59-1.89L6.4 13.6l.69-4L4.2 6.78l4-.58L10 2.5z"/>
+            </svg>
+            Findings
+          </button>
+
+          <span class="nav-section-label">Cyber Essentials</span>
+
+          <button class="nav-item" data-view="ce-workflow" type="button">
+            <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M9 12l2 2 4-4"/>
+              <path d="M5 17H4a2 2 0 01-2-2V5a2 2 0 012-2h11a2 2 0 012 2v2"/>
+              <rect x="9" y="11" width="10" height="8" rx="1.5"/>
+            </svg>
+            CE Workflow
+          </button>
+
+          <button class="nav-item" data-view="ce-review-workbench" type="button">
+            <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <circle cx="8" cy="7" r="3.5"/>
+              <path d="M2 17c0-3 2.7-5 6-5"/>
+              <path d="M14 13l1.5 1.5L18 12"/>
+            </svg>
+            Human Review
+          </button>
+
+          <span class="nav-section-label">Evidence &amp; Trust</span>
+
+          <button class="nav-item" data-view="disclosure" type="button">
+            <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <rect x="3" y="9" width="14" height="9" rx="1.5"/>
+              <path d="M7 9V6a3 3 0 016 0v3"/>
+            </svg>
+            Evidence Room
+          </button>
+
+          <button class="nav-item" data-view="assurance" type="button">
+            <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M10 2l2 6h6l-5 3.6 1.9 6L10 14l-4.9 3.6 1.9-6L2 8h6l2-6z"/>
+            </svg>
+            Trust Center
+          </button>
+
+          <button class="nav-item" data-view="provenance" type="button">
+            <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <circle cx="10" cy="4" r="1.5"/>
+              <circle cx="4"  cy="16" r="1.5"/>
+              <circle cx="16" cy="16" r="1.5"/>
+              <path d="M10 5.5v4.5M10 10l-4.5 4.5M10 10l4.5 4.5"/>
+            </svg>
+            Provenance
+          </button>
+
+          <span class="nav-section-label">Actions</span>
+
+          <button class="nav-item" data-view="reports" type="button">
+            <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M4 3h8l4 4v10a1 1 0 01-1 1H4a1 1 0 01-1-1V4a1 1 0 011-1z"/>
+              <path d="M12 3v4h4M7 10h6M7 13h4"/>
+            </svg>
+            Reports &amp; Artifacts
+          </button>
+
+          <button class="nav-item" data-view="remediation" type="button">
+            <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M15.5 4.5l-1 1-3-3 1-1a2 2 0 012.8 0l.2.2a2 2 0 010 2.8z"/>
+              <path d="M11.5 5.5L4 13l-.5 3 3-.5 7.5-7.5-3-3z"/>
+            </svg>
+            Remediation
+          </button>
         </nav>
+
         <div class="side-card">
-          <span class="eyebrow">Unified platform</span>
-          <p>One product console over deterministic CRIS-SME evidence, decisions, reports, and assurance artifacts.</p>
+          <span class="eyebrow">Quick access</span>
+          <p>Artifact hub, review workbench, and evidence room.</p>
           <a href="#reports">Artifact Hub</a>
           <a href="#ce-review-workbench">Human Review</a>
         </div>
       </aside>
 
+      <!-- ── Main workspace ──────────────────────────────────────────── -->
       <main class="workspace">
+
+        <!-- Top bar -->
         <header class="topbar">
-          <div>
-            <span class="eyebrow">Cloud Risk Assurance Console</span>
-            <h1>One command center for risk decisions, CE readiness, and evidence sharing.</h1>
+          <div class="topbar-left">
+            <h1>Assurance Console</h1>
           </div>
           <div class="top-actions">
-            <label class="search-box">
-              <span>Search</span>
-              <input id="finding-search" type="search" placeholder="Control, title, priority..." />
+            <label class="search-box" aria-label="Search findings">
+              <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true">
+                <circle cx="8.5" cy="8.5" r="5"/><path d="M15 15l-3-3"/>
+              </svg>
+              <input id="finding-search" type="search" placeholder="Control, title, priority…" />
             </label>
-            <a class="ghost-link" href="#reports">Open Artifacts</a>
+            <a class="ghost-link" href="#reports">
+              <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" width="14" height="14" aria-hidden="true">
+                <path d="M4 3h8l4 4v10a1 1 0 01-1 1H4a1 1 0 01-1-1V4a1 1 0 011-1z"/>
+              </svg>
+              Artifacts
+            </a>
           </div>
         </header>
 
-        <section class="view active" id="view-overview" aria-labelledby="overview-title">
-          <div class="hero-panel">
-            <div>
-              <span class="eyebrow">Assessment overview</span>
-              <h2 id="overview-title">Unified assurance workspace for one assessment.</h2>
-              <p id="assessment-summary">Loading CRIS-SME artifacts...</p>
-            </div>
-            <div class="risk-orbit" aria-label="Overall risk score">
-              <svg viewBox="0 0 160 160" role="img">
-                <circle cx="80" cy="80" r="62" class="ring-bg"></circle>
-                <circle cx="80" cy="80" r="62" class="ring-value" id="risk-ring"></circle>
-              </svg>
+        <!-- Run status bar -->
+        <div class="run-status-bar" id="run-status-bar">
+          <span class="status-dot"></span>
+          <strong id="status-org">CRIS-SME</strong>
+          <span class="status-sep"></span>
+          <span id="status-provider">Azure</span>
+          <span class="status-sep"></span>
+          <span id="status-run-time">Last run: loading…</span>
+          <span class="status-sep"></span>
+          <span id="status-findings">— findings</span>
+        </div>
+
+        <!-- ── Views ──────────────────────────────────────────────────── -->
+        <div class="workspace-body">
+
+          <!-- OVERVIEW ────────────────────────────────────────────────── -->
+          <section class="view active" id="view-overview" aria-labelledby="overview-title">
+            <div class="hero-panel">
               <div>
-                <strong id="risk-score">--</strong>
-                <span id="risk-band">risk band</span>
+                <span class="eyebrow">Assessment overview</span>
+                <h2 id="overview-title">Cloud Risk Intelligence</h2>
+                <p id="assessment-summary">Loading CRIS-SME assessment data…</p>
+              </div>
+              <div class="risk-orbit" aria-label="Overall risk score">
+                <svg viewBox="0 0 160 160" role="img" aria-hidden="true">
+                  <circle cx="80" cy="80" r="66" class="ring-bg"></circle>
+                  <circle cx="80" cy="80" r="66" class="ring-value" id="risk-ring"></circle>
+                </svg>
+                <div class="risk-orbit-center">
+                  <strong id="risk-score">—</strong>
+                  <span id="risk-band">risk score</span>
+                </div>
               </div>
             </div>
-          </div>
 
-          <div class="metric-grid" id="overview-metrics"></div>
+            <div class="metric-grid" id="overview-metrics"></div>
 
-          <section class="platform-strip" id="platform-modules" aria-label="Platform modules"></section>
+            <section class="platform-strip" id="platform-modules" aria-label="Platform modules"></section>
 
-          <div class="content-grid two">
-            <section class="panel">
-              <div class="panel-head">
-                <h3>Domain posture</h3>
-                <span>Risk contribution</span>
-              </div>
-              <div class="bar-list" id="domain-bars"></div>
-            </section>
-            <section class="panel">
-              <div class="panel-head">
-                <h3>Top business risks</h3>
-                <span>Highest priority controls</span>
-              </div>
-              <div class="risk-list" id="top-risks"></div>
-            </section>
-          </div>
-        </section>
-
-        <section class="view" id="view-workbench" aria-labelledby="workbench-title">
-          <div class="section-title">
-            <div>
-              <span class="eyebrow">Decision workbench</span>
-              <h2 id="workbench-title">Prioritized findings with evidence quality.</h2>
+            <div class="content-grid two">
+              <section class="panel">
+                <div class="panel-head">
+                  <h3>Domain posture</h3>
+                  <span>Risk by category</span>
+                </div>
+                <div class="bar-list" id="domain-bars"></div>
+              </section>
+              <section class="panel">
+                <div class="panel-head">
+                  <h3>Top risks</h3>
+                  <span>Highest priority findings</span>
+                </div>
+                <div class="risk-list" id="top-risks"></div>
+              </section>
             </div>
-            <div class="segmented" id="priority-filter"></div>
-          </div>
-          <div class="workbench-layout">
-            <section class="panel finding-table-panel">
-              <div class="finding-table" id="finding-table"></div>
-            </section>
-            <aside class="panel detail-panel" id="finding-detail"></aside>
-          </div>
-        </section>
-
-        <section class="view" id="view-provenance" aria-labelledby="provenance-title">
-          <div class="section-title">
-            <div>
-              <span class="eyebrow">Provenance explorer</span>
-              <h2 id="provenance-title">Trace evidence to controls, scores, claims, and assurance.</h2>
-            </div>
-          </div>
-          <div class="content-grid two">
-            <section class="panel">
-              <div class="panel-head">
-                <h3>Decision path</h3>
-                <span id="selected-path-label">Selected finding</span>
-              </div>
-              <div class="decision-path" id="decision-path"></div>
-            </section>
-            <section class="panel">
-              <div class="panel-head">
-                <h3>Graph signals</h3>
-                <span>Context prioritization</span>
-              </div>
-              <div class="graph-canvas" id="graph-canvas"></div>
-            </section>
-          </div>
-        </section>
-
-        <section class="view" id="view-assurance" aria-labelledby="assurance-title">
-          <div class="section-title">
-            <div>
-              <span class="eyebrow">Assurance center</span>
-              <h2 id="assurance-title">Claims, case arguments, replay, RBOM, and trust badge.</h2>
-            </div>
-          </div>
-          <div class="metric-grid" id="assurance-metrics"></div>
-          <div class="content-grid two">
-            <section class="panel">
-              <div class="panel-head">
-                <h3>Verified claims</h3>
-                <span>Stakeholder statements</span>
-              </div>
-              <div class="claim-list" id="claim-list"></div>
-            </section>
-            <section class="panel">
-              <div class="panel-head">
-                <h3>Assurance case</h3>
-                <span>Trust argument</span>
-              </div>
-              <div class="argument-list" id="argument-list"></div>
-            </section>
-          </div>
-        </section>
-
-        <section class="view" id="view-ce-workflow" aria-labelledby="ce-title">
-          <div class="section-title">
-            <div>
-              <span class="eyebrow">Cyber Essentials workflow</span>
-              <h2 id="ce-title">Question-level pre-population, review, and paper evidence.</h2>
-            </div>
-            <div class="quick-links">
-              <a href="../ce-self-assessment.html">Answer Pack</a>
-              <a href="../ce-review-console.html">Review Console</a>
-              <a href="../ce-evaluation.html">Metrics</a>
-            </div>
-          </div>
-
-          <div class="metric-grid" id="ce-metrics"></div>
-
-          <div class="content-grid two">
-            <section class="panel">
-              <div class="panel-head">
-                <h3>Evidence observability</h3>
-                <span>Question coverage</span>
-              </div>
-              <div class="bar-list" id="ce-observability-bars"></div>
-            </section>
-            <section class="panel">
-              <div class="panel-head">
-                <h3>Evidence gaps</h3>
-                <span>Review workload</span>
-              </div>
-              <div class="risk-list" id="ce-gap-list"></div>
-            </section>
-          </div>
-
-          <div class="content-grid two">
-            <section class="panel">
-              <div class="panel-head">
-                <h3>Review outcomes</h3>
-                <span>Human verification ledger</span>
-              </div>
-              <div class="bar-list" id="ce-review-bars"></div>
-            </section>
-            <section class="panel">
-              <div class="panel-head">
-                <h3>Controls affecting CE answers</h3>
-                <span>Top mapped failures</span>
-              </div>
-              <div class="risk-list" id="ce-control-list"></div>
-            </section>
-          </div>
-
-          <section class="panel">
-            <div class="panel-head">
-              <h3>Paper table preview</h3>
-              <span>Generated from deterministic metrics</span>
-            </div>
-            <div class="paper-preview" id="ce-paper-preview"></div>
-          </section>
-        </section>
-
-        <section class="view" id="view-ce-review-workbench" aria-labelledby="ce-review-workbench-title">
-          <div class="section-title">
-            <div>
-              <span class="eyebrow">Human verification workbench</span>
-              <h2 id="ce-review-workbench-title">Accept, override, or request evidence for CE answers.</h2>
-            </div>
-            <div class="quick-links">
-              <button class="ghost-button" id="ce-export-json" type="button">Export JSON</button>
-              <button class="ghost-button" id="ce-export-csv" type="button">Export CSV</button>
-            </div>
-          </div>
-
-          <div class="metric-grid" id="ce-review-workbench-metrics"></div>
-
-          <section class="panel caveat-panel">
-            <strong>Certification boundary</strong>
-            <p>
-              Proposed Yes means CRIS-SME found no mapped cloud risk in the available telemetry. It is not certification,
-              and clean answers still require human verification for scoping, endpoint, policy, and false-negative risk.
-            </p>
           </section>
 
-          <div class="section-title compact-title">
-            <div class="segmented" id="ce-review-filter"></div>
-            <label class="search-box compact-search">
-              <span>Find question</span>
-              <input id="ce-review-search" type="search" placeholder="Question ID, section, answer..." />
-            </label>
-          </div>
-
-          <div class="ce-review-layout">
-            <section class="panel ce-review-list-panel">
-              <div class="ce-review-list" id="ce-review-list"></div>
-            </section>
-            <aside class="panel ce-review-detail" id="ce-review-detail"></aside>
-          </div>
-        </section>
-
-        <section class="view" id="view-disclosure" aria-labelledby="disclosure-title">
-          <div class="section-title">
-            <div>
-              <span class="eyebrow">Selective disclosure</span>
-              <h2 id="disclosure-title">Switch stakeholder view without leaking raw cloud internals.</h2>
+          <!-- NEW ASSESSMENT ──────────────────────────────────────────── -->
+          <section class="view" id="view-assessment" aria-labelledby="assessment-title">
+            <div class="section-title">
+              <div>
+                <span class="eyebrow">Azure assessment wizard</span>
+                <h2 id="assessment-title">Start a live Azure run from the console.</h2>
+              </div>
+              <div class="quick-links">
+                <button class="ghost-button" id="azure-env-refresh" type="button">Check Azure CLI</button>
+              </div>
             </div>
-            <div class="segmented" id="disclosure-tabs"></div>
-          </div>
-          <div class="content-grid two">
-            <section class="panel" id="disclosure-room"></section>
-            <section class="panel">
-              <div class="panel-head">
-                <h3>Redaction and withheld evidence</h3>
-                <span>Share manifest</span>
-              </div>
-              <div id="redaction-register"></div>
-            </section>
-          </div>
-        </section>
 
-        <section class="view" id="view-reports" aria-labelledby="reports-title">
-          <div class="section-title">
-            <div>
-              <span class="eyebrow">Reports and artifacts</span>
-              <h2 id="reports-title">All generated outputs in one controlled artifact hub.</h2>
+            <div class="metric-grid" id="azure-run-metrics"></div>
+
+            <div class="content-grid two">
+              <section class="panel">
+                <div class="panel-head">
+                  <h3>Connection</h3>
+                  <span>Local runner mode</span>
+                </div>
+                <div class="connection-status" id="azure-env-status"></div>
+              </section>
+              <section class="panel">
+                <div class="panel-head">
+                  <h3>Run configuration</h3>
+                  <span>Read-only assessment</span>
+                </div>
+                <form class="assessment-form" id="azure-assessment-form">
+                  <label>
+                    <span>Subscription ID</span>
+                    <input id="azure-subscription-id" type="text" placeholder="Detected from az account show" />
+                  </label>
+                  <label>
+                    <span>Tenant ID</span>
+                    <input id="azure-tenant-id" type="text" placeholder="Detected from az account show" />
+                  </label>
+                  <label class="check-row">
+                    <input id="azure-authorized" type="checkbox" />
+                    <span>I confirm I am authorised to assess this Azure subscription.</span>
+                  </label>
+                  <button class="primary-button" id="azure-run-start" type="submit">Start Azure Assessment</button>
+                </form>
+              </section>
             </div>
-          </div>
 
-          <div class="metric-grid" id="artifact-metrics"></div>
-
-          <div class="artifact-layout">
             <section class="panel">
               <div class="panel-head">
-                <h3>Primary reports</h3>
-                <span>Stakeholder-ready views</span>
+                <h3>Run status</h3>
+                <span id="azure-run-label">No active run</span>
               </div>
-              <div class="artifact-grid" id="primary-artifacts"></div>
+              <div class="run-log" id="azure-run-status"></div>
             </section>
-            <section class="panel">
-              <div class="panel-head">
-                <h3>Research and assurance evidence</h3>
-                <span>Traceable paper and trust artifacts</span>
-              </div>
-              <div class="artifact-grid" id="assurance-artifacts"></div>
-            </section>
-          </div>
-        </section>
+          </section>
 
-        <section class="view" id="view-remediation" aria-labelledby="remediation-title">
-          <div class="section-title">
-            <div>
-              <span class="eyebrow">Remediation simulator</span>
-              <h2 id="remediation-title">Show how risk changes when controls are addressed.</h2>
+          <!-- FINDINGS WORKBENCH ──────────────────────────────────────── -->
+          <section class="view" id="view-workbench" aria-labelledby="workbench-title">
+            <div class="section-title">
+              <div>
+                <span class="eyebrow">Decision workbench</span>
+                <h2 id="workbench-title">Prioritized findings</h2>
+              </div>
+              <div class="segmented" id="priority-filter"></div>
             </div>
-          </div>
-          <div class="content-grid two">
+            <div class="workbench-layout">
+              <section class="panel finding-table-panel">
+                <div class="panel-head">
+                  <h3>Findings</h3>
+                  <span id="findings-count-label">All</span>
+                </div>
+                <div class="finding-table" id="finding-table"></div>
+              </section>
+              <aside class="panel detail-panel" id="finding-detail">
+                <div class="empty-state">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true">
+                    <circle cx="12" cy="12" r="9"/><path d="M12 8v4m0 4h.01"/>
+                  </svg>
+                  Select a finding to see details
+                </div>
+              </aside>
+            </div>
+          </section>
+
+          <!-- PROVENANCE ──────────────────────────────────────────────── -->
+          <section class="view" id="view-provenance" aria-labelledby="provenance-title">
+            <div class="section-title">
+              <div>
+                <span class="eyebrow">Provenance explorer</span>
+                <h2 id="provenance-title">Trace evidence to scores and claims</h2>
+              </div>
+            </div>
+            <div class="content-grid two">
+              <section class="panel">
+                <div class="panel-head">
+                  <h3>Decision path</h3>
+                  <span id="selected-path-label">Select a finding</span>
+                </div>
+                <div class="decision-path" id="decision-path"></div>
+              </section>
+              <section class="panel">
+                <div class="panel-head">
+                  <h3>Graph signals</h3>
+                  <span>Blast radius &amp; toxic combinations</span>
+                </div>
+                <div class="graph-canvas" id="graph-canvas"></div>
+              </section>
+            </div>
+          </section>
+
+          <!-- TRUST CENTER ────────────────────────────────────────────── -->
+          <section class="view" id="view-assurance" aria-labelledby="assurance-title">
+            <div class="section-title">
+              <div>
+                <span class="eyebrow">Trust center</span>
+                <h2 id="assurance-title">Claims, assurance case, and RBOM</h2>
+              </div>
+            </div>
+            <div class="metric-grid" id="assurance-metrics"></div>
+            <div class="content-grid two">
+              <section class="panel">
+                <div class="panel-head">
+                  <h3>Verified claims</h3>
+                  <span>Stakeholder statements</span>
+                </div>
+                <div class="claim-list" id="claim-list"></div>
+              </section>
+              <section class="panel">
+                <div class="panel-head">
+                  <h3>Assurance case</h3>
+                  <span>Trust argument structure</span>
+                </div>
+                <div class="argument-list" id="argument-list"></div>
+              </section>
+            </div>
+          </section>
+
+          <!-- CE WORKFLOW ─────────────────────────────────────────────── -->
+          <section class="view" id="view-ce-workflow" aria-labelledby="ce-title">
+            <div class="section-title">
+              <div>
+                <span class="eyebrow">Cyber Essentials workflow</span>
+                <h2 id="ce-title">Question-level pre-population and observability</h2>
+              </div>
+              <div class="quick-links">
+                <a href="../ce-self-assessment.html">Answer Pack</a>
+                <a href="../ce-review-console.html">Review Console</a>
+                <a href="../ce-evaluation.html">Metrics</a>
+              </div>
+            </div>
+
+            <div class="metric-grid" id="ce-metrics"></div>
+
+            <div class="content-grid two">
+              <section class="panel">
+                <div class="panel-head">
+                  <h3>Evidence observability</h3>
+                  <span>Question coverage by class</span>
+                </div>
+                <div class="bar-list" id="ce-observability-bars"></div>
+              </section>
+              <section class="panel">
+                <div class="panel-head">
+                  <h3>Evidence gaps</h3>
+                  <span>Non-cloud requirements</span>
+                </div>
+                <div class="risk-list" id="ce-gap-list"></div>
+              </section>
+            </div>
+
+            <div class="content-grid two">
+              <section class="panel">
+                <div class="panel-head">
+                  <h3>Review outcomes</h3>
+                  <span>Human verification ledger</span>
+                </div>
+                <div class="bar-list" id="ce-review-bars"></div>
+              </section>
+              <section class="panel">
+                <div class="panel-head">
+                  <h3>Controls affecting CE answers</h3>
+                  <span>Top mapped failures</span>
+                </div>
+                <div class="risk-list" id="ce-control-list"></div>
+              </section>
+            </div>
+
             <section class="panel">
               <div class="panel-head">
-                <h3>Risk reduction candidates</h3>
-                <span>Select controls</span>
+                <h3>Paper table preview</h3>
+                <span>Generated from deterministic metrics</span>
               </div>
-              <div class="simulator-list" id="simulator-list"></div>
+              <div class="paper-preview" id="ce-paper-preview"></div>
             </section>
-            <section class="panel simulator-result">
-              <span class="eyebrow">Projected result</span>
-              <strong id="simulated-score">--</strong>
-              <p id="simulated-summary">Select remediation candidates to model risk reduction.</p>
-              <div class="impact-bars" id="impact-bars"></div>
-            </section>
-          </div>
-        </section>
+          </section>
+
+          <!-- CE HUMAN REVIEW WORKBENCH ──────────────────────────────── -->
+          <section class="view" id="view-ce-review-workbench" aria-labelledby="ce-review-workbench-title">
+            <div class="section-title">
+              <div>
+                <span class="eyebrow">Human verification workbench</span>
+                <h2 id="ce-review-workbench-title">Accept, override, or flag CE answers</h2>
+              </div>
+              <div class="quick-links">
+                <button class="ghost-button" id="ce-export-json" type="button">Export JSON</button>
+                <button class="ghost-button" id="ce-export-csv" type="button">Export CSV</button>
+              </div>
+            </div>
+
+            <div class="metric-grid" id="ce-review-workbench-metrics"></div>
+
+            <div class="caveat-panel">
+              <strong>Certification boundary</strong>
+              <p>Proposed Yes means CRIS-SME found no mapped cloud risk in the available telemetry. It is not certification — clean answers still require human verification for scoping, endpoint, policy, and false-negative risk.</p>
+            </div>
+
+            <div class="section-title compact-title">
+              <div class="segmented" id="ce-review-filter"></div>
+              <label class="compact-search" aria-label="Search CE questions">
+                <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true">
+                  <circle cx="8.5" cy="8.5" r="5"/><path d="M15 15l-3-3"/>
+                </svg>
+                <input id="ce-review-search" type="search" placeholder="Question ID, section, answer…" />
+              </label>
+            </div>
+
+            <div class="ce-review-layout">
+              <section class="panel ce-review-list-panel">
+                <div class="panel-head">
+                  <h3>Questions</h3>
+                  <span id="ce-review-count-label">Cloud supported</span>
+                </div>
+                <div class="ce-review-list" id="ce-review-list"></div>
+              </section>
+              <aside class="panel ce-review-detail" id="ce-review-detail">
+                <div class="empty-state">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true">
+                    <path d="M9 12h6m-6 4h4M5 4h14a1 1 0 011 1v14a1 1 0 01-1 1H5a1 1 0 01-1-1V5a1 1 0 011-1z"/>
+                  </svg>
+                  Select a question to review
+                </div>
+              </aside>
+            </div>
+          </section>
+
+          <!-- EVIDENCE ROOM ───────────────────────────────────────────── -->
+          <section class="view" id="view-disclosure" aria-labelledby="disclosure-title">
+            <div class="section-title">
+              <div>
+                <span class="eyebrow">Selective disclosure</span>
+                <h2 id="disclosure-title">Stakeholder-safe evidence sharing</h2>
+              </div>
+              <div class="segmented" id="disclosure-tabs"></div>
+            </div>
+            <div class="content-grid two">
+              <section class="panel" id="disclosure-room"></section>
+              <section class="panel">
+                <div class="panel-head">
+                  <h3>Redaction register</h3>
+                  <span>Withheld evidence manifest</span>
+                </div>
+                <div id="redaction-register"></div>
+              </section>
+            </div>
+          </section>
+
+          <!-- REPORTS & ARTIFACTS ─────────────────────────────────────── -->
+          <section class="view" id="view-reports" aria-labelledby="reports-title">
+            <div class="section-title">
+              <div>
+                <span class="eyebrow">Reports and artifacts</span>
+                <h2 id="reports-title">Artifact hub</h2>
+              </div>
+            </div>
+            <div class="metric-grid" id="artifact-metrics"></div>
+            <div class="artifact-layout">
+              <section class="panel">
+                <div class="panel-head">
+                  <h3>Primary reports</h3>
+                  <span>Stakeholder-ready outputs</span>
+                </div>
+                <div class="artifact-grid" id="primary-artifacts"></div>
+              </section>
+              <section class="panel">
+                <div class="panel-head">
+                  <h3>Research &amp; assurance evidence</h3>
+                  <span>Paper, trust, and machine-readable artifacts</span>
+                </div>
+                <div class="artifact-grid" id="assurance-artifacts"></div>
+              </section>
+            </div>
+          </section>
+
+          <!-- REMEDIATION ─────────────────────────────────────────────── -->
+          <section class="view" id="view-remediation" aria-labelledby="remediation-title">
+            <div class="section-title">
+              <div>
+                <span class="eyebrow">Remediation simulator</span>
+                <h2 id="remediation-title">Model risk reduction by control</h2>
+              </div>
+            </div>
+            <div class="content-grid two">
+              <section class="panel">
+                <div class="panel-head">
+                  <h3>Risk reduction candidates</h3>
+                  <span>Select controls to simulate</span>
+                </div>
+                <div class="simulator-list" id="simulator-list"></div>
+              </section>
+              <section class="panel simulator-result">
+                <span class="eyebrow">Projected score</span>
+                <strong id="simulated-score">—</strong>
+                <p id="simulated-summary">Select remediation candidates to model risk reduction.</p>
+                <div class="impact-bars" id="impact-bars"></div>
+              </section>
+            </div>
+          </section>
+
+        </div><!-- /workspace-body -->
       </main>
-    </div>
+    </div><!-- /app-shell -->
 
     <script src="./app.js"></script>
   </body>

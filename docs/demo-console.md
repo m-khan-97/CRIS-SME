@@ -29,6 +29,7 @@ The console reads:
 ## Console Views
 
 - Command Center
+- New Assessment
 - Findings
 - Cyber Essentials
 - Human Review
@@ -52,6 +53,28 @@ The artifact hub links to:
 - CE evaluation metrics
 - machine-readable JSON payloads
 - manuscript-ready CE paper tables
+
+## Local Azure Assessment Runner
+
+The console can start a local Azure assessment through a lightweight API runner. This is the first step toward a SaaS-style connect-and-run workflow while keeping credentials out of the browser.
+
+Start the API runner:
+
+```bash
+PYTHONPATH=src python3 -m cris_sme.api.local_runner
+```
+
+Then open the Assurance Console and use **New Assessment**.
+
+The runner exposes:
+
+- `GET /health`
+- `GET /api/environment/azure`
+- `POST /api/assessments/azure`
+- `GET /api/assessments/{run_id}`
+- `GET /api/artifacts/latest`
+
+The MVP uses the local machine's existing `az login` session. The frontend never asks for Azure passwords, client secrets, or refresh tokens. The user must confirm they are authorised to assess the selected subscription before a run starts.
 
 ## Cyber Essentials Workflow
 

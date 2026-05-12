@@ -16,12 +16,17 @@ const state = {
   ceReviewFilter: "Cloud supported",
   ceReviewQuery: "",
   selectedCeQuestionId: null,
+  azureEnvironment: null,
+  azureRun: null,
+  azureRunPoller: null,
 };
 
 const CE_REVIEW_STORAGE_KEY = "cris_sme_ce_review_decisions_v1";
 const CE_REVIEW_FILTERS = ["Cloud supported", "Pending", "Accepted", "Overridden", "Needs evidence", "All"];
+const LOCAL_API_BASE = ["http:", "//127.0.0.1:8787"].join("");
 
 const PLATFORM_MODULES = [
+  ["New Assessment", "Start a local Azure run from the console.", "assessment"],
   ["Findings", "Prioritized cloud risk decisions with evidence quality.", "workbench"],
   ["Cyber Essentials", "Question-level CE answer impact and observability.", "ce-workflow"],
   ["Human Review", "Reviewer ledger for CE accept, override, or evidence requests.", "ce-review-workbench"],
@@ -126,6 +131,8 @@ async function fetchText(key) {
 
 function hydrate() {
   renderOverview();
+  renderStatusBar();
+  renderAzureAssessmentWizard();
   renderPriorityFilter();
   renderFindingTable();
   renderFindingDetail();
@@ -137,6 +144,35 @@ function hydrate() {
   renderDisclosure();
   renderReportsHub();
   renderRemediation();
+}
+
+function renderStatusBar() {
+  const report = state.report || state.dashboard;
+  if (!report) return;
+  const orgs = report.organizations || [];
+  const org = orgs[0]?.organization_name || "CRIS-SME";
+  const provider = orgs[0]?.provider || "azure";
+  const ts = report.generated_at;
+  const nonCompliant = report.evaluation_context?.non_compliant_findings ?? (state.findings.length);
+  text("#status-org", org);
+  text("#status-provider", provider.charAt(0).toUpperCase() + provider.slice(1));
+  text("#status-findings", `${nonCompliant} non-compliant finding${nonCompliant !== 1 ? "s" : ""}`);
+  if (ts) {
+    const d = new Date(ts);
+    const fmt = d.toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" })
+      + " " + d.toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" });
+    text("#status-run-time", "Last run: " + fmt);
+  }
+}
+
+function toast(message, type = "ok") {
+  const shelf = document.getElementById("toast-shelf");
+  if (!shelf) return;
+  const el = document.createElement("div");
+  el.className = `toast ${type}`;
+  el.textContent = message;
+  shelf.appendChild(el);
+  setTimeout(() => el.remove(), 3200);
 }
 
 function wireNavigation() {
@@ -180,6 +216,13 @@ function wireSearch() {
   document.querySelector("#ce-export-csv")?.addEventListener("click", () => {
     exportCeReviewCsv();
   });
+  document.querySelector("#azure-env-refresh")?.addEventListener("click", () => {
+    refreshAzureEnvironment();
+  });
+  document.querySelector("#azure-assessment-form")?.addEventListener("submit", (event) => {
+    event.preventDefault();
+    startAzureAssessmentRun();
+  });
 }
 
 function applyFindingFilters(query = document.querySelector("#finding-search")?.value || "") {
@@ -212,7 +255,7 @@ function renderOverview() {
   text("#assessment-summary", state.report?.summary || "CRIS-SME assessment loaded from generated artifacts.");
   text("#risk-score", score.toFixed(1));
   text("#risk-band", overview.risk_band || "risk band");
-  const circumference = 390;
+  const circumference = 415;
   const offset = circumference - (Math.min(score, 100) / 100) * circumference;
   document.querySelector("#risk-ring")?.style.setProperty("stroke-dashoffset", String(offset));
 
@@ -242,6 +285,133 @@ function renderPlatformModules() {
       document.querySelector(`.nav-item[data-view="${CSS.escape(button.dataset.moduleView)}"]`)?.click();
     });
   });
+}
+
+function renderAzureAssessmentWizard() {
+  const env = state.azureEnvironment;
+  const run = state.azureRun;
+  const account = env?.account || {};
+  const envStatus = env
+    ? env.authenticated ? "Authenticated" : env.azure_cli_available ? "Login needed" : "CLI missing"
+    : "Not checked";
+  const runStatus = run?.status || "idle";
+  const metrics = [
+    ["Local API", env ? "Reachable" : "Not checked", "runner at 127.0.0.1:8787"],
+    ["Azure CLI", envStatus, env?.message || "Check Azure CLI before running."],
+    ["Subscription", account.subscription_name || account.subscription_id || "Not selected", "detected or manually entered"],
+    ["Run", runStatus, run?.run_id || "no active run"],
+  ];
+  html("#azure-run-metrics", metrics.map(metricCard).join(""));
+  html("#azure-env-status", `
+    <article class="connection-card">
+      <span class="pill ${env?.authenticated ? "verified" : "high"}">${escapeHtml(envStatus)}</span>
+      <strong>${escapeHtml(env?.message || "Click Check Azure CLI to inspect local authentication.")}</strong>
+      <p>CRIS-SME never asks for Azure passwords or client secrets in the browser. Local mode uses your existing <code>az login</code> session.</p>
+    </article>
+  `);
+  if (account.subscription_id && !document.querySelector("#azure-subscription-id")?.value) {
+    document.querySelector("#azure-subscription-id").value = account.subscription_id;
+  }
+  if (account.tenant_id && !document.querySelector("#azure-tenant-id")?.value) {
+    document.querySelector("#azure-tenant-id").value = account.tenant_id;
+  }
+  renderAzureRunStatus();
+}
+
+async function refreshAzureEnvironment() {
+  try {
+    state.azureEnvironment = await apiGet("/api/environment/azure");
+    toast("Azure CLI status refreshed.");
+  } catch (error) {
+    state.azureEnvironment = {
+      azure_cli_available: false,
+      authenticated: false,
+      message: `Local runner is not reachable: ${error.message}`,
+    };
+    toast("Local runner is not reachable.", "warn");
+  }
+  renderAzureAssessmentWizard();
+}
+
+async function startAzureAssessmentRun() {
+  const payload = {
+    subscription_id: document.querySelector("#azure-subscription-id")?.value || "",
+    tenant_id: document.querySelector("#azure-tenant-id")?.value || "",
+    authorization_confirmed: Boolean(document.querySelector("#azure-authorized")?.checked),
+  };
+  if (!payload.authorization_confirmed) {
+    toast("Confirm assessment authorisation before starting.", "warn");
+    return;
+  }
+  try {
+    state.azureRun = await apiPost("/api/assessments/azure", payload);
+    toast("Azure assessment started.");
+    pollAzureRun(state.azureRun.run_id);
+  } catch (error) {
+    state.azureRun = { status: "failed", error: error.message };
+    toast("Azure assessment could not start.", "warn");
+  }
+  renderAzureAssessmentWizard();
+}
+
+async function pollAzureRun(runId) {
+  if (state.azureRunPoller) clearInterval(state.azureRunPoller);
+  state.azureRunPoller = setInterval(async () => {
+    try {
+      state.azureRun = await apiGet(`/api/assessments/${encodeURIComponent(runId)}`);
+      renderAzureRunStatus();
+      if (["completed", "failed"].includes(state.azureRun.status)) {
+        clearInterval(state.azureRunPoller);
+        state.azureRunPoller = null;
+        toast(state.azureRun.status === "completed" ? "Azure assessment completed." : "Azure assessment failed.", state.azureRun.status === "completed" ? "ok" : "warn");
+      }
+    } catch (error) {
+      state.azureRun = { run_id: runId, status: "failed", error: error.message };
+      renderAzureRunStatus();
+      clearInterval(state.azureRunPoller);
+      state.azureRunPoller = null;
+    }
+  }, 2500);
+}
+
+function renderAzureRunStatus() {
+  const run = state.azureRun;
+  text("#azure-run-label", run?.run_id || "No active run");
+  if (!run) {
+    html("#azure-run-status", '<p class="muted">Start a run to see live collector status here.</p>');
+    return;
+  }
+  html("#azure-run-status", `
+    <article class="connection-card">
+      <span class="pill ${run.status === "completed" ? "verified" : run.status === "failed" ? "immediate" : "high"}">${escapeHtml(run.status || "unknown")}</span>
+      <strong>${escapeHtml(run.run_id || "local run")}</strong>
+      <p>Output directory: ${escapeHtml(run.output_dir || "outputs/reports")}</p>
+      ${run.error ? `<p class="error-text">${escapeHtml(run.error)}</p>` : ""}
+      ${run.stderr_tail ? `<pre>${escapeHtml(run.stderr_tail)}</pre>` : ""}
+    </article>
+  `);
+}
+
+async function apiGet(path) {
+  const response = await fetch(`${LOCAL_API_BASE}${path}`, { cache: "no-store" });
+  return parseApiResponse(response);
+}
+
+async function apiPost(path, payload) {
+  const response = await fetch(`${LOCAL_API_BASE}${path}`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
+  });
+  return parseApiResponse(response);
+}
+
+async function parseApiResponse(response) {
+  const payload = await response.json().catch(() => ({}));
+  if (!response.ok) {
+    throw new Error(payload.error || `API request failed with status ${response.status}`);
+  }
+  return payload;
 }
 
 function renderDomainBars() {
@@ -714,6 +884,11 @@ function saveCeReviewDecision(entry, decision) {
   };
   persistCeReviewDecisions();
   renderCeReviewWorkbench();
+  const label = decision.state === "accepted" ? "Accepted"
+    : decision.state === "needs_evidence" ? "Flagged for evidence"
+    : decision.state === "overridden" ? "Override saved"
+    : "Review saved";
+  toast(`${label} — ${entry.question_id}`, decision.state === "accepted" ? "ok" : "warn");
 }
 
 function filteredCeReviewEntries() {
