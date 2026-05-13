@@ -18,9 +18,11 @@ category_score,Cost/Governance Hygiene,,,27.11,
 proposed_answer,No,23,,,
 proposed_answer,Yes,5,,,"Bounded: no mapped cloud-control-plane issue observed"
 proposed_answer,Cannot determine,78,,,
-review_metric,reviewed_entries,28,,,
+review_metric,reviewer_ledger_entries_received,28,,,
+review_metric,rows_aligned_with_current_answer_pack,20,,,
+review_metric,rows_requiring_revalidation,8,,,"Evidence pack prepared"
 review_metric,ai_draft_accepted,23,,,"Not independent human agreement"
 review_metric,needs_evidence,5,,,
 review_metric,pending,78,,,
-review_metric,human_agreement_evaluable,0,,,
+review_metric,final_human_agreement_evaluable,,,,"Pending revalidation"
 review_metric,draft_acceptance_evaluable,23,,,

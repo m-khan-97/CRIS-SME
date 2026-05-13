@@ -10,6 +10,11 @@ This folder is the working paper package for:
 - `references.bib` - starter bibliography and related-work sources to verify
 - `submission-plan.md` - venue plan, remaining blockers, and claim discipline
 - `review-ledger-template.csv` - 28 cloud-supported entries for independent human review
+- `review-ledger-completed.csv` - imported reviewer workbook, normalized from the completed review spreadsheet
+- `review-ledger-validation.md` - validation status for the completed review against the current controlled-lab answer pack
+- `review-ledger-revalidation-required.csv` - rows whose original reviewer entries require revalidation
+- `review-ledger-revalidation-with-evidence.csv` - reviewer-facing revalidation CSV with linked CRIS-SME evidence
+- `revalidation-evidence-pack.md` - readable evidence pack for the revalidation rows
 - `tables/results-summary.md` - frozen paper tables from current artifacts
 - `tables/results-summary.csv` - CSV version of headline results
 - `figures/` - four SVG figures for paper drafting
@@ -19,15 +24,15 @@ This folder is the working paper package for:
 Paper readiness:
 
 - strong workshop draft
-- journal draft still needs independent human review and competitor check
+- journal draft still needs revalidated human review and competitor check
 
-Do not claim independent reviewer agreement yet. The AI-assisted ledger is reported only as draft acceptance.
+Do not claim final independent reviewer agreement yet. A completed reviewer ledger has been imported, but `8` rows do not match the current controlled-lab answer pack and must be re-confirmed with the evidence pack before final agreement metrics are reported. The AI-assisted ledger is reported only as draft acceptance.
 
 ## Immediate Next Step
 
-Ask one CE-knowledgeable reviewer to complete `review-ledger-template.csv`.
+Ask the CE-knowledgeable reviewer to re-check `review-ledger-revalidation-with-evidence.csv`.
 
-That single review pass turns the evaluation section from pilot-only to empirically reportable.
+That revalidation pass turns the completed review ledger into a current, empirically reportable controlled-lab result.
 
 Import the completed ledger with:
 

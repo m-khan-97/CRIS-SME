@@ -541,7 +541,6 @@ def build_risk_drift_analysis(
     total_runs = len(reports)
     control_stability: list[dict[str, Any]] = []
     for control_id in sorted(control_appearances, key=lambda k: -control_non_compliant.get(k, 0)):
-        appearances = control_appearances[control_id]
         non_compliant_count = control_non_compliant.get(control_id, 0)
         stability_index = round(non_compliant_count / total_runs, 3)
         control_stability.append(

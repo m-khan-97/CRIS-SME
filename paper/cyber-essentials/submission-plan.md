@@ -43,20 +43,22 @@ Ready:
 - proposed answer derivation
 - controlled Azure vulnerable-lab run
 - AI-assisted pilot review draft
+- completed human review ledger imported
+- revalidation evidence pack prepared for 8 stale rows
 - paper tables and figures
 
 Still required before journal submission:
 
-- one independent CE-knowledgeable review of the 28 cloud-supported entries
+- reviewer revalidation of the 8 rows that no longer match the current controlled-lab answer pack
 - competitor/tool check
 - related-work tightening
 - final venue formatting
 
 ## Human Review Task
 
-Ask one reviewer to complete `review-ledger-template.csv`.
+Ask the reviewer to complete `review-ledger-revalidation-with-evidence.csv`.
 
-Reviewer should mark each of the 28 cloud-supported entries as:
+Reviewer should mark each of the 8 revalidation entries as:
 
 - `accepted`
 - `overridden`
@@ -69,7 +71,7 @@ They should fill:
 - evidence reference
 - override reason when relevant
 
-The reviewer does not need to be a certified CE assessor, but should understand the NCSC Cyber Essentials requirements and the distinction between cloud evidence and final attestation.
+The reviewer does not need to be a certified CE assessor, but should understand the NCSC Cyber Essentials requirements and the distinction between cloud evidence and final attestation. The evidence pack for revalidation is `revalidation-evidence-pack.md`.
 
 ## Competitor Check
 
@@ -100,6 +102,7 @@ Use the figures in `figures/`:
 
 - Refresh all metrics from a frozen run.
 - Confirm no generated table reports AI draft acceptance as human agreement.
+- Confirm the 8 revalidation rows have been reviewed before reporting final human agreement.
 - Keep IASME question text paraphrased.
 - Include false-negative caveat for proposed `Yes` answers.
 - Include cleanup statement for controlled Azure lab.
