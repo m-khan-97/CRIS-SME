@@ -97,11 +97,32 @@ def _evaluate_key_vault_protections(profile: CloudProfile) -> list[Finding]:
     """Check whether sensitive key management controls are adequately protected."""
     data_profile = profile.data
     evidence: list[str] = []
+    metadata = {
+        "key_vault_count": data_profile.key_vault_count,
+        "key_vault_purge_protected_count": (
+            data_profile.key_vault_purge_protected_count
+        ),
+        "key_vault_posture_state": data_profile.key_vault_posture_state,
+    }
+
+    if data_profile.key_vault_posture_state == "not_applicable":
+        return []
 
     if not data_profile.key_vault_mfa_enabled:
         evidence.append("Key vault administrative access is not protected with MFA")
     if not data_profile.key_vault_purge_protection_enabled:
-        evidence.append("Key vault purge protection is not enabled")
+        if data_profile.key_vault_posture_state == "unavailable":
+            evidence.append("Key vault purge protection could not be verified")
+        elif data_profile.key_vault_count > 0:
+            evidence.append(
+                (
+                    f"{data_profile.key_vault_purge_protected_count} of "
+                    f"{data_profile.key_vault_count} key vault(s) have purge "
+                    "protection enabled"
+                )
+            )
+        else:
+            evidence.append("Key vault purge protection is not enabled")
 
     if not evidence:
         return []
@@ -122,5 +143,6 @@ def _evaluate_key_vault_protections(profile: CloudProfile) -> list[Finding]:
             exposure=0.6,
             remediation_effort=0.35,
             generated_by="data_controls",
+            metadata=metadata,
         )
     ]

@@ -5,7 +5,32 @@ import subprocess
 from types import SimpleNamespace
 from unittest.mock import patch
 
+import pytest
+
 from cris_sme.collectors.azure_collector import AzureCollector, AzureCollectorSettings
+
+
+@pytest.fixture(autouse=True)
+def block_unmocked_cli_calls(monkeypatch) -> None:
+    """Keep unit tests from reaching the real Azure CLI by default."""
+
+    def fake_run_cli_command_allow_failure(
+        command: list[str],
+        timeout: int,
+    ) -> subprocess.CompletedProcess[str]:
+        _ = timeout
+        return subprocess.CompletedProcess(
+            args=command,
+            returncode=1,
+            stdout="[]",
+            stderr="unmocked unit-test CLI call",
+        )
+
+    monkeypatch.setattr(
+        AzureCollector,
+        "_run_cli_command_allow_failure",
+        staticmethod(fake_run_cli_command_allow_failure),
+    )
 
 
 class FakeSubscriptionOperations:
@@ -535,6 +560,27 @@ def test_azure_collector_enriches_iam_profile_from_role_assignments_and_graph(
             return FakeCompletedProcess("[]")
         if command[:4] == ["az", "policy", "assignment", "list"]:
             return FakeCompletedProcess("[]")
+        if command[:3] == ["az", "keyvault", "list"]:
+            return FakeCompletedProcess("[]")
+        if command[:4] == ["az", "keyvault", "show"]:
+            return FakeCompletedProcess("{}")
+        if command[:4] == ["az", "consumption", "budget", "list"]:
+            return FakeCompletedProcess("[]")
+        if (
+            command[:5] == ["az", "rest", "--method", "get", "--url"]
+            and "credentialUserRegistrationDetails" in command[5]
+        ):
+            return FakeCompletedProcess('{"value":[]}')
+        if (
+            command[:5] == ["az", "rest", "--method", "get", "--url"]
+            and "accessReviews" in command[5]
+        ):
+            return FakeCompletedProcess('{"value":[]}')
+        if (
+            command[:5] == ["az", "rest", "--method", "get", "--url"]
+            and "Consumption/budgets" in command[5]
+        ):
+            return FakeCompletedProcess('{"value":[]}')
         raise AssertionError(f"Unexpected CLI command: {command}")
 
     monkeypatch.setattr(
@@ -646,6 +692,166 @@ def test_azure_collector_treats_inaccessible_conditional_access_as_unmet(
     assert policy_count == 0
 
 
+def test_azure_collector_requires_purge_protection_on_all_key_vaults(
+    monkeypatch,
+) -> None:
+    def fake_run_cli_command_allow_failure(
+        command: list[str],
+        timeout: int,
+    ) -> subprocess.CompletedProcess[str]:
+        _ = timeout
+        if command[:3] == ["az", "keyvault", "list"]:
+            return subprocess.CompletedProcess(
+                args=command,
+                returncode=0,
+                stdout=(
+                    '[{"name":"kv-protected","resourceGroup":"rg"},'
+                    '{"name":"kv-weak","resourceGroup":"rg"}]'
+                ),
+                stderr="",
+            )
+        if command[:4] == ["az", "keyvault", "show", "--name"]:
+            protected = command[4] == "kv-protected"
+            return subprocess.CompletedProcess(
+                args=command,
+                returncode=0,
+                stdout=(
+                    '{"properties":{"enablePurgeProtection":'
+                    + ("true" if protected else "false")
+                    + "}}"
+                ),
+                stderr="",
+            )
+        raise AssertionError(f"Unexpected CLI command: {command}")
+
+    monkeypatch.setattr(
+        AzureCollector,
+        "_run_cli_command_allow_failure",
+        staticmethod(fake_run_cli_command_allow_failure),
+    )
+
+    posture = AzureCollector()._collect_key_vault_posture(
+        "sub-123",
+        ca_enforced_for_admins=True,
+    )
+
+    assert posture.mfa_enabled is True
+    assert posture.purge_protection_enabled is False
+    assert posture.vault_count == 2
+    assert posture.purge_protected_count == 1
+    assert posture.state == "observed"
+
+
+def test_azure_collector_treats_empty_key_vault_inventory_as_not_applicable(
+    monkeypatch,
+) -> None:
+    def fake_run_cli_command_allow_failure(
+        command: list[str],
+        timeout: int,
+    ) -> subprocess.CompletedProcess[str]:
+        _ = timeout
+        assert command[:3] == ["az", "keyvault", "list"]
+        return subprocess.CompletedProcess(
+            args=command,
+            returncode=0,
+            stdout="[]",
+            stderr="",
+        )
+
+    monkeypatch.setattr(
+        AzureCollector,
+        "_run_cli_command_allow_failure",
+        staticmethod(fake_run_cli_command_allow_failure),
+    )
+
+    posture = AzureCollector()._collect_key_vault_posture(
+        "sub-123",
+        ca_enforced_for_admins=False,
+    )
+
+    assert posture.mfa_enabled is True
+    assert posture.purge_protection_enabled is True
+    assert posture.vault_count == 0
+    assert posture.state == "not_applicable"
+
+
+def test_azure_collector_distinguishes_budget_api_inaccessible(
+    monkeypatch,
+) -> None:
+    def fake_run_cli_command_allow_failure(
+        command: list[str],
+        timeout: int,
+    ) -> subprocess.CompletedProcess[str]:
+        _ = timeout
+        return subprocess.CompletedProcess(
+            args=command,
+            returncode=1,
+            stdout='{"error":{"code":"AuthorizationFailed"}}',
+            stderr="AuthorizationFailed",
+        )
+
+    monkeypatch.setattr(
+        AzureCollector,
+        "_run_cli_command_allow_failure",
+        staticmethod(fake_run_cli_command_allow_failure),
+    )
+
+    posture = AzureCollector()._collect_budget_alert_posture("sub-123")
+
+    assert posture.enabled is False
+    assert posture.api_accessible is False
+    assert posture.budget_count == 0
+    assert posture.state == "unavailable"
+
+
+def test_azure_collector_classifies_generic_access_reviews_as_proxy(
+    monkeypatch,
+) -> None:
+    def fake_run_cli_command_allow_failure(
+        command: list[str],
+        timeout: int,
+    ) -> subprocess.CompletedProcess[str]:
+        _ = timeout
+        assert "accessReviews/definitions" in command[5]
+        return subprocess.CompletedProcess(
+            args=command,
+            returncode=0,
+            stdout=(
+                '{"value":[{"displayName":"Quarterly application access review",'
+                '"lastModifiedDateTime":"2025-01-01T00:00:00Z"}]}'
+            ),
+            stderr="",
+        )
+
+    monkeypatch.setattr(
+        AzureCollector,
+        "_run_cli_command_allow_failure",
+        staticmethod(fake_run_cli_command_allow_failure),
+    )
+
+    posture = AzureCollector()._collect_rbac_review_posture()
+
+    assert posture.api_accessible is True
+    assert posture.definition_count == 1
+    assert posture.privileged_scope_count == 0
+    assert posture.scope == "generic_or_unknown"
+    assert posture.age_days > 90
+
+
+def test_azure_collector_derives_private_endpoint_requirement_with_public_exceptions() -> None:
+    requirement = AzureCollector._derive_private_endpoint_requirement(
+        storage_account_count=3,
+        sql_server_count=2,
+        intentional_public_service_count=1,
+    )
+
+    assert requirement == {
+        "required": 4,
+        "exemptions": 1,
+        "basis": "sensitive_data_services_minus_intentional_public_services",
+    }
+
+
 def test_azure_collector_enriches_governance_profile_from_resource_inventory(
     monkeypatch,
 ) -> None:
@@ -693,6 +899,17 @@ def test_azure_collector_enriches_governance_profile_from_resource_inventory(
             return FakeCompletedProcess('{"value":[]}')
         if command[:4] == ["az", "security", "assessment", "list"]:
             return FakeCompletedProcess("[]")
+        if command[:3] == ["az", "keyvault", "list"]:
+            return FakeCompletedProcess("[]")
+        if command[:4] == ["az", "keyvault", "show"]:
+            return FakeCompletedProcess("{}")
+        if command[:4] == ["az", "consumption", "budget", "list"]:
+            return FakeCompletedProcess("[]")
+        if (
+            command[:5] == ["az", "rest", "--method", "get", "--url"]
+            and "Consumption/budgets" in command[5]
+        ):
+            return FakeCompletedProcess('{"value":[]}')
         raise AssertionError(f"Unexpected CLI command: {command}")
 
     monkeypatch.setattr(
@@ -770,6 +987,17 @@ def test_azure_collector_enriches_monitoring_profile_from_cli_and_workflows(
             return FakeCompletedProcess("[]")
         if command[:4] == ["az", "policy", "assignment", "list"]:
             return FakeCompletedProcess("[]")
+        if command[:3] == ["az", "keyvault", "list"]:
+            return FakeCompletedProcess("[]")
+        if command[:4] == ["az", "keyvault", "show"]:
+            return FakeCompletedProcess("{}")
+        if command[:4] == ["az", "consumption", "budget", "list"]:
+            return FakeCompletedProcess("[]")
+        if (
+            command[:5] == ["az", "rest", "--method", "get", "--url"]
+            and "Consumption/budgets" in command[5]
+        ):
+            return FakeCompletedProcess('{"value":[]}')
         raise AssertionError(f"Unexpected CLI command: {command}")
 
     monkeypatch.setattr(
@@ -837,6 +1065,17 @@ def test_azure_collector_collects_native_security_recommendations(
             )
         if command[:4] == ["az", "policy", "assignment", "list"]:
             return FakeCompletedProcess("[]")
+        if command[:3] == ["az", "keyvault", "list"]:
+            return FakeCompletedProcess("[]")
+        if command[:4] == ["az", "keyvault", "show"]:
+            return FakeCompletedProcess("{}")
+        if command[:4] == ["az", "consumption", "budget", "list"]:
+            return FakeCompletedProcess("[]")
+        if (
+            command[:5] == ["az", "rest", "--method", "get", "--url"]
+            and "Consumption/budgets" in command[5]
+        ):
+            return FakeCompletedProcess('{"value":[]}')
         raise AssertionError(f"Unexpected CLI command: {command}")
 
     monkeypatch.setattr(

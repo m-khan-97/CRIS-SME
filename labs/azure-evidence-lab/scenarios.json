@@ -1,0 +1,171 @@
+{
+  "version": "2026-05-13",
+  "purpose": "Repeatable Azure evidence-lab scenarios for CRIS-SME live dataset generation.",
+  "scenarios": [
+    {
+      "id": "clean-baseline",
+      "title": "Clean SME Baseline",
+      "dataset_source_type": "live_lab",
+      "authorization_basis": "owned_controlled_lab",
+      "dataset_use": "clean_baseline",
+      "risk_intent": "Create a small tagged Azure estate with conservative network and storage defaults.",
+      "expected_findings": [
+        {
+          "control_id": "IAM-005",
+          "expectation": "May appear if tenant-level identity signals are unavailable from the current Azure CLI permissions."
+        },
+        {
+          "control_id": "NET-001",
+          "expectation": "Should not fire from lab resources because no public administrative ingress is deployed."
+        },
+        {
+          "control_id": "DATA-001",
+          "expectation": "Should not fire from lab resources because blob public access is disabled."
+        }
+      ],
+      "resources": [
+        "resource_group",
+        "network_security_group_with_deny_management",
+        "storage_account_private_blob_access"
+      ]
+    },
+    {
+      "id": "public-exposure",
+      "title": "Public Exposure Stress Lab",
+      "dataset_source_type": "vulnerable_lab",
+      "authorization_basis": "intentionally_vulnerable_lab",
+      "dataset_use": "control_stress_test",
+      "risk_intent": "Introduce explicit public SSH/RDP NSG exposure and public blob evidence without deploying a reachable workload.",
+      "expected_findings": [
+        {
+          "control_id": "NET-001",
+          "expectation": "Should fire because the lab NSG allows inbound SSH and RDP from the internet."
+        },
+        {
+          "control_id": "NET-002",
+          "expectation": "Should fire if the collector identifies permissive public network exposure."
+        },
+        {
+          "control_id": "DATA-001",
+          "expectation": "Should fire because blob public access and a public container are intentionally enabled."
+        }
+      ],
+      "resources": [
+        "resource_group",
+        "network_security_group_open_ssh_rdp",
+        "storage_account_public_blob_container"
+      ]
+    },
+    {
+      "id": "governance-drift",
+      "title": "Governance Drift Lab",
+      "dataset_source_type": "live_lab",
+      "authorization_basis": "owned_controlled_lab",
+      "dataset_use": "governance_drift",
+      "risk_intent": "Create a minimal estate with intentionally incomplete tagging and no compensating governance resources.",
+      "expected_findings": [
+        {
+          "control_id": "GOV-001",
+          "expectation": "May fire if the collector observes tag coverage gaps."
+        },
+        {
+          "control_id": "GOV-002",
+          "expectation": "May fire if budget-alert evidence remains unavailable or absent."
+        }
+      ],
+      "resources": [
+        "resource_group",
+        "untagged_storage_account",
+        "untagged_network_security_group"
+      ]
+    },
+    {
+      "id": "data-risk",
+      "title": "Data Protection Stress Lab",
+      "dataset_source_type": "vulnerable_lab",
+      "authorization_basis": "intentionally_vulnerable_lab",
+      "dataset_use": "data_control_stress_test",
+      "risk_intent": "Stress storage and key-management evidence paths with public blob access and a Key Vault without purge protection.",
+      "expected_findings": [
+        {
+          "control_id": "DATA-001",
+          "expectation": "Should fire because blob public access is intentionally enabled."
+        },
+        {
+          "control_id": "DATA-004",
+          "expectation": "May fire if Key Vault purge-protection or key-management posture is observed as weak."
+        }
+      ],
+      "resources": [
+        "resource_group",
+        "storage_account_public_blob_container",
+        "key_vault_without_purge_protection"
+      ]
+    },
+    {
+      "id": "media-office-demo",
+      "title": "International Media Office Demo Lab",
+      "dataset_source_type": "live_lab",
+      "authorization_basis": "owned_controlled_lab",
+      "dataset_use": "sector_training_demo",
+      "risk_intent": "Create a small public-communications style Azure estate for cyber-security training and CRIS-SME evidence collection without touching the real client environment.",
+      "expected_findings": [
+        {
+          "control_id": "NET-001",
+          "expectation": "Should not fire from lab resources because only web ports are exposed; no SSH or RDP rules are created."
+        },
+        {
+          "control_id": "DATA-001",
+          "expectation": "May fire because the lab includes intentionally public content storage to model a public media asset channel."
+        },
+        {
+          "control_id": "GOV-001",
+          "expectation": "Should not fire from lab resources because resources are tagged with scenario and dataset metadata."
+        }
+      ],
+      "resources": [
+        "resource_group",
+        "network_security_group_web_only",
+        "storage_account_public_media_content",
+        "key_vault_with_purge_protection"
+      ]
+    },
+    {
+      "id": "media-office-delegated",
+      "title": "International Media Office Delegated Architecture",
+      "dataset_source_type": "live_lab",
+      "authorization_basis": "owned_controlled_lab",
+      "dataset_use": "delegated_architecture_demo",
+      "risk_intent": "Create a richer media-office training architecture with delegated network zones, public communications storage, private editorial storage, monitoring workspace, and protected key management.",
+      "expected_findings": [
+        {
+          "control_id": "NET-001",
+          "expectation": "Should not fire for administrative exposure because no SSH or RDP ingress is deployed."
+        },
+        {
+          "control_id": "NET-004",
+          "expectation": "May fire because data services exist without matching private endpoint coverage."
+        },
+        {
+          "control_id": "DATA-001",
+          "expectation": "May fire because the public media content storage account intentionally allows public blob access."
+        },
+        {
+          "control_id": "MON-003",
+          "expectation": "May improve compared with smaller labs because a Log Analytics workspace is present, but diagnostic coverage may still be partial."
+        }
+      ],
+      "resources": [
+        "resource_group",
+        "virtual_network_with_edge_editorial_data_monitoring_subnets",
+        "edge_network_security_group_web_only",
+        "editorial_network_security_group_internal_only",
+        "data_network_security_group_internal_only",
+        "public_media_storage_account",
+        "private_editorial_storage_account",
+        "key_vault_with_purge_protection",
+        "log_analytics_workspace"
+      ]
+    }
+  ]
+}

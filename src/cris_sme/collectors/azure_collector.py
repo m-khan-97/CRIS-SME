@@ -43,6 +43,38 @@ class AzureCollectorSettings:
     dataset_use: str = "live_case_study"
 
 
+@dataclass(frozen=True, slots=True)
+class AccessReviewPosture:
+    """Observable Entra access-review posture from Graph."""
+
+    age_days: int
+    api_accessible: bool
+    definition_count: int
+    privileged_scope_count: int
+    scope: str
+
+
+@dataclass(frozen=True, slots=True)
+class KeyVaultPosture:
+    """Observable Key Vault administrative and purge-protection posture."""
+
+    mfa_enabled: bool
+    purge_protection_enabled: bool
+    vault_count: int
+    purge_protected_count: int
+    state: str
+
+
+@dataclass(frozen=True, slots=True)
+class BudgetPosture:
+    """Observable Azure budget-alert posture."""
+
+    enabled: bool
+    api_accessible: bool
+    budget_count: int
+    state: str
+
+
 class AzureCollector:
     """Collect Azure subscription context and normalize it into CRIS-SME cloud profiles."""
 
@@ -208,7 +240,34 @@ class AzureCollector:
         data_profile, data_metadata = self._collect_data_profile(
             subscription_id=subscription_id,
             credential=credential,
+            ca_enforced_for_admins=iam_profile.conditional_access_enforced_for_admins,
         )
+        # Derive private endpoint requirements from sensitive data-service
+        # inventory while allowing explicitly tagged public-content services.
+        private_endpoint_requirement = self._derive_private_endpoint_requirement(
+            storage_account_count=int(data_metadata.get("storage_account_count", 0)),
+            sql_server_count=int(data_metadata.get("sql_server_count", 0)),
+            intentional_public_service_count=int(
+                data_metadata.get("intentional_public_service_count", 0)
+            ),
+        )
+        if (
+            private_endpoint_requirement["required"] > 0
+            and network_profile.private_endpoints_required == 0
+        ):
+            from cris_sme.models.cloud_profile import NetworkProfile as _NetworkProfile
+            network_profile = _NetworkProfile(
+                internet_exposed_rdp_assets=network_profile.internet_exposed_rdp_assets,
+                internet_exposed_ssh_assets=network_profile.internet_exposed_ssh_assets,
+                permissive_nsg_rules=network_profile.permissive_nsg_rules,
+                public_storage_endpoints=network_profile.public_storage_endpoints,
+                private_endpoints_required=private_endpoint_requirement["required"],
+                private_endpoints_configured=network_profile.private_endpoints_configured,
+                private_endpoint_exemptions=private_endpoint_requirement["exemptions"],
+                private_endpoint_requirement_basis=str(
+                    private_endpoint_requirement["basis"]
+                ),
+            )
         monitoring_profile, monitoring_metadata = self._collect_monitoring_profile(
             subscription_id=subscription_id,
             credential=credential,
@@ -291,6 +350,16 @@ class AzureCollector:
                 "directory_role_catalog_visible": iam_metadata[
                     "directory_role_catalog_visible"
                 ],
+                "rbac_review_api_accessible": iam_metadata[
+                    "rbac_review_api_accessible"
+                ],
+                "rbac_review_definition_count": iam_metadata[
+                    "rbac_review_definition_count"
+                ],
+                "rbac_review_privileged_scope_count": iam_metadata[
+                    "rbac_review_privileged_scope_count"
+                ],
+                "rbac_review_scope": iam_metadata["rbac_review_scope"],
                 "collector_stage": "azure_live_enriched",
                 "network_collection_mode": network_metadata["network_collection_mode"],
                 "data_collection_mode": data_metadata["data_collection_mode"],
@@ -298,8 +367,24 @@ class AzureCollector:
                 "public_storage_asset_count": data_metadata[
                     "public_storage_asset_count"
                 ],
+                "intentional_public_service_count": data_metadata[
+                    "intentional_public_service_count"
+                ],
+                "private_endpoint_requirement_basis": (
+                    network_profile.private_endpoint_requirement_basis
+                ),
+                "private_endpoint_exemption_count": (
+                    network_profile.private_endpoint_exemptions
+                ),
                 "unencrypted_data_store_count": data_metadata[
                     "unencrypted_data_store_count"
+                ],
+                "key_vault_count": data_metadata["key_vault_count"],
+                "key_vault_purge_protected_count": data_metadata[
+                    "key_vault_purge_protected_count"
+                ],
+                "key_vault_posture_state": data_metadata[
+                    "key_vault_posture_state"
                 ],
                 "sql_server_count": data_metadata["sql_server_count"],
                 "sql_database_count": data_metadata["sql_database_count"],
@@ -347,6 +432,13 @@ class AzureCollector:
                 ],
                 "orphaned_resource_count": governance_metadata[
                     "orphaned_resource_count"
+                ],
+                "budget_api_accessible": governance_metadata[
+                    "budget_api_accessible"
+                ],
+                "budget_alert_count": governance_metadata["budget_alert_count"],
+                "budget_evidence_state": governance_metadata[
+                    "budget_evidence_state"
                 ],
                 "native_recommendation_collection_mode": (
                     "azure_security_assessment_inventory"
@@ -446,13 +538,18 @@ class AzureCollector:
             else "full"
         )
 
+        privileged_accounts_without_mfa = self._collect_privileged_accounts_without_mfa(
+            privileged_principal_ids=privileged_principal_ids,
+        )
+        access_review_posture = self._collect_rbac_review_posture()
+
         return (
             IamProfile(
                 privileged_accounts=privileged_principal_count,
-                privileged_accounts_without_mfa=0,
+                privileged_accounts_without_mfa=privileged_accounts_without_mfa,
                 overprivileged_accounts=overprivileged_accounts,
                 stale_service_principals=stale_service_principals,
-                rbac_review_age_days=0,
+                rbac_review_age_days=access_review_posture.age_days,
                 conditional_access_enforced_for_admins=conditional_access_enforced_for_admins,
                 privileged_user_assignments=privileged_user_assignments,
                 privileged_service_principal_assignments=(
@@ -466,6 +563,12 @@ class AzureCollector:
                 ),
                 directory_role_catalog_visible=directory_role_catalog_visible,
                 identity_observability=identity_observability,
+                rbac_review_api_accessible=access_review_posture.api_accessible,
+                rbac_review_definition_count=access_review_posture.definition_count,
+                rbac_review_privileged_scope_count=(
+                    access_review_posture.privileged_scope_count
+                ),
+                rbac_review_scope=access_review_posture.scope,
             ),
             {
                 "iam_collection_mode": (
@@ -500,6 +603,12 @@ class AzureCollector:
                 ),
                 "directory_role_catalog_visible": directory_role_catalog_visible,
                 "identity_observability": identity_observability,
+                "rbac_review_api_accessible": access_review_posture.api_accessible,
+                "rbac_review_definition_count": access_review_posture.definition_count,
+                "rbac_review_privileged_scope_count": (
+                    access_review_posture.privileged_scope_count
+                ),
+                "rbac_review_scope": access_review_posture.scope,
             },
         )
 
@@ -695,6 +804,8 @@ class AzureCollector:
         self,
         subscription_id: str,
         credential: Any,
+        *,
+        ca_enforced_for_admins: bool = False,
     ) -> tuple[DataProfile, dict[str, int | str]]:
         """Collect Azure storage posture for public access, encryption, and retention signals."""
         if (
@@ -702,7 +813,10 @@ class AzureCollector:
             and self._sql_client_factory is None
             and self._credential_factory is None
         ):
-            cli_data_profile = self._collect_data_profile_from_cli(subscription_id)
+            cli_data_profile = self._collect_data_profile_from_cli(
+                subscription_id,
+                ca_enforced_for_admins=ca_enforced_for_admins,
+            )
             if cli_data_profile is not None:
                 return cli_data_profile
 
@@ -714,12 +828,15 @@ class AzureCollector:
             storage_accounts = []
 
         public_storage_assets = 0
+        intentional_public_service_count = 0
         unencrypted_data_stores = 0
         retention_enabled_count = 0
 
         for account in storage_accounts:
             if self._storage_account_is_public(account):
                 public_storage_assets += 1
+            if self._storage_account_is_intentional_public_service(account):
+                intentional_public_service_count += 1
 
             if not self._storage_account_is_encrypted(account):
                 unencrypted_data_stores += 1
@@ -790,14 +907,26 @@ class AzureCollector:
             else 0.0
         )
 
+        key_vault_posture = self._collect_key_vault_posture(
+            subscription_id,
+            ca_enforced_for_admins=ca_enforced_for_admins,
+        )
+
         return (
             DataProfile(
                 public_storage_assets=public_storage_assets,
                 unencrypted_data_stores=unencrypted_data_stores,
                 backup_coverage_ratio=coverage_ratio,
                 retention_policy_coverage_ratio=coverage_ratio,
-                key_vault_mfa_enabled=False,
-                key_vault_purge_protection_enabled=False,
+                key_vault_mfa_enabled=key_vault_posture.mfa_enabled,
+                key_vault_purge_protection_enabled=(
+                    key_vault_posture.purge_protection_enabled
+                ),
+                key_vault_count=key_vault_posture.vault_count,
+                key_vault_purge_protected_count=(
+                    key_vault_posture.purge_protected_count
+                ),
+                key_vault_posture_state=key_vault_posture.state,
             ),
             {
                 "data_collection_mode": (
@@ -811,7 +940,13 @@ class AzureCollector:
                 ),
                 "storage_account_count": storage_account_count,
                 "public_storage_asset_count": public_storage_assets,
+                "intentional_public_service_count": intentional_public_service_count,
                 "unencrypted_data_store_count": unencrypted_data_stores,
+                "key_vault_count": key_vault_posture.vault_count,
+                "key_vault_purge_protected_count": (
+                    key_vault_posture.purge_protected_count
+                ),
+                "key_vault_posture_state": key_vault_posture.state,
                 "sql_server_count": sql_server_count,
                 "sql_database_count": sql_database_count,
                 "public_sql_server_count": public_sql_server_count,
@@ -822,6 +957,8 @@ class AzureCollector:
     def _collect_data_profile_from_cli(
         self,
         subscription_id: str,
+        *,
+        ca_enforced_for_admins: bool = False,
     ) -> tuple[DataProfile, dict[str, int | str]] | None:
         """Collect Azure data posture from Azure CLI inventory."""
         storage_accounts = self._run_cli_json(
@@ -853,6 +990,7 @@ class AzureCollector:
             return None
 
         public_storage_assets = 0
+        intentional_public_service_count = 0
         unencrypted_data_stores = 0
         retention_enabled_count = 0
         storage_account_count = len(storage_accounts) if isinstance(storage_accounts, list) else 0
@@ -860,6 +998,8 @@ class AzureCollector:
         for account in storage_accounts if isinstance(storage_accounts, list) else []:
             if self._storage_account_is_public_dict(account):
                 public_storage_assets += 1
+            if self._storage_account_is_intentional_public_service_dict(account):
+                intentional_public_service_count += 1
             if not self._storage_account_is_encrypted_dict(account):
                 unencrypted_data_stores += 1
 
@@ -923,14 +1063,26 @@ class AzureCollector:
             else 0.0
         )
 
+        key_vault_posture = self._collect_key_vault_posture(
+            subscription_id,
+            ca_enforced_for_admins=ca_enforced_for_admins,
+        )
+
         return (
             DataProfile(
                 public_storage_assets=public_storage_assets,
                 unencrypted_data_stores=unencrypted_data_stores,
                 backup_coverage_ratio=coverage_ratio,
                 retention_policy_coverage_ratio=coverage_ratio,
-                key_vault_mfa_enabled=False,
-                key_vault_purge_protection_enabled=False,
+                key_vault_mfa_enabled=key_vault_posture.mfa_enabled,
+                key_vault_purge_protection_enabled=(
+                    key_vault_posture.purge_protection_enabled
+                ),
+                key_vault_count=key_vault_posture.vault_count,
+                key_vault_purge_protected_count=(
+                    key_vault_posture.purge_protected_count
+                ),
+                key_vault_posture_state=key_vault_posture.state,
             ),
             {
                 "data_collection_mode": (
@@ -944,7 +1096,13 @@ class AzureCollector:
                 ),
                 "storage_account_count": storage_account_count,
                 "public_storage_asset_count": public_storage_assets,
+                "intentional_public_service_count": intentional_public_service_count,
                 "unencrypted_data_store_count": unencrypted_data_stores,
+                "key_vault_count": key_vault_posture.vault_count,
+                "key_vault_purge_protected_count": (
+                    key_vault_posture.purge_protected_count
+                ),
+                "key_vault_posture_state": key_vault_posture.state,
                 "sql_server_count": sql_server_count,
                 "sql_database_count": sql_database_count,
                 "public_sql_server_count": public_sql_server_count,
@@ -1213,10 +1371,15 @@ class AzureCollector:
                 credential=credential,
             )
 
+        budget_posture = self._collect_budget_alert_posture(subscription_id)
+
         return (
             GovernanceProfile(
                 tagging_coverage_ratio=tagging_coverage_ratio,
-                budget_alerts_enabled=False,
+                budget_alerts_enabled=budget_posture.enabled,
+                budget_api_accessible=budget_posture.api_accessible,
+                budget_alert_count=budget_posture.budget_count,
+                budget_evidence_state=budget_posture.state,
                 policy_assignment_coverage_ratio=policy_assignment_coverage_ratio,
                 orphaned_resource_count=orphaned_resource_count,
             ),
@@ -1229,6 +1392,9 @@ class AzureCollector:
                 "governance_resource_count": total_resources,
                 "policy_assignment_count": policy_assignment_count,
                 "orphaned_resource_count": orphaned_resource_count,
+                "budget_api_accessible": budget_posture.api_accessible,
+                "budget_alert_count": budget_posture.budget_count,
+                "budget_evidence_state": budget_posture.state,
             },
         )
 
@@ -1520,6 +1686,154 @@ class AzureCollector:
         )
         admin_roles_excluded = isinstance(exclude_roles, list) and bool(exclude_roles)
         return all_users_included and not admin_roles_excluded
+
+    def _collect_privileged_accounts_without_mfa(
+        self,
+        privileged_principal_ids: set[str],
+    ) -> int:
+        """Return the count of privileged users that have not registered MFA.
+
+        Requires Reports.Read.All Graph permission. Returns 0 when the report is
+        inaccessible so the assessment degrades gracefully without false positives.
+        The companion IAM-005 finding surfaces the observability boundary.
+        """
+        if not privileged_principal_ids:
+            return 0
+
+        completed = self._run_cli_command_allow_failure(
+            [
+                "az",
+                "rest",
+                "--method",
+                "get",
+                "--url",
+                (
+                    "https://graph.microsoft.com/v1.0/reports/"
+                    "credentialUserRegistrationDetails"
+                    "?$select=userPrincipalName,id,isMfaRegistered,isMfaCapable"
+                    "&$filter=isMfaRegistered eq false"
+                ),
+            ],
+            timeout=25,
+        )
+        if completed is None or completed.returncode != 0:
+            return 0
+
+        try:
+            payload = json.loads(completed.stdout)
+        except json.JSONDecodeError:
+            return 0
+
+        registrations = payload.get("value", [])
+        if not isinstance(registrations, list):
+            return 0
+
+        without_mfa_ids = {
+            str(item.get("id", "")).strip()
+            for item in registrations
+            if isinstance(item, dict) and not item.get("isMfaRegistered", True)
+        }
+        return len(privileged_principal_ids & without_mfa_ids)
+
+    def _collect_rbac_review_age_days(self) -> int:
+        """Return the age in days of the most recent Entra access review."""
+        return self._collect_rbac_review_posture().age_days
+
+    def _collect_rbac_review_posture(self) -> AccessReviewPosture:
+        """Return observable Entra access-review posture.
+
+        Uses Identity Governance access review definitions. When accessible and
+        no reviews exist, returns 365 to surface IAM-004 (no review configured).
+        When inaccessible (permission gap), returns 0 so IAM-004 does not fire
+        from a missing evidence boundary rather than a genuine posture failure.
+        Scope metadata records whether observed definitions appear privileged-role
+        scoped or are only a generic proxy.
+        """
+        completed = self._run_cli_command_allow_failure(
+            [
+                "az",
+                "rest",
+                "--method",
+                "get",
+                "--url",
+                (
+                    "https://graph.microsoft.com/v1.0/identityGovernance/"
+                    "accessReviews/definitions"
+                    "?$select=id,displayName,status,lastModifiedDateTime&$top=20"
+                ),
+            ],
+            timeout=20,
+        )
+        if completed is None or completed.returncode != 0:
+            return AccessReviewPosture(
+                age_days=0,
+                api_accessible=False,
+                definition_count=0,
+                privileged_scope_count=0,
+                scope="unavailable",
+            )
+
+        try:
+            payload = json.loads(completed.stdout)
+        except json.JSONDecodeError:
+            return AccessReviewPosture(
+                age_days=0,
+                api_accessible=False,
+                definition_count=0,
+                privileged_scope_count=0,
+                scope="unavailable",
+            )
+
+        definitions = payload.get("value", [])
+        if not isinstance(definitions, list):
+            return AccessReviewPosture(
+                age_days=0,
+                api_accessible=False,
+                definition_count=0,
+                privileged_scope_count=0,
+                scope="unavailable",
+            )
+
+        if not definitions:
+            return AccessReviewPosture(
+                age_days=365,
+                api_accessible=True,
+                definition_count=0,
+                privileged_scope_count=0,
+                scope="none_configured",
+            )
+
+        now = datetime.now(UTC)
+        most_recent: datetime | None = None
+        privileged_scope_count = 0
+        for definition in definitions:
+            if not isinstance(definition, dict):
+                continue
+            if self._access_review_definition_is_privileged_scoped(definition):
+                privileged_scope_count += 1
+            raw_ts = definition.get("lastModifiedDateTime")
+            if not raw_ts:
+                continue
+            parsed = self._parse_graph_datetime(str(raw_ts))
+            if parsed is not None and (most_recent is None or parsed > most_recent):
+                most_recent = parsed
+
+        if most_recent is None:
+            age_days = 365
+        else:
+            age_days = max(0, (now - most_recent).days)
+
+        return AccessReviewPosture(
+            age_days=age_days,
+            api_accessible=True,
+            definition_count=len(definitions),
+            privileged_scope_count=privileged_scope_count,
+            scope=(
+                "privileged_role_scoped"
+                if privileged_scope_count
+                else "generic_or_unknown"
+            ),
+        )
 
     def _collect_signed_in_user_directory_roles(self) -> tuple[int, bool, bool]:
         """Return visible directory-role context for the signed-in assessment identity."""
@@ -1818,6 +2132,261 @@ class AzureCollector:
             returncode=process.returncode if process.returncode is not None else 1,
             stdout=stdout,
             stderr=stderr,
+        )
+
+    def _collect_key_vault_posture(
+        self,
+        subscription_id: str,
+        *,
+        ca_enforced_for_admins: bool,
+    ) -> KeyVaultPosture:
+        """Return observable Key Vault MFA and purge-protection posture.
+
+        MFA protection for Key Vault is proxied from the CA enforcement signal:
+        if CA is enforced for admins, admin access to Key Vault is MFA-gated.
+        Purge protection is read directly from Key Vault resource properties.
+        """
+        vault_list_command = [
+            "az",
+            "keyvault",
+            "list",
+            "--subscription",
+            subscription_id,
+            "--output",
+            "json",
+        ]
+        vault_result = self._run_cli_command_allow_failure(
+            vault_list_command,
+            timeout=20,
+        )
+        if vault_result is None or vault_result.returncode != 0:
+            vaults = None
+        else:
+            try:
+                vaults = json.loads(vault_result.stdout)
+            except json.JSONDecodeError:
+                vaults = None
+        if not isinstance(vaults, list):
+            return KeyVaultPosture(
+                mfa_enabled=ca_enforced_for_admins,
+                purge_protection_enabled=False,
+                vault_count=0,
+                purge_protected_count=0,
+                state="unavailable",
+            )
+        if not vaults:
+            return KeyVaultPosture(
+                mfa_enabled=True,
+                purge_protection_enabled=True,
+                vault_count=0,
+                purge_protected_count=0,
+                state="not_applicable",
+            )
+
+        purge_protected_count = 0
+        inspected_count = 0
+        for vault in vaults:
+            if not isinstance(vault, dict):
+                continue
+            resource_group = vault.get("resourceGroup")
+            name = vault.get("name")
+            if not resource_group or not name:
+                continue
+
+            detail_command = [
+                "az",
+                "keyvault",
+                "show",
+                "--name",
+                str(name),
+                "--resource-group",
+                str(resource_group),
+                "--subscription",
+                subscription_id,
+                "--output",
+                "json",
+            ]
+            detail_result = self._run_cli_command_allow_failure(
+                detail_command,
+                timeout=20,
+            )
+            if detail_result is None or detail_result.returncode != 0:
+                continue
+            try:
+                details = json.loads(detail_result.stdout)
+            except json.JSONDecodeError:
+                details = None
+            if isinstance(details, dict):
+                inspected_count += 1
+                properties = details.get("properties", {})
+                if isinstance(properties, dict) and properties.get("enablePurgeProtection"):
+                    purge_protected_count += 1
+
+        state = "observed" if inspected_count == len(vaults) else "partial"
+        return KeyVaultPosture(
+            mfa_enabled=ca_enforced_for_admins,
+            purge_protection_enabled=purge_protected_count == len(vaults),
+            vault_count=len(vaults),
+            purge_protected_count=purge_protected_count,
+            state=state,
+        )
+
+    def _collect_budget_alerts_enabled(self, subscription_id: str) -> bool:
+        """Return whether at least one Azure budget is configured for the subscription."""
+        return self._collect_budget_alert_posture(subscription_id).enabled
+
+    def _collect_budget_alert_posture(self, subscription_id: str) -> BudgetPosture:
+        """Return observable Azure Consumption budget-alert posture.
+
+        Inaccessible APIs are reported separately from observed empty budget
+        lists, while still returning enabled=False for conservative scoring.
+        """
+        budget_command = [
+            "az",
+            "consumption",
+            "budget",
+            "list",
+            "--subscription",
+            subscription_id,
+            "--output",
+            "json",
+        ]
+        budget_result = self._run_cli_command_allow_failure(budget_command, timeout=25)
+        if budget_result is not None and budget_result.returncode == 0:
+            try:
+                budgets = json.loads(budget_result.stdout)
+            except json.JSONDecodeError:
+                budgets = None
+            if isinstance(budgets, list):
+                return BudgetPosture(
+                    enabled=bool(budgets),
+                    api_accessible=True,
+                    budget_count=len(budgets),
+                    state="observed",
+                )
+
+        rest_command = [
+            "az",
+            "rest",
+            "--method",
+            "get",
+            "--url",
+            (
+                f"https://management.azure.com/subscriptions/{subscription_id}"
+                "/providers/Microsoft.Consumption/budgets?api-version=2023-05-01"
+            ),
+            "--output",
+            "json",
+        ]
+        rest_result = self._run_cli_command_allow_failure(rest_command, timeout=25)
+        if rest_result is not None and rest_result.returncode == 0:
+            try:
+                budgets_v2 = json.loads(rest_result.stdout)
+            except json.JSONDecodeError:
+                budgets_v2 = None
+            if isinstance(budgets_v2, dict):
+                values = budgets_v2.get("value", [])
+                if isinstance(values, list):
+                    return BudgetPosture(
+                        enabled=bool(values),
+                        api_accessible=True,
+                        budget_count=len(values),
+                        state="observed",
+                    )
+
+        return BudgetPosture(
+            enabled=False,
+            api_accessible=False,
+            budget_count=0,
+            state="unavailable",
+        )
+
+    @staticmethod
+    def _derive_private_endpoint_requirement(
+        *,
+        storage_account_count: int,
+        sql_server_count: int,
+        intentional_public_service_count: int,
+    ) -> dict[str, int | str]:
+        """Derive private endpoint requirements with intentional-public exceptions."""
+        exemptions = min(storage_account_count, intentional_public_service_count)
+        sensitive_storage_count = max(storage_account_count - exemptions, 0)
+        required = sensitive_storage_count + sql_server_count
+        return {
+            "required": required,
+            "exemptions": exemptions,
+            "basis": (
+                "sensitive_data_services_minus_intentional_public_services"
+                if exemptions
+                else "sensitive_data_services"
+            ),
+        }
+
+    @staticmethod
+    def _access_review_definition_is_privileged_scoped(
+        definition: dict[str, Any],
+    ) -> bool:
+        """Return whether an access-review definition appears privileged scoped."""
+        encoded = json.dumps(definition, sort_keys=True).lower()
+        privileged_terms = (
+            "privileged",
+            "administrator",
+            "admin",
+            "owner",
+            "role assignment",
+            "roleassignment",
+            "directoryrole",
+        )
+        return any(term in encoded for term in privileged_terms)
+
+    @staticmethod
+    def _resource_tags(resource: Any) -> dict[str, str]:
+        """Extract case-insensitive tags from an Azure SDK resource."""
+        tags = getattr(resource, "tags", None)
+        if not isinstance(tags, dict):
+            return {}
+        return {str(key).lower(): str(value).lower() for key, value in tags.items()}
+
+    @staticmethod
+    def _resource_tags_dict(resource: dict[str, Any]) -> dict[str, str]:
+        """Extract case-insensitive tags from an Azure CLI resource dictionary."""
+        tags = resource.get("tags")
+        if not isinstance(tags, dict):
+            return {}
+        return {str(key).lower(): str(value).lower() for key, value in tags.items()}
+
+    @staticmethod
+    def _tags_indicate_intentional_public_service(tags: dict[str, str]) -> bool:
+        """Return whether tags explicitly mark a service as intentionally public."""
+        intent_values = {
+            tags.get("cris-sme-public-intent", ""),
+            tags.get("cris-sme-intent", ""),
+            tags.get("cris-sme-data-classification", ""),
+        }
+        return any(
+            value
+            in {
+                "intentional-public-service",
+                "public-static-content",
+                "public-media-content",
+                "public-content",
+            }
+            for value in intent_values
+        )
+
+    @classmethod
+    def _storage_account_is_intentional_public_service(cls, account: Any) -> bool:
+        """Return whether a storage account is tagged as intentional public content."""
+        return cls._tags_indicate_intentional_public_service(cls._resource_tags(account))
+
+    @classmethod
+    def _storage_account_is_intentional_public_service_dict(
+        cls,
+        account: dict[str, Any],
+    ) -> bool:
+        """Return whether a CLI storage account is tagged as intentional public content."""
+        return cls._tags_indicate_intentional_public_service(
+            cls._resource_tags_dict(account)
         )
 
     @staticmethod

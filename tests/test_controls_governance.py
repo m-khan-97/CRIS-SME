@@ -19,6 +19,9 @@ def make_profile(
     sector: str = "Financial Services",
     tagging_coverage_ratio: float = 1.0,
     budget_alerts_enabled: bool = True,
+    budget_api_accessible: bool = True,
+    budget_alert_count: int = 1,
+    budget_evidence_state: str = "observed",
     policy_assignment_coverage_ratio: float = 1.0,
     orphaned_resource_count: int = 0,
 ) -> CloudProfile:
@@ -69,6 +72,9 @@ def make_profile(
         governance=GovernanceProfile(
             tagging_coverage_ratio=tagging_coverage_ratio,
             budget_alerts_enabled=budget_alerts_enabled,
+            budget_api_accessible=budget_api_accessible,
+            budget_alert_count=budget_alert_count,
+            budget_evidence_state=budget_evidence_state,
             policy_assignment_coverage_ratio=policy_assignment_coverage_ratio,
             orphaned_resource_count=orphaned_resource_count,
         ),
@@ -102,3 +108,22 @@ def test_evaluate_governance_controls_generates_multiple_findings_for_broader_we
 
     control_ids = {item.control_id for item in findings}
     assert {"GOV-001", "GOV-002", "GOV-003", "GOV-004"} <= control_ids
+
+
+def test_evaluate_governance_controls_distinguishes_budget_api_gap() -> None:
+    findings = evaluate_governance_controls(
+        [
+            make_profile(
+                budget_alerts_enabled=False,
+                budget_api_accessible=False,
+                budget_alert_count=0,
+                budget_evidence_state="unavailable",
+            )
+        ]
+    )
+
+    budget_finding = next(item for item in findings if item.control_id == "GOV-002")
+    assert budget_finding.is_compliant is False
+    assert budget_finding.confidence == 0.62
+    assert budget_finding.metadata["budget_api_accessible"] is False
+    assert any("could not be verified" in item for item in budget_finding.evidence)

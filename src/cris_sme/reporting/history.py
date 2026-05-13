@@ -6,6 +6,10 @@ from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
+# ── Drift analysis constants ──────────────────────────────────────────────────
+_MIN_RUNS_FOR_TREND = 3   # minimum history depth for a meaningful slope
+_DAYS_PER_WEEK = 7.0
+
 
 def archive_report_snapshot(
     report: dict[str, Any],
@@ -457,6 +461,212 @@ def _build_priority_distribution_trend(
             }
         )
     return trend
+
+
+def build_risk_drift_analysis(
+    reports: list[dict[str, Any]],
+) -> dict[str, Any]:
+    """Compute longitudinal risk drift, velocity, and control stability from N history runs.
+
+    Returns a structured dict suitable for inclusion in the JSON report and paper.
+    Requires at least three runs to produce a meaningful trend; returns a skeleton
+    with status='insufficient_history' for fewer runs.
+    """
+    if len(reports) < _MIN_RUNS_FOR_TREND:
+        return {
+            "status": "insufficient_history",
+            "minimum_runs_required": _MIN_RUNS_FOR_TREND,
+            "available_runs": len(reports),
+            "note": (
+                f"Risk drift analysis requires at least {_MIN_RUNS_FOR_TREND} "
+                "historical snapshots. Run more assessments to activate trend fitting."
+            ),
+        }
+
+    overall_scores = [_safe_float(r.get("overall_risk_score")) for r in reports]
+    timestamps = [_parse_iso(r.get("generated_at")) for r in reports]
+
+    # Overall risk velocity (risk-points per week, positive = worsening)
+    overall_slope_per_run = _linear_slope(list(range(len(overall_scores))), overall_scores)
+    overall_velocity_weekly = _slope_per_week(overall_slope_per_run, timestamps)
+
+    # Direction label
+    direction = _velocity_label(overall_velocity_weekly)
+
+    # Per-category slopes
+    category_slopes: dict[str, dict[str, Any]] = {}
+    all_categories: set[str] = set()
+    for report in reports:
+        all_categories.update((report.get("category_scores") or {}).keys())
+
+    for category in sorted(all_categories):
+        cat_scores = [
+            _safe_float((report.get("category_scores") or {}).get(category))
+            for report in reports
+        ]
+        cat_slope_per_run = _linear_slope(list(range(len(cat_scores))), cat_scores)
+        cat_velocity_weekly = _slope_per_week(cat_slope_per_run, timestamps)
+        category_slopes[str(category)] = {
+            "slope_per_run": round(cat_slope_per_run, 4),
+            "velocity_per_week": round(cat_velocity_weekly, 3),
+            "direction": _velocity_label(cat_velocity_weekly),
+            "first_score": round(cat_scores[0], 2),
+            "latest_score": round(cat_scores[-1], 2),
+            "change_total": round(cat_scores[-1] - cat_scores[0], 2),
+        }
+
+    # Fastest deteriorating category
+    worst_category = max(
+        category_slopes,
+        key=lambda k: category_slopes[k]["velocity_per_week"],
+        default=None,
+    )
+
+    # Control stability index: fraction of runs each control was non-compliant
+    control_appearances: dict[str, int] = {}
+    control_non_compliant: dict[str, int] = {}
+    for report in reports:
+        risks = report.get("prioritized_risks", [])
+        seen_controls_this_run: set[str] = set()
+        for risk in risks if isinstance(risks, list) else []:
+            if not isinstance(risk, dict):
+                continue
+            control_id = str(risk.get("control_id", "")).strip()
+            if not control_id or control_id in seen_controls_this_run:
+                continue
+            seen_controls_this_run.add(control_id)
+            control_appearances[control_id] = control_appearances.get(control_id, 0) + 1
+            control_non_compliant[control_id] = control_non_compliant.get(control_id, 0) + 1
+
+    total_runs = len(reports)
+    control_stability: list[dict[str, Any]] = []
+    for control_id in sorted(control_appearances, key=lambda k: -control_non_compliant.get(k, 0)):
+        appearances = control_appearances[control_id]
+        non_compliant_count = control_non_compliant.get(control_id, 0)
+        stability_index = round(non_compliant_count / total_runs, 3)
+        control_stability.append(
+            {
+                "control_id": control_id,
+                "non_compliant_run_count": non_compliant_count,
+                "total_runs": total_runs,
+                "stability_index": stability_index,
+                "persistence_label": _persistence_label(stability_index),
+            }
+        )
+
+    # Persistent controls (always non-compliant) — highest remediation priority
+    persistent_controls = [c for c in control_stability if c["stability_index"] == 1.0]
+
+    # Intermittent controls (some runs compliant, some not) — possible false negatives
+    intermittent_controls = [
+        c for c in control_stability
+        if 0.0 < c["stability_index"] < 1.0
+    ]
+
+    return {
+        "status": "available",
+        "run_count": total_runs,
+        "first_run_at": reports[0].get("generated_at"),
+        "latest_run_at": reports[-1].get("generated_at"),
+        "overall_risk": {
+            "first_score": round(overall_scores[0], 2),
+            "latest_score": round(overall_scores[-1], 2),
+            "change_total": round(overall_scores[-1] - overall_scores[0], 2),
+            "slope_per_run": round(overall_slope_per_run, 4),
+            "velocity_per_week": round(overall_velocity_weekly, 3),
+            "direction": direction,
+            "direction_note": _velocity_note(direction, overall_velocity_weekly),
+        },
+        "category_drift": category_slopes,
+        "fastest_deteriorating_category": worst_category,
+        "control_stability": control_stability[:30],
+        "persistent_control_count": len(persistent_controls),
+        "persistent_controls": [c["control_id"] for c in persistent_controls],
+        "intermittent_control_count": len(intermittent_controls),
+        "method": (
+            "Ordinary least-squares linear regression on run-indexed risk scores. "
+            "Weekly velocity derived from timestamp intervals. "
+            "Control stability index = non-compliant runs / total runs (0=always ok, 1=always failing)."
+        ),
+    }
+
+
+def _linear_slope(x: list[float], y: list[float]) -> float:
+    """Return the OLS slope of y ~ x. Returns 0.0 for degenerate inputs."""
+    n = len(x)
+    if n < 2:
+        return 0.0
+    mean_x = sum(x) / n
+    mean_y = sum(y) / n
+    numerator = sum((x[i] - mean_x) * (y[i] - mean_y) for i in range(n))
+    denominator = sum((x[i] - mean_x) ** 2 for i in range(n))
+    if denominator == 0.0:
+        return 0.0
+    return numerator / denominator
+
+
+def _slope_per_week(slope_per_run: float, timestamps: list[datetime | None]) -> float:
+    """Convert per-run slope to per-week slope using actual timestamp intervals."""
+    valid_ts = [ts for ts in timestamps if ts is not None]
+    if len(valid_ts) < 2:
+        return slope_per_run
+
+    total_days = (valid_ts[-1] - valid_ts[0]).total_seconds() / 86400.0
+    if total_days <= 0.0:
+        return slope_per_run
+
+    runs_per_week = ((len(valid_ts) - 1) / total_days) * _DAYS_PER_WEEK
+    if runs_per_week <= 0.0:
+        return slope_per_run
+
+    return slope_per_run * runs_per_week
+
+
+def _parse_iso(value: Any) -> datetime | None:
+    """Parse an ISO 8601 timestamp into an aware datetime."""
+    if not isinstance(value, str):
+        return None
+    try:
+        return datetime.fromisoformat(value.replace("Z", "+00:00"))
+    except ValueError:
+        return None
+
+
+def _velocity_label(velocity_per_week: float) -> str:
+    if velocity_per_week > 1.5:
+        return "rapidly_worsening"
+    if velocity_per_week > 0.3:
+        return "worsening"
+    if velocity_per_week < -1.5:
+        return "rapidly_improving"
+    if velocity_per_week < -0.3:
+        return "improving"
+    return "stable"
+
+
+def _velocity_note(direction: str, velocity: float) -> str:
+    v = abs(round(velocity, 2))
+    if direction == "rapidly_worsening":
+        return f"Risk score rising at approximately {v} points per week. Urgent remediation review recommended."
+    if direction == "worsening":
+        return f"Risk score rising at approximately {v} points per week."
+    if direction == "rapidly_improving":
+        return f"Risk score falling at approximately {v} points per week. Remediation effort is measurably reducing posture risk."
+    if direction == "improving":
+        return f"Risk score falling at approximately {v} points per week."
+    return "Risk score is stable across recent assessment runs."
+
+
+def _persistence_label(stability_index: float) -> str:
+    if stability_index == 1.0:
+        return "persistent"
+    if stability_index >= 0.75:
+        return "frequent"
+    if stability_index >= 0.5:
+        return "intermittent"
+    if stability_index > 0.0:
+        return "occasional"
+    return "resolved"
 
 
 def _build_framework_readiness_trend(

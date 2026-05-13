@@ -34,6 +34,13 @@ def test_demo_console_assets_exist_and_use_generated_data() -> None:
     assert "LOCAL_API_BASE" in app
     assert "/api/assessments/azure" in app
     assert "authorization_confirmed" in app
+    assert "renderScoreBreakdownGrid" in app
+    assert "renderRiskTrendSparkline" in app
+    assert "renderCePillarBars" in app
+    assert "buildFindingMarkdown" in app
+    assert "azure-step-track" in index
+    assert "risk-trend-card" in index
+    assert "ce-pillar-bars" in index
 
 
 def test_demo_console_does_not_depend_on_remote_assets() -> None:

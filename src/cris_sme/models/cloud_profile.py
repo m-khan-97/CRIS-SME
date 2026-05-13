@@ -23,6 +23,10 @@ class IamProfile(BaseModel):
     visible_directory_role_catalog_entries: int = Field(0, ge=0)
     directory_role_catalog_visible: bool = False
     identity_observability: str = Field(default="partial", min_length=4)
+    rbac_review_api_accessible: bool = True
+    rbac_review_definition_count: int = Field(0, ge=0)
+    rbac_review_privileged_scope_count: int = Field(0, ge=0)
+    rbac_review_scope: str = Field(default="unknown", min_length=3)
 
 
 class NetworkProfile(BaseModel):
@@ -34,6 +38,8 @@ class NetworkProfile(BaseModel):
     public_storage_endpoints: int = Field(..., ge=0)
     private_endpoints_required: int = Field(..., ge=0)
     private_endpoints_configured: int = Field(..., ge=0)
+    private_endpoint_exemptions: int = Field(0, ge=0)
+    private_endpoint_requirement_basis: str = Field(default="unspecified", min_length=3)
 
 
 class DataProfile(BaseModel):
@@ -45,6 +51,9 @@ class DataProfile(BaseModel):
     retention_policy_coverage_ratio: float = Field(..., ge=0.0, le=1.0)
     key_vault_mfa_enabled: bool
     key_vault_purge_protection_enabled: bool
+    key_vault_count: int = Field(0, ge=0)
+    key_vault_purge_protected_count: int = Field(0, ge=0)
+    key_vault_posture_state: str = Field(default="not_observed", min_length=3)
 
 
 class MonitoringProfile(BaseModel):
@@ -72,6 +81,9 @@ class GovernanceProfile(BaseModel):
 
     tagging_coverage_ratio: float = Field(..., ge=0.0, le=1.0)
     budget_alerts_enabled: bool
+    budget_api_accessible: bool = True
+    budget_alert_count: int = Field(0, ge=0)
+    budget_evidence_state: str = Field(default="observed", min_length=3)
     policy_assignment_coverage_ratio: float = Field(..., ge=0.0, le=1.0)
     orphaned_resource_count: int = Field(..., ge=0)
 

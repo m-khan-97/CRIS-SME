@@ -118,20 +118,36 @@ def _evaluate_private_endpoint_coverage(profile: CloudProfile) -> list[Finding]:
 
     missing = required - configured
     severity = FindingSeverity.HIGH if missing >= 2 else FindingSeverity.MEDIUM
+    evidence = [
+        f"{missing} required private endpoint(s) are not configured",
+        f"{configured} of {required} expected private endpoint(s) are currently deployed",
+    ]
+    if profile.network.private_endpoint_exemptions:
+        evidence.append(
+            (
+                f"{profile.network.private_endpoint_exemptions} data service(s) "
+                "were excluded as intentional_public_service"
+            )
+        )
 
     return [
         build_control_finding(
             profile=profile,
             control_id="NET-004",
             severity=severity,
-            evidence=[
-                f"{missing} required private endpoint(s) are not configured",
-                f"{configured} of {required} expected private endpoint(s) are currently deployed",
-            ],
+            evidence=evidence,
             is_compliant=False,
             confidence=0.82,
             exposure=0.7,
             remediation_effort=0.5,
             generated_by="network_controls",
+            metadata={
+                "private_endpoint_requirement_basis": (
+                    profile.network.private_endpoint_requirement_basis
+                ),
+                "private_endpoint_exemptions": (
+                    profile.network.private_endpoint_exemptions
+                ),
+            },
         )
     ]

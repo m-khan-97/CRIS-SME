@@ -43,6 +43,14 @@
             New Assessment
           </button>
 
+          <button class="nav-item" data-view="public-exposure" type="button">
+            <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <circle cx="10" cy="10" r="7"/>
+              <path d="M3 10h14M10 3a11 11 0 010 14M10 3a11 11 0 000 14"/>
+            </svg>
+            Public Exposure
+          </button>
+
           <button class="nav-item" data-view="workbench" type="button">
             <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
               <path d="M10 2.5l1.8 3.7 4 .58-2.9 2.83.69 4-3.59-1.89L6.4 13.6l.69-4L4.2 6.78l4-.58L10 2.5z"/>
@@ -183,6 +191,23 @@
               </div>
             </div>
 
+            <div class="overview-insights">
+              <section class="panel compact-panel">
+                <div class="panel-head">
+                  <h3>Risk trajectory</h3>
+                  <span id="risk-trend-label">History</span>
+                </div>
+                <div class="sparkline-card" id="risk-trend-card"></div>
+              </section>
+              <section class="panel compact-panel">
+                <div class="panel-head">
+                  <h3>Cyber Essentials</h3>
+                  <span>Readiness by pillar</span>
+                </div>
+                <div class="ce-pillar-bars" id="ce-pillar-bars"></div>
+              </section>
+            </div>
+
             <div class="metric-grid" id="overview-metrics"></div>
 
             <section class="platform-strip" id="platform-modules" aria-label="Platform modules"></section>
@@ -210,52 +235,209 @@
             <div class="section-title">
               <div>
                 <span class="eyebrow">Azure assessment wizard</span>
-                <h2 id="assessment-title">Start a live Azure run from the console.</h2>
+                <h2 id="assessment-title">Live cloud risk assessment</h2>
               </div>
               <div class="quick-links">
-                <button class="ghost-button" id="azure-env-refresh" type="button">Check Azure CLI</button>
+                <button class="ghost-button" id="azure-env-refresh" type="button">
+                  <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" width="13" height="13" aria-hidden="true">
+                    <path d="M13.5 8a5.5 5.5 0 11-1-3.2M13.5 2v3h-3"/>
+                  </svg>
+                  Refresh connection
+                </button>
               </div>
+            </div>
+
+            <!-- Step tracker -->
+            <div class="step-track" id="azure-step-track" aria-label="Assessment steps">
+              <div class="step-item">
+                <div class="step-num done" aria-label="Step 1 complete">1</div>
+                <span class="step-label done">Authenticate</span>
+              </div>
+              <div class="step-connector"></div>
+              <div class="step-item">
+                <div class="step-num active" aria-label="Step 2 active">2</div>
+                <span class="step-label active">Connect</span>
+              </div>
+              <div class="step-connector"></div>
+              <div class="step-item">
+                <div class="step-num" aria-label="Step 3">3</div>
+                <span class="step-label">Configure</span>
+              </div>
+              <div class="step-connector"></div>
+              <div class="step-item">
+                <div class="step-num" aria-label="Step 4">4</div>
+                <span class="step-label">Run</span>
+              </div>
+              <div class="step-connector"></div>
+              <div class="step-item">
+                <div class="step-num" aria-label="Step 5">5</div>
+                <span class="step-label">Review</span>
+              </div>
+            </div>
+
+            <!-- API notice -->
+            <div class="api-notice" role="note">
+              <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" width="14" height="14" aria-hidden="true">
+                <circle cx="8" cy="8" r="6"/><path d="M8 5v3m0 2.5h.01"/>
+              </svg>
+              <strong>Local runner required.</strong>
+              Requires the CRIS-SME API server running at <code style="font-family:monospace;font-size:0.78rem;background:rgba(148,163,184,.08);padding:1px 5px;border-radius:3px">127.0.0.1:8787</code>. Run <code style="font-family:monospace;font-size:0.78rem;background:rgba(148,163,184,.08);padding:1px 5px;border-radius:3px">PYTHONPATH=src python -m cris_sme.api.local_runner --port 8787</code> first.
             </div>
 
             <div class="metric-grid" id="azure-run-metrics"></div>
 
             <div class="content-grid two">
+              <!-- Connection status panel -->
               <section class="panel">
                 <div class="panel-head">
-                  <h3>Connection</h3>
-                  <span>Local runner mode</span>
+                  <h3>Azure connection</h3>
+                  <span>Local runner · read-only</span>
                 </div>
-                <div class="connection-status" id="azure-env-status"></div>
+                <div class="connection-status" id="azure-env-status">
+                  <article class="connection-card">
+                    <span class="pill">Checking…</span>
+                    <strong>Inspecting local Azure CLI session</strong>
+                    <p>CRIS-SME uses your existing <code>az login</code> session. No passwords or secrets are entered in the browser.</p>
+                  </article>
+                </div>
+                <div style="margin-top:14px;padding-top:14px;border-top:1px solid var(--line)">
+                  <p style="font-size:0.75rem;color:var(--faint);margin:0;line-height:1.5">
+                    CRIS-SME performs only read operations (Reader + Security Reader roles). No resources are created, modified, or deleted. All evidence is collected from the Azure control plane only.
+                  </p>
+                </div>
               </section>
+
+              <!-- Configuration form panel -->
               <section class="panel">
                 <div class="panel-head">
                   <h3>Run configuration</h3>
-                  <span>Read-only assessment</span>
+                  <span>Subscription-scoped read assessment</span>
                 </div>
                 <form class="assessment-form" id="azure-assessment-form">
                   <label>
                     <span>Subscription ID</span>
-                    <input id="azure-subscription-id" type="text" placeholder="Detected from az account show" />
+                    <input id="azure-subscription-id" type="text" placeholder="Auto-detected from az account show" autocomplete="off" spellcheck="false" />
                   </label>
                   <label>
                     <span>Tenant ID</span>
-                    <input id="azure-tenant-id" type="text" placeholder="Detected from az account show" />
+                    <input id="azure-tenant-id" type="text" placeholder="Auto-detected from az account show" autocomplete="off" spellcheck="false" />
                   </label>
                   <label class="check-row">
                     <input id="azure-authorized" type="checkbox" />
-                    <span>I confirm I am authorised to assess this Azure subscription.</span>
+                    <span>I confirm I hold Reader and Security Reader permissions on this subscription and am authorised to perform a read-only security assessment.</span>
                   </label>
-                  <button class="primary-button" id="azure-run-start" type="submit">Start Azure Assessment</button>
+                  <button class="primary-button" id="azure-run-start" type="submit">
+                    Start Azure assessment
+                  </button>
                 </form>
               </section>
             </div>
 
-            <section class="panel">
+            <!-- Run status / log -->
+            <section class="panel" style="margin-top:12px">
               <div class="panel-head">
-                <h3>Run status</h3>
+                <h3>Run output</h3>
                 <span id="azure-run-label">No active run</span>
               </div>
-              <div class="run-log" id="azure-run-status"></div>
+              <div class="run-log" id="azure-run-status">
+                <p class="muted">Start a run to see live collector status and output here.</p>
+              </div>
+            </section>
+          </section>
+
+          <!-- PUBLIC EXPOSURE ────────────────────────────────────────── -->
+          <section class="view" id="view-public-exposure" aria-labelledby="public-exposure-title">
+            <div class="section-title">
+              <div>
+                <span class="eyebrow">Public exposure assessment</span>
+                <h2 id="public-exposure-title">Authorised surface analysis</h2>
+              </div>
+            </div>
+
+            <!-- Scope boundary notice -->
+            <div class="scope-notice" role="note">
+              <div class="scope-notice-icon" aria-hidden="true">
+                <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="3" y="9" width="14" height="9" rx="1.5"/>
+                  <path d="M7 9V6a3 3 0 016 0v3"/>
+                </svg>
+              </div>
+              <div>
+                <strong>Scoped passive metadata collection only</strong>
+                <p>CRIS-SME collects DNS A/AAAA records, HTTP response codes, HTTPS availability, TLS certificate metadata, and security-header presence for explicitly entered targets. No exploitation, brute force, crawling, port sweeping, or internet-wide scanning is performed.</p>
+              </div>
+            </div>
+
+            <div class="metric-grid" id="public-exposure-metrics"></div>
+
+            <div class="content-grid two">
+              <!-- Target input panel -->
+              <section class="panel">
+                <div class="panel-head">
+                  <h3>Target scope</h3>
+                  <span>One hostname or IP per line</span>
+                </div>
+                <form class="assessment-form" id="public-exposure-form">
+                  <label>
+                    <span>Authorised targets</span>
+                    <textarea
+                      id="public-exposure-targets"
+                      rows="8"
+                      placeholder="example.com&#10;app.example.com&#10;api.example.com&#10;203.0.113.10"
+                      spellcheck="false"
+                      autocomplete="off"
+                    ></textarea>
+                  </label>
+                  <label class="check-row">
+                    <input id="public-exposure-authorized" type="checkbox" />
+                    <span>I confirm I am the owner or hold explicit written authorisation to perform passive surface analysis on these targets.</span>
+                  </label>
+                  <button class="primary-button" id="public-exposure-start" type="submit">
+                    Run exposure analysis
+                  </button>
+                </form>
+              </section>
+
+              <!-- Evidence coverage panel -->
+              <section class="panel">
+                <div class="panel-head">
+                  <h3>Evidence collected per target</h3>
+                  <span>Passive control-plane signals</span>
+                </div>
+                <div class="connection-status">
+                  <article class="connection-card" style="border-left-color:var(--ok)">
+                    <span class="pill verified">DNS</span>
+                    <strong>A / AAAA resolution</strong>
+                    <p>IPv4 and IPv6 addresses observed for the entered hostname. Used to confirm the target resolves and to check for unexpected IP ranges.</p>
+                  </article>
+                  <article class="connection-card" style="border-left-color:var(--accent)">
+                    <span class="pill low">HTTP / HTTPS</span>
+                    <strong>Response code and redirect chain</strong>
+                    <p>HTTP status code, redirect-to-HTTPS behaviour, and final response status. HTTPS availability is a CE and UK GDPR signal.</p>
+                  </article>
+                  <article class="connection-card" style="border-left-color:var(--info)">
+                    <span class="pill info">TLS</span>
+                    <strong>Certificate and protocol version</strong>
+                    <p>TLS protocol version, certificate validity, expiry date, and issuer. Expired or weak TLS configurations surface as CE control gaps.</p>
+                  </article>
+                  <article class="connection-card" style="border-left-color:var(--muted)">
+                    <span class="pill">Security headers</span>
+                    <strong>HSTS, CSP, X-Frame-Options</strong>
+                    <p>Presence or absence of security-relevant HTTP response headers. Missing headers may indicate misconfigured web surface.</p>
+                  </article>
+                </div>
+              </section>
+            </div>
+
+            <!-- Results panel -->
+            <section class="panel" style="margin-top:12px">
+              <div class="panel-head">
+                <h3>Exposure results</h3>
+                <span id="public-exposure-label">No scan run</span>
+              </div>
+              <div class="run-log" id="public-exposure-results">
+                <p class="muted">Enter authorised targets and run an exposure analysis to see DNS, HTTP, HTTPS, and TLS evidence here.</p>
+              </div>
             </section>
           </section>
 

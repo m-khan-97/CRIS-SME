@@ -17,8 +17,12 @@ const state = {
   ceReviewQuery: "",
   selectedCeQuestionId: null,
   azureEnvironment: null,
+  azureEnvironmentLoading: false,
+  azureEnvironmentChecked: false,
   azureRun: null,
   azureRunPoller: null,
+  publicExposure: null,
+  publicExposureLoading: false,
 };
 
 const CE_REVIEW_STORAGE_KEY = "cris_sme_ce_review_decisions_v1";
@@ -27,6 +31,7 @@ const LOCAL_API_BASE = ["http:", "//127.0.0.1:8787"].join("");
 
 const PLATFORM_MODULES = [
   ["New Assessment", "Start a local Azure run from the console.", "assessment"],
+  ["Public Exposure", "Authorised DNS, HTTP, HTTPS, and TLS checks.", "public-exposure"],
   ["Findings", "Prioritized cloud risk decisions with evidence quality.", "workbench"],
   ["Cyber Essentials", "Question-level CE answer impact and observability.", "ce-workflow"],
   ["Human Review", "Reviewer ledger for CE accept, override, or evidence requests.", "ce-review-workbench"],
@@ -133,6 +138,7 @@ function hydrate() {
   renderOverview();
   renderStatusBar();
   renderAzureAssessmentWizard();
+  renderPublicExposure();
   renderPriorityFilter();
   renderFindingTable();
   renderFindingDetail();
@@ -184,6 +190,9 @@ function wireNavigation() {
       button.classList.add("active");
       document.querySelector(`#view-${view}`)?.classList.add("active");
       history.replaceState(null, "", `#${view}`);
+      if (view === "assessment") {
+        ensureAzureEnvironmentPreflight();
+      }
     });
   });
   document.querySelectorAll('a[href^="#"]').forEach((link) => {
@@ -217,11 +226,15 @@ function wireSearch() {
     exportCeReviewCsv();
   });
   document.querySelector("#azure-env-refresh")?.addEventListener("click", () => {
-    refreshAzureEnvironment();
+    refreshAzureEnvironment({ force: true });
   });
   document.querySelector("#azure-assessment-form")?.addEventListener("submit", (event) => {
     event.preventDefault();
     startAzureAssessmentRun();
+  });
+  document.querySelector("#public-exposure-form")?.addEventListener("submit", (event) => {
+    event.preventDefault();
+    startPublicExposureAssessment();
   });
 }
 
@@ -258,6 +271,8 @@ function renderOverview() {
   const circumference = 415;
   const offset = circumference - (Math.min(score, 100) / 100) * circumference;
   document.querySelector("#risk-ring")?.style.setProperty("stroke-dashoffset", String(offset));
+  renderRiskTrendSparkline();
+  renderCePillarBars();
 
   const metrics = [
     ["Findings", overview.finding_count || 0, "prioritized non-compliant decisions"],
@@ -293,19 +308,20 @@ function renderAzureAssessmentWizard() {
   const account = env?.account || {};
   const envStatus = env
     ? env.authenticated ? "Authenticated" : env.azure_cli_available ? "Login needed" : "CLI missing"
-    : "Not checked";
+    : state.azureEnvironmentLoading ? "Checking" : "Not checked";
   const runStatus = run?.status || "idle";
   const metrics = [
-    ["Local API", env ? "Reachable" : "Not checked", "runner at 127.0.0.1:8787"],
-    ["Azure CLI", envStatus, env?.message || "Check Azure CLI before running."],
+    ["Local API", env ? "Reachable" : state.azureEnvironmentLoading ? "Checking" : "Not checked", "runner at 127.0.0.1:8787"],
+    ["Azure CLI", envStatus, env?.message || (state.azureEnvironmentLoading ? "Inspecting local Azure CLI session." : "Open this view to auto-check Azure CLI.")],
     ["Subscription", account.subscription_name || account.subscription_id || "Not selected", "detected or manually entered"],
     ["Run", runStatus, run?.run_id || "no active run"],
   ];
   html("#azure-run-metrics", metrics.map(metricCard).join(""));
+  renderAzureStepTracker();
   html("#azure-env-status", `
     <article class="connection-card">
       <span class="pill ${env?.authenticated ? "verified" : "high"}">${escapeHtml(envStatus)}</span>
-      <strong>${escapeHtml(env?.message || "Click Check Azure CLI to inspect local authentication.")}</strong>
+      <strong>${escapeHtml(env?.message || (state.azureEnvironmentLoading ? "Checking local Azure CLI authentication..." : "Azure CLI will be checked automatically when this view opens."))}</strong>
       <p>CRIS-SME never asks for Azure passwords or client secrets in the browser. Local mode uses your existing <code>az login</code> session.</p>
     </article>
   `);
@@ -318,17 +334,55 @@ function renderAzureAssessmentWizard() {
   renderAzureRunStatus();
 }
 
-async function refreshAzureEnvironment() {
+function renderAzureStepTracker() {
+  const env = state.azureEnvironment;
+  const run = state.azureRun;
+  const hasConfig = Boolean(
+    document.querySelector("#azure-subscription-id")?.value ||
+    env?.account?.subscription_id
+  );
+  const running = ["queued", "running", "started"].includes(String(run?.status || "").toLowerCase());
+  const completed = String(run?.status || "").toLowerCase() === "completed";
+  const failed = String(run?.status || "").toLowerCase() === "failed";
+  const steps = [
+    ["Authenticate", Boolean(env?.authenticated), state.azureEnvironmentLoading && !env, failed && !env?.authenticated],
+    ["Connect", Boolean(env?.azure_cli_available), state.azureEnvironmentLoading, Boolean(env && !env.azure_cli_available)],
+    ["Configure", hasConfig, Boolean(env?.authenticated && !hasConfig), false],
+    ["Run", completed || running, running, failed],
+    ["Review", completed, false, false],
+  ];
+  html("#azure-step-track", steps.map(([label, done, active, error], index) => `
+    <div class="step-item">
+      <div class="step-num ${error ? "error" : done ? "done" : active ? "active" : ""}" aria-label="Step ${index + 1} ${error ? "error" : done ? "complete" : active ? "active" : "pending"}">${index + 1}</div>
+      <span class="step-label ${error ? "error" : done ? "done" : active ? "active" : ""}">${escapeHtml(label)}</span>
+    </div>
+    ${index < steps.length - 1 ? `<div class="step-connector ${done ? "done" : ""}"></div>` : ""}
+  `).join(""));
+}
+
+function ensureAzureEnvironmentPreflight() {
+  if (state.azureEnvironmentChecked || state.azureEnvironmentLoading) return;
+  refreshAzureEnvironment({ quiet: true });
+}
+
+async function refreshAzureEnvironment({ force = false, quiet = false } = {}) {
+  if (state.azureEnvironmentLoading) return;
+  if (state.azureEnvironmentChecked && !force) return;
+  state.azureEnvironmentLoading = true;
+  renderAzureAssessmentWizard();
   try {
     state.azureEnvironment = await apiGet("/api/environment/azure");
-    toast("Azure CLI status refreshed.");
+    if (!quiet) toast("Azure connection refreshed.");
   } catch (error) {
     state.azureEnvironment = {
       azure_cli_available: false,
       authenticated: false,
       message: `Local runner is not reachable: ${error.message}`,
     };
-    toast("Local runner is not reachable.", "warn");
+    if (!quiet) toast("Local runner is not reachable.", "warn");
+  } finally {
+    state.azureEnvironmentLoading = false;
+    state.azureEnvironmentChecked = true;
   }
   renderAzureAssessmentWizard();
 }
@@ -392,6 +446,97 @@ function renderAzureRunStatus() {
   `);
 }
 
+function renderPublicExposure() {
+  const report = state.publicExposure;
+  const summary = report?.summary || {};
+  const metrics = [
+    ["Targets", summary.target_count ?? 0, "authorised public targets"],
+    ["Resolved", summary.resolved_target_count ?? 0, "DNS A/AAAA observed"],
+    ["HTTPS", summary.https_available_count ?? 0, "targets with HTTPS response"],
+    ["Findings", summary.finding_count ?? 0, `${summary.high_finding_count ?? 0} high`],
+  ];
+  html("#public-exposure-metrics", metrics.map(metricCard).join(""));
+  text("#public-exposure-label", report ? report.generated_at || "Latest run" : "No public exposure run");
+  if (state.publicExposureLoading) {
+    html("#public-exposure-results", `
+      <article class="connection-card">
+        <span class="pill high">running</span>
+        <strong>Checking authorised public targets...</strong>
+        <p>CRIS-SME is collecting DNS, HTTP, HTTPS, and TLS metadata for the supplied scope.</p>
+      </article>
+    `);
+    return;
+  }
+  if (!report) {
+    html("#public-exposure-results", '<p class="muted">Run a public exposure check to see endpoint evidence here.</p>');
+    return;
+  }
+  const findings = report.findings || [];
+  const targets = report.targets || [];
+  html("#public-exposure-results", `
+    <div class="content-grid two compact-grid">
+      <div>
+        <h4>Findings</h4>
+        ${findings.length ? findings.map((finding) => `
+          <article class="risk-item">
+            <span class="pill ${publicExposureSeverityClass(finding.severity)}">${escapeHtml(finding.severity || "info")}</span>
+            <div>
+              <strong>${escapeHtml(finding.id || "")} ${escapeHtml(finding.title || "")}</strong>
+              <p>${escapeHtml(finding.target || "")} · ${escapeHtml(finding.evidence_summary || "")}</p>
+            </div>
+          </article>
+        `).join("") : '<p class="muted">No public exposure findings were generated for this scoped run.</p>'}
+      </div>
+      <div>
+        <h4>Targets</h4>
+        ${targets.map((target) => `
+          <article class="connection-card">
+            <span class="pill ${target.https?.reachable ? "verified" : "high"}">${target.https?.reachable ? "HTTPS" : "Review"}</span>
+            <strong>${escapeHtml(target.host || "")}</strong>
+            <p>DNS: ${escapeHtml((target.dns?.addresses || []).join(", ") || "unresolved")}</p>
+            <p>HTTP ${escapeHtml(target.http?.status || "n/a")} · HTTPS ${escapeHtml(target.https?.status || "n/a")} · TLS ${escapeHtml(target.tls?.protocol || "n/a")}</p>
+          </article>
+        `).join("")}
+      </div>
+    </div>
+  `);
+}
+
+async function startPublicExposureAssessment() {
+  const targets = document.querySelector("#public-exposure-targets")?.value || "";
+  const authorizationConfirmed = Boolean(document.querySelector("#public-exposure-authorized")?.checked);
+  if (!authorizationConfirmed) {
+    toast("Confirm target authorisation before starting.", "warn");
+    return;
+  }
+  state.publicExposureLoading = true;
+  renderPublicExposure();
+  try {
+    state.publicExposure = await apiPost("/api/public-exposure", {
+      targets,
+      authorization_confirmed: authorizationConfirmed,
+    });
+    toast("Public exposure assessment completed.");
+  } catch (error) {
+    state.publicExposure = {
+      generated_at: new Date().toISOString(),
+      summary: { target_count: 0, finding_count: 1 },
+      targets: [],
+      findings: [{
+        id: "PE-RUN",
+        title: "Public exposure check failed",
+        severity: "high",
+        target: "local runner",
+        evidence_summary: error.message,
+      }],
+    };
+    toast("Public exposure assessment failed.", "warn");
+  } finally {
+    state.publicExposureLoading = false;
+  }
+  renderPublicExposure();
+}
+
 async function apiGet(path) {
   const response = await fetch(`${LOCAL_API_BASE}${path}`, { cache: "no-store" });
   return parseApiResponse(response);
@@ -440,6 +585,65 @@ function renderTopRisks() {
   `).join(""));
 }
 
+function renderRiskTrendSparkline() {
+  const points = getRiskTrendPoints().slice(-7);
+  if (points.length < 2) {
+    html("#risk-trend-card", '<p class="muted">At least two assessment snapshots are needed for a trajectory.</p>');
+    text("#risk-trend-label", "Insufficient history");
+    return;
+  }
+  const values = points.map((point) => Number(point.overall_risk_score || point.score || 0));
+  const min = Math.min(...values);
+  const max = Math.max(...values);
+  const range = Math.max(max - min, 1);
+  const width = 260;
+  const height = 70;
+  const path = values.map((value, index) => {
+    const x = values.length === 1 ? width / 2 : (index / (values.length - 1)) * width;
+    const y = height - ((value - min) / range) * (height - 12) - 6;
+    return `${index === 0 ? "M" : "L"}${x.toFixed(1)},${y.toFixed(1)}`;
+  }).join(" ");
+  const latest = values[values.length - 1];
+  const previous = values[values.length - 2];
+  const delta = latest - previous;
+  text("#risk-trend-label", `${delta >= 0 ? "+" : ""}${delta.toFixed(2)} since prior`);
+  html("#risk-trend-card", `
+    <svg class="sparkline" viewBox="0 0 ${width} ${height}" preserveAspectRatio="none" role="img" aria-label="Risk score trajectory">
+      <path class="sparkline-area" d="${path} L${width},${height} L0,${height} Z"></path>
+      <path class="sparkline-line" d="${path}"></path>
+    </svg>
+    <div class="sparkline-meta">
+      <span>${escapeHtml(points.length)} runs</span>
+      <strong>${fmtNumber(latest)}</strong>
+    </div>
+  `);
+}
+
+function renderCePillarBars() {
+  const readiness = state.report?.cyber_essentials_readiness
+    || state.dashboard?.compliance_readiness?.cyber_essentials
+    || {};
+  const pillars = Array.isArray(readiness.pillars) ? readiness.pillars : [];
+  if (!pillars.length) {
+    html("#ce-pillar-bars", '<p class="muted">Cyber Essentials readiness data is not available in this artifact set.</p>');
+    return;
+  }
+  html("#ce-pillar-bars", pillars.map((pillar) => {
+    const score = Number(pillar.readiness_score || 0);
+    const status = String(pillar.status || "unknown").toLowerCase();
+    return `
+      <div class="ce-pillar-row">
+        <div>
+          <strong>${escapeHtml(pillar.pillar_name || "Pillar")}</strong>
+          <span class="pill ${ceStatusClass(status)}">${escapeHtml(status)}</span>
+        </div>
+        <div class="bar-track"><div class="bar-fill ${ceStatusClass(status)}" style="width:${clamp(score)}%"></div></div>
+        <span>${fmtNumber(score)}%</span>
+      </div>
+    `;
+  }).join(""));
+}
+
 function renderPriorityFilter() {
   const priorities = ["All", ...new Set(state.findings.map((finding) => finding.priority).filter(Boolean))];
   html("#priority-filter", priorities.map((priority) => `
@@ -483,13 +687,21 @@ function renderFindingDetail() {
   }
   const quality = finding.evidence_quality || {};
   const confidence = finding.confidence_calibration || {};
+  const breakdown = finding.score_breakdown || {};
   html("#finding-detail", `
     <span class="eyebrow">${escapeHtml(finding.finding_id || "finding")}</span>
     <h3>${escapeHtml(finding.title || "")}</h3>
     <p>${escapeHtml(finding.decision_rationale || "Deterministic decision rationale unavailable.")}</p>
+    <div class="detail-actions">
+      <button class="ghost-button" id="finding-markdown-export" type="button">Export markdown</button>
+    </div>
     <div class="detail-block">
       <strong>Risk decision</strong>
       <p>${escapeHtml(finding.control_id)} | ${escapeHtml(finding.category)} | ${escapeHtml(finding.severity)} | Score ${fmtNumber(finding.score)}</p>
+    </div>
+    <div class="detail-block">
+      <strong>Deterministic score breakdown</strong>
+      ${renderScoreBreakdownGrid(breakdown)}
     </div>
     <div class="detail-block">
       <strong>Evidence quality</strong>
@@ -504,6 +716,34 @@ function renderFindingDetail() {
       <p>${escapeHtml(finding.remediation_summary || "No remediation summary available.")}</p>
     </div>
   `);
+  document.querySelector("#finding-markdown-export")?.addEventListener("click", () => {
+    exportFindingMarkdown(finding);
+  });
+}
+
+function renderScoreBreakdownGrid(breakdown) {
+  if (!breakdown || typeof breakdown !== "object" || !Object.keys(breakdown).length) {
+    return '<p class="muted">Score factor data is unavailable for this finding.</p>';
+  }
+  const cells = [
+    ["Severity", breakdown.base_severity],
+    ["Likelihood", breakdown.likelihood_factor],
+    ["Data", breakdown.data_factor],
+    ["Confidence", breakdown.confidence_factor],
+    ["Effort", breakdown.remediation_factor],
+    ["Raw score", breakdown.raw_score],
+  ];
+  return `
+    <div class="score-breakdown-grid">
+      ${cells.map(([label, value]) => `
+        <div class="score-breakdown-cell">
+          <span>${escapeHtml(label)}</span>
+          <strong>${fmtNumber(value)}</strong>
+        </div>
+      `).join("")}
+    </div>
+    <p>Normalized score: ${fmtNumber(breakdown.normalized_score)} / 100 · Calibration: ${escapeHtml(breakdown.calibration_status || "unknown")}</p>
+  `;
 }
 
 function renderProvenance() {
@@ -1164,6 +1404,76 @@ function selectedFinding() {
   return state.findings.find((finding) => finding.finding_id === state.selectedFindingId);
 }
 
+function getRiskTrendPoints() {
+  const dashboardTrend = state.dashboard?.trend?.overall;
+  if (Array.isArray(dashboardTrend) && dashboardTrend.length) return dashboardTrend;
+  const reportTrend = state.report?.history_comparison?.overall_trend;
+  if (Array.isArray(reportTrend) && reportTrend.length) return reportTrend;
+  return [];
+}
+
+function ceStatusClass(status) {
+  const text = String(status || "").toLowerCase();
+  if (text.includes("ready")) return "verified";
+  if (text.includes("partial")) return "high";
+  if (text.includes("gap")) return "immediate";
+  return "info";
+}
+
+function buildFindingMarkdown(finding) {
+  const breakdown = finding.score_breakdown || {};
+  const evidence = Array.isArray(finding.evidence) ? finding.evidence : [];
+  const mapping = Array.isArray(finding.mapping) ? finding.mapping : [];
+  return [
+    `# ${finding.control_id || "Finding"} - ${finding.title || "CRIS-SME finding"}`,
+    "",
+    `- Finding ID: ${finding.finding_id || "n/a"}`,
+    `- Severity: ${finding.severity || "n/a"}`,
+    `- Priority: ${finding.priority || "n/a"}`,
+    `- Score: ${fmtNumber(finding.score)}`,
+    `- Category: ${finding.category || "n/a"}`,
+    "",
+    "## Evidence",
+    evidence.length ? evidence.map((item) => `- ${item}`).join("\n") : "- No evidence statements available.",
+    "",
+    "## Deterministic Score Breakdown",
+    `- Base severity: ${fmtNumber(breakdown.base_severity)}`,
+    `- Likelihood factor: ${fmtNumber(breakdown.likelihood_factor)}`,
+    `- Data factor: ${fmtNumber(breakdown.data_factor)}`,
+    `- Confidence factor: ${fmtNumber(breakdown.confidence_factor)}`,
+    `- Remediation factor: ${fmtNumber(breakdown.remediation_factor)}`,
+    `- Raw score: ${fmtNumber(breakdown.raw_score)}`,
+    `- Normalized score: ${fmtNumber(breakdown.normalized_score)}`,
+    "",
+    "## Remediation",
+    finding.remediation_summary || "No remediation summary available.",
+    "",
+    "## Mapping",
+    mapping.length ? mapping.map((item) => `- ${item}`).join("\n") : "- No mapping available.",
+  ].join("\n");
+}
+
+async function exportFindingMarkdown(finding) {
+  const markdown = buildFindingMarkdown(finding);
+  try {
+    if (navigator.clipboard?.writeText) {
+      await navigator.clipboard.writeText(markdown);
+      toast("Finding markdown copied.");
+      return;
+    }
+  } catch {
+    // Fall through to file download.
+  }
+  const blob = new Blob([markdown], { type: "text/markdown" });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = `${finding.control_id || "cris-finding"}-${finding.finding_id || "brief"}.md`;
+  link.click();
+  URL.revokeObjectURL(url);
+  toast("Finding markdown exported.");
+}
+
 function metricCard([label, value, note]) {
   return `
     <article class="metric-card">
@@ -1202,6 +1512,14 @@ function priorityClass(priority) {
   const text = String(priority || "").toLowerCase();
   if (text.includes("immediate")) return "immediate";
   if (text.includes("high")) return "high";
+  return "";
+}
+
+function publicExposureSeverityClass(severity) {
+  const text = String(severity || "").toLowerCase();
+  if (text === "high") return "immediate";
+  if (text === "medium") return "high";
+  if (text === "low") return "verified";
   return "";
 }
 

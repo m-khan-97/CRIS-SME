@@ -140,9 +140,10 @@ The best research dataset sequence for CRIS-SME is:
 
 1. keep the synthetic baseline as the reproducible control set
 2. keep the current authorized live Azure track as the real-cloud evidence branch
-3. add a Microsoft sandbox track for safe reproducible platform experiments
-4. maintain an AzureGoat track for intentionally vulnerable Azure scenarios as the stress-test branch
-5. later add additional consented or owned real environments for comparative analysis
+3. maintain the Azure Evidence Lab as the repeatable controlled live-lab branch
+4. add a Microsoft sandbox track for safe reproducible platform experiments
+5. maintain an AzureGoat track for intentionally vulnerable Azure scenarios as a broader stress-test branch
+6. later add additional consented or owned real environments for comparative analysis
 
 This sequence gives CRIS-SME:
 
@@ -153,12 +154,13 @@ This sequence gives CRIS-SME:
 
 ## Recommended Next Dataset Expansions
 
-The next strongest dataset-building tasks are:
+The current controlled-lab workflow is implemented in [Azure Evidence Lab](azure-evidence-lab.md). The next strongest dataset-building tasks are:
 
-1. create a small ingestion format for adding new evaluation runs into the dataset catalog
-2. run CRIS-SME against an Azure sandbox environment where terms allow
-3. deploy AzureGoat in an isolated subscription and capture a dedicated assessment snapshot
-4. update `docs/paper-results-tables.md` and the three-mode comparison once those runs exist
+1. run the Azure Evidence Lab scenarios across several days and archive the output manifests
+2. create a small ingestion format for adding new evaluation runs into the dataset catalog
+3. run CRIS-SME against an Azure sandbox environment where terms allow
+4. deploy AzureGoat in an isolated subscription and capture a dedicated assessment snapshot
+5. update `docs/paper-results-tables.md` and the three-mode comparison once those runs exist
 
 ## Research and Ethics Positioning
 

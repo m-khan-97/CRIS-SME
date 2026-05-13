@@ -23,6 +23,8 @@ def make_profile(
     public_storage_endpoints: int = 0,
     private_endpoints_required: int = 0,
     private_endpoints_configured: int = 0,
+    private_endpoint_exemptions: int = 0,
+    private_endpoint_requirement_basis: str = "unspecified",
 ) -> CloudProfile:
     """Create compact synthetic cloud profiles for network control testing."""
     return CloudProfile(
@@ -46,6 +48,8 @@ def make_profile(
             public_storage_endpoints=public_storage_endpoints,
             private_endpoints_required=private_endpoints_required,
             private_endpoints_configured=private_endpoints_configured,
+            private_endpoint_exemptions=private_endpoint_exemptions,
+            private_endpoint_requirement_basis=private_endpoint_requirement_basis,
         ),
         data=DataProfile(
             public_storage_assets=0,
@@ -107,3 +111,25 @@ def test_evaluate_network_controls_generates_multiple_findings_for_broader_weakn
 
     control_ids = {item.control_id for item in findings}
     assert {"NET-001", "NET-002", "NET-003", "NET-004"} <= control_ids
+
+
+def test_evaluate_network_controls_records_intentional_public_exemptions() -> None:
+    findings = evaluate_network_controls(
+        [
+            make_profile(
+                private_endpoints_required=2,
+                private_endpoints_configured=0,
+                private_endpoint_exemptions=1,
+                private_endpoint_requirement_basis=(
+                    "sensitive_data_services_minus_intentional_public_services"
+                ),
+            )
+        ]
+    )
+
+    private_endpoint_finding = next(
+        item for item in findings if item.control_id == "NET-004"
+    )
+    assert private_endpoint_finding.is_compliant is False
+    assert private_endpoint_finding.metadata["private_endpoint_exemptions"] == 1
+    assert any("intentional_public_service" in item for item in private_endpoint_finding.evidence)

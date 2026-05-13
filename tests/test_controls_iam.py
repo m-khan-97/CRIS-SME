@@ -31,6 +31,10 @@ def make_profile(
     visible_directory_role_catalog_entries: int = 0,
     directory_role_catalog_visible: bool = False,
     identity_observability: str = "full",
+    rbac_review_api_accessible: bool = True,
+    rbac_review_definition_count: int = 1,
+    rbac_review_privileged_scope_count: int = 1,
+    rbac_review_scope: str = "privileged_role_scoped",
 ) -> CloudProfile:
     """Create compact synthetic cloud profiles for IAM control testing."""
     return CloudProfile(
@@ -54,6 +58,10 @@ def make_profile(
             visible_directory_role_catalog_entries=visible_directory_role_catalog_entries,
             directory_role_catalog_visible=directory_role_catalog_visible,
             identity_observability=identity_observability,
+            rbac_review_api_accessible=rbac_review_api_accessible,
+            rbac_review_definition_count=rbac_review_definition_count,
+            rbac_review_privileged_scope_count=rbac_review_privileged_scope_count,
+            rbac_review_scope=rbac_review_scope,
         ),
         network=NetworkProfile(
             internet_exposed_rdp_assets=0,
@@ -148,6 +156,24 @@ def test_evaluate_iam_controls_generates_multiple_findings_for_broader_iam_weakn
 
     control_ids = {item.control_id for item in findings}
     assert {"IAM-001", "IAM-002", "IAM-003", "IAM-004", "IAM-005"} <= control_ids
+
+
+def test_evaluate_iam_controls_marks_generic_access_review_as_proxy() -> None:
+    findings = evaluate_iam_controls(
+        [
+            make_profile(
+                rbac_review_age_days=200,
+                rbac_review_definition_count=2,
+                rbac_review_privileged_scope_count=0,
+                rbac_review_scope="generic_or_unknown",
+            )
+        ]
+    )
+
+    review_finding = next(item for item in findings if item.control_id == "IAM-004")
+    assert review_finding.is_compliant is False
+    assert review_finding.metadata["rbac_review_scope"] == "generic_or_unknown"
+    assert any("manually confirmed" in item for item in review_finding.evidence)
 
 
 def test_evaluate_iam_controls_flags_partial_identity_observability() -> None:

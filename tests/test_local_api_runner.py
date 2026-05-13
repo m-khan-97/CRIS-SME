@@ -92,3 +92,32 @@ def test_latest_artifacts_reports_known_outputs(tmp_path) -> None:
     assert artifacts["report"]["exists"] is True
     assert artifacts["dashboard"]["exists"] is False
     assert artifacts["report"]["path"].endswith("cris_sme_report.json")
+
+
+def test_public_exposure_assessment_writes_artifacts(tmp_path, monkeypatch) -> None:
+    class FakeScanner:
+        def assess(self, targets, *, authorization_confirmed):
+            assert targets == ["example.com"]
+            assert authorization_confirmed is True
+            return {
+                "assessment_type": "public_exposure",
+                "generated_at": "2026-05-13T00:00:00Z",
+                "scope_note": "Authorised targets only.",
+                "summary": {"target_count": 1, "finding_count": 0},
+                "targets": [],
+                "findings": [],
+            }
+
+    monkeypatch.setattr("cris_sme.api.local_runner.PublicExposureScanner", FakeScanner)
+    runner = LocalAssessmentRunner(output_dir=tmp_path)
+
+    report = runner.assess_public_exposure(
+        {
+            "targets": "example.com",
+            "authorization_confirmed": True,
+        }
+    )
+
+    assert report["summary"]["target_count"] == 1
+    assert (tmp_path / "cris_sme_public_exposure.json").exists()
+    assert report["artifacts"]["json"].endswith("cris_sme_public_exposure.json")

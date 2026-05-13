@@ -190,7 +190,24 @@ export AZURE_SUBSCRIPTION_ID=<your-subscription-id>
 PYTHONPATH=src python3 -m cris_sme.main
 ```
 
-### 4. Run tests
+### 4. Run a controlled Azure evidence lab
+
+For repeatable live-data evaluation, deploy a small labelled Azure lab, run CRIS-SME, and clean it up:
+
+```bash
+python3 scripts/azure_evidence_lab.py cycle \
+  --scenario public-exposure \
+  --location uksouth \
+  --run-id paper-day-001
+```
+
+See [Azure Evidence Lab](docs/azure-evidence-lab.md) for the scenario catalog and daily dataset workflow.
+
+### 5. Run scoped public exposure checks
+
+The local demo console can assess explicitly authorised public endpoints for DNS, HTTP, HTTPS, TLS, redirect, and security-header evidence. See [Public Exposure Mode](docs/public-exposure-mode.md).
+
+### 6. Run tests
 
 ```bash
 PYTHONPATH=src pytest -q

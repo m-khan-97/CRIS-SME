@@ -33,6 +33,7 @@ from .history import (
     archive_report_snapshot,
     build_evaluation_mode_summary,
     build_history_comparison,
+    build_risk_drift_analysis,
     load_report_history,
 )
 from .html_report import build_html_report, write_html_report
@@ -59,6 +60,7 @@ __all__ = [
     "build_ce_review_console_html",
     "build_evaluation_mode_summary",
     "build_history_comparison",
+    "build_risk_drift_analysis",
     "build_dashboard_html",
     "build_dashboard_payload",
     "build_executive_pack",

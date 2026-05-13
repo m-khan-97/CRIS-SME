@@ -43,20 +43,37 @@ def _evaluate_tagging_coverage(profile: CloudProfile) -> list[Finding]:
 
 def _evaluate_budget_alerting(profile: CloudProfile) -> list[Finding]:
     """Check whether budget alerts are enabled for cloud spending oversight."""
-    if profile.governance.budget_alerts_enabled:
+    governance = profile.governance
+    if governance.budget_alerts_enabled:
         return []
+
+    metadata = {
+        "budget_api_accessible": governance.budget_api_accessible,
+        "budget_alert_count": governance.budget_alert_count,
+        "budget_evidence_state": governance.budget_evidence_state,
+    }
+    if governance.budget_api_accessible:
+        evidence = ["Budget or spend alerting is not configured"]
+        confidence = 0.8
+    else:
+        evidence = [
+            "Budget or spend alerting could not be verified because Azure budget APIs were inaccessible",
+            "The finding is conservative and should be reviewed as an evidence availability gap",
+        ]
+        confidence = 0.62
 
     return [
         build_control_finding(
             profile=profile,
             control_id="GOV-002",
             severity=FindingSeverity.MEDIUM,
-            evidence=["Budget or spend alerting is not configured"],
+            evidence=evidence,
             is_compliant=False,
-            confidence=0.8,
+            confidence=confidence,
             exposure=0.2,
             remediation_effort=0.25,
             generated_by="governance_controls",
+            metadata=metadata,
         )
     ]
 

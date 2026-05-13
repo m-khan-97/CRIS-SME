@@ -15,6 +15,11 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from typing import Any, Callable
 
+from cris_sme.engine.public_exposure import (
+    PublicExposureScanner,
+    write_public_exposure_outputs,
+)
+
 
 DEFAULT_HOST = "127.0.0.1"
 DEFAULT_PORT = 8787
@@ -148,6 +153,24 @@ class LocalAssessmentRunner:
         thread.start()
         return run
 
+    def assess_public_exposure(self, request: dict[str, Any]) -> dict[str, Any]:
+        """Run a scoped public exposure assessment for authorised targets."""
+        raw_targets = request.get("targets", [])
+        if isinstance(raw_targets, str):
+            targets = [line.strip() for line in raw_targets.splitlines()]
+        elif isinstance(raw_targets, list):
+            targets = [str(item).strip() for item in raw_targets]
+        else:
+            raise ValueError("targets must be a list or newline-separated string.")
+
+        scanner = PublicExposureScanner()
+        report = scanner.assess(
+            targets,
+            authorization_confirmed=bool(request.get("authorization_confirmed")),
+        )
+        artifacts = write_public_exposure_outputs(report, self.output_dir)
+        return {**report, "artifacts": artifacts}
+
     def get_run(self, run_id: str) -> AssessmentRun | None:
         with self._lock:
             return self._runs.get(run_id)
@@ -213,6 +236,7 @@ def latest_artifacts(output_dir: Path = DEFAULT_OUTPUT_DIR) -> dict[str, Any]:
         "ce_self_assessment": output_dir / "cris_sme_ce_self_assessment.json",
         "ce_review_console": output_dir / "cris_sme_ce_review_console.json",
         "ce_evaluation_metrics": output_dir / "cris_sme_ce_evaluation_metrics.json",
+        "public_exposure": output_dir / "cris_sme_public_exposure.json",
     }
     return {
         name: {
@@ -255,6 +279,18 @@ def create_handler(runner: LocalAssessmentRunner) -> type[BaseHTTPRequestHandler
 
         def do_POST(self) -> None:  # noqa: N802 - stdlib handler API
             if self.path != "/api/assessments/azure":
+                if self.path == "/api/public-exposure":
+                    try:
+                        payload = self._read_json()
+                        report = runner.assess_public_exposure(payload)
+                    except ValueError as exc:
+                        self._send_json({"error": str(exc)}, status=400)
+                        return
+                    except Exception as exc:  # pragma: no cover - defensive runtime guard
+                        self._send_json({"error": str(exc)}, status=500)
+                        return
+                    self._send_json(report, status=200)
+                    return
                 self._send_json({"error": "not found"}, status=404)
                 return
             try:

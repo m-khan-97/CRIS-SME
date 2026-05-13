@@ -207,24 +207,47 @@ def _build_identity_observability_evidence(profile: CloudProfile) -> list[str]:
 
 def _evaluate_rbac_review_freshness(profile: CloudProfile) -> list[Finding]:
     """Check whether privileged access reviews appear operationally current."""
-    age_days = profile.iam.rbac_review_age_days
+    iam = profile.iam
+    age_days = iam.rbac_review_age_days
     if age_days <= 90:
         return []
 
     severity = FindingSeverity.MEDIUM if age_days <= 180 else FindingSeverity.HIGH
+    evidence = [
+        f"Last RBAC review is approximately {age_days} day(s) old",
+    ]
+    if iam.rbac_review_api_accessible:
+        evidence.append(
+            (
+                f"Observed {iam.rbac_review_definition_count} access review "
+                f"definition(s); scope classified as {iam.rbac_review_scope}"
+            )
+        )
+        if iam.rbac_review_scope == "generic_or_unknown":
+            evidence.append(
+                "Access review evidence is generic; privileged Azure RBAC coverage should be manually confirmed"
+            )
+    else:
+        evidence.append("Access review evidence was not observable from Microsoft Graph")
 
     return [
         build_control_finding(
             profile=profile,
             control_id="IAM-004",
             severity=severity,
-            evidence=[
-                f"Last RBAC review is approximately {age_days} day(s) old",
-            ],
+            evidence=evidence,
             is_compliant=False,
             confidence=0.78,
             exposure=0.5,
             remediation_effort=0.3,
             generated_by="iam_controls",
+            metadata={
+                "rbac_review_api_accessible": iam.rbac_review_api_accessible,
+                "rbac_review_definition_count": iam.rbac_review_definition_count,
+                "rbac_review_privileged_scope_count": (
+                    iam.rbac_review_privileged_scope_count
+                ),
+                "rbac_review_scope": iam.rbac_review_scope,
+            },
         )
     ]

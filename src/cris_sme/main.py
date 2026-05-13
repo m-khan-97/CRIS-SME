@@ -77,6 +77,7 @@ from cris_sme.reporting import (
     build_executive_pack,
     build_evidence_room_html,
     build_history_comparison,
+    build_risk_drift_analysis,
     build_html_report,
     build_json_report,
     build_summary_report,
@@ -228,6 +229,7 @@ def main() -> None:
         history_reports_before[-1] if history_reports_before else None,
     ).model_dump(mode="json")
     output["evaluation_mode_summary"] = build_evaluation_mode_summary(history_reports)
+    output["risk_drift_analysis"] = build_risk_drift_analysis(history_reports)
 
     dashboard_payload = build_dashboard_payload(output, history_reports)
     dashboard_payload_path = write_dashboard_payload(dashboard_payload, output_dir)

@@ -30,6 +30,7 @@ The console reads:
 
 - Command Center
 - New Assessment
+- Public Exposure
 - Findings
 - Cyber Essentials
 - Human Review
@@ -64,17 +65,29 @@ Start the API runner:
 PYTHONPATH=src python3 -m cris_sme.api.local_runner
 ```
 
-Then open the Assurance Console and use **New Assessment**.
+Then open the Assurance Console and use **New Assessment**. The console automatically checks the local runner and current Azure CLI session when the New Assessment view opens. Use **Refresh Azure Connection** only when you have changed `az login`, tenant, subscription, or want to re-run the pre-flight check.
 
 The runner exposes:
 
 - `GET /health`
 - `GET /api/environment/azure`
 - `POST /api/assessments/azure`
+- `POST /api/public-exposure`
 - `GET /api/assessments/{run_id}`
 - `GET /api/artifacts/latest`
 
-The MVP uses the local machine's existing `az login` session. The frontend never asks for Azure passwords, client secrets, or refresh tokens. The user must confirm they are authorised to assess the selected subscription before a run starts.
+The MVP uses the local machine's existing `az login` session. The frontend never asks for Azure passwords, client secrets, or refresh tokens. Connection checks are automatic, but the assessment itself still requires an explicit authorisation checkbox and manual start action before any live Azure collection begins.
+
+## Public Exposure Mode
+
+The console includes a **Public Exposure** view for explicitly authorised domains, URLs, or public IPs. This view records DNS, HTTP, HTTPS, TLS, redirect, and security-header evidence through the local runner. It does not perform exploitation, crawling, brute force, form submission, or internet-wide scanning.
+
+Outputs are written to:
+
+- `outputs/reports/cris_sme_public_exposure.json`
+- `outputs/reports/cris_sme_public_exposure.md`
+
+See [Public Exposure Mode](public-exposure-mode.md) for scope boundaries and finding IDs.
 
 ## Cyber Essentials Workflow
 

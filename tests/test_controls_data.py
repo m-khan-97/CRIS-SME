@@ -23,6 +23,9 @@ def make_profile(
     retention_policy_coverage_ratio: float = 1.0,
     key_vault_mfa_enabled: bool = True,
     key_vault_purge_protection_enabled: bool = True,
+    key_vault_count: int = 1,
+    key_vault_purge_protected_count: int = 1,
+    key_vault_posture_state: str = "observed",
 ) -> CloudProfile:
     """Create compact synthetic cloud profiles for data control testing."""
     return CloudProfile(
@@ -54,6 +57,9 @@ def make_profile(
             retention_policy_coverage_ratio=retention_policy_coverage_ratio,
             key_vault_mfa_enabled=key_vault_mfa_enabled,
             key_vault_purge_protection_enabled=key_vault_purge_protection_enabled,
+            key_vault_count=key_vault_count,
+            key_vault_purge_protected_count=key_vault_purge_protected_count,
+            key_vault_posture_state=key_vault_posture_state,
         ),
         monitoring=MonitoringProfile(
             activity_log_retention_days=180,
@@ -106,3 +112,35 @@ def test_evaluate_data_controls_generates_multiple_findings_for_broader_weakness
 
     control_ids = {item.control_id for item in findings}
     assert {"DATA-001", "DATA-002", "DATA-003", "DATA-004"} <= control_ids
+
+
+def test_evaluate_data_controls_requires_all_key_vaults_to_have_purge_protection() -> None:
+    findings = evaluate_data_controls(
+        [
+            make_profile(
+                key_vault_purge_protection_enabled=False,
+                key_vault_count=5,
+                key_vault_purge_protected_count=1,
+            )
+        ]
+    )
+
+    key_vault_finding = next(item for item in findings if item.control_id == "DATA-004")
+    assert key_vault_finding.is_compliant is False
+    assert key_vault_finding.metadata["key_vault_count"] == 5
+    assert key_vault_finding.metadata["key_vault_purge_protected_count"] == 1
+    assert any("1 of 5 key vault" in item for item in key_vault_finding.evidence)
+
+
+def test_evaluate_data_controls_treats_no_key_vaults_as_not_applicable() -> None:
+    findings = evaluate_data_controls(
+        [
+            make_profile(
+                key_vault_count=0,
+                key_vault_purge_protected_count=0,
+                key_vault_posture_state="not_applicable",
+            )
+        ]
+    )
+
+    assert all(item.control_id != "DATA-004" for item in findings)
