@@ -1,46 +1,31 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1040" height="360" viewBox="0 0 1040 360" role="img" aria-labelledby="title desc">
-  <title id="title">CRIS-SME Cyber Essentials Workflow</title>
-  <desc id="desc">Workflow from cloud telemetry to controls, answer pack, review ledger, and paper metrics.</desc>
-  <rect width="1040" height="360" fill="#ffffff"/>
-  <text x="40" y="46" font-family="Inter, Arial, sans-serif" font-size="24" font-weight="700" fill="#172033">CRIS-SME Cyber Essentials Workflow</text>
-  <text x="40" y="74" font-family="Inter, Arial, sans-serif" font-size="14" fill="#617083">Deterministic scores remain unchanged; CE review is a downstream evidence-support layer</text>
-  <defs>
-    <marker id="arrow" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth">
-      <path d="M0,0 L0,6 L9,3 z" fill="#617083"/>
-    </marker>
-  </defs>
-  <g font-family="Inter, Arial, sans-serif">
-    <rect x="50" y="135" width="160" height="88" rx="8" fill="#f8fafc" stroke="#cbd5e1"/>
-    <text x="130" y="166" font-size="15" font-weight="700" fill="#172033" text-anchor="middle">Cloud Telemetry</text>
-    <text x="130" y="192" font-size="12" fill="#617083" text-anchor="middle">Azure CLI / APIs</text>
-    <text x="130" y="211" font-size="12" fill="#617083" text-anchor="middle">evidence provenance</text>
-    <line x1="210" y1="179" x2="260" y2="179" stroke="#617083" stroke-width="2" marker-end="url(#arrow)"/>
-
-    <rect x="260" y="135" width="160" height="88" rx="8" fill="#f8fafc" stroke="#cbd5e1"/>
-    <text x="340" y="166" font-size="15" font-weight="700" fill="#172033" text-anchor="middle">CRIS-SME Controls</text>
-    <text x="340" y="192" font-size="12" fill="#617083" text-anchor="middle">26 deterministic</text>
-    <text x="340" y="211" font-size="12" fill="#617083" text-anchor="middle">governance checks</text>
-    <line x1="420" y1="179" x2="470" y2="179" stroke="#617083" stroke-width="2" marker-end="url(#arrow)"/>
-
-    <rect x="470" y="135" width="160" height="88" rx="8" fill="#f8fafc" stroke="#cbd5e1"/>
-    <text x="550" y="166" font-size="15" font-weight="700" fill="#172033" text-anchor="middle">CE Answer Pack</text>
-    <text x="550" y="192" font-size="12" fill="#617083" text-anchor="middle">Yes / No /</text>
-    <text x="550" y="211" font-size="12" fill="#617083" text-anchor="middle">Cannot determine</text>
-    <line x1="630" y1="179" x2="680" y2="179" stroke="#617083" stroke-width="2" marker-end="url(#arrow)"/>
-
-    <rect x="680" y="135" width="160" height="88" rx="8" fill="#f8fafc" stroke="#cbd5e1"/>
-    <text x="760" y="166" font-size="15" font-weight="700" fill="#172033" text-anchor="middle">Review Ledger</text>
-    <text x="760" y="192" font-size="12" fill="#617083" text-anchor="middle">accept / override /</text>
-    <text x="760" y="211" font-size="12" fill="#617083" text-anchor="middle">needs evidence</text>
-    <line x1="840" y1="179" x2="890" y2="179" stroke="#617083" stroke-width="2" marker-end="url(#arrow)"/>
-
-    <rect x="890" y="135" width="110" height="88" rx="8" fill="#f8fafc" stroke="#cbd5e1"/>
-    <text x="945" y="166" font-size="15" font-weight="700" fill="#172033" text-anchor="middle">Paper</text>
-    <text x="945" y="192" font-size="12" fill="#617083" text-anchor="middle">metrics</text>
-    <text x="945" y="211" font-size="12" fill="#617083" text-anchor="middle">tables</text>
-
-    <rect x="470" y="255" width="370" height="46" rx="8" fill="#ecfeff" stroke="#67e8f9"/>
-    <text x="655" y="284" font-size="13" fill="#155e75" text-anchor="middle">Reviewer decisions never change deterministic CRIS-SME risk scores</text>
-  </g>
-  <text x="40" y="340" font-family="Inter, Arial, sans-serif" font-size="12" fill="#617083">Figure 4. Cyber Essentials pre-population is a downstream, human-reviewable evidence workflow.</text>
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="360" viewBox="0 0 960 360" role="img" aria-labelledby="title desc">
+  <title id="title">Cyber Essentials Evidence Workflow</title>
+  <desc id="desc">Workflow from cloud evidence through deterministic controls, answer pack, human review, and paper exports.</desc>
+<rect width="960" height="360" fill="#ffffff"/>
+<text x="40.0" y="48.0" font-family="Inter, Arial, sans-serif" font-size="24" fill="#172033" font-weight="700">Cyber Essentials Evidence Workflow</text>
+<text x="40.0" y="76.0" font-family="Inter, Arial, sans-serif" font-size="14" fill="#617083">Deterministic scoring stays upstream; human review never changes CRIS-SME risk scores</text>
+<rect x="40" y="135" width="156" height="94" rx="8" fill="#f8fafc" stroke="#d8e2ec"/>
+<text x="54.0" y="163.0" font-family="Inter, Arial, sans-serif" font-size="14" fill="#172033" font-weight="700">Cloud evidence</text>
+<text x="54.0" y="189.0" font-family="Inter, Arial, sans-serif" font-size="11" fill="#617083">Azure collector + normalized CRIS profile</text>
+<line x1="202" y1="182" x2="218" y2="182" stroke="#2563eb" stroke-width="2"/>
+<path d="M 218 177 L 228 182 L 218 187 Z" fill="#2563eb"/>
+<rect x="224" y="135" width="156" height="94" rx="8" fill="#f8fafc" stroke="#d8e2ec"/>
+<text x="238.0" y="163.0" font-family="Inter, Arial, sans-serif" font-size="14" fill="#172033" font-weight="700">Deterministic controls</text>
+<text x="238.0" y="189.0" font-family="Inter, Arial, sans-serif" font-size="11" fill="#617083">26 controls across 6 cloud risk domains</text>
+<line x1="386" y1="182" x2="402" y2="182" stroke="#2563eb" stroke-width="2"/>
+<path d="M 402 177 L 412 182 L 402 187 Z" fill="#2563eb"/>
+<rect x="408" y="135" width="156" height="94" rx="8" fill="#f8fafc" stroke="#d8e2ec"/>
+<text x="422.0" y="163.0" font-family="Inter, Arial, sans-serif" font-size="14" fill="#172033" font-weight="700">CE answer pack</text>
+<text x="422.0" y="189.0" font-family="Inter, Arial, sans-serif" font-size="11" fill="#617083">28 cloud-supported entries</text>
+<line x1="570" y1="182" x2="586" y2="182" stroke="#2563eb" stroke-width="2"/>
+<path d="M 586 177 L 596 182 L 586 187 Z" fill="#2563eb"/>
+<rect x="592" y="135" width="156" height="94" rx="8" fill="#f8fafc" stroke="#d8e2ec"/>
+<text x="606.0" y="163.0" font-family="Inter, Arial, sans-serif" font-size="14" fill="#172033" font-weight="700">Human review</text>
+<text x="606.0" y="189.0" font-family="Inter, Arial, sans-serif" font-size="11" fill="#617083">23/23 accepted agreements</text>
+<line x1="754" y1="182" x2="770" y2="182" stroke="#2563eb" stroke-width="2"/>
+<path d="M 770 177 L 780 182 L 770 187 Z" fill="#2563eb"/>
+<rect x="776" y="135" width="156" height="94" rx="8" fill="#f8fafc" stroke="#d8e2ec"/>
+<text x="790.0" y="163.0" font-family="Inter, Arial, sans-serif" font-size="14" fill="#172033" font-weight="700">Paper exports</text>
+<text x="790.0" y="189.0" font-family="Inter, Arial, sans-serif" font-size="11" fill="#617083">Tables, figures, ledger, and reproducibility artifacts</text>
+<text x="40.0" y="320.0" font-family="Inter, Arial, sans-serif" font-size="12" fill="#617083">Figure 4. Evidence workflow. Review decisions are downstream artifacts and do not mutate deterministic findings or scores.</text>
 </svg>

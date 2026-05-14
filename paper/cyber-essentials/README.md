@@ -48,6 +48,14 @@ PYTHONPATH=src:. python scripts/validate_paper_package.py
 
 The validator parses paper SVGs and CSVs, checks local Markdown links, blocks stale provisional-review wording, and verifies that final human agreement remains separated from AI-assisted draft acceptance.
 
+Regenerate the paper figures from the current controlled-lab metrics with:
+
+```bash
+PYTHONPATH=src:. python scripts/generate_ce_paper_figures.py
+```
+
+The generator reads the final CE evaluation metrics and controlled-lab report JSON, then rewrites the four SVGs in `figures/`.
+
 Import the completed ledger with:
 
 ```bash
