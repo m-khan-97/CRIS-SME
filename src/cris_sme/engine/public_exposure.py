@@ -3,8 +3,10 @@ from __future__ import annotations
 
 import ipaddress
 import json
+import shutil
 import socket
 import ssl
+import subprocess
 from dataclasses import dataclass, field
 from datetime import UTC, datetime
 from pathlib import Path
@@ -15,6 +17,7 @@ from urllib import error, parse, request
 Resolver = Callable[[str], list[str]]
 HttpProbe = Callable[[str, float], dict[str, Any]]
 TlsProbe = Callable[[str, int, float], dict[str, Any]]
+DnsRecordLookup = Callable[[str, str, float], dict[str, Any]]
 
 SECURITY_HEADERS = {
     "strict-transport-security": "HSTS",
@@ -41,6 +44,7 @@ class PublicExposureScanner:
     resolver: Resolver | None = None
     http_probe: HttpProbe | None = None
     tls_probe: TlsProbe | None = None
+    dns_record_lookup: DnsRecordLookup | None = None
 
     def assess(self, targets: list[str], *, authorization_confirmed: bool) -> dict[str, Any]:
         """Return a deterministic public exposure report for the supplied targets."""
@@ -106,6 +110,8 @@ class PublicExposureScanner:
         https = self._http(https_url)
         http = self._http(http_url)
         tls = self._tls(host, 443)
+        dns_records = self._dns_records(host)
+        security_txt = self._http(f"https://{host}/.well-known/security.txt")
 
         if not dns["addresses"]:
             findings.append(
@@ -173,13 +179,63 @@ class PublicExposureScanner:
                     evidence={"status": http.get("status"), "location": http.get("location", "")},
                 )
             )
+        if not dns_records["dmarc"]["records"]:
+            findings.append(
+                build_finding(
+                    "PE-006",
+                    "DMARC record not observed",
+                    "medium",
+                    host,
+                    "No DMARC TXT record was observed at _dmarc for the authorised target.",
+                    "Publish a DMARC policy and align it with the organisation's email sending posture.",
+                    evidence=dns_records["dmarc"],
+                )
+            )
+        if not dns_records["spf"]["records"]:
+            findings.append(
+                build_finding(
+                    "PE-007",
+                    "SPF record not observed",
+                    "low",
+                    host,
+                    "No SPF TXT record was observed for the authorised target.",
+                    "Publish SPF for domains that send mail, or document why the domain is non-sending.",
+                    evidence=dns_records["spf"],
+                )
+            )
+        if not dns_records["caa"]["records"]:
+            findings.append(
+                build_finding(
+                    "PE-008",
+                    "CAA record not observed",
+                    "low",
+                    host,
+                    "No CAA record was observed for the authorised target.",
+                    "Consider CAA records to restrict which certificate authorities may issue certificates.",
+                    evidence=dns_records["caa"],
+                )
+            )
+        if not security_txt.get("reachable") or int(security_txt.get("status") or 0) >= 400:
+            findings.append(
+                build_finding(
+                    "PE-009",
+                    "security.txt not observed",
+                    "low",
+                    host,
+                    "No reachable security.txt file was observed at the standard well-known path.",
+                    "Publish /.well-known/security.txt for public vulnerability reporting contacts where appropriate.",
+                    evidence=security_txt,
+                )
+            )
 
         return {
             **target,
             "dns": dns,
+            "dns_records": dns_records,
             "https": https,
             "http": http,
             "tls": tls,
+            "security_txt": security_txt,
             "findings": findings,
         }
 
@@ -204,6 +260,21 @@ class PublicExposureScanner:
             return probe(host, port, self.settings.timeout_seconds)
         except Exception as exc:
             return {"host": host, "port": port, "available": False, "error": str(exc)}
+
+    def _dns_records(self, host: str) -> dict[str, Any]:
+        lookup = self.dns_record_lookup or lookup_dns_records
+        return {
+            "spf": _lookup_named_record(lookup, host, "TXT", self.settings.timeout_seconds, predicate="v=spf1"),
+            "dmarc": _lookup_named_record(lookup, f"_dmarc.{host}", "TXT", self.settings.timeout_seconds, predicate="v=dmarc1"),
+            "mta_sts": _lookup_named_record(lookup, f"_mta-sts.{host}", "TXT", self.settings.timeout_seconds, predicate="v=stsv1"),
+            "tls_rpt": _lookup_named_record(lookup, f"_smtp._tls.{host}", "TXT", self.settings.timeout_seconds, predicate="v=tlsrptv1"),
+            "caa": _lookup_named_record(lookup, host, "CAA", self.settings.timeout_seconds),
+            "dkim": {
+                "status": "selector_required",
+                "records": [],
+                "note": "DKIM discovery requires one or more selector names and is not guessed by the safe public exposure mode.",
+            },
+        }
 
 
 def normalize_targets(targets: list[str], *, max_targets: int = 10) -> list[dict[str, str]]:
@@ -294,6 +365,30 @@ def probe_tls(host: str, port: int, timeout_seconds: float) -> dict[str, Any]:
             }
 
 
+def lookup_dns_records(name: str, record_type: str, timeout_seconds: float) -> dict[str, Any]:
+    """Lookup passive DNS records using local `dig` when available."""
+    if not shutil.which("dig"):
+        return {"name": name, "type": record_type, "records": [], "error": "dig command not available"}
+    try:
+        completed = subprocess.run(
+            ["dig", "+short", record_type, name],
+            capture_output=True,
+            text=True,
+            timeout=timeout_seconds,
+            check=False,
+        )
+    except Exception as exc:
+        return {"name": name, "type": record_type, "records": [], "error": str(exc)}
+    records = [line.strip().strip('"') for line in completed.stdout.splitlines() if line.strip()]
+    return {
+        "name": name,
+        "type": record_type,
+        "records": records,
+        "error": completed.stderr.strip(),
+        "returncode": completed.returncode,
+    }
+
+
 def write_public_exposure_outputs(report: dict[str, Any], output_dir: Path) -> dict[str, str]:
     """Persist public exposure JSON and Markdown artifacts."""
     output_dir.mkdir(parents=True, exist_ok=True)
@@ -380,6 +475,32 @@ def is_private_address(address: str) -> bool:
         or ip.is_multicast
         or ip.is_unspecified
     )
+
+
+def _lookup_named_record(
+    lookup: DnsRecordLookup,
+    name: str,
+    record_type: str,
+    timeout_seconds: float,
+    *,
+    predicate: str | None = None,
+) -> dict[str, Any]:
+    result = lookup(name, record_type, timeout_seconds)
+    records = result.get("records", [])
+    if not isinstance(records, list):
+        records = []
+    if predicate:
+        records = [
+            str(record)
+            for record in records
+            if str(record).strip().lower().startswith(predicate.lower())
+        ]
+    return {
+        **result,
+        "name": name,
+        "type": record_type,
+        "records": records,
+    }
 
 
 def _redirects_to_https(http_result: dict[str, Any]) -> bool:

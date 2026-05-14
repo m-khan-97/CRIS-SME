@@ -11,11 +11,19 @@ It is deliberately separate from the Azure live collector. Azure assessment answ
 For each supplied target, CRIS-SME records:
 
 - DNS A/AAAA resolution
+- passive DNS policy records where observable through the local resolver tooling:
+  - SPF TXT
+  - DMARC TXT
+  - MTA-STS TXT
+  - TLS-RPT TXT
+  - CAA
+- DKIM discovery boundary, without guessing selectors
 - HTTP reachability
 - HTTPS reachability
 - HTTP-to-HTTPS redirect behaviour
 - TLS certificate metadata
 - common HTTPS security-header presence
+- `/.well-known/security.txt` presence
 
 The first implementation generates public exposure findings:
 
@@ -25,6 +33,10 @@ The first implementation generates public exposure findings:
 - `PE-003`: security headers missing on HTTPS response
 - `PE-004`: TLS certificate expires within 30 days
 - `PE-005`: HTTP does not redirect to HTTPS
+- `PE-006`: DMARC record not observed
+- `PE-007`: SPF record not observed
+- `PE-008`: CAA record not observed
+- `PE-009`: `security.txt` not observed
 
 ## What It Does Not Do
 
@@ -35,6 +47,9 @@ Public Exposure Mode does not:
 - crawl applications
 - submit forms
 - fuzz parameters
+- guess DKIM selectors
+- enumerate subdomains
+- sweep arbitrary TCP ports by default
 - run internet-wide scans
 - test targets that the user has not explicitly authorised
 
@@ -69,6 +84,8 @@ In the Assurance Console:
 3. Confirm authorisation.
 4. Run the check.
 5. Review DNS, HTTP, HTTPS, TLS, and finding output.
+
+DNS policy checks are passive and best-effort. If local DNS tooling cannot retrieve TXT or CAA records, CRIS-SME records the evidence gap instead of treating the absence as proof.
 
 ## Research Value
 
