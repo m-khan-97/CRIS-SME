@@ -166,9 +166,9 @@ The top controls contributing to proposed `No` answers were:
 
 The AI-assisted pilot review ledger reviewed the 28 cloud-supported entries. It accepted 23 conservative answer-impact decisions, marked 5 as `needs_evidence`, and left 78 non-cloud entries pending.
 
-This is not independent human agreement. A CE-knowledgeable reviewer ledger has now been received for the 28 cloud-supported entries, but validation against the current controlled-lab answer pack found that 8 rows require revalidation because their recorded evidence class, proposed status, or proposed answer no longer matches the current generated evidence. The aligned subset contains 20 rows: 15 accepted rows and 5 `needs_evidence` rows. A reviewer-facing evidence pack has been prepared for the 8 revalidation rows, including linked controls, finding IDs, finding titles, scores, and evidence statements.
+This is not independent human agreement. A CE-knowledgeable reviewer ledger was received for the 28 cloud-supported entries. Validation against the current controlled-lab answer pack found that 8 rows required revalidation because their recorded evidence class, proposed status, or proposed answer no longer matched the current generated evidence. A reviewer-facing evidence pack was prepared for those 8 rows, including linked controls, finding IDs, finding titles, scores, and evidence statements.
 
-Until those 8 rows are re-confirmed, the paper should not report a final independent human agreement rate for the controlled-lab run. The AI-assisted draft acceptance rate remains a workflow/pilot metric only.
+A revalidation workbook has since marked all 8 stale rows as `accepted` with final answer `No`, matching the current CRIS-SME proposed answers. The merged provisional ledger now contains 23 accepted rows and 5 `needs_evidence` rows. All 23 accepted rows match the current CRIS-SME proposed answer. However, the revalidation workbook states that external human cross-check is pending, so this result should be reported as provisional revalidation rather than final independent human agreement.
 
 ## 9. Discussion
 
@@ -186,7 +186,7 @@ The implementation is Azure-first. AWS, GCP, Intune, Defender for Endpoint, and 
 
 The controlled lab is small by design. It validates cloud-control-plane evidence paths without exposing a reachable VM workload, but it is not a complete SME production environment or a full AzureGoat deployment.
 
-AI-assisted draft review is not independent human review. Human agreement claims require a CE-knowledgeable reviewer to validate or override the 28 cloud-supported entries. The current reviewer ledger has been received, but 8 rows require revalidation against the current controlled-lab evidence before final agreement can be reported.
+AI-assisted draft review is not independent human review. Human agreement claims require a CE-knowledgeable reviewer to validate or override the 28 cloud-supported entries. The current merged ledger is provisionally revalidated, but the supplied workbook records that external human cross-check is still pending before final agreement can be reported.
 
 Proposed `Yes` answers carry false-negative risk outside mapped cloud-control-plane evidence.
 
@@ -207,4 +207,4 @@ The defensible claim should be:
 
 ## 12. Conclusion
 
-CRIS-SME demonstrates that cloud control-plane telemetry can support a bounded, evidence-sufficiency-aware Cyber Essentials pre-population workflow. The current Azure-first implementation maps 106 preparation entries, identifies that 28 are cloud-supported, and produces reviewable proposed answers with explicit evidence gaps. The controlled Azure vulnerable lab shows that intentionally weak cloud-control-plane signals can be reflected in both deterministic risk findings and Cyber Essentials answer impact. The next required step is revalidation of the 8 reviewer-ledger rows whose earlier entries no longer match the current evidence pack, after which the completed human review can be reported as the main empirical agreement result.
+CRIS-SME demonstrates that cloud control-plane telemetry can support a bounded, evidence-sufficiency-aware Cyber Essentials pre-population workflow. The current Azure-first implementation maps 106 preparation entries, identifies that 28 are cloud-supported, and produces reviewable proposed answers with explicit evidence gaps. The controlled Azure vulnerable lab shows that intentionally weak cloud-control-plane signals can be reflected in both deterministic risk findings and Cyber Essentials answer impact. The next required step is external human cross-check of the provisional merged ledger, after which the accepted-answer agreement can be reported as the main empirical review result.

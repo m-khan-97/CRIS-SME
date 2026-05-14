@@ -14,6 +14,9 @@ This folder is the working paper package for:
 - `review-ledger-validation.md` - validation status for the completed review against the current controlled-lab answer pack
 - `review-ledger-revalidation-required.csv` - rows whose original reviewer entries require revalidation
 - `review-ledger-revalidation-with-evidence.csv` - reviewer-facing revalidation CSV with linked CRIS-SME evidence
+- `review-ledger-revalidation-marked-whole-set.csv` - normalized revalidation workbook supplied after evidence review
+- `review-ledger-current-provisional.csv` - merged 28-row provisional ledger using the revalidated rows
+- `review-ledger-revalidation-summary.md` - import summary and interpretation of the revalidation workbook
 - `revalidation-evidence-pack.md` - readable evidence pack for the revalidation rows
 - `tables/results-summary.md` - frozen paper tables from current artifacts
 - `tables/results-summary.csv` - CSV version of headline results
@@ -24,15 +27,15 @@ This folder is the working paper package for:
 Paper readiness:
 
 - strong workshop draft
-- journal draft still needs revalidated human review and competitor check
+- journal draft still needs external reviewer cross-check and competitor check
 
-Do not claim final independent reviewer agreement yet. A completed reviewer ledger has been imported, but `8` rows do not match the current controlled-lab answer pack and must be re-confirmed with the evidence pack before final agreement metrics are reported. The AI-assisted ledger is reported only as draft acceptance.
+Do not claim final independent reviewer agreement yet. A completed reviewer ledger and a revalidation workbook have been imported, and the merged provisional ledger now has `23` accepted rows and `5` needs-evidence rows. However, the revalidation workbook states that external human cross-check is still pending, so this should be reported as provisional revalidation rather than final independent agreement.
 
 ## Immediate Next Step
 
-Ask the CE-knowledgeable reviewer to re-check `review-ledger-revalidation-with-evidence.csv`.
+Ask the CE-knowledgeable reviewer to externally cross-check `review-ledger-current-provisional.csv` against `revalidation-evidence-pack.md`.
 
-That revalidation pass turns the completed review ledger into a current, empirically reportable controlled-lab result.
+That cross-check turns the provisional merged ledger into a final empirically reportable controlled-lab result.
 
 Import the completed ledger with:
 

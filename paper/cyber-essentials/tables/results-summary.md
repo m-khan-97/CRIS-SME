@@ -44,13 +44,14 @@
 | Metric | Value |
 | --- | ---: |
 | Reviewer ledger entries received | 28 |
-| Rows aligned with current answer pack | 20 |
-| Rows requiring revalidation | 8 |
+| Revalidation rows accepted | 8 |
+| Provisional accepted rows | 23 |
 | AI-assisted draft accepted | 23 |
 | Needs evidence | 5 |
 | Pending | 78 |
-| Final human agreement evaluable | Pending revalidation |
-| Final human agreement rate | Pending revalidation |
+| Provisional agreement evaluable | 23 |
+| Provisional agreement rate | 100.0% |
+| External human cross-check | Pending |
 | Draft acceptance evaluable | 23 |
 | Draft accepted rate | 100.0% |
 

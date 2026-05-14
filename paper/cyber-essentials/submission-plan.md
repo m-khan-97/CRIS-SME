@@ -45,20 +45,21 @@ Ready:
 - AI-assisted pilot review draft
 - completed human review ledger imported
 - revalidation evidence pack prepared for 8 stale rows
+- provisional merged review ledger produced and hash-bound
 - paper tables and figures
 
 Still required before journal submission:
 
-- reviewer revalidation of the 8 rows that no longer match the current controlled-lab answer pack
+- external human cross-check of the provisional merged review ledger
 - competitor/tool check
 - related-work tightening
 - final venue formatting
 
 ## Human Review Task
 
-Ask the reviewer to complete `review-ledger-revalidation-with-evidence.csv`.
+Ask the reviewer to cross-check `review-ledger-current-provisional.csv` against the evidence pack.
 
-Reviewer should mark each of the 8 revalidation entries as:
+Reviewer should confirm whether the provisional decisions can be treated as final:
 
 - `accepted`
 - `overridden`
@@ -102,7 +103,7 @@ Use the figures in `figures/`:
 
 - Refresh all metrics from a frozen run.
 - Confirm no generated table reports AI draft acceptance as human agreement.
-- Confirm the 8 revalidation rows have been reviewed before reporting final human agreement.
+- Confirm the provisional merged ledger has external human cross-check before reporting final human agreement.
 - Keep IASME question text paraphrased.
 - Include false-negative caveat for proposed `Yes` answers.
 - Include cleanup statement for controlled Azure lab.

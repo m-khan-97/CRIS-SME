@@ -19,10 +19,12 @@ proposed_answer,No,23,,,
 proposed_answer,Yes,5,,,"Bounded: no mapped cloud-control-plane issue observed"
 proposed_answer,Cannot determine,78,,,
 review_metric,reviewer_ledger_entries_received,28,,,
-review_metric,rows_aligned_with_current_answer_pack,20,,,
-review_metric,rows_requiring_revalidation,8,,,"Evidence pack prepared"
+review_metric,revalidation_rows_accepted,8,,,"Workbook states external human cross-check is pending"
+review_metric,provisional_accepted_rows,23,,,
 review_metric,ai_draft_accepted,23,,,"Not independent human agreement"
 review_metric,needs_evidence,5,,,
 review_metric,pending,78,,,
-review_metric,final_human_agreement_evaluable,,,,"Pending revalidation"
+review_metric,provisional_agreement_evaluable,23,,,
+review_metric,provisional_agreement_rate,,100.0%,,"External human cross-check pending"
+review_metric,external_human_cross_check,,,,Pending
 review_metric,draft_acceptance_evaluable,23,,,
