@@ -68,7 +68,8 @@ Run a complete deploy, assess, and cleanup cycle:
 python3 scripts/azure_evidence_lab.py cycle \
   --scenario public-exposure \
   --location uksouth \
-  --run-id paper-day-001
+  --run-id paper-day-001 \
+  --yes
 ```
 
 Keep the lab after assessment for manual inspection:
@@ -78,7 +79,8 @@ python3 scripts/azure_evidence_lab.py cycle \
   --scenario data-risk \
   --location uksouth \
   --run-id paper-day-002 \
-  --keep
+  --keep \
+  --yes
 ```
 
 Clean up a kept lab:
@@ -86,7 +88,8 @@ Clean up a kept lab:
 ```bash
 python3 scripts/azure_evidence_lab.py cleanup \
   --scenario data-risk \
-  --run-id paper-day-002
+  --run-id paper-day-002 \
+  --yes
 ```
 
 ## Output Location
@@ -119,8 +122,13 @@ It tags managed lab resources with:
 - `cris-sme-scenario`
 - `cris-sme-run-id`
 - `cris-sme-purpose=evidence-dataset`
+- `cris-sme-owner`
+- `cris-sme-delete-after`
+- `cris-sme-managed-by=cris-sme-azure-evidence-lab`
 
-Cleanup deletes the selected lab resource group only. Do not point the cleanup command at non-lab resource groups.
+Creation, cleanup, and full cycles require `--yes` unless `--dry-run` is used. Cleanup deletes the selected lab resource group only, then waits for Azure to confirm deletion. Do not point the cleanup command at non-lab resource groups.
+
+The controlled lab scenarios are designed to be low cost. The public-exposure scenario creates an NSG and storage account only; it does not attach a VM to the public SSH/RDP rules. Richer demo scenarios may create a virtual network, storage accounts, a Key Vault, and a Log Analytics workspace. Review Azure regional pricing and delete kept labs promptly.
 
 ## Research Framing
 

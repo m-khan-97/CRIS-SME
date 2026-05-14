@@ -4,6 +4,8 @@ from __future__ import annotations
 import json
 import subprocess
 
+import pytest
+
 from scripts import azure_evidence_lab as lab
 
 
@@ -23,6 +25,18 @@ def test_catalog_lists_expected_lab_scenarios() -> None:
     public_exposure = next(item for item in summary["scenarios"] if item["id"] == "public-exposure")
     assert public_exposure["dataset_source_type"] == "vulnerable_lab"
     assert "NET-001" in public_exposure["expected_controls"]
+
+
+def test_main_requires_yes_for_resource_changes(monkeypatch) -> None:
+    monkeypatch.setattr(
+        "sys.argv",
+        ["azure_evidence_lab.py", "deploy", "--scenario", "public-exposure"],
+    )
+
+    with pytest.raises(SystemExit) as exc:
+        lab.main()
+
+    assert "without --yes" in str(exc.value)
 
 
 def test_deploy_public_exposure_builds_expected_az_commands(monkeypatch, tmp_path) -> None:
@@ -53,6 +67,9 @@ def test_deploy_public_exposure_builds_expected_az_commands(monkeypatch, tmp_pat
     manifest = json.loads((tmp_path / "paper-run" / "public-exposure" / "lab_manifest.json").read_text())
     assert manifest["scenario"]["id"] == "public-exposure"
     assert manifest["status"] == "deployed"
+    assert manifest["tags"]["cris-sme-owner"]
+    assert manifest["tags"]["cris-sme-delete-after"]
+    assert manifest["tags"]["cris-sme-managed-by"] == "cris-sme-azure-evidence-lab"
 
 
 def test_governance_drift_does_not_pass_empty_tags(monkeypatch, tmp_path) -> None:
@@ -176,3 +193,36 @@ def test_deploy_media_office_delegated_builds_segmented_architecture(monkeypatch
     assert any("monitor log-analytics workspace create" in command for command in joined)
     assert not any("Allow-Internet-22" in command for command in joined)
     assert not any("Allow-Internet-3389" in command for command in joined)
+
+
+def test_cleanup_deletes_resource_group_and_waits(monkeypatch, tmp_path) -> None:
+    commands: list[list[str]] = []
+    monkeypatch.setattr(lab, "DEFAULT_OUTPUT_ROOT", tmp_path)
+
+    def fake_run(command, cwd=None, env=None, check=False):
+        commands.append(command)
+        return subprocess.CompletedProcess(command, 0)
+
+    monkeypatch.setattr(lab.subprocess, "run", fake_run)
+    scenario = lab.find_scenario(lab.load_catalog(), "public-exposure")
+    context = lab.build_context(
+        scenario=scenario,
+        run_id="cleanup-run",
+        location="uksouth",
+        resource_group="cris-lab-public-exposure-cleanup-run",
+        dry_run=False,
+    )
+
+    lab.cleanup(context)
+
+    assert commands[0][:4] == ["az", "group", "delete", "--name"]
+    assert "--yes" in commands[0]
+    assert "--no-wait" in commands[0]
+    assert commands[1] == [
+        "az",
+        "group",
+        "wait",
+        "--name",
+        "cris-lab-public-exposure-cleanup-run",
+        "--deleted",
+    ]

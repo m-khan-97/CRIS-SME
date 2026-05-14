@@ -9,7 +9,7 @@ import shutil
 import subprocess
 import sys
 from dataclasses import dataclass
-from datetime import UTC, datetime
+from datetime import UTC, datetime, timedelta
 from pathlib import Path
 from typing import Any
 
@@ -74,12 +74,22 @@ def main() -> int:
         action="store_true",
         help="For cycle action, keep lab resources after assessment instead of deleting them.",
     )
+    parser.add_argument(
+        "--yes",
+        action="store_true",
+        help="Confirm creation or deletion of Azure lab resources. Required for non-dry-run deploy, cleanup, and cycle actions.",
+    )
     args = parser.parse_args()
 
     catalog = load_catalog()
     if args.action == "list":
         print(json.dumps(summarize_catalog(catalog), indent=2))
         return 0
+    if args.action in {"deploy", "cleanup", "cycle"} and not args.dry_run and not args.yes:
+        raise SystemExit(
+            "Refusing to create or delete Azure resources without --yes. "
+            "Use --dry-run to preview commands."
+        )
 
     scenario = find_scenario(catalog, args.scenario)
     run_id = normalize_run_id(args.run_id or datetime.now(UTC).strftime("%Y%m%d%H%M%S"))
@@ -158,6 +168,9 @@ def build_context(
         "cris-sme-scenario": str(scenario["id"]),
         "cris-sme-run-id": run_id,
         "cris-sme-purpose": "evidence-dataset",
+        "cris-sme-owner": os.getenv("CRIS_SME_AZURE_LAB_OWNER", os.getenv("USER", "unknown")),
+        "cris-sme-delete-after": (datetime.now(UTC) + timedelta(days=2)).date().isoformat(),
+        "cris-sme-managed-by": "cris-sme-azure-evidence-lab",
     }
     return LabContext(
         scenario=scenario,
@@ -202,6 +215,7 @@ def deploy(context: LabContext) -> None:
         raise ValueError(f"Scenario '{scenario_id}' has no deployer.")
 
     write_manifest(context, status="deployed")
+    print_assessment_command(context)
 
 
 def assess(context: LabContext, output_root: Path) -> None:
@@ -248,6 +262,16 @@ def cleanup(context: LabContext) -> None:
             context.resource_group,
             "--yes",
             "--no-wait",
+        ],
+        context,
+    )
+    run_az(
+        [
+            "group",
+            "wait",
+            "--name",
+            context.resource_group,
+            "--deleted",
         ],
         context,
     )
@@ -666,6 +690,22 @@ def run_command(
     if context.dry_run:
         return
     subprocess.run(command, cwd=cwd, env=env, check=True)
+
+
+def print_assessment_command(context: LabContext) -> None:
+    command = [
+        "python3",
+        "scripts/azure_evidence_lab.py",
+        "assess",
+        "--scenario",
+        str(context.scenario["id"]),
+        "--run-id",
+        context.run_id,
+        "--resource-group",
+        context.resource_group,
+    ]
+    print("Next assessment command:")
+    print(f"$ {' '.join(command)}")
 
 
 def manifest_path(context: LabContext) -> Path:
