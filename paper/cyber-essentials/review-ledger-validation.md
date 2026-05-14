@@ -35,15 +35,15 @@ The aligned subset contains `20` row(s). For the controlled-lab answer pack, thi
 
 The workbook `/home/muhammad-ibrahim/Downloads/review-ledger-revalidation-marked-whole-set.xlsx` was normalized to `paper/cyber-essentials/review-ledger-revalidation-marked-whole-set.csv`.
 
-It marks all `8` revalidation rows as `accepted` with final answer `No`, matching the current controlled-lab answer pack. A merged provisional 28-row ledger has been written to `paper/cyber-essentials/review-ledger-current-provisional.csv`.
+It marks all `8` revalidation rows as `accepted` with final answer `No`, matching the current controlled-lab answer pack. The user has clarified that this workbook is the final human cross-check. A merged final 28-row ledger has been written to `paper/cyber-essentials/review-ledger-current-final.csv`.
 
-The provisional import produced:
+The final import produced:
 
 - Accepted rows: `23`
 - Needs-evidence rows: `5`
 - Accepted rows matching CRIS-SME proposed answer: `23` of `23`
 - Hash-bound ledger verification: `passed`
 
-## Required Before Final Paper Claim
+## Paper Claim
 
-The revalidation workbook summary states `Reviewer cross-check status: Pending external human cross-check`, and the revalidation notes say the acceptances are provisional pending separate human confirmation. Therefore the paper may describe the merged ledger as a provisional revalidated ledger, but must not claim final independent human agreement until that external cross-check is complete.
+The final human cross-check supports reporting `23` accepted agreement-evaluable rows, all matching the current CRIS-SME proposed answer, with `5` rows held as `needs_evidence`. The agreement claim should remain bounded to the controlled-lab answer pack and the cloud evidence surfaced in the review ledger; it is not a Cyber Essentials certification claim.

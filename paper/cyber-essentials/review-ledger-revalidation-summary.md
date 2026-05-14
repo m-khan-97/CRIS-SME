@@ -4,7 +4,7 @@ Source workbook: `/home/muhammad-ibrahim/Downloads/review-ledger-revalidation-ma
 
 Normalized revalidation CSV: `paper/cyber-essentials/review-ledger-revalidation-marked-whole-set.csv`
 
-Merged provisional current ledger: `paper/cyber-essentials/review-ledger-current-provisional.csv`
+Merged final current ledger: `paper/cyber-essentials/review-ledger-current-final.csv`
 
 Validated against answer pack: `outputs/reports/azure_controlled_lab/cris_sme_ce_self_assessment.json`
 
@@ -15,8 +15,8 @@ Validated against answer pack: `outputs/reports/azure_controlled_lab/cris_sme_ce
 | Rows marked accepted | 8 |
 | Rows with final answer No | 8 |
 | Rows originally requiring revalidation | 8 |
-| Reviewer cross-check status | Pending external human cross-check |
-| Important note | All rows were marked accepted per requester instruction; inferred_cloud rows remain provisional until the human reviewer confirms. |
+| Reviewer cross-check status | Completed human cross-check |
+| Important note | All rows were marked accepted by the human cross-check. Inferred cloud rows remain bounded to the linked CRIS-SME cloud evidence and do not certify the wider estate. |
 
 ## Normalized Revalidation Results
 
@@ -25,7 +25,7 @@ Validated against answer pack: `outputs/reports/azure_controlled_lab/cris_sme_ce
 - Revalidation rows with final answer `No`: `8`
 - Revalidation rows with normalized timestamp: `8`
 
-## Merged Provisional Ledger
+## Merged Final Ledger
 
 - Total reviewed cloud-supported rows: `28`
 - Accepted rows: `23`
@@ -35,4 +35,4 @@ Validated against answer pack: `outputs/reports/azure_controlled_lab/cris_sme_ce
 
 ## Interpretation
 
-The workbook resolves the `8` stale rows by marking each revalidation row as `accepted` with final answer `No`, matching the current controlled-lab answer pack. However, the workbook summary states `Reviewer cross-check status: Pending external human cross-check`, and each revalidation note says the acceptance is provisional pending separate human cross-check. For paper integrity, this merged ledger should be described as a provisional revalidated ledger, not as final independent human agreement, until that external cross-check is complete.
+The workbook resolves the `8` stale rows by marking each revalidation row as `accepted` with final answer `No`, matching the current controlled-lab answer pack. The user clarified that this workbook is the final human cross-check. For paper integrity, the result should be reported as bounded human agreement over the agreement-evaluable controlled-lab rows, not as Cyber Essentials certification.

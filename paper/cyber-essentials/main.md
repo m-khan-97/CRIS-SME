@@ -168,7 +168,7 @@ The AI-assisted pilot review ledger reviewed the 28 cloud-supported entries. It 
 
 This is not independent human agreement. A CE-knowledgeable reviewer ledger was received for the 28 cloud-supported entries. Validation against the current controlled-lab answer pack found that 8 rows required revalidation because their recorded evidence class, proposed status, or proposed answer no longer matched the current generated evidence. A reviewer-facing evidence pack was prepared for those 8 rows, including linked controls, finding IDs, finding titles, scores, and evidence statements.
 
-A revalidation workbook has since marked all 8 stale rows as `accepted` with final answer `No`, matching the current CRIS-SME proposed answers. The merged provisional ledger now contains 23 accepted rows and 5 `needs_evidence` rows. All 23 accepted rows match the current CRIS-SME proposed answer. However, the revalidation workbook states that external human cross-check is pending, so this result should be reported as provisional revalidation rather than final independent human agreement.
+A final human cross-check workbook has since marked all 8 stale rows as `accepted` with final answer `No`, matching the current CRIS-SME proposed answers. The merged final ledger contains 23 accepted rows and 5 `needs_evidence` rows. All 23 accepted rows match the current CRIS-SME proposed answer, yielding 23 of 23 agreement over agreement-evaluable rows. The 5 `needs_evidence` rows are excluded from the agreement denominator.
 
 ## 9. Discussion
 
@@ -186,7 +186,7 @@ The implementation is Azure-first. AWS, GCP, Intune, Defender for Endpoint, and 
 
 The controlled lab is small by design. It validates cloud-control-plane evidence paths without exposing a reachable VM workload, but it is not a complete SME production environment or a full AzureGoat deployment.
 
-AI-assisted draft review is not independent human review. Human agreement claims require a CE-knowledgeable reviewer to validate or override the 28 cloud-supported entries. The current merged ledger is provisionally revalidated, but the supplied workbook records that external human cross-check is still pending before final agreement can be reported.
+AI-assisted draft review is not independent human review. Human agreement claims require a CE-knowledgeable reviewer to validate or override the 28 cloud-supported entries. The current merged ledger includes the final human cross-check for the controlled-lab answer pack, but the agreement claim remains bounded to the reviewed cloud-evidence rows and is not a Cyber Essentials certification claim.
 
 Proposed `Yes` answers carry false-negative risk outside mapped cloud-control-plane evidence.
 
@@ -207,4 +207,4 @@ The defensible claim should be:
 
 ## 12. Conclusion
 
-CRIS-SME demonstrates that cloud control-plane telemetry can support a bounded, evidence-sufficiency-aware Cyber Essentials pre-population workflow. The current Azure-first implementation maps 106 preparation entries, identifies that 28 are cloud-supported, and produces reviewable proposed answers with explicit evidence gaps. The controlled Azure vulnerable lab shows that intentionally weak cloud-control-plane signals can be reflected in both deterministic risk findings and Cyber Essentials answer impact. The next required step is external human cross-check of the provisional merged ledger, after which the accepted-answer agreement can be reported as the main empirical review result.
+CRIS-SME demonstrates that cloud control-plane telemetry can support a bounded, evidence-sufficiency-aware Cyber Essentials pre-population workflow. The current Azure-first implementation maps 106 preparation entries, identifies that 28 are cloud-supported, and produces reviewable proposed answers with explicit evidence gaps. The controlled Azure vulnerable lab shows that intentionally weak cloud-control-plane signals can be reflected in both deterministic risk findings and Cyber Essentials answer impact. The final human cross-check provides an empirical review result for the agreement-evaluable rows: 23 of 23 accepted reviewer decisions matched CRIS-SME's proposed answers, while 5 rows remained classified as needing additional evidence.

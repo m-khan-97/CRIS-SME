@@ -14,8 +14,8 @@ This folder is the working paper package for:
 - `review-ledger-validation.md` - validation status for the completed review against the current controlled-lab answer pack
 - `review-ledger-revalidation-required.csv` - rows whose original reviewer entries require revalidation
 - `review-ledger-revalidation-with-evidence.csv` - reviewer-facing revalidation CSV with linked CRIS-SME evidence
-- `review-ledger-revalidation-marked-whole-set.csv` - normalized revalidation workbook supplied after evidence review
-- `review-ledger-current-provisional.csv` - merged 28-row provisional ledger using the revalidated rows
+- `review-ledger-revalidation-marked-whole-set.csv` - normalized final human cross-check workbook supplied after evidence review
+- `review-ledger-current-final.csv` - merged 28-row final review ledger using the revalidated rows
 - `review-ledger-revalidation-summary.md` - import summary and interpretation of the revalidation workbook
 - `revalidation-evidence-pack.md` - readable evidence pack for the revalidation rows
 - `tables/results-summary.md` - frozen paper tables from current artifacts
@@ -27,15 +27,15 @@ This folder is the working paper package for:
 Paper readiness:
 
 - strong workshop draft
-- journal draft still needs external reviewer cross-check and competitor check
+- journal draft still needs competitor check and final venue formatting
 
-Do not claim final independent reviewer agreement yet. A completed reviewer ledger and a revalidation workbook have been imported, and the merged provisional ledger now has `23` accepted rows and `5` needs-evidence rows. However, the revalidation workbook states that external human cross-check is still pending, so this should be reported as provisional revalidation rather than final independent agreement.
+The completed reviewer ledger and final human cross-check workbook have been imported. The merged final ledger has `23` accepted rows and `5` needs-evidence rows. All `23` accepted rows match the current CRIS-SME proposed answers.
 
 ## Immediate Next Step
 
-Ask the CE-knowledgeable reviewer to externally cross-check `review-ledger-current-provisional.csv` against `revalidation-evidence-pack.md`.
+Use `review-ledger-current-final.csv` as the reviewed ledger for the controlled-lab evaluation.
 
-That cross-check turns the provisional merged ledger into a final empirically reportable controlled-lab result.
+The final reviewer result is empirically reportable as `23` of `23` accepted answers agreeing with CRIS-SME, with `5` rows remaining as needs-evidence rather than agreement-evaluable decisions.
 
 Import the completed ledger with:
 

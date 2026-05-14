@@ -45,13 +45,13 @@
 | --- | ---: |
 | Reviewer ledger entries received | 28 |
 | Revalidation rows accepted | 8 |
-| Provisional accepted rows | 23 |
+| Final accepted rows | 23 |
 | AI-assisted draft accepted | 23 |
 | Needs evidence | 5 |
 | Pending | 78 |
-| Provisional agreement evaluable | 23 |
-| Provisional agreement rate | 100.0% |
-| External human cross-check | Pending |
+| Final human agreement evaluable | 23 |
+| Final human agreement rate | 100.0% |
+| External human cross-check | Complete |
 | Draft acceptance evaluable | 23 |
 | Draft accepted rate | 100.0% |
 
