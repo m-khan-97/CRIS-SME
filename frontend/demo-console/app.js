@@ -958,14 +958,16 @@ function renderCeReviewList() {
   html("#ce-review-list", entries.map((entry) => {
     const decision = entryDecision(entry);
     const answerClass = String(entry.proposed_answer || "").toLowerCase().replaceAll(" ", "-");
+    const answerHint = ceAnswerHint(entry);
     return `
-      <article class="ce-review-row ${entry.question_id === state.selectedCeQuestionId ? "active" : ""}" data-question-id="${escapeHtml(entry.question_id)}">
+      <article class="ce-review-row ${entry.question_id === state.selectedCeQuestionId ? "active" : ""} answer-${answerClass}" data-question-id="${escapeHtml(entry.question_id)}">
         <span class="pill ${reviewPillClass(decision.state)}">${escapeHtml(reviewLabel(decision.state))}</span>
         <div>
           <strong>${escapeHtml(entry.question_id)} ${escapeHtml(entry.section || "")}</strong>
           <p>${escapeHtml(entry.short_paraphrase || "")}</p>
+          <p class="answer-hint">${escapeHtml(answerHint)}</p>
         </div>
-        <span class="answer-chip ${answerClass}">${escapeHtml(entry.proposed_answer || "Cannot determine")}</span>
+        <span class="answer-chip ${answerClass}" title="${escapeHtml(answerHint)}">${escapeHtml(entry.proposed_answer || "Cannot determine")}</span>
       </article>
     `;
   }).join(""));
@@ -987,15 +989,21 @@ function renderCeReviewDetail() {
   const decision = entryDecision(entry);
   const linkedFindings = entry.linked_findings || [];
   const evidenceItems = entry.evidence || [];
+  const answerAdvisory = ceAnswerAdvisory(entry);
+  const answerClass = String(entry.proposed_answer || "").toLowerCase().replaceAll(" ", "-");
   html("#ce-review-detail", `
     <div class="ce-detail-heading">
       <span class="eyebrow">${escapeHtml(entry.question_id)} | ${escapeHtml(labelize(entry.section))}</span>
       <h3>${escapeHtml(entry.short_paraphrase || "")}</h3>
     </div>
     <div class="answer-strip">
-      ${answerBox("Proposed answer", entry.proposed_answer || "Cannot determine")}
+      ${answerBox("Proposed answer", entry.proposed_answer || "Cannot determine", answerClass)}
       ${answerBox("Evidence class", labelize(entry.evidence_class))}
       ${answerBox("Proposed status", labelize(entry.proposed_status))}
+    </div>
+    <div class="detail-block answer-advisory ${answerClass}">
+      <strong>${escapeHtml(answerAdvisory.title)}</strong>
+      <p>${escapeHtml(answerAdvisory.body)}</p>
     </div>
     <div class="detail-block caveat-box">
       <strong>Answer basis</strong>
@@ -1258,13 +1266,44 @@ function isCloudSupported(entry) {
   return entry.evidence_class === "direct_cloud" || entry.evidence_class === "inferred_cloud";
 }
 
-function answerBox(label, value) {
+function answerBox(label, value, modifier = "") {
   return `
-    <div>
+    <div class="${modifier ? `answer-box-${escapeHtml(modifier)}` : ""}">
       <span>${escapeHtml(label)}</span>
       <strong>${escapeHtml(value)}</strong>
     </div>
   `;
+}
+
+function ceAnswerHint(entry) {
+  const answer = String(entry.proposed_answer || "Cannot determine");
+  if (answer === "Yes") {
+    return "Bounded evidence support only; no mapped cloud-control-plane issue was observed and human verification is still required.";
+  }
+  if (answer === "No") {
+    return "Mapped CRIS-SME finding evidence supports a conservative No for review.";
+  }
+  return "Cloud telemetry cannot determine this answer; use endpoint, policy, or manual evidence.";
+}
+
+function ceAnswerAdvisory(entry) {
+  const answer = String(entry.proposed_answer || "Cannot determine");
+  if (answer === "Yes") {
+    return {
+      title: "Proposed Yes is bounded evidence support",
+      body: "CRIS-SME found no mapped cloud-control-plane issue for this question in the available telemetry. This is not proof of Cyber Essentials compliance and still needs human corroboration for scope, endpoint coverage, policy evidence, and false-negative risk.",
+    };
+  }
+  if (answer === "No") {
+    return {
+      title: "Proposed No is linked to mapped findings",
+      body: "The candidate No is supported by CRIS-SME findings or inferred cloud evidence. Review the linked findings and evidence text before accepting or overriding it.",
+    };
+  }
+  return {
+    title: "Cannot determine from cloud telemetry",
+    body: "This question needs endpoint, MDM, EDR, policy, interview, or administrative evidence before a Cyber Essentials answer can be proposed.",
+  };
 }
 
 function reviewStateOption(value, selected) {

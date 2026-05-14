@@ -23,6 +23,11 @@ def test_demo_console_assets_exist_and_use_generated_data() -> None:
     assert "view-ce-review-workbench" in index
     assert "Reports &amp; Artifacts" in index
     assert "Proposed Yes means" in index
+    assert "Proposed Yes is bounded evidence support" in app
+    assert "no mapped cloud-control-plane issue was observed" in app
+    assert "Cannot determine from cloud telemetry" in app
+    assert "answer-advisory" in styles
+    assert "answer-chip.cannot-determine" in styles
     assert "radial-gradient" not in styles
     assert "CE_REVIEW_STORAGE_KEY" in app
     assert "cris_sme_ce_human_review_ledger.csv" in app
