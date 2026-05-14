@@ -12,13 +12,13 @@
 
 ## Table 2. Technical-Control Observability
 
-| Evidence class | Count |
-| --- | ---: |
-| direct_cloud | 5 |
-| inferred_cloud | 17 |
-| endpoint_required | 21 |
-| policy_required | 18 |
-| manual_required | 1 |
+| Evidence class | Count | Rate |
+| --- | ---: | ---: |
+| direct_cloud | 5 | 8.06% |
+| inferred_cloud | 17 | 27.42% |
+| endpoint_required | 21 | 33.87% |
+| policy_required | 18 | 29.03% |
+| manual_required | 1 | 1.61% |
 
 ## Table 3. Controlled Azure Vulnerable-Lab Category Scores
 

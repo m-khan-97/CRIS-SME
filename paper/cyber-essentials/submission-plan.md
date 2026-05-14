@@ -50,9 +50,8 @@ Ready:
 
 Still required before journal submission:
 
-- competitor/tool check
-- related-work tightening
 - final venue formatting
+- optional second reviewer or second live tenant if targeting a stronger empirical venue
 
 ## Human Review Task
 
@@ -75,19 +74,21 @@ The evidence pack for revalidation is `revalidation-evidence-pack.md`. The final
 
 ## Competitor Check
 
-Check these before making novelty claims:
+Completed in `related-work-competitor-check.md`.
 
 - Microsoft Defender for Cloud
 - Prowler
 - ScoutSuite
+- Vanta
 - JumpCloud
+- CE FastTrack
 - IASME/NCSC self-assessment workflow
 - ConnectWise / Datto / NinjaRMM style MSP tooling
 - Axonius-style compliance mapping
 
 Expected defensible claim:
 
-> To our knowledge, existing tools provide readiness guidance, compliance-control mapping, or resource-level compliance assessments, but do not generate a question-level Cyber Essentials answer pack from live cloud telemetry with explicit evidence-sufficiency labels and human-verification boundaries.
+> To our knowledge, the checked public tools do not provide the same combination of UK Cyber Essentials question-level answer pre-population, live cloud-control-plane evidence lineage, explicit evidence-sufficiency labels, and review-ledger separation between deterministic evidence and human attestation.
 
 ## Figure Plan
 
@@ -108,3 +109,5 @@ Use the figures in `figures/`:
 - Include cleanup statement for controlled Azure lab.
 - Do not publish raw tenant identifiers.
 - Verify all claims use absolute counts and percentages together.
+- Convert Markdown citations to the target venue's required format.
+- Decide whether to include the competitor-check table in the appendix or compress it into related work.

@@ -2,9 +2,9 @@
 
 ## Abstract
 
-Cyber Essentials is a widely used UK baseline cyber security scheme, but small and medium enterprises often complete its self-assessment manually despite already operating cloud environments that contain relevant control evidence. Existing cloud security tools report technical misconfigurations or framework-level compliance mappings, but they do not provide question-level Cyber Essentials pre-population with explicit evidence sufficiency boundaries. This paper presents CRIS-SME, a deterministic cloud risk decision engine extended with a Cyber Essentials pre-assessment workflow. CRIS-SME maps paraphrased Cyber Essentials preparation entries to cloud control-plane evidence, classifies each entry as direct cloud, inferred cloud, endpoint required, policy required, manual required, or not observable, and emits a human-reviewable answer pack with proposed answers of `Yes`, `No`, or `Cannot determine`.
+Cyber Essentials is a widely used UK baseline cyber security scheme, but small and medium enterprises often complete its self-assessment manually despite already operating cloud environments that contain relevant control evidence. Existing cloud security and GRC tools report technical misconfigurations, collect audit evidence, or expose framework-level compliance mappings, but they do not generally expose which Cyber Essentials entries are answerable from cloud control-plane telemetry and which require non-cloud evidence. This paper presents CRIS-SME, a deterministic cloud risk decision engine extended with a Cyber Essentials pre-assessment workflow. CRIS-SME maps paraphrased Cyber Essentials preparation entries to cloud control-plane evidence, classifies each entry as direct cloud, inferred cloud, endpoint required, policy required, manual required, or not observable, and emits a human-reviewable answer pack with proposed answers of `Yes`, `No`, or `Cannot determine`.
 
-In the current Azure-first implementation, CRIS-SME maps 106 Cyber Essentials preparation entries, including 62 technical-control entries. From cloud control-plane evidence alone, 28 entries are cloud-supported overall and 22 technical entries are cloud-supported. A controlled Azure vulnerable-lab run produced 23 proposed `No` answers, 5 proposed `Yes` answers, and 78 `Cannot determine` answers, demonstrating that cloud telemetry can materially reduce Cyber Essentials evidence retrieval work while preserving human accountability. The system explicitly avoids certification automation: proposed answers remain reviewable, AI-assisted draft review is reported separately from human agreement, and non-cloud evidence gaps are preserved rather than silently inferred.
+In the current Azure-first implementation, CRIS-SME maps 106 Cyber Essentials preparation entries, including 62 technical-control entries. From cloud control-plane evidence alone, 28 entries are cloud-supported overall and 22 technical entries are cloud-supported. A controlled Azure vulnerable-lab run produced 23 proposed `No` answers, 5 proposed `Yes` answers, and 78 `Cannot determine` answers, demonstrating that cloud telemetry can materially reduce Cyber Essentials evidence retrieval work while preserving human accountability. A final human cross-check accepted 23 agreement-evaluable proposed answers, with 23 of 23 matching CRIS-SME's proposed answers; 5 rows were marked `needs_evidence` and excluded from the agreement denominator. The system explicitly avoids certification automation: proposed answers remain reviewable, AI-assisted draft review is reported separately from human agreement, and non-cloud evidence gaps are preserved rather than silently inferred.
 
 ## 1. Introduction
 
@@ -16,13 +16,14 @@ The answer is useful precisely because it is partial. In the current mapping, 28
 
 ## 2. Contributions
 
-This paper makes five contributions:
+This paper makes six contributions:
 
 1. A question-level Cyber Essentials mapping model that avoids reproducing proprietary IASME wording by storing paraphrased descriptions and stable local question identifiers.
 2. A deterministic answer-pack generator that links Cyber Essentials entries to CRIS-SME controls, findings, evidence snippets, and caveats.
 3. A six-class evidence taxonomy for Cyber Essentials pre-population: direct cloud, inferred cloud, endpoint required, policy required, manual required, and not observable.
 4. A human-review ledger that records accepted answers, overrides, evidence requests, reviewer notes, and final reviewed status without altering deterministic CRIS-SME scores.
 5. A reproducible evaluation pipeline that exports observability metrics, proposed answers, review outcomes, control-contribution tables, and chart-ready data for paper use.
+6. An empirical Azure controlled-lab evaluation showing 26.42% overall cloud support, 35.48% technical-entry cloud support, and 23 of 23 accepted human-review agreements over agreement-evaluable rows.
 
 ## 3. Background and Problem
 
@@ -190,20 +191,17 @@ AI-assisted draft review is not independent human review. Human agreement claims
 
 Proposed `Yes` answers carry false-negative risk outside mapped cloud-control-plane evidence.
 
-## 11. Related Work Plan
+## 11. Related Work
 
-Before submission, the novelty claim should be checked against:
+CRIS-SME sits between three bodies of work: cloud security posture management, GRC/evidence automation, and Cyber Essentials assessment preparation.
 
-- Microsoft Defender for Cloud regulatory compliance and secure score outputs
-- Prowler
-- ScoutSuite
-- JumpCloud Cyber Essentials readiness material
-- IASME/NCSC self-assessment workflow
-- MSP compliance tooling such as ConnectWise, Datto, NinjaRMM, and Axonius-style asset compliance systems
+Cloud posture tools such as Microsoft Defender for Cloud, Prowler, and ScoutSuite assess cloud resources and expose security findings or compliance mappings. Defender for Cloud represents standards as compliance controls and automatically assesses resources where possible; Microsoft documentation also notes that controls that cannot be automatically assessed cannot be decided automatically. Prowler supports compliance-framework execution and maps security checks to frameworks, while ScoutSuite provides multi-cloud security auditing. These tools are valuable posture assessors, but the checked public material does not expose a UK Cyber Essentials question-level answer pack with `Yes`/`No`/`Cannot determine` candidates, evidence sufficiency classes, linked finding lineage, and a human-review ledger.
 
-The defensible claim should be:
+GRC and evidence-automation platforms such as Vanta automate evidence collection, integrations, tests, and compliance workflow management. MSP tooling such as ConnectWise supports monitoring, automation, reporting, remediation workflow, and audit support. These platforms address operational compliance management more broadly than CRIS-SME. The distinction is not that they lack automation; rather, CRIS-SME exposes a deterministic and reproducible cloud-control-plane method for deciding which UK Cyber Essentials entries can be supported by cloud evidence and which must remain outside the automated answer boundary.
 
-> To our knowledge, existing tools provide readiness guidance, compliance-control mapping, or resource-level compliance assessments, but do not generate a question-level Cyber Essentials answer pack from live cloud telemetry with explicit evidence-sufficiency labels and human-verification boundaries.
+Cyber Essentials-specific workflows include IASME/NCSC assessment guidance and preparation tools such as CE FastTrack. These are closer to the assessment process itself. CRIS-SME does not replace the official assessment portal or reproduce official question wording. Instead, it uses paraphrased local entries and treats the task as evidence preparation: each generated answer remains bounded by its evidence class and human review state.
+
+The resulting claim is deliberately narrow: to our knowledge, the checked public tools do not provide the same combination of UK Cyber Essentials question-level answer pre-population, live cloud-control-plane evidence lineage, explicit evidence-sufficiency labels, and review-ledger separation between deterministic evidence and human attestation.
 
 ## 12. Conclusion
 

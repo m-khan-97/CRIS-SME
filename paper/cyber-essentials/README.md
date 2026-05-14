@@ -8,6 +8,7 @@ This folder is the working paper package for:
 
 - `main.md` - first full manuscript draft
 - `references.bib` - starter bibliography and related-work sources to verify
+- `related-work-competitor-check.md` - checked competitor/related-work notes and defensible novelty claim
 - `submission-plan.md` - venue plan, remaining blockers, and claim discipline
 - `review-ledger-template.csv` - 28 cloud-supported entries for independent human review
 - `review-ledger-completed.csv` - imported reviewer workbook, normalized from the completed review spreadsheet
@@ -27,7 +28,7 @@ This folder is the working paper package for:
 Paper readiness:
 
 - strong workshop draft
-- journal draft still needs competitor check and final venue formatting
+- journal draft still needs final venue formatting; a second reviewer or second live tenant would strengthen the evaluation
 
 The completed reviewer ledger and final human cross-check workbook have been imported. The merged final ledger has `23` accepted rows and `5` needs-evidence rows. All `23` accepted rows match the current CRIS-SME proposed answers.
 
@@ -42,8 +43,8 @@ Import the completed ledger with:
 ```bash
 PYTHONPATH=src python3 scripts/import_ce_review_ledger.py \
   --answer-pack outputs/reports/azure_controlled_lab/cris_sme_ce_self_assessment.json \
-  --ledger paper/cyber-essentials/review-ledger-template.csv \
-  --output-dir outputs/reports/azure_controlled_lab/ce_review_import
+  --ledger paper/cyber-essentials/review-ledger-current-final.csv \
+  --output-dir outputs/reports/azure_controlled_lab/ce_review_final
 ```
 
 Then create a hash-bound reviewer ledger for reproducibility:
@@ -51,17 +52,17 @@ Then create a hash-bound reviewer ledger for reproducibility:
 ```bash
 PYTHONPATH=src python3 scripts/sign_ce_review_ledger.py \
   --answer-pack outputs/reports/azure_controlled_lab/cris_sme_ce_self_assessment.json \
-  --ledger paper/cyber-essentials/review-ledger-template.csv \
-  --output outputs/reports/azure_controlled_lab/cris_sme_ce_human_review_ledger.signed.json \
-  --reviewer-name "Reviewer Name" \
-  --reviewer-role "CE-knowledgeable reviewer"
+  --ledger paper/cyber-essentials/review-ledger-current-final.csv \
+  --output outputs/reports/azure_controlled_lab/ce_review_final/cris_sme_ce_review_ledger_final.signed.json \
+  --reviewer-name "Reviewer-CRIS-SME-01" \
+  --reviewer-role "CE-knowledgeable human reviewer"
 ```
 
 Verification:
 
 ```bash
 PYTHONPATH=src python3 scripts/verify_ce_review_ledger.py \
-  --ledger outputs/reports/azure_controlled_lab/cris_sme_ce_human_review_ledger.signed.json \
+  --ledger outputs/reports/azure_controlled_lab/ce_review_final/cris_sme_ce_review_ledger_final.signed.json \
   --answer-pack outputs/reports/azure_controlled_lab/cris_sme_ce_self_assessment.json
 ```
 
