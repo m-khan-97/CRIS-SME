@@ -93,6 +93,10 @@ jobs:
             exit 1
           fi
 
+      - name: Paper package consistency checks
+        run: |
+          PYTHONPATH=src:. python scripts/validate_paper_package.py
+
       - name: Upload generated outputs
         if: ${{ inputs.upload-generated-artifacts && inputs.run-mock-pipeline }}
         uses: actions/upload-artifact@v4

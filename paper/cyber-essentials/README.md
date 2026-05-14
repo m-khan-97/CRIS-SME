@@ -38,6 +38,16 @@ Use `review-ledger-current-final.csv` as the reviewed ledger for the controlled-
 
 The final reviewer result is empirically reportable as `23` of `23` accepted answers agreeing with CRIS-SME, with `5` rows remaining as needs-evidence rather than agreement-evaluable decisions.
 
+## Consistency Checks
+
+The paper package is checked in CI with:
+
+```bash
+PYTHONPATH=src:. python scripts/validate_paper_package.py
+```
+
+The validator parses paper SVGs and CSVs, checks local Markdown links, blocks stale provisional-review wording, and verifies that final human agreement remains separated from AI-assisted draft acceptance.
+
 Import the completed ledger with:
 
 ```bash

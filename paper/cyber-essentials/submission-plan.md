@@ -46,6 +46,7 @@ Ready:
 - completed human review ledger imported
 - revalidation evidence pack prepared for 8 stale rows
 - final merged review ledger produced and hash-bound
+- paper package consistency checks in CI
 - paper tables and figures
 
 Still required before journal submission:
@@ -103,6 +104,7 @@ Use the figures in `figures/`:
 
 - Refresh all metrics from a frozen run.
 - Confirm no generated table reports AI draft acceptance as human agreement.
+- Run `PYTHONPATH=src:. python scripts/validate_paper_package.py`.
 - Report final human agreement only over agreement-evaluable accepted/overridden rows, excluding `needs_evidence`.
 - Keep IASME question text paraphrased.
 - Include false-negative caveat for proposed `Yes` answers.
