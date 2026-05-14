@@ -78,6 +78,20 @@ The runner exposes:
 
 The MVP uses the local machine's existing `az login` session. The frontend never asks for Azure passwords, client secrets, or refresh tokens. Connection checks are automatic, but the assessment itself still requires an explicit authorisation checkbox and manual start action before any live Azure collection begins.
 
+API responses are intentionally structured for the frontend:
+
+- environment checks include `status`, `message`, `error`, `azure_cli_available`, `authenticated`, and `account`
+- Azure runs include `run_id`, `status`, `message/error` where relevant, stdout/stderr tails, and artifact paths
+- validation errors return `status=failed`, `message`, and `error`
+- public exposure runs return `status=completed`, a human-readable `message`, scope notes, findings, targets, and artifact paths
+
+Common states:
+
+- runner unavailable: the browser cannot reach `127.0.0.1:8787`
+- CLI missing: Azure CLI is not installed or not on `PATH`
+- login needed: Azure CLI exists but `az account show` failed
+- run failed: the CRIS-SME subprocess returned a non-zero status; inspect the `stderr_tail` shown in the console
+
 ## Public Exposure Mode
 
 The console includes a **Public Exposure** view for explicitly authorised domains, URLs, or public IPs. This view records DNS, HTTP, HTTPS, TLS, redirect, and security-header evidence through the local runner. It does not perform exploitation, crawling, brute force, form submission, or internet-wide scanning.

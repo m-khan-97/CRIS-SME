@@ -91,9 +91,11 @@ class LocalAssessmentRunner:
         az_path = shutil.which("az")
         if not az_path:
             return {
+                "status": "cli_missing",
                 "azure_cli_available": False,
                 "authenticated": False,
                 "account": None,
+                "error": "azure_cli_not_found",
                 "message": "Azure CLI was not found on this machine.",
             }
         try:
@@ -105,16 +107,20 @@ class LocalAssessmentRunner:
             )
         except Exception as exc:  # pragma: no cover - exercised through API behavior
             return {
+                "status": "error",
                 "azure_cli_available": True,
                 "authenticated": False,
                 "account": None,
+                "error": "azure_cli_check_failed",
                 "message": f"Azure CLI account check failed: {exc}",
             }
         if completed.returncode != 0:
             return {
+                "status": "unauthenticated",
                 "azure_cli_available": True,
                 "authenticated": False,
                 "account": None,
+                "error": "azure_cli_unauthenticated",
                 "message": _tail(completed.stderr) or "Run az login before starting an assessment.",
             }
         try:
@@ -122,6 +128,7 @@ class LocalAssessmentRunner:
         except json.JSONDecodeError:
             account = {}
         return {
+            "status": "authenticated",
             "azure_cli_available": True,
             "authenticated": True,
             "account": {
@@ -169,7 +176,12 @@ class LocalAssessmentRunner:
             authorization_confirmed=bool(request.get("authorization_confirmed")),
         )
         artifacts = write_public_exposure_outputs(report, self.output_dir)
-        return {**report, "artifacts": artifacts}
+        return {
+            "status": "completed",
+            "message": "Public exposure assessment completed for authorised targets.",
+            **report,
+            "artifacts": artifacts,
+        }
 
     def get_run(self, run_id: str) -> AssessmentRun | None:
         with self._lock:
@@ -259,7 +271,13 @@ def create_handler(runner: LocalAssessmentRunner) -> type[BaseHTTPRequestHandler
 
         def do_GET(self) -> None:  # noqa: N802 - stdlib handler API
             if self.path == "/health":
-                self._send_json({"status": "ok", "service": "cris-sme-local-runner"})
+                self._send_json(
+                    {
+                        "status": "ok",
+                        "service": "cris-sme-local-runner",
+                        "message": "CRIS-SME local runner is available.",
+                    }
+                )
                 return
             if self.path == "/api/environment/azure":
                 self._send_json(runner.azure_environment())
@@ -271,11 +289,11 @@ def create_handler(runner: LocalAssessmentRunner) -> type[BaseHTTPRequestHandler
                 run_id = self.path.rsplit("/", 1)[-1]
                 run = runner.get_run(run_id)
                 if run is None:
-                    self._send_json({"error": "run not found"}, status=404)
+                    self._send_error("run not found", status=404)
                     return
                 self._send_json(run.to_dict())
                 return
-            self._send_json({"error": "not found"}, status=404)
+            self._send_error("not found", status=404)
 
         def do_POST(self) -> None:  # noqa: N802 - stdlib handler API
             if self.path != "/api/assessments/azure":
@@ -284,23 +302,23 @@ def create_handler(runner: LocalAssessmentRunner) -> type[BaseHTTPRequestHandler
                         payload = self._read_json()
                         report = runner.assess_public_exposure(payload)
                     except ValueError as exc:
-                        self._send_json({"error": str(exc)}, status=400)
+                        self._send_error(str(exc), status=400)
                         return
                     except Exception as exc:  # pragma: no cover - defensive runtime guard
-                        self._send_json({"error": str(exc)}, status=500)
+                        self._send_error(str(exc), status=500)
                         return
                     self._send_json(report, status=200)
                     return
-                self._send_json({"error": "not found"}, status=404)
+                self._send_error("not found", status=404)
                 return
             try:
                 payload = self._read_json()
                 run = runner.start_azure_assessment(payload)
             except ValueError as exc:
-                self._send_json({"error": str(exc)}, status=400)
+                self._send_error(str(exc), status=400)
                 return
             except Exception as exc:  # pragma: no cover - defensive runtime guard
-                self._send_json({"error": str(exc)}, status=500)
+                self._send_error(str(exc), status=500)
                 return
             self._send_json(run.to_dict(), status=202)
 
@@ -325,6 +343,16 @@ def create_handler(runner: LocalAssessmentRunner) -> type[BaseHTTPRequestHandler
             self.send_header("Access-Control-Allow-Headers", "Content-Type")
             self.end_headers()
             self.wfile.write(body)
+
+        def _send_error(self, message: str, *, status: int) -> None:
+            self._send_json(
+                {
+                    "status": "failed",
+                    "message": message,
+                    "error": message,
+                },
+                status=status,
+            )
 
     return LocalRunnerHandler
 
