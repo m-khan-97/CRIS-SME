@@ -16,6 +16,7 @@ from cris_sme.models.cloud_profile import (
     DataProfile,
     GovernanceProfile,
     IamProfile,
+    IotProfile,
     MonitoringProfile,
     NetworkProfile,
 )
@@ -280,6 +281,9 @@ class AzureCollector:
             subscription_id=subscription_id,
             credential=credential,
         )
+        iot_profile, iot_metadata = self._collect_iot_profile(
+            subscription_id=subscription_id,
+        )
         native_recommendations = self._collect_security_assessments_from_cli(
             subscription_id
         )
@@ -296,6 +300,7 @@ class AzureCollector:
             "monitoring": monitoring_profile.model_dump(),
             "compute": compute_profile.model_dump(),
             "governance": governance_profile.model_dump(),
+            "iot": iot_profile.model_dump() if iot_profile is not None else None,
             "metadata": {
                 "collection_mode": "azure_sdk_subscription_inventory",
                 "profile_source": "azure_live",
@@ -440,6 +445,29 @@ class AzureCollector:
                 "budget_evidence_state": governance_metadata[
                     "budget_evidence_state"
                 ],
+                "iot_collection_mode": iot_metadata["iot_collection_mode"],
+                "iot_hub_count": iot_metadata["iot_hub_count"],
+                "iot_device_identity_count": iot_metadata["iot_device_identity_count"],
+                "iot_device_identity_observable": iot_metadata[
+                    "iot_device_identity_observable"
+                ],
+                "iot_shared_access_policy_count": iot_metadata[
+                    "iot_shared_access_policy_count"
+                ],
+                "iot_overbroad_shared_access_policy_count": iot_metadata[
+                    "iot_overbroad_shared_access_policy_count"
+                ],
+                "iot_diagnostic_destination_count": iot_metadata[
+                    "iot_diagnostic_destination_count"
+                ],
+                "iot_defender_enabled": iot_metadata["iot_defender_enabled"],
+                "iot_public_network_hub_count": iot_metadata[
+                    "iot_public_network_hub_count"
+                ],
+                "iot_private_endpoint_count": iot_metadata[
+                    "iot_private_endpoint_count"
+                ],
+                "iot_alert_rule_count": iot_metadata["iot_alert_rule_count"],
                 "native_recommendation_collection_mode": (
                     "azure_security_assessment_inventory"
                     if native_recommendations
@@ -1395,6 +1423,183 @@ class AzureCollector:
                 "budget_api_accessible": budget_posture.api_accessible,
                 "budget_alert_count": budget_posture.budget_count,
                 "budget_evidence_state": budget_posture.state,
+            },
+        )
+
+    def _collect_iot_profile(
+        self,
+        subscription_id: str,
+    ) -> tuple[IotProfile | None, dict[str, int | str | bool]]:
+        """Collect Azure IoT Hub posture from ARM and optional IoT CLI evidence."""
+        iot_hubs = self._run_cli_json(
+            [
+                "az",
+                "resource",
+                "list",
+                "--subscription",
+                subscription_id,
+                "--resource-type",
+                "Microsoft.Devices/IotHubs",
+                "--output",
+                "json",
+            ],
+            timeout=25,
+        )
+        if not isinstance(iot_hubs, list) or not iot_hubs:
+            return (
+                None,
+                {
+                    "iot_collection_mode": "default_no_iot_hub_inventory",
+                    "iot_hub_count": 0,
+                    "iot_device_identity_count": 0,
+                    "iot_device_identity_observable": False,
+                    "iot_shared_access_policy_count": 0,
+                    "iot_overbroad_shared_access_policy_count": 0,
+                    "iot_diagnostic_destination_count": 0,
+                    "iot_defender_enabled": False,
+                    "iot_public_network_hub_count": 0,
+                    "iot_private_endpoint_count": 0,
+                    "iot_alert_rule_count": 0,
+                },
+            )
+
+        device_identity_count = 0
+        device_identity_observable = False
+        certificate_authority_configured = False
+        shared_access_policy_count = 0
+        overbroad_shared_access_policy_count = 0
+        diagnostic_settings_enabled_count = 0
+        diagnostic_destination_count = 0
+        diagnostic_category_ratios: list[float] = []
+        public_network_hub_count = 0
+        allowed_ip_rule_count = 0
+        private_endpoint_count = 0
+        message_route_count = 0
+        telemetry_storage_governed = False
+        iot_key_vault_linked = False
+        alert_rule_count = 0
+        action_group_count = 0
+
+        for hub in iot_hubs:
+            if not isinstance(hub, dict):
+                continue
+
+            hub_id = str(hub.get("id") or "")
+            hub_name = str(hub.get("name") or "")
+            resource_group_name = str(
+                hub.get("resourceGroup")
+                or self._extract_resource_group_name(hub_id)
+                or ""
+            )
+            hub_detail = self._collect_iot_hub_detail(hub_id) or hub
+            properties = hub_detail.get("properties", {})
+            if not isinstance(properties, dict):
+                properties = {}
+
+            if self._iot_hub_public_network_enabled(properties):
+                public_network_hub_count += 1
+            allowed_ip_rule_count += self._iot_hub_allowed_ip_rule_count(properties)
+            private_endpoint_count += self._iot_hub_private_endpoint_count(properties)
+            route_count, storage_governed = self._iot_hub_routing_posture(properties)
+            message_route_count += route_count
+            telemetry_storage_governed = telemetry_storage_governed or storage_governed
+            if self._iot_hub_key_vault_linked(properties):
+                iot_key_vault_linked = True
+
+            diagnostics = self._collect_iot_hub_diagnostic_settings(hub_id)
+            if diagnostics:
+                diagnostic_settings_enabled_count += 1
+                diagnostic_destination_count += self._diagnostic_destination_count(
+                    diagnostics
+                )
+                diagnostic_category_ratios.append(
+                    self._diagnostic_category_coverage_ratio(diagnostics)
+                )
+
+            policies = self._collect_iot_hub_policies(
+                hub_name=hub_name,
+                resource_group_name=resource_group_name,
+            )
+            shared_access_policy_count += len(policies)
+            overbroad_shared_access_policy_count += sum(
+                1 for policy in policies if self._iot_policy_is_overbroad(policy)
+            )
+
+            devices = self._collect_iot_hub_device_identities(
+                hub_name=hub_name,
+                resource_group_name=resource_group_name,
+            )
+            if devices is not None:
+                device_identity_observable = True
+                device_identity_count += len(devices)
+
+            certificates = self._collect_iot_hub_certificates(
+                hub_name=hub_name,
+                resource_group_name=resource_group_name,
+            )
+            certificate_authority_configured = (
+                certificate_authority_configured or bool(certificates)
+            )
+
+            alerts = self._collect_iot_hub_alerts(subscription_id, hub_id)
+            alert_rule_count += len(alerts)
+            action_group_count += self._alert_action_group_count(alerts)
+
+        hub_count = len(iot_hubs)
+        defender_iot_enabled = self._collect_defender_iot_enabled(subscription_id)
+        diagnostic_category_coverage_ratio = (
+            round(sum(diagnostic_category_ratios) / len(diagnostic_category_ratios), 4)
+            if diagnostic_category_ratios
+            else 0.0
+        )
+
+        return (
+            IotProfile(
+                iot_hub_count=hub_count,
+                device_identity_count=device_identity_count,
+                device_identity_observable=device_identity_observable,
+                certificate_authority_configured=certificate_authority_configured,
+                shared_access_policy_count=shared_access_policy_count,
+                overbroad_shared_access_policy_count=(
+                    overbroad_shared_access_policy_count
+                ),
+                diagnostic_settings_enabled=diagnostic_settings_enabled_count == hub_count,
+                diagnostic_destination_count=diagnostic_destination_count,
+                diagnostic_category_coverage_ratio=diagnostic_category_coverage_ratio,
+                defender_iot_enabled=defender_iot_enabled,
+                iot_security_monitoring_observable=True,
+                public_network_access_enabled=public_network_hub_count > 0,
+                allowed_ip_rule_count=allowed_ip_rule_count,
+                private_endpoint_count=private_endpoint_count,
+                private_endpoint_required=hub_count > 0,
+                message_route_count=message_route_count,
+                telemetry_retention_days=30 if diagnostic_settings_enabled_count else 0,
+                telemetry_storage_governed=telemetry_storage_governed,
+                iot_key_vault_linked=iot_key_vault_linked,
+                iot_secret_rotation_observable=False,
+                alert_rule_count=alert_rule_count,
+                action_group_count=action_group_count,
+                clinical_operational_boundary_documented=False,
+                device_evidence_required_count=0
+                if device_identity_observable
+                else hub_count,
+                clinical_operational_evidence_required_count=hub_count,
+                evidence_state="observed" if device_identity_observable else "partial",
+            ),
+            {
+                "iot_collection_mode": "azure_iot_hub_cli_inventory",
+                "iot_hub_count": hub_count,
+                "iot_device_identity_count": device_identity_count,
+                "iot_device_identity_observable": device_identity_observable,
+                "iot_shared_access_policy_count": shared_access_policy_count,
+                "iot_overbroad_shared_access_policy_count": (
+                    overbroad_shared_access_policy_count
+                ),
+                "iot_diagnostic_destination_count": diagnostic_destination_count,
+                "iot_defender_enabled": defender_iot_enabled,
+                "iot_public_network_hub_count": public_network_hub_count,
+                "iot_private_endpoint_count": private_endpoint_count,
+                "iot_alert_rule_count": alert_rule_count,
             },
         )
 
@@ -2851,6 +3056,314 @@ class AzureCollector:
         if isinstance(resource, dict):
             return resource.get(attr, default)
         return getattr(resource, attr, default)
+
+    def _collect_iot_hub_detail(self, hub_id: str) -> dict[str, Any] | None:
+        """Return ARM details for one IoT Hub resource."""
+        if not hub_id:
+            return None
+        payload = self._run_cli_json(
+            ["az", "resource", "show", "--ids", hub_id, "--output", "json"],
+            timeout=20,
+        )
+        return payload if isinstance(payload, dict) else None
+
+    def _collect_iot_hub_diagnostic_settings(
+        self,
+        hub_id: str,
+    ) -> list[dict[str, Any]]:
+        """Return diagnostic settings attached to an IoT Hub."""
+        if not hub_id:
+            return []
+        payload = self._run_cli_json(
+            [
+                "az",
+                "monitor",
+                "diagnostic-settings",
+                "list",
+                "--resource",
+                hub_id,
+                "--output",
+                "json",
+            ],
+            timeout=25,
+        )
+        if isinstance(payload, dict) and isinstance(payload.get("value"), list):
+            return payload["value"]
+        return payload if isinstance(payload, list) else []
+
+    def _collect_iot_hub_policies(
+        self,
+        *,
+        hub_name: str,
+        resource_group_name: str,
+    ) -> list[dict[str, Any]]:
+        """Return IoT Hub shared access policies when the IoT CLI path is available."""
+        if not hub_name or not resource_group_name:
+            return []
+        payload = self._run_cli_json(
+            [
+                "az",
+                "iot",
+                "hub",
+                "policy",
+                "list",
+                "--hub-name",
+                hub_name,
+                "--resource-group",
+                resource_group_name,
+                "--output",
+                "json",
+            ],
+            timeout=25,
+        )
+        return payload if isinstance(payload, list) else []
+
+    def _collect_iot_hub_device_identities(
+        self,
+        *,
+        hub_name: str,
+        resource_group_name: str,
+    ) -> list[dict[str, Any]] | None:
+        """Return IoT device identities, or None when the evidence is not observable."""
+        if not hub_name or not resource_group_name:
+            return None
+        completed = self._run_cli_command_allow_failure(
+            [
+                "az",
+                "iot",
+                "hub",
+                "device-identity",
+                "list",
+                "--hub-name",
+                hub_name,
+                "--resource-group",
+                resource_group_name,
+                "--output",
+                "json",
+            ],
+            timeout=30,
+        )
+        if completed is None or completed.returncode != 0:
+            return None
+        try:
+            payload = json.loads(completed.stdout)
+        except json.JSONDecodeError:
+            return None
+        return payload if isinstance(payload, list) else None
+
+    def _collect_iot_hub_certificates(
+        self,
+        *,
+        hub_name: str,
+        resource_group_name: str,
+    ) -> list[dict[str, Any]]:
+        """Return IoT Hub certificate authorities when visible."""
+        if not hub_name or not resource_group_name:
+            return []
+        payload = self._run_cli_json(
+            [
+                "az",
+                "iot",
+                "hub",
+                "certificate",
+                "list",
+                "--hub-name",
+                hub_name,
+                "--resource-group",
+                resource_group_name,
+                "--output",
+                "json",
+            ],
+            timeout=25,
+        )
+        return payload if isinstance(payload, list) else []
+
+    def _collect_iot_hub_alerts(
+        self,
+        subscription_id: str,
+        hub_id: str,
+    ) -> list[dict[str, Any]]:
+        """Return metric alerts scoped to the IoT Hub resource."""
+        if not hub_id:
+            return []
+        payload = self._run_cli_json(
+            [
+                "az",
+                "monitor",
+                "metrics",
+                "alert",
+                "list",
+                "--subscription",
+                subscription_id,
+                "--output",
+                "json",
+            ],
+            timeout=25,
+        )
+        if not isinstance(payload, list):
+            return []
+        normalized_hub_id = hub_id.lower()
+        return [
+            alert
+            for alert in payload
+            if normalized_hub_id in json.dumps(alert, sort_keys=True).lower()
+        ]
+
+    def _collect_defender_iot_enabled(self, subscription_id: str) -> bool:
+        """Return whether Defender for IoT or IoT Hub security pricing appears enabled."""
+        pricing_payload = self._run_cli_json(
+            [
+                "az",
+                "security",
+                "pricing",
+                "list",
+                "--subscription",
+                subscription_id,
+                "--output",
+                "json",
+            ],
+            timeout=25,
+        )
+        plans = (
+            pricing_payload.get("value", [])
+            if isinstance(pricing_payload, dict)
+            else []
+        )
+        if not isinstance(plans, list):
+            return False
+        for plan in plans:
+            if not isinstance(plan, dict):
+                continue
+            plan_name = str(plan.get("name") or plan.get("pricingTier") or "").lower()
+            tier = str(plan.get("pricingTier") or plan.get("tier") or "").lower()
+            if "iot" in plan_name and tier in {"standard", "on", "enabled"}:
+                return True
+        return False
+
+    @staticmethod
+    def _iot_hub_public_network_enabled(properties: dict[str, Any]) -> bool:
+        """Return whether an IoT Hub accepts public network access."""
+        public_network_access = str(
+            properties.get("publicNetworkAccess", "Enabled")
+        ).lower()
+        if public_network_access == "disabled":
+            return False
+        network_rules = properties.get("networkRuleSets", {})
+        if isinstance(network_rules, dict):
+            default_action = str(network_rules.get("defaultAction", "")).lower()
+            if default_action == "deny":
+                return False
+        return True
+
+    @staticmethod
+    def _iot_hub_allowed_ip_rule_count(properties: dict[str, Any]) -> int:
+        """Return the number of explicit IoT Hub IP allow rules."""
+        network_rules = properties.get("networkRuleSets", {})
+        if not isinstance(network_rules, dict):
+            return 0
+        ip_rules = network_rules.get("ipRules", [])
+        return len(ip_rules) if isinstance(ip_rules, list) else 0
+
+    @staticmethod
+    def _iot_hub_private_endpoint_count(properties: dict[str, Any]) -> int:
+        """Return the number of visible private endpoint connections."""
+        connections = properties.get("privateEndpointConnections", [])
+        return len(connections) if isinstance(connections, list) else 0
+
+    @staticmethod
+    def _iot_hub_routing_posture(properties: dict[str, Any]) -> tuple[int, bool]:
+        """Return message-route count and whether governed storage routing is present."""
+        routing = properties.get("routing", {})
+        if not isinstance(routing, dict):
+            return (0, False)
+        routes = routing.get("routes", [])
+        route_count = len(routes) if isinstance(routes, list) else 0
+        endpoints = routing.get("endpoints", {})
+        storage_endpoints = []
+        if isinstance(endpoints, dict):
+            storage_endpoints = endpoints.get("storageContainers", [])
+        return (
+            route_count,
+            isinstance(storage_endpoints, list) and bool(storage_endpoints),
+        )
+
+    @staticmethod
+    def _iot_hub_key_vault_linked(properties: dict[str, Any]) -> bool:
+        """Return whether IoT Hub properties reference Key Vault-backed identity material."""
+        serialized = json.dumps(properties, sort_keys=True).lower()
+        return "keyvault" in serialized or "keyvault.vault.azure.net" in serialized
+
+    @staticmethod
+    def _iot_policy_is_overbroad(policy: dict[str, Any]) -> bool:
+        """Return whether a shared access policy appears broader than operational need."""
+        policy_name = str(policy.get("keyName") or policy.get("name") or "").lower()
+        rights = policy.get("rights", [])
+        if isinstance(rights, str):
+            rights_set = {item.strip().lower() for item in rights.split(",")}
+        elif isinstance(rights, list):
+            rights_set = {str(item).strip().lower() for item in rights}
+        else:
+            rights_set = set()
+        if policy_name in {"iothubowner", "serviceandregistryreadwrite"}:
+            return True
+        return len(rights_set) >= 3 or {
+            "registrywrite",
+            "serviceconnect",
+            "deviceconnect",
+        }.issubset(rights_set)
+
+    @staticmethod
+    def _diagnostic_destination_count(settings: list[dict[str, Any]]) -> int:
+        """Return the number of distinct diagnostic destinations."""
+        destinations: set[str] = set()
+        for setting in settings:
+            for key in (
+                "workspaceId",
+                "eventHubAuthorizationRuleId",
+                "storageAccountId",
+                "marketplacePartnerId",
+            ):
+                value = setting.get(key)
+                if value:
+                    destinations.add(str(value))
+        return len(destinations)
+
+    @staticmethod
+    def _diagnostic_category_coverage_ratio(settings: list[dict[str, Any]]) -> float:
+        """Return enabled log/metric category coverage across diagnostic settings."""
+        observed = 0
+        enabled = 0
+        for setting in settings:
+            for key in ("logs", "metrics"):
+                entries = setting.get(key, [])
+                if not isinstance(entries, list):
+                    continue
+                for entry in entries:
+                    if not isinstance(entry, dict):
+                        continue
+                    observed += 1
+                    if bool(entry.get("enabled")):
+                        enabled += 1
+        return round(enabled / observed, 4) if observed else 0.0
+
+    @staticmethod
+    def _alert_action_group_count(alerts: list[dict[str, Any]]) -> int:
+        """Return distinct action groups referenced by alert rules."""
+        action_group_ids: set[str] = set()
+        for alert in alerts:
+            properties = alert.get("properties", {})
+            actions = alert.get("actions")
+            if actions is None and isinstance(properties, dict):
+                actions = properties.get("actions")
+            if not isinstance(actions, list):
+                continue
+            for action in actions:
+                if not isinstance(action, dict):
+                    continue
+                action_group_id = action.get("actionGroupId")
+                if action_group_id:
+                    action_group_ids.add(str(action_group_id))
+        return len(action_group_ids)
 
     @staticmethod
     def _extract_resource_group_name(resource_id: str | None) -> str | None:

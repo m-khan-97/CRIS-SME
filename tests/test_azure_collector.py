@@ -899,6 +899,11 @@ def test_azure_collector_enriches_governance_profile_from_resource_inventory(
             return FakeCompletedProcess('{"value":[]}')
         if command[:4] == ["az", "security", "assessment", "list"]:
             return FakeCompletedProcess("[]")
+        if (
+            command[:3] == ["az", "resource", "list"]
+            and "Microsoft.Devices/IotHubs" in command
+        ):
+            return FakeCompletedProcess("[]")
         if command[:3] == ["az", "keyvault", "list"]:
             return FakeCompletedProcess("[]")
         if command[:4] == ["az", "keyvault", "show"]:
@@ -985,6 +990,11 @@ def test_azure_collector_enriches_monitoring_profile_from_cli_and_workflows(
             )
         if command[:4] == ["az", "security", "assessment", "list"]:
             return FakeCompletedProcess("[]")
+        if (
+            command[:3] == ["az", "resource", "list"]
+            and "Microsoft.Devices/IotHubs" in command
+        ):
+            return FakeCompletedProcess("[]")
         if command[:4] == ["az", "policy", "assignment", "list"]:
             return FakeCompletedProcess("[]")
         if command[:3] == ["az", "keyvault", "list"]:
@@ -1063,6 +1073,11 @@ def test_azure_collector_collects_native_security_recommendations(
             return FakeCompletedProcess(
                 '[{"name":"net-open-001","displayName":"All network ports should be restricted on network security groups associated to your virtual machine","status":{"code":"Unhealthy","cause":"NetworkPortsAreOpenToAllSources","description":"Network ports are open to all sources."},"resourceDetails":{"ResourceType":"microsoft.compute/virtualmachines","ResourceName":"vm-01"},"resourceGroup":"rg-demo"}]'
             )
+        if (
+            command[:3] == ["az", "resource", "list"]
+            and "Microsoft.Devices/IotHubs" in command
+        ):
+            return FakeCompletedProcess("[]")
         if command[:4] == ["az", "policy", "assignment", "list"]:
             return FakeCompletedProcess("[]")
         if command[:3] == ["az", "keyvault", "list"]:
@@ -1098,6 +1113,94 @@ def test_azure_collector_collects_native_security_recommendations(
     assert profile.metadata["native_security_recommendation_count"] == 1
     assert profile.metadata["native_unhealthy_recommendation_count"] == 1
     assert profile.metadata["native_security_recommendations"][0]["resource_name"] == "vm-01"
+
+
+def test_azure_collector_builds_iot_profile_from_iot_hub_inventory(
+    monkeypatch,
+) -> None:
+    class FakeCompletedProcess:
+        def __init__(
+            self,
+            stdout: str,
+            returncode: int = 0,
+            stderr: str = "",
+        ) -> None:
+            self.stdout = stdout
+            self.returncode = returncode
+            self.stderr = stderr
+
+    hub_id = (
+        "/subscriptions/sub-123/resourceGroups/rg-iot/providers/"
+        "Microsoft.Devices/IotHubs/hub-clinical"
+    )
+
+    def fake_run_cli_command_allow_failure(
+        command: list[str],
+        timeout: int,
+    ) -> FakeCompletedProcess:
+        _ = timeout
+        if (
+            command[:3] == ["az", "resource", "list"]
+            and "Microsoft.Devices/IotHubs" in command
+        ):
+            return FakeCompletedProcess(
+                f'[{{"id":"{hub_id}","name":"hub-clinical","resourceGroup":"rg-iot"}}]'
+            )
+        if command[:3] == ["az", "resource", "show"]:
+            return FakeCompletedProcess(
+                (
+                    '{"id":"'
+                    + hub_id
+                    + '","name":"hub-clinical","properties":{"publicNetworkAccess":"Enabled",'
+                    '"networkRuleSets":{"defaultAction":"Allow","ipRules":[]},'
+                    '"privateEndpointConnections":[],"routing":{"routes":[],'
+                    '"endpoints":{"storageContainers":[]}}}}'
+                )
+            )
+        if command[:4] == ["az", "monitor", "diagnostic-settings", "list"]:
+            return FakeCompletedProcess(
+                '[{"workspaceId":"/subscriptions/sub-123/workspaces/law",'
+                '"logs":[{"category":"Connections","enabled":true}],'
+                '"metrics":[{"category":"AllMetrics","enabled":true}]}]'
+            )
+        if command[:5] == ["az", "iot", "hub", "policy", "list"]:
+            return FakeCompletedProcess(
+                '[{"keyName":"iothubowner","rights":["RegistryWrite","ServiceConnect","DeviceConnect"]}]'
+            )
+        if command[:5] == ["az", "iot", "hub", "device-identity", "list"]:
+            return FakeCompletedProcess('[{"deviceId":"pump-001"},{"deviceId":"bed-002"}]')
+        if command[:5] == ["az", "iot", "hub", "certificate", "list"]:
+            return FakeCompletedProcess('[{"name":"clinical-ca"}]')
+        if command[:4] == ["az", "monitor", "metrics", "alert"]:
+            return FakeCompletedProcess(
+                f'[{{"scopes":["{hub_id}"],"actions":[{{"actionGroupId":"/actionGroups/secops"}}]}}]'
+            )
+        if command[:4] == ["az", "security", "pricing", "list"]:
+            return FakeCompletedProcess(
+                '{"value":[{"name":"IoT","pricingTier":"Standard"}]}'
+            )
+        return FakeCompletedProcess("[]")
+
+    monkeypatch.setattr(
+        AzureCollector,
+        "_run_cli_command_allow_failure",
+        staticmethod(fake_run_cli_command_allow_failure),
+    )
+
+    collector = AzureCollector()
+    iot_profile, metadata = collector._collect_iot_profile("sub-123")
+
+    assert iot_profile is not None
+    assert iot_profile.iot_hub_count == 1
+    assert iot_profile.device_identity_observable is True
+    assert iot_profile.device_identity_count == 2
+    assert iot_profile.certificate_authority_configured is True
+    assert iot_profile.overbroad_shared_access_policy_count == 1
+    assert iot_profile.public_network_access_enabled is True
+    assert iot_profile.diagnostic_settings_enabled is True
+    assert iot_profile.defender_iot_enabled is True
+    assert iot_profile.alert_rule_count == 1
+    assert metadata["iot_collection_mode"] == "azure_iot_hub_cli_inventory"
 
 
 def test_azure_collector_enriches_data_profile_from_storage_inventory() -> None:
