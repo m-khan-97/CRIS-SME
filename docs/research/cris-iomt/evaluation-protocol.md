@@ -37,6 +37,14 @@ Expected outcome:
 - evidence gaps still present for device-side and clinical-operational evidence
 - clear pass/partial outcomes for logging and governance controls
 
+Evidence-lab command:
+
+```bash
+python3 scripts/azure_evidence_lab.py deploy --scenario iomt-clean-baseline --yes
+python3 scripts/azure_evidence_lab.py assess --scenario iomt-clean-baseline --run-id <run-id>
+python3 scripts/azure_evidence_lab.py cleanup --scenario iomt-clean-baseline --run-id <run-id> --yes
+```
+
 ### Track B: Weak Healthcare IoT Lab
 
 Purpose:
@@ -57,6 +65,14 @@ Expected outcome:
 - `IOT-002`, `IOT-003`, `IOT-004`, `IOT-005`, `IOT-006`, and `IOT-009` should trigger
 - evidence output should explain why each finding was generated
 - NHS DSPT and CAF readiness should show explicit gaps
+
+Evidence-lab command:
+
+```bash
+python3 scripts/azure_evidence_lab.py deploy --scenario iomt-weak-baseline --yes
+python3 scripts/azure_evidence_lab.py assess --scenario iomt-weak-baseline --run-id <run-id>
+python3 scripts/azure_evidence_lab.py cleanup --scenario iomt-weak-baseline --run-id <run-id> --yes
+```
 
 ### Track C: Realistic Simulated Clinic Architecture
 
@@ -80,6 +96,19 @@ Expected outcome:
 - mixed pass/fail/partial results
 - evidence sufficiency report with meaningful clinical-operational boundaries
 - better demonstration value for senior healthcare/sensing collaborators
+
+Evidence-lab command:
+
+```bash
+python3 scripts/azure_evidence_lab.py deploy --scenario iomt-simulated-clinic --yes
+python3 scripts/azure_evidence_lab.py assess --scenario iomt-simulated-clinic --run-id <run-id>
+python3 scripts/azure_evidence_lab.py cleanup --scenario iomt-simulated-clinic --run-id <run-id> --yes
+```
+
+The IoMT lab harness writes `lab_manifest.json` under `outputs/evidence-lab/<run-id>/<scenario>/`.
+The manifest should be retained as part of the paper evidence package because it records the scenario, intended weaknesses, resource group, tags, and dataset-use classification.
+
+For cost control, the IoT Hub SKU defaults to `F1`. If the subscription already has a Free IoT Hub, set `CRIS_SME_IOMT_IOTHUB_SKU=S1` for a paid controlled run, then delete the resource group immediately after evidence collection.
 
 ## Metrics
 
@@ -173,4 +202,3 @@ A strong first paper should include:
 - evidence sufficiency table
 - one external expert review pass, ideally from healthcare IoT/sensing or cyber-physical systems expertise
 - clear patient-data and clinical-safety boundary
-

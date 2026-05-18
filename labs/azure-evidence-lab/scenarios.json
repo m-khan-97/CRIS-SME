@@ -166,6 +166,114 @@
         "key_vault_with_purge_protection",
         "log_analytics_workspace"
       ]
+    },
+    {
+      "id": "iomt-clean-baseline",
+      "title": "IoMT Clean Healthcare Baseline",
+      "dataset_source_type": "live_lab",
+      "authorization_basis": "owned_controlled_lab",
+      "dataset_use": "iomt_clean_baseline",
+      "risk_intent": "Create a clean Azure IoT Hub baseline with simulated device identities, diagnostic logging, alert routing, protected storage, and key management for healthcare IoT assurance evaluation.",
+      "expected_findings": [
+        {
+          "control_id": "IOT-003",
+          "expectation": "Should not fire when diagnostic settings are created successfully for the IoT Hub."
+        },
+        {
+          "control_id": "IOT-005",
+          "expectation": "Should not fire because public network access is disabled after hub creation."
+        },
+        {
+          "control_id": "IOT-010",
+          "expectation": "May fire because clinical-operational ownership still requires human validation even in a clean cloud lab."
+        }
+      ],
+      "resources": [
+        "resource_group",
+        "azure_iot_hub_public_network_disabled",
+        "simulated_iot_device_identity",
+        "iot_hub_certificate_authority_placeholder",
+        "log_analytics_workspace",
+        "iot_hub_diagnostic_settings",
+        "iot_metric_alert_and_action_group",
+        "storage_account_private_blob_access",
+        "key_vault_with_purge_protection"
+      ]
+    },
+    {
+      "id": "iomt-weak-baseline",
+      "title": "IoMT Weak Healthcare Baseline",
+      "dataset_source_type": "vulnerable_lab",
+      "authorization_basis": "intentionally_vulnerable_lab",
+      "dataset_use": "iomt_control_stress_test",
+      "risk_intent": "Stress CRIS-IoMT controls using a deliberately weak IoT Hub with public access, broad shared access policy, missing diagnostics, no private endpoint, and weak telemetry governance.",
+      "expected_findings": [
+        {
+          "control_id": "IOT-002",
+          "expectation": "Should fire because an intentionally broad shared access policy is created."
+        },
+        {
+          "control_id": "IOT-003",
+          "expectation": "Should fire because no diagnostic setting is created."
+        },
+        {
+          "control_id": "IOT-005",
+          "expectation": "Should fire because public network access is enabled without IP rules or private endpoints."
+        },
+        {
+          "control_id": "IOT-006",
+          "expectation": "Should fire because no private endpoint is created for the sensitive IoMT telemetry path."
+        },
+        {
+          "control_id": "IOT-009",
+          "expectation": "Should fire because no IoT-specific alert rule is created."
+        }
+      ],
+      "resources": [
+        "resource_group",
+        "azure_iot_hub_public_network_enabled",
+        "simulated_legacy_device_identity",
+        "overbroad_iot_shared_access_policy",
+        "storage_account_public_blob_container"
+      ]
+    },
+    {
+      "id": "iomt-simulated-clinic",
+      "title": "IoMT Simulated Clinic Architecture",
+      "dataset_source_type": "live_lab",
+      "authorization_basis": "owned_controlled_lab",
+      "dataset_use": "iomt_realistic_clinic_simulation",
+      "risk_intent": "Create a richer simulated clinic architecture with IoT Hub, ward-style synthetic devices, diagnostic logging, alert routing, network segmentation, protected storage, and key management.",
+      "expected_findings": [
+        {
+          "control_id": "IOT-001",
+          "expectation": "Should improve compared with the weak baseline because simulated device identities and certificate evidence are created."
+        },
+        {
+          "control_id": "IOT-003",
+          "expectation": "Should not fire when diagnostic settings are created successfully."
+        },
+        {
+          "control_id": "IOT-005",
+          "expectation": "May fire because public network access remains enabled to model transitional clinical connectivity."
+        },
+        {
+          "control_id": "IOT-010",
+          "expectation": "Should still identify clinical-operational evidence requiring human confirmation."
+        }
+      ],
+      "resources": [
+        "resource_group",
+        "virtual_network_with_edge_editorial_data_monitoring_subnets",
+        "azure_iot_hub_public_network_enabled",
+        "three_simulated_iomt_device_identities",
+        "iot_hub_certificate_authority_placeholder",
+        "log_analytics_workspace",
+        "iot_hub_diagnostic_settings",
+        "iot_metric_alert_and_action_group",
+        "storage_account_private_blob_access",
+        "key_vault_with_purge_protection"
+      ]
     }
   ]
 }

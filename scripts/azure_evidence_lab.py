@@ -8,6 +8,7 @@ import re
 import shutil
 import subprocess
 import sys
+import tempfile
 from dataclasses import dataclass
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
@@ -211,6 +212,12 @@ def deploy(context: LabContext) -> None:
         create_media_office_demo(context)
     elif scenario_id == "media-office-delegated":
         create_media_office_delegated(context)
+    elif scenario_id == "iomt-clean-baseline":
+        create_iomt_clean_baseline(context)
+    elif scenario_id == "iomt-weak-baseline":
+        create_iomt_weak_baseline(context)
+    elif scenario_id == "iomt-simulated-clinic":
+        create_iomt_simulated_clinic(context)
     else:
         raise ValueError(f"Scenario '{scenario_id}' has no deployer.")
 
@@ -416,6 +423,371 @@ def create_media_office_delegated(context: LabContext) -> None:
             context.location,
             "--sku",
             "PerGB2018",
+            *tag_args(context.tags),
+        ],
+        context,
+    )
+
+
+def create_iomt_clean_baseline(context: LabContext) -> None:
+    workspace_name = create_log_analytics_workspace(context, "iomt-clean-law")
+    hub_name = create_iot_hub(context, "iomtclean", public_network_access="Disabled")
+    create_iot_device_identity(context, hub_name, "ward-monitor-001")
+    create_iot_certificate(context, hub_name, "clinical-root-ca")
+    configure_iot_diagnostics(context, hub_name, workspace_name)
+    create_iot_metric_alert(context, hub_name, "iomt-clean-connectivity-alert")
+    create_storage(context, "iomtclean", public_blob=False, tags=context.tags)
+    vault_name = unique_name("crisiomtkv", context.suffix, max_len=24)
+    run_az(
+        [
+            "keyvault",
+            "create",
+            "--name",
+            vault_name,
+            "--resource-group",
+            context.resource_group,
+            "--location",
+            context.location,
+            "--enable-purge-protection",
+            "true",
+            "--retention-days",
+            "7",
+            *tag_args(context.tags),
+        ],
+        context,
+    )
+
+
+def create_iomt_weak_baseline(context: LabContext) -> None:
+    hub_name = create_iot_hub(context, "iomtweak", public_network_access="Enabled")
+    create_iot_device_identity(context, hub_name, "legacy-infusion-001")
+    create_iot_policy(
+        context,
+        hub_name,
+        "legacy-all-access",
+        ["RegistryWrite", "ServiceConnect", "DeviceConnect"],
+    )
+    create_storage(context, "iomtweak", public_blob=True, tags=context.tags)
+
+
+def create_iomt_simulated_clinic(context: LabContext) -> None:
+    workspace_name = create_log_analytics_workspace(context, "iomt-clinic-law")
+    create_vnet_with_subnets(context, f"iomt-vnet-{context.run_id}"[:64])
+    hub_name = create_iot_hub(context, "iomtclinic", public_network_access="Enabled")
+    for device_id in (
+        "ward-monitor-001",
+        "bedside-sensor-002",
+        "mobile-cart-003",
+    ):
+        create_iot_device_identity(context, hub_name, device_id)
+    create_iot_certificate(context, hub_name, "clinic-root-ca")
+    configure_iot_diagnostics(context, hub_name, workspace_name)
+    create_iot_metric_alert(context, hub_name, "iomt-clinic-message-alert")
+    create_storage(context, "iomtclinic", public_blob=False, tags=context.tags)
+    vault_name = unique_name("crisiomtckv", context.suffix, max_len=24)
+    run_az(
+        [
+            "keyvault",
+            "create",
+            "--name",
+            vault_name,
+            "--resource-group",
+            context.resource_group,
+            "--location",
+            context.location,
+            "--enable-purge-protection",
+            "true",
+            "--retention-days",
+            "7",
+            *tag_args(context.tags),
+        ],
+        context,
+    )
+
+
+def create_iot_hub(
+    context: LabContext,
+    prefix: str,
+    *,
+    public_network_access: str,
+) -> str:
+    hub_name = unique_name(prefix, context.suffix, max_len=50)
+    sku = os.getenv("CRIS_SME_IOMT_IOTHUB_SKU", "F1")
+    command = [
+        "iot",
+        "hub",
+        "create",
+        "--name",
+        hub_name,
+        "--resource-group",
+        context.resource_group,
+        "--location",
+        context.location,
+        "--sku",
+        sku,
+        "--partition-count",
+        "2",
+        *tag_args(context.tags),
+    ]
+    run_az(command, context)
+    run_az(
+        [
+            "iot",
+            "hub",
+            "update",
+            "--name",
+            hub_name,
+            "--resource-group",
+            context.resource_group,
+            "--set",
+            f"properties.publicNetworkAccess={public_network_access}",
+        ],
+        context,
+    )
+    return hub_name
+
+
+def create_iot_device_identity(
+    context: LabContext,
+    hub_name: str,
+    device_id: str,
+) -> None:
+    run_az(
+        [
+            "iot",
+            "hub",
+            "device-identity",
+            "create",
+            "--hub-name",
+            hub_name,
+            "--resource-group",
+            context.resource_group,
+            "--device-id",
+            device_id,
+            "--auth-method",
+            "shared_private_key",
+        ],
+        context,
+    )
+
+
+def create_iot_certificate(context: LabContext, hub_name: str, certificate_name: str) -> None:
+    if context.dry_run:
+        print("Dry run: IoT certificate upload uses a temporary self-signed lab certificate.")
+        return
+    certificate_path = create_temporary_lab_certificate(context, certificate_name)
+    run_az(
+        [
+            "iot",
+            "hub",
+            "certificate",
+            "create",
+            "--hub-name",
+            hub_name,
+            "--resource-group",
+            context.resource_group,
+            "--name",
+            certificate_name,
+            "--path",
+            str(certificate_path),
+        ],
+        context,
+    )
+
+
+def create_temporary_lab_certificate(context: LabContext, certificate_name: str) -> Path:
+    certificate_dir = Path(tempfile.gettempdir()) / "cris-sme-iomt-certs" / context.run_id
+    certificate_dir.mkdir(parents=True, exist_ok=True)
+    key_path = certificate_dir / f"{certificate_name}.key"
+    certificate_path = certificate_dir / f"{certificate_name}.cer"
+    command = [
+        "openssl",
+        "req",
+        "-x509",
+        "-newkey",
+        "rsa:2048",
+        "-keyout",
+        str(key_path),
+        "-out",
+        str(certificate_path),
+        "-days",
+        "2",
+        "-nodes",
+        "-subj",
+        f"/CN={certificate_name}.cris-sme-iomt-lab",
+    ]
+    print(f"$ {' '.join(command)}")
+    subprocess.run(command, check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    return certificate_path
+
+
+def create_iot_policy(
+    context: LabContext,
+    hub_name: str,
+    policy_name: str,
+    rights: list[str],
+) -> None:
+    run_az(
+        [
+            "iot",
+            "hub",
+            "policy",
+            "create",
+            "--hub-name",
+            hub_name,
+            "--resource-group",
+            context.resource_group,
+            "--name",
+            policy_name,
+            "--permissions",
+            *rights,
+        ],
+        context,
+    )
+
+
+def create_log_analytics_workspace(context: LabContext, prefix: str) -> str:
+    workspace_name = unique_name(prefix, context.suffix, max_len=63)
+    run_az(
+        [
+            "monitor",
+            "log-analytics",
+            "workspace",
+            "create",
+            "--workspace-name",
+            workspace_name,
+            "--resource-group",
+            context.resource_group,
+            "--location",
+            context.location,
+            "--sku",
+            "PerGB2018",
+            *tag_args(context.tags),
+        ],
+        context,
+    )
+    return workspace_name
+
+
+def configure_iot_diagnostics(
+    context: LabContext,
+    hub_name: str,
+    workspace_name: str,
+) -> None:
+    if context.dry_run:
+        print(
+            "Dry run: diagnostic settings use live resource IDs resolved after deployment."
+        )
+        return
+    hub_id = capture_az_text(
+        [
+            "iot",
+            "hub",
+            "show",
+            "--name",
+            hub_name,
+            "--resource-group",
+            context.resource_group,
+            "--query",
+            "id",
+            "--output",
+            "tsv",
+        ],
+        context,
+    )
+    workspace_id = capture_az_text(
+        [
+            "monitor",
+            "log-analytics",
+            "workspace",
+            "show",
+            "--workspace-name",
+            workspace_name,
+            "--resource-group",
+            context.resource_group,
+            "--query",
+            "id",
+            "--output",
+            "tsv",
+        ],
+        context,
+    )
+    run_az(
+        [
+            "monitor",
+            "diagnostic-settings",
+            "create",
+            "--name",
+            "cris-iomt-diagnostics",
+            "--resource",
+            hub_id,
+            "--workspace",
+            workspace_id,
+            "--logs",
+            '[{"categoryGroup":"allLogs","enabled":true}]',
+            "--metrics",
+            '[{"category":"AllMetrics","enabled":true}]',
+        ],
+        context,
+    )
+
+
+def create_iot_metric_alert(context: LabContext, hub_name: str, alert_name: str) -> None:
+    if context.dry_run:
+        print("Dry run: IoT metric alert uses the hub resource ID resolved after deployment.")
+        return
+    hub_id = capture_az_text(
+        [
+            "iot",
+            "hub",
+            "show",
+            "--name",
+            hub_name,
+            "--resource-group",
+            context.resource_group,
+            "--query",
+            "id",
+            "--output",
+            "tsv",
+        ],
+        context,
+    )
+    action_group_name = unique_name("iomt-ag", context.suffix, max_len=64)
+    run_az(
+        [
+            "monitor",
+            "action-group",
+            "create",
+            "--name",
+            action_group_name,
+            "--resource-group",
+            context.resource_group,
+            "--short-name",
+            "iomtsec",
+            *tag_args(context.tags),
+        ],
+        context,
+    )
+    run_az(
+        [
+            "monitor",
+            "metrics",
+            "alert",
+            "create",
+            "--name",
+            alert_name,
+            "--resource-group",
+            context.resource_group,
+            "--scopes",
+            hub_id,
+            "--condition",
+            "count total_messages_used > 0",
+            "--window-size",
+            "5m",
+            "--evaluation-frequency",
+            "5m",
+            "--action",
+            action_group_name,
             *tag_args(context.tags),
         ],
         context,
@@ -676,6 +1048,20 @@ def normalize_run_id(value: str) -> str:
 
 def run_az(args: list[str], context: LabContext) -> None:
     run_command(["az", *args], context)
+
+
+def capture_az_text(args: list[str], context: LabContext) -> str:
+    command = ["az", *args]
+    printable = " ".join(command)
+    print(f"$ {printable}")
+    completed = subprocess.run(
+        command,
+        check=True,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        text=True,
+    )
+    return completed.stdout.strip()
 
 
 def run_command(
