@@ -12,6 +12,7 @@ htmlcov/
 # Local environment files.
 .env
 .env.*
+.codex
 
 # Build and packaging artifacts.
 build/
@@ -24,5 +25,6 @@ dist/
 # Generated outputs.
 outputs/reports/*
 outputs/figures/*
+outputs/evidence-lab/
 !outputs/reports/.gitkeep
 !outputs/figures/.gitkeep
