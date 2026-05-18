@@ -1,0 +1,248 @@
+{
+  "version": "2026-05-18",
+  "name": "CRIS-IoMT healthcare cloud-control mapping",
+  "scope": "Azure-first cloud-connected healthcare IoT and Internet of Medical Things assurance research mapping.",
+  "certification_boundary": "This mapping supports evidence-informed readiness and research evaluation only. It is not NHS DSPT certification, NCSC CAF certification, medical-device certification, or clinical safety approval.",
+  "controls": [
+    {
+      "control_id": "IOT-001",
+      "title": "Device identity and authentication posture",
+      "evidence_class": "direct_cloud",
+      "azure_evidence": [
+        "IoT Hub inventory",
+        "device identity inventory",
+        "authentication metadata where available",
+        "certificate authority configuration where available"
+      ],
+      "manual_or_external_evidence": [
+        "device-side credential storage",
+        "firmware trust anchor validation",
+        "clinical device ownership and lifecycle process"
+      ],
+      "nhs_dspt_themes": [
+        "access control",
+        "asset management",
+        "data security"
+      ],
+      "ncsc_caf_objectives": [
+        "B2 identity and access control",
+        "B4 data security"
+      ]
+    },
+    {
+      "control_id": "IOT-002",
+      "title": "Shared access policy and key exposure risk",
+      "evidence_class": "direct_cloud",
+      "azure_evidence": [
+        "IoT Hub shared access policies",
+        "policy rights",
+        "custom policy count",
+        "default policy exposure"
+      ],
+      "manual_or_external_evidence": [
+        "application usage of shared access policies",
+        "secret rotation process",
+        "break-glass access procedure"
+      ],
+      "nhs_dspt_themes": [
+        "access control",
+        "secure configuration"
+      ],
+      "ncsc_caf_objectives": [
+        "B2 identity and access control"
+      ]
+    },
+    {
+      "control_id": "IOT-003",
+      "title": "IoT telemetry diagnostic logging",
+      "evidence_class": "direct_cloud",
+      "azure_evidence": [
+        "IoT Hub diagnostic settings",
+        "Log Analytics destination",
+        "Event Hub destination",
+        "Storage destination",
+        "enabled log and metric categories"
+      ],
+      "manual_or_external_evidence": [
+        "SOC review process",
+        "clinical incident investigation workflow"
+      ],
+      "nhs_dspt_themes": [
+        "logging and monitoring",
+        "auditability"
+      ],
+      "ncsc_caf_objectives": [
+        "C1 security monitoring"
+      ]
+    },
+    {
+      "control_id": "IOT-004",
+      "title": "IoT security monitoring and Defender coverage",
+      "evidence_class": "inferred_cloud",
+      "azure_evidence": [
+        "Defender for IoT coverage where accessible",
+        "Defender for Cloud recommendations",
+        "security alert integration"
+      ],
+      "manual_or_external_evidence": [
+        "SIEM triage process",
+        "clinical operations escalation path",
+        "security monitoring runbooks"
+      ],
+      "nhs_dspt_themes": [
+        "incident detection",
+        "incident response"
+      ],
+      "ncsc_caf_objectives": [
+        "C1 security monitoring",
+        "C2 proactive security event discovery"
+      ]
+    },
+    {
+      "control_id": "IOT-005",
+      "title": "Public network exposure of IoT ingestion endpoints",
+      "evidence_class": "direct_cloud",
+      "azure_evidence": [
+        "IoT Hub public network access",
+        "firewall rules",
+        "allowed IP ranges",
+        "private endpoint connections"
+      ],
+      "manual_or_external_evidence": [
+        "documented remote-care access requirement",
+        "network architecture review",
+        "third-party connectivity evidence"
+      ],
+      "nhs_dspt_themes": [
+        "network security",
+        "secure configuration"
+      ],
+      "ncsc_caf_objectives": [
+        "B4 data security",
+        "B5 resilient networks and systems"
+      ]
+    },
+    {
+      "control_id": "IOT-006",
+      "title": "Private endpoint and network isolation posture",
+      "evidence_class": "direct_cloud",
+      "azure_evidence": [
+        "private endpoint inventory",
+        "private endpoint connection state",
+        "VNet and subnet association",
+        "firewall default action"
+      ],
+      "manual_or_external_evidence": [
+        "network segmentation design",
+        "clinical network dependency review"
+      ],
+      "nhs_dspt_themes": [
+        "infrastructure security",
+        "network security"
+      ],
+      "ncsc_caf_objectives": [
+        "B5 resilient networks and systems"
+      ]
+    },
+    {
+      "control_id": "IOT-007",
+      "title": "Telemetry storage and retention governance",
+      "evidence_class": "inferred_cloud",
+      "azure_evidence": [
+        "IoT message routes",
+        "storage destinations",
+        "retention settings where available",
+        "storage lifecycle policies",
+        "backup and retention posture"
+      ],
+      "manual_or_external_evidence": [
+        "clinical record retention policy",
+        "privacy impact assessment",
+        "data minimisation justification"
+      ],
+      "nhs_dspt_themes": [
+        "data protection",
+        "records retention",
+        "auditability"
+      ],
+      "ncsc_caf_objectives": [
+        "B4 data security",
+        "D1 response and recovery planning"
+      ]
+    },
+    {
+      "control_id": "IOT-008",
+      "title": "Key Vault and secret management for IoT integrations",
+      "evidence_class": "inferred_cloud",
+      "azure_evidence": [
+        "Key Vault inventory",
+        "purge protection",
+        "private endpoint posture",
+        "secret and key metadata where available"
+      ],
+      "manual_or_external_evidence": [
+        "application secret usage",
+        "rotation approval evidence",
+        "third-party integration secret handling"
+      ],
+      "nhs_dspt_themes": [
+        "access control",
+        "data security"
+      ],
+      "ncsc_caf_objectives": [
+        "B2 identity and access control",
+        "B3 secure configuration"
+      ]
+    },
+    {
+      "control_id": "IOT-009",
+      "title": "Incident detection and alerting coverage",
+      "evidence_class": "direct_cloud",
+      "azure_evidence": [
+        "Azure Monitor alert rules",
+        "Log Analytics workspace",
+        "diagnostic settings",
+        "action groups where observable"
+      ],
+      "manual_or_external_evidence": [
+        "incident response runbook",
+        "clinical escalation process",
+        "SOC operating model"
+      ],
+      "nhs_dspt_themes": [
+        "incident management",
+        "business continuity"
+      ],
+      "ncsc_caf_objectives": [
+        "C1 security monitoring",
+        "D2 lessons learned"
+      ]
+    },
+    {
+      "control_id": "IOT-010",
+      "title": "Evidence sufficiency and clinical safety boundary",
+      "evidence_class": "clinical_operational_required",
+      "azure_evidence": [
+        "evidence class counts",
+        "unavailable signal counts",
+        "device-required evidence paths",
+        "report caveats"
+      ],
+      "manual_or_external_evidence": [
+        "clinical safety case",
+        "medical device safety review",
+        "biomedical engineering validation",
+        "operational acceptance"
+      ],
+      "nhs_dspt_themes": [
+        "governance",
+        "assurance",
+        "risk management"
+      ],
+      "ncsc_caf_objectives": [
+        "A1 governance",
+        "A2 risk management"
+      ]
+    }
+  ]
+}
