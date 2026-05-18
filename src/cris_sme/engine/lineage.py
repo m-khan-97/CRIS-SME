@@ -137,6 +137,10 @@ def build_collector_coverage(profiles: list[CloudProfile]) -> list[CollectorCove
             str(profile.metadata.get("compute_collection_mode", "compute-default")),
             str(profile.metadata.get("governance_collection_mode", "governance-default")),
         ]
+        if profile.iot is not None:
+            observed_domains.append(
+                str(profile.metadata.get("iot_collection_mode", "iot-default"))
+            )
         partially_observed_domains: list[str] = []
         unavailable_domains: list[str] = []
         identity_observability = str(profile.metadata.get("identity_observability", "")).strip().lower()

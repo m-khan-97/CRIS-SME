@@ -218,6 +218,7 @@ def _build_collection_details(profile: CloudProfile) -> dict[str, object]:
         "compute_collection_mode",
         "governance_collection_mode",
         "native_recommendation_collection_mode",
+        "iot_collection_mode",
     ):
         if key in metadata:
             details[key] = metadata[key]
@@ -264,6 +265,24 @@ def _build_collection_details(profile: CloudProfile) -> dict[str, object]:
         "native_unhealthy_recommendation_count": metadata.get(
             "native_unhealthy_recommendation_count"
         ),
+        "iot_hub_count": metadata.get("iot_hub_count"),
+        "iot_device_identity_count": metadata.get("iot_device_identity_count"),
+        "iot_device_identity_observable": metadata.get(
+            "iot_device_identity_observable"
+        ),
+        "iot_shared_access_policy_count": metadata.get(
+            "iot_shared_access_policy_count"
+        ),
+        "iot_overbroad_shared_access_policy_count": metadata.get(
+            "iot_overbroad_shared_access_policy_count"
+        ),
+        "iot_diagnostic_destination_count": metadata.get(
+            "iot_diagnostic_destination_count"
+        ),
+        "iot_defender_enabled": metadata.get("iot_defender_enabled"),
+        "iot_public_network_hub_count": metadata.get("iot_public_network_hub_count"),
+        "iot_private_endpoint_count": metadata.get("iot_private_endpoint_count"),
+        "iot_alert_rule_count": metadata.get("iot_alert_rule_count"),
     }
     details["evidence_counts"] = {
         key: value for key, value in evidence_counts.items() if value is not None

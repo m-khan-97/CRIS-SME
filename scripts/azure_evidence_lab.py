@@ -431,11 +431,12 @@ def create_media_office_delegated(context: LabContext) -> None:
 
 def create_iomt_clean_baseline(context: LabContext) -> None:
     workspace_name = create_log_analytics_workspace(context, "iomt-clean-law")
-    hub_name = create_iot_hub(context, "iomtclean", public_network_access="Disabled")
+    hub_name = create_iot_hub(context, "iomtclean", public_network_access="Enabled")
     create_iot_device_identity(context, hub_name, "ward-monitor-001")
     create_iot_certificate(context, hub_name, "clinical-root-ca")
     configure_iot_diagnostics(context, hub_name, workspace_name)
     create_iot_metric_alert(context, hub_name, "iomt-clean-connectivity-alert")
+    update_iot_hub_public_network_access(context, hub_name, "Disabled")
     create_storage(context, "iomtclean", public_blob=False, tags=context.tags)
     vault_name = unique_name("crisiomtkv", context.suffix, max_len=24)
     run_az(
@@ -529,6 +530,8 @@ def create_iot_hub(
         "2",
         *tag_args(context.tags),
     ]
+    if context.location.lower() == "qatarcentral":
+        command.extend(["--enforce-data-residency", "true"])
     run_az(command, context)
     run_az(
         [
@@ -545,6 +548,27 @@ def create_iot_hub(
         context,
     )
     return hub_name
+
+
+def update_iot_hub_public_network_access(
+    context: LabContext,
+    hub_name: str,
+    public_network_access: str,
+) -> None:
+    run_az(
+        [
+            "iot",
+            "hub",
+            "update",
+            "--name",
+            hub_name,
+            "--resource-group",
+            context.resource_group,
+            "--set",
+            f"properties.publicNetworkAccess={public_network_access}",
+        ],
+        context,
+    )
 
 
 def create_iot_device_identity(

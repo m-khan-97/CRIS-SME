@@ -1,6 +1,7 @@
 # Unit tests for Healthcare IoT / IoMT control evaluation.
 from cris_sme.controls.iot_controls import evaluate_iot_controls
 from cris_sme.engine.assessment_replay import evaluate_profiles
+from cris_sme.engine.lineage import build_collector_coverage
 from cris_sme.engine.scoring import score_findings
 from cris_sme.models.cloud_profile import (
     CloudProfile,
@@ -13,6 +14,7 @@ from cris_sme.models.cloud_profile import (
     NetworkProfile,
 )
 from cris_sme.models.finding import FindingCategory, FindingSeverity
+from cris_sme.reporting.json_report import build_json_report
 
 
 def make_profile(*, iot: IotProfile | None = None) -> CloudProfile:
@@ -171,3 +173,36 @@ def test_iot_controls_participate_in_replay_and_category_scoring() -> None:
     assert any(finding.control_id.startswith("IOT-") for finding in findings)
     assert scored.category_scores["Healthcare IoT"] > 0
     assert scored.overall_risk_score == 0.0
+
+
+def test_iot_evidence_is_visible_in_report_metadata() -> None:
+    profile = make_profile(iot=weak_iot_profile())
+    profile.metadata.update(
+        {
+            "collection_mode": "azure_sdk_subscription_inventory",
+            "iot_collection_mode": "azure_iot_hub_cli_inventory",
+            "iot_hub_count": 1,
+            "iot_device_identity_count": 0,
+            "iot_overbroad_shared_access_policy_count": 2,
+            "iot_diagnostic_destination_count": 0,
+            "iot_defender_enabled": False,
+            "iot_public_network_hub_count": 1,
+            "iot_private_endpoint_count": 0,
+            "iot_alert_rule_count": 0,
+        }
+    )
+    findings = evaluate_iot_controls([profile])
+    scored = score_findings(findings)
+
+    report = build_json_report(
+        profiles=[profile],
+        findings=findings,
+        scoring_result=scored,
+    )
+    collection_details = report["organizations"][0]["collection_details"]
+    coverage = build_collector_coverage([profile])[0]
+
+    assert collection_details["iot_collection_mode"] == "azure_iot_hub_cli_inventory"
+    assert collection_details["evidence_counts"]["iot_hub_count"] == 1
+    assert collection_details["evidence_counts"]["iot_public_network_hub_count"] == 1
+    assert "azure_iot_hub_cli_inventory" in coverage.observed_domains
