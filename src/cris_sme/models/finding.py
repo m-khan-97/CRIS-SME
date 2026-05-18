@@ -25,6 +25,7 @@ class FindingCategory(str, Enum):
     MONITORING = "Monitoring/Logging"
     COMPUTE = "Compute/Workloads"
     GOVERNANCE = "Cost/Governance Hygiene"
+    IOT = "Healthcare IoT"
 
 
 class RemediationCostTier(str, Enum):

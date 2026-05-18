@@ -24,10 +24,11 @@ def test_provider_evidence_contract_catalog_reflects_active_and_planned_support(
     catalog = build_provider_evidence_contract_catalog()
 
     assert catalog.provider_count == 3
-    assert catalog.control_count == 26
-    assert catalog.contract_count == 78
+    assert catalog.control_count == 36
+    assert catalog.contract_count == 108
     assert catalog.support_status_counts["active"] == 26
-    assert catalog.support_status_counts["planned"] == 52
+    assert catalog.support_status_counts["planned"] == 72
+    assert catalog.support_status_counts["research_preview"] == 10
 
     azure_net = next(
         contract
@@ -46,3 +47,11 @@ def test_provider_evidence_contract_catalog_reflects_active_and_planned_support(
     assert "directly observed" in azure_net.sufficiency_policy
     assert aws_net.support_status == "planned"
     assert "collector evidence" in aws_net.activation_gate
+
+    azure_iot = next(
+        contract
+        for contract in catalog.contracts
+        if contract.provider == "azure" and contract.control_id == "IOT-001"
+    )
+    assert azure_iot.support_status == "research_preview"
+    assert "experimental" in azure_iot.sufficiency_policy

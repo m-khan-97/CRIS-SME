@@ -88,6 +88,37 @@ class GovernanceProfile(BaseModel):
     orphaned_resource_count: int = Field(..., ge=0)
 
 
+class IotProfile(BaseModel):
+    """Cloud control-plane posture for IoT and IoMT platform services."""
+
+    iot_hub_count: int = Field(0, ge=0)
+    device_identity_count: int = Field(0, ge=0)
+    device_identity_observable: bool = False
+    certificate_authority_configured: bool = False
+    shared_access_policy_count: int = Field(0, ge=0)
+    overbroad_shared_access_policy_count: int = Field(0, ge=0)
+    diagnostic_settings_enabled: bool = False
+    diagnostic_destination_count: int = Field(0, ge=0)
+    diagnostic_category_coverage_ratio: float = Field(0.0, ge=0.0, le=1.0)
+    defender_iot_enabled: bool = False
+    iot_security_monitoring_observable: bool = False
+    public_network_access_enabled: bool = False
+    allowed_ip_rule_count: int = Field(0, ge=0)
+    private_endpoint_count: int = Field(0, ge=0)
+    private_endpoint_required: bool = False
+    message_route_count: int = Field(0, ge=0)
+    telemetry_retention_days: int = Field(0, ge=0)
+    telemetry_storage_governed: bool = False
+    iot_key_vault_linked: bool = False
+    iot_secret_rotation_observable: bool = False
+    alert_rule_count: int = Field(0, ge=0)
+    action_group_count: int = Field(0, ge=0)
+    clinical_operational_boundary_documented: bool = False
+    device_evidence_required_count: int = Field(0, ge=0)
+    clinical_operational_evidence_required_count: int = Field(0, ge=0)
+    evidence_state: str = Field(default="not_observed", min_length=3)
+
+
 class CloudProfile(BaseModel):
     """Synthetic cloud governance profile collected before control evaluation."""
 
@@ -102,4 +133,5 @@ class CloudProfile(BaseModel):
     monitoring: MonitoringProfile
     compute: ComputeProfile
     governance: GovernanceProfile
+    iot: IotProfile | None = None
     metadata: dict[str, Any] = Field(default_factory=dict)

@@ -10,11 +10,11 @@ def test_provider_contract_conformance_matches_declared_support() -> None:
 
     assert report.passed is True
     assert report.provider_count == 3
-    assert report.control_count == 26
+    assert report.control_count == 36
     assert report.active_contract_count == 26
-    assert report.planned_contract_count == 52
+    assert report.planned_contract_count == 72
     assert report.failed_contract_count == 0
-    assert report.passed_contract_count == 78
+    assert report.passed_contract_count == 108
 
 
 def test_provider_contract_conformance_distinguishes_active_and_planned() -> None:
@@ -44,5 +44,5 @@ def test_provider_contract_conformance_dashboard_summary() -> None:
 
     assert summary["passed"] is True
     assert summary["active_contract_count"] == 26
-    assert summary["planned_contract_count"] == 52
+    assert summary["planned_contract_count"] == 72
     assert summary["failed_contract_count"] == 0

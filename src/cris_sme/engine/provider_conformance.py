@@ -166,6 +166,8 @@ def _required_signals_for_status(support_status: str) -> list[str]:
             "live_collector_not_present",
             "docs_present",
         ]
+    if support_status == "research_preview":
+        return ["docs_present"]
     return ["adapter_not_registered", "live_collector_not_present"]
 
 

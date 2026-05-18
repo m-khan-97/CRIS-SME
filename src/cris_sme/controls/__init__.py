@@ -28,6 +28,12 @@ def evaluate_iam_controls(*args, **kwargs):
     return _impl(*args, **kwargs)
 
 
+def evaluate_iot_controls(*args, **kwargs):
+    from .iot_controls import evaluate_iot_controls as _impl
+
+    return _impl(*args, **kwargs)
+
+
 def evaluate_monitoring_controls(*args, **kwargs):
     from .monitoring_controls import evaluate_monitoring_controls as _impl
 
@@ -44,6 +50,7 @@ __all__ = [
     "evaluate_data_controls",
     "evaluate_governance_controls",
     "evaluate_iam_controls",
+    "evaluate_iot_controls",
     "evaluate_monitoring_controls",
     "evaluate_network_controls",
 ]

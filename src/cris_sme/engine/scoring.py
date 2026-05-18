@@ -22,6 +22,9 @@ CATEGORY_WEIGHTS: dict[FindingCategory, float] = {
     FindingCategory.MONITORING: 0.15,
     FindingCategory.COMPUTE: 0.10,
     FindingCategory.GOVERNANCE: 0.10,
+    # IoMT controls are reported as a separate research domain until category weights
+    # are empirically recalibrated for healthcare IoT environments.
+    FindingCategory.IOT: 0.0,
 }
 
 MAX_FINDING_SCORE = SEVERITY_WEIGHTS[FindingSeverity.CRITICAL] * 1.6 * 1.6 * 1.0

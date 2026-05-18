@@ -22,5 +22,32 @@
     "known_limitations": [
       "live budget-alert evidence is currently conservative in some collection contexts"
     ]
+  },
+  "IOT-001": {
+    "version": "0.1.0",
+    "applicability": "healthcare_iot_research_preview",
+    "provider_support": {
+      "azure": "research_preview",
+      "aws": "planned",
+      "gcp": "planned"
+    },
+    "known_limitations": [
+      "device-level certificate posture may require IoT Hub registry permissions or device-management integration"
+    ]
+  },
+  "IOT-004": {
+    "version": "0.1.0",
+    "applicability": "healthcare_iot_research_preview",
+    "known_limitations": [
+      "Defender for IoT state is a control-plane signal and does not prove complete medical-device sensor coverage"
+    ]
+  },
+  "IOT-010": {
+    "version": "0.1.0",
+    "applicability": "healthcare_iot_human_verification_boundary",
+    "intent": "Make clinical-operational ownership assumptions explicit rather than treating cloud control-plane evidence as complete medical-device assurance.",
+    "known_limitations": [
+      "clinical ownership, supplier accountability, and patient-safety workflow evidence require human validation"
+    ]
   }
 }

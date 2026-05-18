@@ -48,11 +48,7 @@ def load_control_specs(
             "domain": control.category.value,
             "applicability": "azure_first_provider_neutral_core",
             "evidence_requirements": _default_evidence_requirements(control.category.value),
-            "provider_support": {
-                "azure": "active",
-                "aws": "planned",
-                "gcp": "planned",
-            },
+            "provider_support": _default_provider_support(control.category.value),
             "remediation_template": control.remediation_summary,
             "exception_guidance": (
                 "Exceptions require compensating controls, a bounded expiry, and documented owner approval."
@@ -133,6 +129,11 @@ def _default_evidence_requirements(domain: str) -> list[str]:
             "log retention and alerting evidence",
             "incident runbook or workflow evidence",
         ]
+    if "iot" in normalized:
+        return [
+            "IoT platform configuration evidence",
+            "device identity, telemetry, and clinical boundary evidence",
+        ]
     if "compute" in normalized:
         return [
             "patch posture proxy evidence",
@@ -142,6 +143,20 @@ def _default_evidence_requirements(domain: str) -> list[str]:
         "resource inventory evidence",
         "governance policy/budget/tagging control evidence",
     ]
+
+
+def _default_provider_support(domain: str) -> dict[str, str]:
+    if "iot" in domain.lower():
+        return {
+            "azure": "research_preview",
+            "aws": "planned",
+            "gcp": "planned",
+        }
+    return {
+        "azure": "active",
+        "aws": "planned",
+        "gcp": "planned",
+    }
 
 
 def _default_confidence_penalty_rules(control_id: str) -> list[str]:

@@ -232,5 +232,95 @@
     "empirical_agreement_rate": 0.74,
     "sample_size": 5,
     "notes": "Orphaned resource detection is useful but still heuristic across some asset types."
+  },
+  {
+    "control_id": "IOT-001",
+    "calibration_status": "research_preview",
+    "validation_method": "iot_device_identity_model_review",
+    "benchmark_source": "azure_iot_hub_control_plane_fixture",
+    "empirical_agreement_rate": 0.72,
+    "sample_size": 0,
+    "notes": "IoMT device identity control is newly introduced and requires lab and expert validation."
+  },
+  {
+    "control_id": "IOT-002",
+    "calibration_status": "research_preview",
+    "validation_method": "iot_policy_model_review",
+    "benchmark_source": "azure_iot_hub_control_plane_fixture",
+    "empirical_agreement_rate": 0.75,
+    "sample_size": 0,
+    "notes": "Shared-access policy findings are direct where policy inventory is visible, but clinical deployment validation remains pending."
+  },
+  {
+    "control_id": "IOT-003",
+    "calibration_status": "research_preview",
+    "validation_method": "diagnostic_setting_fixture_review",
+    "benchmark_source": "azure_monitor_diagnostic_settings",
+    "empirical_agreement_rate": 0.78,
+    "sample_size": 0,
+    "notes": "Diagnostic coverage is directly observable in Azure but needs IoMT lab validation."
+  },
+  {
+    "control_id": "IOT-004",
+    "calibration_status": "research_preview",
+    "validation_method": "iot_security_monitoring_model_review",
+    "benchmark_source": "defender_for_iot_control_plane_signal",
+    "empirical_agreement_rate": 0.68,
+    "sample_size": 0,
+    "notes": "Security monitoring status is a cloud configuration signal and does not prove full clinical-device coverage."
+  },
+  {
+    "control_id": "IOT-005",
+    "calibration_status": "research_preview",
+    "validation_method": "iot_network_exposure_fixture_review",
+    "benchmark_source": "azure_iot_hub_network_rules",
+    "empirical_agreement_rate": 0.8,
+    "sample_size": 0,
+    "notes": "Public access posture is direct where IoT Hub network configuration is visible."
+  },
+  {
+    "control_id": "IOT-006",
+    "calibration_status": "research_preview",
+    "validation_method": "private_endpoint_requirement_review",
+    "benchmark_source": "azure_private_endpoint_inventory",
+    "empirical_agreement_rate": 0.74,
+    "sample_size": 0,
+    "notes": "Private endpoint requirement depends on sensitivity and architecture assumptions that require study calibration."
+  },
+  {
+    "control_id": "IOT-007",
+    "calibration_status": "research_preview",
+    "validation_method": "telemetry_governance_model_review",
+    "benchmark_source": "iot_message_routes_and_log_retention",
+    "empirical_agreement_rate": 0.72,
+    "sample_size": 0,
+    "notes": "Telemetry retention and routing need healthcare scenario validation before being treated as empirically calibrated."
+  },
+  {
+    "control_id": "IOT-008",
+    "calibration_status": "research_preview",
+    "validation_method": "secret_governance_model_review",
+    "benchmark_source": "key_management_and_iot_policy_inventory",
+    "empirical_agreement_rate": 0.7,
+    "sample_size": 0,
+    "notes": "Credential-governance evidence is often partly inferred until key-rotation workflows are observable."
+  },
+  {
+    "control_id": "IOT-009",
+    "calibration_status": "research_preview",
+    "validation_method": "alert_route_model_review",
+    "benchmark_source": "azure_monitor_alert_rules_and_action_groups",
+    "empirical_agreement_rate": 0.76,
+    "sample_size": 0,
+    "notes": "Alert routing is directly observable, but clinical response ownership requires human validation."
+  },
+  {
+    "control_id": "IOT-010",
+    "calibration_status": "research_preview",
+    "validation_method": "clinical_boundary_expert_review_pending",
+    "benchmark_source": "human_validation_boundary",
+    "empirical_agreement_rate": 0.65,
+    "sample_size": 0,
+    "notes": "This control intentionally captures evidence that cloud telemetry cannot certify without clinical-operational review."
   }
 ]

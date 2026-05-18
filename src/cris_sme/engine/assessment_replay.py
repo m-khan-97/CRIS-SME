@@ -11,6 +11,7 @@ from cris_sme.controls import (
     evaluate_data_controls,
     evaluate_governance_controls,
     evaluate_iam_controls,
+    evaluate_iot_controls,
     evaluate_monitoring_controls,
     evaluate_network_controls,
 )
@@ -232,6 +233,7 @@ def evaluate_profiles(profiles: list[CloudProfile]) -> list[Finding]:
         *evaluate_monitoring_controls(profiles),
         *evaluate_compute_controls(profiles),
         *evaluate_governance_controls(profiles),
+        *evaluate_iot_controls(profiles),
     ]
 
 

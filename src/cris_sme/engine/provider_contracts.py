@@ -74,6 +74,11 @@ def _sufficiency_policy(support_status: str) -> str:
             "Provider path is planned; decisions may be modeled for schema testing but "
             "must not be claimed as live provider evidence."
         )
+    if support_status == "research_preview":
+        return (
+            "Provider path is available only for research preview; decisions must be "
+            "reported as experimental and separated from production assurance claims."
+        )
     return (
         "Provider path is unsupported; unavailable evidence must remain explicit and "
         "must not be interpreted as compliance."
@@ -89,6 +94,11 @@ def _activation_gate(provider: str, support_status: str) -> str:
         return (
             f"{provider} support can be activated only after collector evidence, adapter "
             "routing, tests, and documented limitations are present."
+        )
+    if support_status == "research_preview":
+        return (
+            f"{provider} support is limited to research-preview evidence until lab "
+            "validation, collector coverage, and expert review are complete."
         )
     return f"{provider} support is not available for this control."
 
