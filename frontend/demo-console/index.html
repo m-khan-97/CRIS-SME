@@ -173,24 +173,45 @@
 
           <!-- OVERVIEW ────────────────────────────────────────────────── -->
           <section class="view active" id="view-overview" aria-labelledby="overview-title">
-            <div class="hero-panel">
-              <div>
+
+            <!-- SVG defs for sparkline gradient — hidden -->
+            <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+              <defs>
+                <linearGradient id="sparkGradient" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%"   stop-color="#3b82f6" stop-opacity="0.6"/>
+                  <stop offset="100%" stop-color="#3b82f6" stop-opacity="0"/>
+                </linearGradient>
+              </defs>
+            </svg>
+
+            <!-- Hero: score gauge + label + summary -->
+            <div class="hero-panel" aria-label="Overall risk summary">
+              <div class="hero-left">
                 <span class="eyebrow">Assessment overview</span>
-                <h2 id="overview-title">Cloud Risk Intelligence</h2>
-                <p id="assessment-summary">Loading CRIS-SME assessment data…</p>
+                <h2 id="overview-title" style="margin:4px 0 8px">Cloud Risk Intelligence</h2>
+                <p id="assessment-summary" style="color:var(--muted);font-size:0.9rem;line-height:1.6;max-width:52ch">
+                  Loading CRIS-SME assessment data…
+                </p>
               </div>
-              <div class="risk-orbit" aria-label="Overall risk score">
-                <svg viewBox="0 0 160 160" role="img" aria-hidden="true">
-                  <circle cx="80" cy="80" r="66" class="ring-bg"></circle>
-                  <circle cx="80" cy="80" r="66" class="ring-value" id="risk-ring"></circle>
-                </svg>
-                <div class="risk-orbit-center">
-                  <strong id="risk-score">—</strong>
-                  <span id="risk-band">risk score</span>
+              <div class="hero-score-block">
+                <div class="risk-orbit" aria-label="Overall risk score">
+                  <svg viewBox="0 0 160 160" role="img" aria-hidden="true">
+                    <circle cx="80" cy="80" r="66" class="ring-bg"></circle>
+                    <circle cx="80" cy="80" r="66" class="ring-value" id="risk-ring"></circle>
+                  </svg>
+                  <div class="risk-orbit-center">
+                    <strong id="risk-score">—</strong>
+                    <span style="font-size:0.7rem;color:var(--faint);letter-spacing:.06em;text-transform:uppercase">/ 100</span>
+                  </div>
                 </div>
+                <div id="risk-band"></div>
               </div>
             </div>
 
+            <!-- Quick stats row -->
+            <div class="overview-stats-row" id="overview-stats-row" style="margin-top:14px"></div>
+
+            <!-- Sparkline + CE pillars side by side -->
             <div class="overview-insights">
               <section class="panel compact-panel">
                 <div class="panel-head">
@@ -201,29 +222,32 @@
               </section>
               <section class="panel compact-panel">
                 <div class="panel-head">
-                  <h3>Cyber Essentials</h3>
-                  <span>Readiness by pillar</span>
+                  <h3>Cyber Essentials readiness</h3>
+                  <span>By pillar</span>
                 </div>
                 <div class="ce-pillar-bars" id="ce-pillar-bars"></div>
               </section>
             </div>
 
+            <!-- Metric cards -->
             <div class="metric-grid" id="overview-metrics"></div>
 
+            <!-- Module quick-access strip -->
             <section class="platform-strip" id="platform-modules" aria-label="Platform modules"></section>
 
+            <!-- Domain posture + top risks -->
             <div class="content-grid two">
               <section class="panel">
                 <div class="panel-head">
                   <h3>Domain posture</h3>
-                  <span>Risk by category</span>
+                  <span>Risk score by category</span>
                 </div>
                 <div class="bar-list" id="domain-bars"></div>
               </section>
               <section class="panel">
                 <div class="panel-head">
                   <h3>Top risks</h3>
-                  <span>Highest priority findings</span>
+                  <span>Highest severity findings</span>
                 </div>
                 <div class="risk-list" id="top-risks"></div>
               </section>

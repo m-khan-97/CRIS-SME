@@ -1,83 +1,155 @@
+% ─── Cyber Essentials scheme ───────────────────────────────────────────────
+
 @misc{ncsc_cyber_essentials_overview,
-  author = {{National Cyber Security Centre}},
-  title = {Cyber Essentials},
-  howpublished = {https://www.ncsc.gov.uk/cyberessentials/overview},
-  note = {Accessed for CRIS-SME Cyber Essentials research framing}
+  author       = {{National Cyber Security Centre}},
+  title        = {Cyber Essentials},
+  year         = {2024},
+  howpublished = {\url{https://www.ncsc.gov.uk/cyberessentials/overview}},
+  note         = {UK government baseline cyber security scheme overview. Accessed May 2026.}
+}
+
+@misc{ncsc_ce_requirements_v33,
+  author       = {{National Cyber Security Centre}},
+  title        = {Cyber Essentials: Requirements for {IT} Infrastructure, version 3.3},
+  year         = {2024},
+  howpublished = {\url{https://www.ncsc.gov.uk/files/cyber-essentials-requirements-for-it-infrastructure-v3-3.pdf}},
+  note         = {Normative requirements document used as the basis for CRIS-SME evidence mapping.}
 }
 
 @misc{iasme_ce_preview,
-  author = {{IASME Consortium}},
-  title = {Preview the self-assessment questions for Cyber Essentials},
-  howpublished = {https://iasme.co.uk/cyber-essentials/preview-the-self-assessment-questions-for-cyber-essentials/},
-  note = {Question wording is not reproduced in CRIS-SME; mappings use paraphrased local entries}
-}
-
-@misc{microsoft_defender_cloud,
-  author = {{Microsoft}},
-  title = {Regulatory compliance standards in Microsoft Defender for Cloud},
-  howpublished = {https://learn.microsoft.com/en-us/azure/defender-for-cloud/concept-regulatory-compliance-standards},
-  note = {Provider-native posture and regulatory-compliance reference}
-}
-
-@misc{microsoft_defender_cloud_faq,
-  author = {{Microsoft}},
-  title = {Common questions: regulatory compliance in Microsoft Defender for Cloud},
-  howpublished = {https://learn.microsoft.com/en-us/azure/defender-for-cloud/faq-regulatory-compliance},
-  note = {Clarifies that some compliance controls cannot be automatically assessed}
-}
-
-@misc{prowler,
-  author = {{Prowler}},
-  title = {Prowler compliance documentation},
-  howpublished = {https://docs.prowler.com/projects/prowler-open-source/en/latest/tutorials/compliance},
-  note = {Open-source cloud security assessment comparison point}
-}
-
-@misc{prowler_hub_cisa,
-  author = {{Prowler}},
-  title = {Prowler Hub: CISA Cyber Essentials},
-  howpublished = {https://hub.prowler.com/compliance/cisa_aws},
-  note = {CISA Cyber Essentials comparison point; distinct from UK NCSC Cyber Essentials self-assessment}
-}
-
-@misc{scoutsuite,
-  author = {{NCC Group}},
-  title = {Scout Suite},
-  howpublished = {https://github.com/nccgroup/ScoutSuite},
-  note = {Open-source multi-cloud security auditing comparison point}
-}
-
-@misc{azuregoat,
-  author = {{INE Labs}},
-  title = {AzureGoat},
-  howpublished = {https://github.com/ine-labs/AzureGoat},
-  note = {Deliberately vulnerable Azure lab reference; CRIS-SME controlled lab is not a full AzureGoat deployment}
-}
-
-@misc{vanta_cyber_essentials,
-  author = {{Vanta}},
-  title = {Cyber Essentials compliance automation software},
-  howpublished = {https://www.vanta.com/products/cyber-essentials},
-  note = {Commercial GRC and evidence automation comparison point}
-}
-
-@misc{jumpcloud_cyber_essentials_plus,
-  author = {{JumpCloud}},
-  title = {How to Ace Your CyberSecurity Plus Compliance Assessment},
-  howpublished = {https://jumpcloud.com/blog/cybersecurity-plus-compliance-get-ready},
-  note = {Identity and endpoint readiness comparison point}
-}
-
-@misc{connectwise_automate,
-  author = {{ConnectWise}},
-  title = {ConnectWise Automate},
-  howpublished = {https://www.connectwise.com/platform/automate},
-  note = {MSP automation and compliance reporting comparison point}
+  author       = {{IASME Consortium}},
+  title        = {Preview the self-assessment questions for {Cyber Essentials}},
+  year         = {2026},
+  howpublished = {\url{https://iasme.co.uk/cyber-essentials/preview-the-self-assessment-questions-for-cyber-essentials/}},
+  note         = {Official IASME preparation question preview for the Danzell v16.2 question set.
+                  Question wording is not reproduced in CRIS-SME; the mapping uses paraphrased
+                  local entries with stable identifiers.}
 }
 
 @misc{ce_fasttrack,
-  author = {{CE FastTrack}},
-  title = {Prepare for Cyber Essentials Certification},
-  howpublished = {https://cefasttrack.com/},
-  note = {Cyber Essentials preparation workflow comparison point}
+  author       = {{CE FastTrack}},
+  title        = {Prepare for {Cyber Essentials} Certification},
+  year         = {2025},
+  howpublished = {\url{https://cefasttrack.com/}},
+  note         = {Cyber Essentials preparation workflow tool. Closest prior tool in framing to
+                  CRIS-SME; produces a working document for the IASME portal.}
+}
+
+% ─── Cloud security posture management ─────────────────────────────────────
+
+@misc{microsoft_defender_cloud,
+  author       = {{Microsoft}},
+  title        = {Regulatory compliance standards in {Microsoft Defender for Cloud}},
+  year         = {2025},
+  howpublished = {\url{https://learn.microsoft.com/en-us/azure/defender-for-cloud/concept-regulatory-compliance-standards}},
+  note         = {Provider-native CSPM regulatory compliance reference. Maps to CE at control level.}
+}
+
+@misc{microsoft_defender_cloud_faq,
+  author       = {{Microsoft}},
+  title        = {Common questions: regulatory compliance in {Microsoft Defender for Cloud}},
+  year         = {2025},
+  howpublished = {\url{https://learn.microsoft.com/en-us/azure/defender-for-cloud/faq-regulatory-compliance}},
+  note         = {Clarifies that some compliance controls cannot be automatically assessed by Defender.}
+}
+
+@misc{prowler,
+  author       = {{Prowler Cloud}},
+  title        = {Prowler: Open Source Security for Cloud and {AI}},
+  year         = {2025},
+  howpublished = {\url{https://docs.prowler.com/projects/prowler-open-source/en/latest/tutorials/compliance}},
+  note         = {Open-source multi-cloud CSPM with compliance framework execution. CE mapping
+                  targets CISA Cyber Essentials, not UK NCSC Cyber Essentials self-assessment.}
+}
+
+@misc{prowler_hub_cisa,
+  author       = {{Prowler Cloud}},
+  title        = {Prowler Hub: {CISA} Cyber Essentials ({AWS})},
+  year         = {2025},
+  howpublished = {\url{https://hub.prowler.com/compliance/cisa_aws}},
+  note         = {Confirms Prowler CE mapping is for CISA not UK NCSC Cyber Essentials.}
+}
+
+@misc{scoutsuite,
+  author       = {{NCC Group}},
+  title        = {{Scout Suite}: Multi-Cloud Security Auditing Tool},
+  year         = {2024},
+  howpublished = {\url{https://github.com/nccgroup/ScoutSuite}},
+  note         = {Open-source multi-cloud security auditing tool. No UK Cyber Essentials
+                  preparation workflow found in checked public material.}
+}
+
+% ─── GRC and evidence automation ───────────────────────────────────────────
+
+@misc{vanta_cyber_essentials,
+  author       = {{Vanta}},
+  title        = {Cyber Essentials compliance automation software},
+  year         = {2025},
+  howpublished = {\url{https://www.vanta.com/products/cyber-essentials}},
+  note         = {Commercial GRC and evidence automation platform. Automates tests and
+                  integrations at control level.}
+}
+
+@misc{jumpcloud_cyber_essentials_plus,
+  author       = {{JumpCloud}},
+  title        = {How to Ace Your Cyber Essentials Plus Compliance Assessment},
+  year         = {2024},
+  howpublished = {\url{https://jumpcloud.com/blog/cybersecurity-plus-compliance-get-ready}},
+  note         = {Identity and endpoint-focused CE readiness guidance. Endpoint-management
+                  orientation distinct from cloud-control-plane pre-population.}
+}
+
+@misc{connectwise_automate,
+  author       = {{ConnectWise}},
+  title        = {{ConnectWise Automate}},
+  year         = {2025},
+  howpublished = {\url{https://www.connectwise.com/platform/automate}},
+  note         = {MSP remote monitoring, automation, and compliance reporting platform.}
+}
+
+% ─── Evaluation infrastructure ─────────────────────────────────────────────
+
+@misc{azuregoat,
+  author       = {{INE Labs}},
+  title        = {{AzureGoat}: A Damn Vulnerable {Azure} Infrastructure},
+  year         = {2022},
+  howpublished = {\url{https://github.com/ine-labs/AzureGoat}},
+  note         = {Deliberately vulnerable Azure lab reference. The CRIS-SME controlled lab
+                  used a minimal NSG and storage account; it is not a full AzureGoat deployment.}
+}
+
+% ─── Normative references ───────────────────────────────────────────────────
+
+@misc{nist_csf2,
+  author       = {{National Institute of Standards and Technology}},
+  title        = {The {NIST} Cybersecurity Framework 2.0},
+  year         = {2024},
+  howpublished = {\url{https://doi.org/10.6028/NIST.CSWP.29}},
+  note         = {NIST CSF 2.0, February 2024. Referenced for IAM and network control mappings.}
+}
+
+@techreport{iso27001_2022,
+  author       = {{International Organization for Standardization}},
+  title        = {{ISO/IEC} 27001:2022 Information security, cybersecurity and privacy protection —
+                  Information security management systems — Requirements},
+  year         = {2022},
+  institution  = {{ISO/IEC}},
+  note         = {Compliance mapping reference for CRIS-SME control catalog.}
+}
+
+@misc{cis_controls_v8,
+  author       = {{Center for Internet Security}},
+  title        = {{CIS Controls} v8},
+  year         = {2021},
+  howpublished = {\url{https://www.cisecurity.org/controls/v8}},
+  note         = {Used as a secondary reference for control design rationale in the CRIS-SME
+                  evidence taxonomy.}
+}
+
+@misc{uk_gdpr_art32,
+  author       = {{Information Commissioner's Office}},
+  title        = {Guide to the {UK GDPR}: Article 32 — Security of processing},
+  year         = {2024},
+  howpublished = {\url{https://ico.org.uk/for-organisations/uk-gdpr-guidance-and-resources/}},
+  note         = {UK GDPR Article 32 compliance mapping reference in CRIS-SME control catalog.}
 }

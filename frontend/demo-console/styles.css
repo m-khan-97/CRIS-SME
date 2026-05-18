@@ -2073,3 +2073,357 @@ nav {
   vertical-align: middle;
   margin-right: 5px;
 }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   ENHANCED DASHBOARD — risk-adaptive theming, severity colours, category map
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ─── Category colour palette ────────────────────────────────────────────── */
+:root {
+  --cat-iam:        #7c3aed;
+  --cat-network:    #ef4444;
+  --cat-data:       #f59e0b;
+  --cat-monitoring: #3b82f6;
+  --cat-compute:    #0891b2;
+  --cat-governance: #059669;
+}
+
+/* ─── Risk-level hero theming ────────────────────────────────────────────── */
+.hero-panel { transition: background 0.6s, box-shadow 0.6s; }
+
+.hero-panel.risk-critical {
+  background: linear-gradient(135deg, rgba(40,8,8,0.95) 0%, rgba(22,8,8,0.98) 100%);
+  box-shadow: 0 0 80px rgba(239,68,68,0.12), var(--shadow);
+}
+.hero-panel.risk-high {
+  background: linear-gradient(135deg, rgba(38,18,4,0.95) 0%, rgba(20,10,4,0.98) 100%);
+  box-shadow: 0 0 80px rgba(249,115,22,0.10), var(--shadow);
+}
+.hero-panel.risk-medium {
+  background: linear-gradient(135deg, rgba(30,24,4,0.95) 0%, rgba(18,16,4,0.98) 100%);
+  box-shadow: 0 0 80px rgba(234,179,8,0.09), var(--shadow);
+}
+.hero-panel.risk-low {
+  background: linear-gradient(135deg, rgba(4,22,14,0.95) 0%, rgba(4,18,10,0.98) 100%);
+  box-shadow: 0 0 80px rgba(34,197,94,0.09), var(--shadow);
+}
+
+/* ─── Animated ring glow ─────────────────────────────────────────────────── */
+.risk-orbit svg {
+  filter: drop-shadow(0 0 18px var(--ring-glow, rgba(59,130,246,0.45)));
+  transition: filter 0.6s ease;
+}
+.ring-value {
+  transition: stroke 0.6s ease, stroke-dashoffset 0.9s cubic-bezier(0.4,0,0.2,1);
+}
+
+/* ─── Risk-band chip below the score ─────────────────────────────────────── */
+.risk-band-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 6px;
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.risk-band-chip.critical { background: var(--critical-bg); color: #fca5a5; }
+.risk-band-chip.high     { background: var(--high-bg);     color: #fdba74; }
+.risk-band-chip.medium   { background: var(--medium-bg);   color: #fde047; }
+.risk-band-chip.low      { background: var(--ok-bg);       color: #86efac; }
+.risk-band-chip.stable   { background: var(--low-bg);      color: #93c5fd; }
+
+/* ─── Severity-coded finding rows ────────────────────────────────────────── */
+.finding-row[data-sev="Critical"] {
+  border-left: 3px solid var(--critical);
+  padding-left: 10px;
+}
+.finding-row[data-sev="High"] {
+  border-left: 3px solid var(--high);
+  padding-left: 10px;
+}
+.finding-row[data-sev="Medium"] {
+  border-left: 3px solid var(--medium);
+  padding-left: 10px;
+}
+.finding-row[data-sev="Low"] {
+  border-left: 3px solid var(--low);
+  padding-left: 10px;
+}
+
+/* ─── Category-coloured domain bars ──────────────────────────────────────── */
+.bar-row[data-cat="IAM"] .bar-fill             { background: linear-gradient(90deg, var(--cat-iam), #a855f7); }
+.bar-row[data-cat="Network"] .bar-fill         { background: linear-gradient(90deg, var(--cat-network), #f87171); }
+.bar-row[data-cat="Data"] .bar-fill            { background: linear-gradient(90deg, var(--cat-data), #fcd34d); }
+.bar-row[data-cat="Monitoring/Logging"] .bar-fill { background: linear-gradient(90deg, var(--cat-monitoring), #60a5fa); }
+.bar-row[data-cat="Compute/Workloads"] .bar-fill  { background: linear-gradient(90deg, var(--cat-compute), #22d3ee); }
+.bar-row[data-cat="Cost/Governance Hygiene"] .bar-fill { background: linear-gradient(90deg, var(--cat-governance), #34d399); }
+
+/* Category dot before bar label */
+.bar-row[data-cat]::before { display: none; }
+
+.cat-dot {
+  display: inline-block;
+  width: 8px; height: 8px;
+  border-radius: 999px;
+  flex-shrink: 0;
+  margin-right: 6px;
+}
+.cat-dot-iam        { background: var(--cat-iam); box-shadow: 0 0 6px rgba(124,58,237,0.5); }
+.cat-dot-network    { background: var(--cat-network); box-shadow: 0 0 6px rgba(239,68,68,0.5); }
+.cat-dot-data       { background: var(--cat-data); box-shadow: 0 0 6px rgba(245,158,11,0.5); }
+.cat-dot-monitoring { background: var(--cat-monitoring); box-shadow: 0 0 6px rgba(59,130,246,0.5); }
+.cat-dot-compute    { background: var(--cat-compute); box-shadow: 0 0 6px rgba(8,145,178,0.5); }
+.cat-dot-governance { background: var(--cat-governance); box-shadow: 0 0 6px rgba(5,150,105,0.5); }
+
+/* ─── Enhanced bar-row layout ────────────────────────────────────────────── */
+.bar-row {
+  display: grid;
+  grid-template-columns: 185px 1fr 52px;
+  align-items: center;
+  gap: 10px;
+}
+.bar-row-label {
+  display: flex;
+  align-items: center;
+  font-size: 0.82rem;
+  color: var(--muted);
+  font-weight: 500;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+/* ─── Severity dot in risk items ─────────────────────────────────────────── */
+.risk-item-sev {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+.risk-item-sev .sev-pip {
+  width: 7px; height: 7px;
+  border-radius: 999px;
+}
+.risk-item-sev.critical .sev-pip { background: var(--critical); box-shadow: 0 0 6px rgba(239,68,68,0.6); }
+.risk-item-sev.high     .sev-pip { background: var(--high); }
+.risk-item-sev.medium   .sev-pip { background: var(--medium); }
+.risk-item-sev.low      .sev-pip { background: var(--low); }
+
+/* ─── Module card icons ──────────────────────────────────────────────────── */
+.module-card { position: relative; overflow: hidden; }
+
+.module-card::after {
+  content: "";
+  position: absolute;
+  bottom: -24px; right: -24px;
+  width: 80px; height: 80px;
+  border-radius: 999px;
+  background: rgba(255,255,255,0.03);
+  pointer-events: none;
+}
+
+.module-icon {
+  width: 32px; height: 32px;
+  border-radius: 8px;
+  display: grid;
+  place-items: center;
+  margin-bottom: 8px;
+  background: rgba(148,163,184,0.08);
+  color: var(--muted);
+  transition: background var(--ease), color var(--ease);
+}
+.module-icon svg { width: 16px; height: 16px; }
+
+.module-card:hover .module-icon {
+  background: rgba(59,130,246,0.18);
+  color: var(--accent);
+}
+
+/* Module-specific accent colours */
+.module-card[data-accent="findings"] .module-icon  { background: rgba(239,68,68,0.12);  color: #fca5a5; }
+.module-card[data-accent="ce"]       .module-icon  { background: rgba(34,197,94,0.12);  color: #86efac; }
+.module-card[data-accent="review"]   .module-icon  { background: rgba(234,179,8,0.12);  color: #fde047; }
+.module-card[data-accent="evidence"] .module-icon  { background: rgba(59,130,246,0.12); color: #93c5fd; }
+.module-card[data-accent="reports"]  .module-icon  { background: rgba(167,139,250,0.12); color: #c4b5fd; }
+.module-card[data-accent="trust"]    .module-icon  { background: rgba(8,145,178,0.12);  color: #67e8f9; }
+.module-card[data-accent="run"]      .module-icon  { background: rgba(249,115,22,0.12); color: #fdba74; }
+.module-card[data-accent="exposure"] .module-icon  { background: rgba(124,58,237,0.12); color: #c4b5fd; }
+
+/* ─── Enhanced overview layout ───────────────────────────────────────────── */
+.overview-stats-row {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0,1fr));
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.stat-chip {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 14px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-xs);
+  background: var(--bg-surface);
+}
+
+.stat-chip-icon {
+  width: 34px; height: 34px;
+  border-radius: 8px;
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+}
+.stat-chip-icon svg { width: 16px; height: 16px; }
+
+.stat-chip-body strong {
+  display: block;
+  font-size: 1.45rem;
+  font-weight: 800;
+  line-height: 1;
+  color: var(--ink);
+}
+.stat-chip-body span {
+  display: block;
+  font-size: 0.73rem;
+  color: var(--faint);
+  margin-top: 3px;
+  font-weight: 500;
+}
+
+/* ─── Metric card improvements ───────────────────────────────────────────── */
+.metric-card { position: relative; }
+
+.metric-card .metric-trend {
+  position: absolute;
+  top: 12px; right: 12px;
+  font-size: 0.72rem;
+  font-weight: 700;
+}
+.metric-card .metric-trend.up   { color: var(--critical); }
+.metric-card .metric-trend.down { color: var(--ok); }
+.metric-card .metric-trend.flat { color: var(--faint); }
+
+/* ─── Enhanced sparkline card ────────────────────────────────────────────── */
+.sparkline-card { min-height: 88px; }
+
+.sparkline-line {
+  stroke: var(--accent);
+  stroke-width: 2.2;
+  fill: none;
+  filter: drop-shadow(0 0 4px rgba(59,130,246,0.5));
+}
+
+.sparkline-area {
+  fill: url(#sparkGradient);
+  opacity: 0.35;
+}
+
+/* ─── Overview insights side-by-side ─────────────────────────────────────── */
+.overview-insights {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.compact-panel { padding: 14px; }
+
+/* ─── CE pillar bar enhancements ─────────────────────────────────────────── */
+.ce-pillar-row {
+  display: grid;
+  grid-template-columns: 1fr 120px 44px;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 0;
+}
+.ce-pillar-row + .ce-pillar-row { border-top: 1px solid var(--line); }
+
+.ce-pillar-row strong { font-size: 0.82rem; font-weight: 600; color: var(--ink); }
+.ce-pillar-row > span { font-size: 0.78rem; font-weight: 700; text-align: right; color: var(--muted); }
+
+.ce-pillar-fill-ready   { background: linear-gradient(90deg, var(--ok), #34d399); }
+.ce-pillar-fill-partial { background: linear-gradient(90deg, var(--medium), #fcd34d); }
+.ce-pillar-fill-gap     { background: linear-gradient(90deg, var(--critical), #f87171); }
+
+/* ─── Finding table column headers ───────────────────────────────────────── */
+.finding-col-heads {
+  display: grid;
+  grid-template-columns: 88px minmax(0,1fr) 72px;
+  gap: 10px;
+  padding: 0 12px 7px 15px;
+  margin-bottom: 4px;
+  border-bottom: 1px solid var(--line);
+}
+.finding-col-heads span {
+  font-size: 0.67rem;
+  font-weight: 700;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--faint);
+}
+.finding-col-heads span:last-child { text-align: right; }
+
+/* ─── Priority badge improvements ────────────────────────────────────────── */
+.pill.immediate, .pill.critical {
+  background: linear-gradient(135deg, rgba(239,68,68,0.2), rgba(220,38,38,0.12));
+  color: #fca5a5;
+  border: 1px solid rgba(239,68,68,0.25);
+}
+.pill.high {
+  background: linear-gradient(135deg, rgba(249,115,22,0.18), rgba(234,88,12,0.10));
+  color: #fdba74;
+  border: 1px solid rgba(249,115,22,0.2);
+}
+.pill.medium, .pill.planned {
+  background: linear-gradient(135deg, rgba(234,179,8,0.15), rgba(202,138,4,0.08));
+  color: #fde047;
+  border: 1px solid rgba(234,179,8,0.18);
+}
+.pill.low, .pill.monitor {
+  background: linear-gradient(135deg, rgba(59,130,246,0.15), rgba(37,99,235,0.08));
+  color: #93c5fd;
+  border: 1px solid rgba(59,130,246,0.18);
+}
+
+/* ─── Section header improvements ────────────────────────────────────────── */
+.section-title h2 {
+  background: linear-gradient(135deg, var(--ink) 60%, var(--muted));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* ─── Board brief / overview hero wide layout ────────────────────────────── */
+.hero-panel {
+  display: grid;
+  grid-template-columns: minmax(0,1fr) 200px;
+  gap: 24px;
+}
+
+.hero-left { display: flex; flex-direction: column; justify-content: center; }
+
+.hero-score-block {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+/* ─── Responsive adjustments ─────────────────────────────────────────────── */
+@media (max-width: 900px) {
+  .overview-stats-row { grid-template-columns: repeat(2, 1fr); }
+  .overview-insights  { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 640px) {
+  .overview-stats-row { grid-template-columns: 1fr 1fr; }
+  .bar-row { grid-template-columns: 1fr; }
+  .finding-col-heads { display: none; }
+}

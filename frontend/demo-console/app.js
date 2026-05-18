@@ -265,14 +265,78 @@ function renderOverview() {
   const assurance = state.dashboard?.assessment_assurance || {};
   const replay = state.dashboard?.confidence_and_evidence?.assessment_replay || {};
   const score = Number(overview.overall_risk_score || state.report?.overall_risk_score || 0);
+
   text("#assessment-summary", state.report?.summary || "CRIS-SME assessment loaded from generated artifacts.");
   text("#risk-score", score.toFixed(1));
-  text("#risk-band", overview.risk_band || "risk band");
-  const circumference = 415;
-  const offset = circumference - (Math.min(score, 100) / 100) * circumference;
-  document.querySelector("#risk-ring")?.style.setProperty("stroke-dashoffset", String(offset));
+
+  // Dynamic ring colour + hero glow based on risk score
+  const ringColor = score >= 75 ? "#ef4444" : score >= 50 ? "#f97316" : score >= 25 ? "#eab308" : "#22c55e";
+  const heroClass = score >= 75 ? "risk-critical" : score >= 50 ? "risk-high" : score >= 25 ? "risk-medium" : "risk-low";
+  const glowColor = score >= 75 ? "rgba(239,68,68,0.55)" : score >= 50 ? "rgba(249,115,22,0.5)" : score >= 25 ? "rgba(234,179,8,0.45)" : "rgba(34,197,94,0.45)";
+  const bandLabel = score >= 75 ? "Critical" : score >= 50 ? "High" : score >= 25 ? "Medium" : "Low";
+  const bandClass = score >= 75 ? "critical" : score >= 50 ? "high" : score >= 25 ? "medium" : "low";
+
+  const heroEl = document.querySelector(".hero-panel");
+  if (heroEl) {
+    heroEl.className = heroEl.className.replace(/\brisk-\w+\b/g, "").trim() + ` ${heroClass}`;
+  }
+  const ring = document.querySelector("#risk-ring");
+  if (ring) {
+    ring.style.stroke = ringColor;
+    ring.closest("svg")?.style.setProperty("--ring-glow", glowColor);
+    const circumference = 415;
+    ring.style.strokeDashoffset = String(circumference - (Math.min(score, 100) / 100) * circumference);
+  }
+
+  // Risk band chip below score
+  html("#risk-band", `<span class="risk-band-chip ${bandClass}">${escapeHtml(bandLabel)} risk</span>`);
+
   renderRiskTrendSparkline();
   renderCePillarBars();
+
+  const nonCompliant = state.report?.evaluation_context?.non_compliant_findings ?? state.findings.length;
+  const ceScore = state.report?.cyber_essentials_readiness?.overall_readiness_score;
+  const frameworkCount = overview.framework_coverage_count || 0;
+  const providerCount = overview.provider_coverage_count || 1;
+
+  html("#overview-stats-row", `
+    <div class="stat-chip">
+      <div class="stat-chip-icon" style="background:rgba(239,68,68,0.12);color:#fca5a5">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M8 3v5l3 3"/><circle cx="8" cy="8" r="6"/></svg>
+      </div>
+      <div class="stat-chip-body">
+        <strong>${escapeHtml(nonCompliant)}</strong>
+        <span>Active findings</span>
+      </div>
+    </div>
+    <div class="stat-chip">
+      <div class="stat-chip-icon" style="background:rgba(34,197,94,0.12);color:#86efac">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M3 8l3 3 7-7"/></svg>
+      </div>
+      <div class="stat-chip-body">
+        <strong>${ceScore !== undefined ? fmtNumber(ceScore) + "%" : "—"}</strong>
+        <span>CE readiness</span>
+      </div>
+    </div>
+    <div class="stat-chip">
+      <div class="stat-chip-icon" style="background:rgba(59,130,246,0.12);color:#93c5fd">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><rect x="2" y="2" width="5" height="5" rx="1"/><rect x="9" y="2" width="5" height="5" rx="1"/><rect x="2" y="9" width="5" height="5" rx="1"/><rect x="9" y="9" width="5" height="5" rx="1"/></svg>
+      </div>
+      <div class="stat-chip-body">
+        <strong>${escapeHtml(frameworkCount)}</strong>
+        <span>Frameworks mapped</span>
+      </div>
+    </div>
+    <div class="stat-chip">
+      <div class="stat-chip-icon" style="background:rgba(8,145,178,0.12);color:#67e8f9">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="8" cy="8" r="6"/><path d="M2 8h12M8 2a10 10 0 010 12M8 2a10 10 0 000 12"/></svg>
+      </div>
+      <div class="stat-chip-body">
+        <strong>${escapeHtml(providerCount)}</strong>
+        <span>Provider${providerCount !== 1 ? "s" : ""} in scope</span>
+      </div>
+    </div>
+  `);
 
   const metrics = [
     ["Findings", overview.finding_count || 0, "prioritized non-compliant decisions"],
@@ -288,13 +352,32 @@ function renderOverview() {
   renderTopRisks();
 }
 
+const MODULE_META = {
+  "assessment":         { accent: "run",      icon: `<path d="M4 14.5V6a2 2 0 012-2h8a2 2 0 012 2v8.5"/><path d="M2.5 14.5h15l-1.5 2h-12l-1.5-2z"/><path d="M8 8h4M8 11h4"/>` },
+  "public-exposure":    { accent: "exposure",  icon: `<circle cx="10" cy="10" r="7"/><path d="M3 10h14M10 3a11 11 0 010 14M10 3a11 11 0 000 14"/>` },
+  "workbench":          { accent: "findings",  icon: `<path d="M10 2.5l1.8 3.7 4 .58-2.9 2.83.69 4-3.59-1.89L6.4 13.6l.69-4L4.2 6.78l4-.58L10 2.5z"/>` },
+  "ce-workflow":        { accent: "ce",        icon: `<path d="M9 12l2 2 4-4"/><path d="M5 17H4a2 2 0 01-2-2V5a2 2 0 012-2h11a2 2 0 012 2v2"/><rect x="9" y="11" width="10" height="8" rx="1.5"/>` },
+  "ce-review-workbench":{ accent: "review",    icon: `<circle cx="8" cy="7" r="3.5"/><path d="M2 17c0-3 2.7-5 6-5"/><path d="M14 13l1.5 1.5L18 12"/>` },
+  "disclosure":         { accent: "evidence",  icon: `<rect x="3" y="9" width="14" height="9" rx="1.5"/><path d="M7 9V6a3 3 0 016 0v3"/>` },
+  "reports":            { accent: "reports",   icon: `<path d="M4 3h8l4 4v10a1 1 0 01-1 1H4a1 1 0 01-1-1V4a1 1 0 011-1z"/><path d="M12 3v4h4M7 10h6M7 13h4"/>` },
+  "assurance":          { accent: "trust",     icon: `<path d="M10 2l2 6h6l-5 3.6 1.9 6L10 14l-4.9 3.6 1.9-6L2 8h6l2-6z"/>` },
+};
+
 function renderPlatformModules() {
-  html("#platform-modules", PLATFORM_MODULES.map(([title, note, view]) => `
-    <button class="module-card" type="button" data-module-view="${escapeHtml(view)}">
-      <strong>${escapeHtml(title)}</strong>
-      <span>${escapeHtml(note)}</span>
-    </button>
-  `).join(""));
+  html("#platform-modules", PLATFORM_MODULES.map(([title, note, view]) => {
+    const meta = MODULE_META[view] || { accent: "", icon: `<rect x="3" y="3" width="14" height="14" rx="2"/>` };
+    return `
+      <button class="module-card" type="button" data-module-view="${escapeHtml(view)}" data-accent="${escapeHtml(meta.accent)}">
+        <div class="module-icon">
+          <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            ${meta.icon}
+          </svg>
+        </div>
+        <strong>${escapeHtml(title)}</strong>
+        <span>${escapeHtml(note)}</span>
+      </button>
+    `;
+  }).join(""));
   document.querySelectorAll(".module-card").forEach((button) => {
     button.addEventListener("click", () => {
       document.querySelector(`.nav-item[data-view="${CSS.escape(button.dataset.moduleView)}"]`)?.click();
@@ -561,28 +644,56 @@ async function parseApiResponse(response) {
 
 function renderDomainBars() {
   const scores = state.dashboard?.domain_breakdown?.scores || {};
-  const rows = Object.entries(scores).map(([domain, value]) => `
-    <div class="bar-row">
-      <strong>${escapeHtml(domain)}</strong>
-      <div class="bar-track"><div class="bar-fill" style="width:${clamp(value)}%"></div></div>
-      <span>${fmtNumber(value)}</span>
-    </div>
-  `);
+  const rows = Object.entries(scores).map(([domain, value]) => {
+    const dotClass = _catDotClass(domain);
+    return `
+      <div class="bar-row" data-cat="${escapeHtml(domain)}">
+        <div class="bar-row-label">
+          <span class="cat-dot ${dotClass}"></span>
+          ${escapeHtml(domain)}
+        </div>
+        <div class="bar-track"><div class="bar-fill" style="width:${clamp(value)}%"></div></div>
+        <span class="bar-value">${fmtNumber(value)}</span>
+      </div>
+    `;
+  });
   html("#domain-bars", rows.join(""));
+}
+
+function _catDotClass(domain) {
+  const map = {
+    "IAM": "cat-dot-iam",
+    "Network": "cat-dot-network",
+    "Data": "cat-dot-data",
+    "Monitoring/Logging": "cat-dot-monitoring",
+    "Compute/Workloads": "cat-dot-compute",
+    "Cost/Governance Hygiene": "cat-dot-governance",
+  };
+  return map[domain] || "";
 }
 
 function renderTopRisks() {
   const risks = state.dashboard?.executive_overview?.top_business_risks || state.findings.slice(0, 5);
-  html("#top-risks", risks.map((risk) => `
-    <article class="risk-item">
-      <span class="pill ${priorityClass(risk.priority)}">${escapeHtml(risk.priority || "Risk")}</span>
-      <div>
-        <strong>${escapeHtml(risk.control_id || "")}</strong>
-        <p>${escapeHtml(risk.title || "")}</p>
-      </div>
-      <strong>${fmtNumber(risk.score)}</strong>
-    </article>
-  `).join(""));
+  html("#top-risks", risks.map((risk) => {
+    const sev = String(risk.severity || "").toLowerCase();
+    const sevClass = sev === "critical" ? "critical" : sev === "high" ? "high" : sev === "medium" ? "medium" : "low";
+    const scoreNum = Number(risk.score || 0);
+    const scoreColor = scoreNum >= 75 ? "var(--critical)" : scoreNum >= 50 ? "var(--high)" : scoreNum >= 25 ? "var(--medium)" : "var(--ok)";
+    return `
+      <article class="risk-item" style="border-left:3px solid ${scoreColor};padding-left:10px;">
+        <div class="risk-item-sev ${sevClass}">
+          <span class="sev-pip"></span>
+          ${escapeHtml(risk.severity || risk.priority || "Risk")}
+        </div>
+        <div>
+          <strong>${escapeHtml(risk.control_id || "")}</strong>
+          <p>${escapeHtml(risk.title || "")}</p>
+          <small style="color:var(--faint);font-size:0.72rem">${escapeHtml(risk.category || "")}</small>
+        </div>
+        <strong style="font-size:1.05rem;color:${scoreColor}">${fmtNumber(risk.score)}</strong>
+      </article>
+    `;
+  }).join(""));
 }
 
 function renderRiskTrendSparkline() {
@@ -659,16 +770,27 @@ function renderPriorityFilter() {
 }
 
 function renderFindingTable() {
-  html("#finding-table", state.filteredFindings.map((finding) => `
-    <article class="finding-row ${finding.finding_id === state.selectedFindingId ? "active" : ""}" data-finding-id="${escapeHtml(finding.finding_id)}">
+  const colHeads = `
+    <div class="finding-col-heads">
+      <span>Priority</span>
+      <span>Control / Finding</span>
+      <span>Score</span>
+    </div>
+  `;
+  const rows = state.filteredFindings.map((finding) => `
+    <article class="finding-row ${finding.finding_id === state.selectedFindingId ? "active" : ""}"
+             data-finding-id="${escapeHtml(finding.finding_id)}"
+             data-sev="${escapeHtml(finding.severity || "")}">
       <span class="pill ${priorityClass(finding.priority)}">${escapeHtml(finding.priority || "Risk")}</span>
       <div class="finding-title">
         <strong>${escapeHtml(finding.control_id || "")}</strong>
         <p>${escapeHtml(finding.title || "")}</p>
+        <small style="color:var(--faint);font-size:0.72rem">${escapeHtml(finding.category || "")}</small>
       </div>
-      <strong>${fmtNumber(finding.score)}</strong>
+      <strong class="finding-score-col">${fmtNumber(finding.score)}</strong>
     </article>
-  `).join(""));
+  `).join("");
+  html("#finding-table", colHeads + rows);
   document.querySelectorAll(".finding-row").forEach((row) => {
     row.addEventListener("click", () => {
       state.selectedFindingId = row.dataset.findingId;
