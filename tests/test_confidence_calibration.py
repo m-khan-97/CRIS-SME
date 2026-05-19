@@ -7,12 +7,16 @@ from cris_sme.engine.scoring import score_findings
 from cris_sme.models.finding import Finding, FindingCategory, FindingSeverity, RemediationCostTier
 
 
-def make_finding(control_id: str = "NET-001", confidence: float = 0.94) -> Finding:
+def make_finding(
+    control_id: str = "NET-001",
+    confidence: float = 0.94,
+    category: FindingCategory = FindingCategory.NETWORK,
+) -> Finding:
     """Create a compact finding for confidence-calibration tests."""
     return Finding(
         control_id=control_id,
         title="Administrative services are exposed to the public internet",
-        category=FindingCategory.NETWORK,
+        category=category,
         severity=FindingSeverity.CRITICAL,
         evidence=["3 asset(s) expose SSH to the public internet"],
         resource_scope="subscription/test",
@@ -47,6 +51,23 @@ def test_score_findings_exposes_calibration_details_in_breakdown() -> None:
     assert breakdown.observed_confidence == 0.96
     assert breakdown.calibrated_confidence > 0.0
     assert breakdown.calibration_status in {"validated", "provisional", "unmapped"}
+
+
+def test_iomt_controls_use_provisional_lab_calibration() -> None:
+    finding = make_finding(
+        control_id="IOT-009",
+        confidence=0.82,
+        category=FindingCategory.IOT,
+    )
+
+    result = calibrate_finding_confidence(finding)
+
+    assert result.calibration_status == "provisional"
+    assert result.validation_method == "controlled_lab_scenario_comparison"
+    assert result.benchmark_source == "azure_iomt_lab_scenarios"
+    assert result.sample_size == 3
+    assert result.empirical_weight == 0.3
+    assert result.calibrated_confidence == 0.802
 
 
 def test_summarize_confidence_calibration_reports_status_counts() -> None:

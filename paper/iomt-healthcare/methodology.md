@@ -65,9 +65,19 @@ This distinction is central to the paper. CRIS-IoMT is not a certification engin
 
 IoMT controls are mapped to healthcare-readiness themes where cloud evidence is relevant. The mapping is treated as readiness support, not as compliance certification.
 
+The mapping now records candidate NHS DSPT 2025-26 CAF-aligned outcome IDs for each `IOT-*` control. Examples include `B2.a` for identity verification, authentication and authorisation, `C1.a` for monitoring coverage, and `D1.a` for response planning. These IDs are deliberately marked as `candidate_pending_expert_review` in the machine-readable mapping because healthcare DSPT interpretation should be validated by domain experts before publication as an assessment crosswalk.
+
 The paper should use language such as:
 
 > CRIS-IoMT maps cloud-observable IoMT governance signals to NHS DSPT and NCSC CAF-aligned readiness themes, while explicitly preserving evidence gaps that require endpoint, device, clinical, or organisational validation.
+
+## Scoring and Calibration Boundary
+
+Healthcare IoT is treated as an optional research domain inside CRIS. The base SME risk model assigns the `IOT` category a weight of `0.0`; this prevents experimental IoMT findings from changing the standard CRIS SME overall score. The Healthcare IoT category score is reported separately as a standalone research metric.
+
+The `IOT-*` confidence entries are provisional, not fully empirical. They use the three controlled Azure IoMT lab runs as the initial calibration source and should be expanded through expert review, production-like healthcare scenarios, and licensed Defender for IoT validation.
+
+`IOT-004` is a special case. Defender for IoT was not observable in the Azure for Students evaluation environment. A triggered `IOT-004` finding therefore records that cloud security-monitoring evidence was unavailable or absent in the observed scope; it must not be interpreted as proof that no compensating SIEM, SOC, or clinical operations monitoring exists.
 
 ## Non-Claims
 

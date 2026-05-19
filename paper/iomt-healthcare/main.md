@@ -17,7 +17,7 @@ This paper contributes:
 1. A cloud-side evidence model for healthcare IoT assurance.
 2. A deterministic Azure-first IoMT control catalogue with ten `IOT-*` controls.
 3. An evidence-sufficiency boundary that distinguishes cloud-observable findings from device, endpoint, clinical, and human-verification gaps.
-4. A mapping from IoMT controls to NHS DSPT and NCSC CAF-oriented readiness themes.
+4. A candidate mapping from IoMT controls to NHS DSPT 2025-26 CAF-aligned outcome IDs and NCSC CAF-oriented readiness themes.
 5. A controlled Azure lab methodology for weak and simulated-clinic healthcare IoT architectures.
 6. JSON and Markdown IoMT evidence packs for reviewer-ready reporting.
 
@@ -40,7 +40,7 @@ CRIS-IoMT extends the CRIS pipeline:
 1. The Azure collector discovers IoT Hub resources and related cloud services.
 2. The IoMT evidence model normalizes IoT Hub posture into deterministic fields.
 3. Ten `IOT-*` controls evaluate identity, shared-access policy, diagnostics, monitoring, exposure, private endpoint, routing, retention, secret governance, alerting, and clinical-operational boundary evidence.
-4. Findings flow through deterministic CRIS scoring, evidence lineage, confidence, and reporting.
+4. Findings flow through deterministic CRIS scoring, evidence lineage, provisional IoMT confidence calibration, and reporting.
 5. IoMT evidence packs summarize cloud-observable findings and manual evidence gaps.
 
 ## 5. Threat Model and Assurance Boundary
@@ -52,6 +52,8 @@ The adversary model is intentionally broader than an external attacker. It inclu
 The assurance boundary is strict. CRIS-IoMT does not assess physiological sensing correctness, device firmware integrity, wireless protocol security, patient data content, or clinical safety. It can support cloud-observable assurance claims, but it must not claim that a healthcare IoT system is clinically safe, medically certified, or fully secure.
 
 Allowed claims include statements such as whether IoT Hub public access, shared access policies, diagnostic settings, alert rules, private endpoint posture, and security-monitoring observability were detected in the assessment scope. Forbidden claims include NHS DSPT certification, NCSC CAF certification, medical-device security certification, clinical safety approval, or end-to-end patient data protection.
+
+NHS DSPT references in this paper are candidate mappings to the 2025-26 CAF-aligned outcome structure, such as `B2.a` for identity verification, authentication and authorisation, `C1.a` for monitoring coverage, and `D1.a` for response planning. They are included to support expert review and readiness discussion, not to assert DSPT compliance.
 
 ## 6. Methodology
 
@@ -67,6 +69,8 @@ The first evaluation uses controlled Azure IoT Hub labs in `uaenorth`:
 
 The weak and simulated-clinic assessments use resource-group scoped collection to isolate scenario resources from other subscription assets.
 
+Healthcare IoT findings are reported as an optional standalone category. The base CRIS SME overall score currently assigns the `IOT` category a weight of `0.0`, so IoMT findings do not change the standard SME overall risk score; the Healthcare IoT category score is reported separately for research evaluation.
+
 ## 8. Results
 
 Detailed results are recorded in `evaluation-results.md`.
@@ -78,17 +82,21 @@ Key results:
 - The simulated clinic included diagnostics and an alert rule, removing `IOT-009` compared with the weak baseline.
 - Both scenarios retained meaningful findings around public IoT Hub exposure, overbroad shared access policies, missing private endpoints, Defender for IoT observability, telemetry governance, secret governance, and clinical-operational ownership boundaries.
 
+The most important controlled difference is `IOT-009`: the weak baseline had no IoT alert rule and triggered the finding, while the simulated clinic deployed a real Azure Monitor metric alert and did not trigger the finding. This result is the clearest early evidence that CRIS-IoMT can distinguish weak and more operationally mature cloud-side IoMT monitoring posture.
+
 ## 9. Discussion
 
 The results support the paper's central argument: cloud-side governance evidence can identify a meaningful subset of healthcare IoT assurance weaknesses without touching patient data or device firmware. The results also show why cloud evidence must be carefully bounded. A cloud report cannot certify clinical safety, device security, firmware integrity, or sensing reliability.
 
 The strongest framing is therefore not automation of healthcare IoT certification. It is evidence-sufficiency-aware pre-assessment of the cloud governance layer that supports healthcare IoT operations.
 
+`IOT-004` should be interpreted especially carefully. In the Azure for Students evaluation context, Defender for IoT was not observable in any scenario. The resulting finding is therefore a structural monitoring-evidence gap: CRIS-IoMT did not observe Defender for IoT or equivalent cloud security monitoring evidence. It is not proof that a healthcare organisation has no compensating monitoring outside the assessed Azure control plane.
+
 ## 10. Threats to Validity
 
 The evaluation currently uses controlled Azure labs, not production NHS environments. The scenarios are intentionally simplified and do not include real clinical devices, patient telemetry, biomedical instrumentation, or operational healthcare workflows. Azure IoT Hub evidence may not generalize directly to AWS IoT Core, Google Cloud IoT alternatives, on-premises gateways, or hybrid medical device networks.
 
-The scoring model is deterministic, but control weights and confidence values still require broader empirical calibration. The current live runs demonstrate feasibility and signal separation between scenarios, not complete validation of healthcare IoT assurance.
+The scoring model is deterministic, but control weights and confidence values still require broader empirical calibration. IoMT controls are marked as provisional using the three controlled lab runs as early calibration evidence. The current live runs demonstrate feasibility and signal separation between scenarios, not complete validation of healthcare IoT assurance.
 
 ## 11. Limitations
 

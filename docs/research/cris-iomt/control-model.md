@@ -39,7 +39,7 @@ Risk decision:
 
 Mapping:
 
-- NHS DSPT: access control, asset management, data security
+- NHS DSPT candidate outcomes: `B2.a` identity verification, authentication and authorisation; `B4.d` vulnerability management
 - NCSC CAF: B2 identity and access control, B4 data security
 
 ### IOT-002: Shared Access Policy and Key Exposure Risk
@@ -61,7 +61,7 @@ Risk decision:
 
 Mapping:
 
-- NHS DSPT: access control, secure configuration
+- NHS DSPT candidate outcomes: `B2.a` identity verification, authentication and authorisation; `B3.a` secure configuration
 - NCSC CAF: B2 identity and access control
 
 ### IOT-003: IoT Telemetry Diagnostic Logging
@@ -83,7 +83,7 @@ Risk decision:
 
 Mapping:
 
-- NHS DSPT: logging and monitoring
+- NHS DSPT candidate outcome: `C1.a` monitoring coverage
 - NCSC CAF: C1 security monitoring
 
 ### IOT-004: IoT Security Monitoring and Defender Coverage
@@ -105,8 +105,10 @@ Risk decision:
 
 Mapping:
 
-- NHS DSPT: incident detection and response
+- NHS DSPT candidate outcomes: `C1.a` monitoring coverage; `C2.a` proactive security event discovery
 - NCSC CAF: C1 security monitoring, C2 proactive security event discovery
+
+Note: in the Azure for Students lab environment, Defender for IoT was not observable. A triggered `IOT-004` finding should be read as a monitoring-evidence gap, not proof that no compensating SIEM, SOC, or clinical operations monitoring exists.
 
 ### IOT-005: Public Network Exposure of IoT Ingestion Endpoints
 
@@ -127,7 +129,7 @@ Risk decision:
 
 Mapping:
 
-- NHS DSPT: secure configuration, network security
+- NHS DSPT candidate outcomes: `B4.a` secure by design; `C1.a` monitoring coverage
 - NCSC CAF: B4 data security, B5 resilient networks and systems
 
 ### IOT-006: Private Endpoint and Network Isolation Posture
@@ -149,7 +151,7 @@ Risk decision:
 
 Mapping:
 
-- NHS DSPT: infrastructure security
+- NHS DSPT candidate outcomes: `B4.a` secure by design; `B5.a` resilient networks and systems
 - NCSC CAF: B5 resilient networks and systems
 
 ### IOT-007: Telemetry Storage and Retention Governance
@@ -172,7 +174,7 @@ Risk decision:
 
 Mapping:
 
-- NHS DSPT: data protection, records retention, auditability
+- NHS DSPT candidate outcomes: `B4.b` secure data management; `E3.a` using and sharing information for direct care
 - NCSC CAF: B4 data security, D1 response and recovery planning
 
 ### IOT-008: Key Vault and Secret Management for IoT Integrations
@@ -195,7 +197,7 @@ Risk decision:
 
 Mapping:
 
-- NHS DSPT: access control, data security
+- NHS DSPT candidate outcomes: `B2.a` identity verification, authentication and authorisation; `B4.b` secure data management
 - NCSC CAF: B3 data security, B2 identity and access control
 
 ### IOT-009: Incident Detection and Alerting Coverage
@@ -218,7 +220,7 @@ Risk decision:
 
 Mapping:
 
-- NHS DSPT: incident management
+- NHS DSPT candidate outcomes: `C1.a` monitoring coverage; `D1.a` response plan
 - NCSC CAF: C1 security monitoring, D2 lessons learned
 
 ### IOT-010: Evidence Sufficiency and Clinical Safety Boundary
@@ -241,7 +243,7 @@ Risk decision:
 
 Mapping:
 
-- NHS DSPT: governance and assurance
+- NHS DSPT candidate outcomes: `A2.a` risk management process; `D1.a` response plan
 - NCSC CAF: A1 governance, A2 risk management
 
 ## Scoring Guidance
@@ -255,3 +257,4 @@ IoMT controls should use the existing CRIS scoring model but adjust modifiers ca
 
 No IoMT control should imply clinical safety approval. Clinical and biomedical assurance remains outside deterministic cloud scoring.
 
+Healthcare IoT is an optional research category in the base CRIS scoring model. The `IOT` category currently has a weight of `0.0`, so IoMT findings are reported in a standalone Healthcare IoT category score without changing the standard SME overall risk score. This keeps the experimental IoMT extension visible without contaminating the original SME risk model.

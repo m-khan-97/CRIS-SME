@@ -4,6 +4,8 @@
 
 The first CRIS-IoMT evaluation uses controlled Azure IoT Hub labs in the `uaenorth` region. The weak and simulated-clinic runs were assessed with a resource-group scope so that each result reflects only the resources deployed for that scenario.
 
+Healthcare IoT is reported as a standalone optional research category. The base CRIS SME overall score currently assigns the `IOT` category a weight of `0.0`, so the Healthcare IoT score should be interpreted separately from the standard SME risk score.
+
 ## Scenario Comparison
 
 | Metric | Clean standing demo | Weak IoMT baseline | Simulated clinic |
@@ -26,6 +28,15 @@ The first CRIS-IoMT evaluation uses controlled Azure IoT Hub labs in the `uaenor
 | Private endpoints | `0` | `0` | `0` |
 | IoT alert rules | `0` | `0` | `1` |
 
+## Core Controlled Result: Alerting Signal Separation
+
+| Scenario | `IOT-009` fires? | Observed cloud evidence | Interpretation |
+| --- | --- | --- | --- |
+| Weak IoMT baseline | Yes | No IoT-specific Azure Monitor alert rule observed | CRIS-IoMT correctly reports missing operational alert-routing evidence. |
+| Simulated clinic | No | One Azure Monitor metric alert rule observed for the scenario IoT Hub | CRIS-IoMT correctly distinguishes the scenario where a real cloud-side alert was deployed. |
+
+This is the strongest empirical result in the current study. The two scenarios differ by a concrete Azure control-plane artefact, and the deterministic control outcome changes accordingly.
+
 ## Triggered IoMT Controls
 
 | Control | Weak IoMT baseline | Simulated clinic | Interpretation |
@@ -33,7 +44,7 @@ The first CRIS-IoMT evaluation uses controlled Azure IoT Hub labs in the `uaenor
 | `IOT-001` Device identity authentication evidence | Triggered | Triggered | Shared-key device identities and incomplete strong-authentication evidence remain visible in both runs. |
 | `IOT-002` Shared access policy least privilege | Triggered | Triggered | Both runs include overbroad or default shared-access policy exposure. |
 | `IOT-003` Diagnostic logging | Triggered | Triggered | Weak baseline has no diagnostic destination. Simulated clinic has diagnostics, but still leaves category/retention evidence gaps. |
-| `IOT-004` Defender/security monitoring | Triggered | Triggered | Defender for IoT or equivalent security monitoring was not observed. |
+| `IOT-004` Defender/security monitoring | Triggered | Triggered | Defender for IoT or equivalent security monitoring was not observed. In this Azure for Students evaluation, this is a monitoring-evidence/observability gap rather than proof that no compensating monitoring could exist. |
 | `IOT-005` Public network access | Triggered | Triggered | Both scenarios expose IoT Hub over public network access. |
 | `IOT-006` Private endpoint coverage | Triggered | Triggered | No private endpoint coverage was observed for sensitive IoMT telemetry paths. |
 | `IOT-007` Telemetry routing and retention | Triggered | Triggered | Routing and retention evidence remains incomplete. |

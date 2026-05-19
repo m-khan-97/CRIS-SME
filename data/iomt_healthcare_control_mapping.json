@@ -24,6 +24,20 @@
         "asset management",
         "data security"
       ],
+      "nhs_dspt_outcome_candidates": [
+        {
+          "outcome_id": "B2.a",
+          "name": "Identity verification, authentication and authorisation",
+          "rationale": "IoMT device identities and authentication metadata support assessment of device and system access to cloud-connected healthcare IoT services.",
+          "status": "candidate_pending_expert_review"
+        },
+        {
+          "outcome_id": "B4.d",
+          "name": "Vulnerability management",
+          "rationale": "Device identity inventory contributes to understanding exposed and unsupported technology in the IoMT environment, but device firmware validation remains external.",
+          "status": "candidate_pending_expert_review"
+        }
+      ],
       "ncsc_caf_objectives": [
         "B2 identity and access control",
         "B4 data security"
@@ -48,6 +62,20 @@
         "access control",
         "secure configuration"
       ],
+      "nhs_dspt_outcome_candidates": [
+        {
+          "outcome_id": "B2.a",
+          "name": "Identity verification, authentication and authorisation",
+          "rationale": "Shared access policies determine non-human and application-level authority over IoT ingestion and device management paths.",
+          "status": "candidate_pending_expert_review"
+        },
+        {
+          "outcome_id": "B3.a",
+          "name": "Secure configuration",
+          "rationale": "Least-privilege shared access policies are part of secure cloud configuration for healthcare IoT ingestion services.",
+          "status": "candidate_pending_expert_review"
+        }
+      ],
       "ncsc_caf_objectives": [
         "B2 identity and access control"
       ]
@@ -71,6 +99,14 @@
         "logging and monitoring",
         "auditability"
       ],
+      "nhs_dspt_outcome_candidates": [
+        {
+          "outcome_id": "C1.a",
+          "name": "Monitoring coverage",
+          "rationale": "IoT Hub diagnostics provide cloud-side logs and metrics needed for healthcare IoT investigation and monitoring coverage.",
+          "status": "candidate_pending_expert_review"
+        }
+      ],
       "ncsc_caf_objectives": [
         "C1 security monitoring"
       ]
@@ -92,6 +128,20 @@
       "nhs_dspt_themes": [
         "incident detection",
         "incident response"
+      ],
+      "nhs_dspt_outcome_candidates": [
+        {
+          "outcome_id": "C1.a",
+          "name": "Monitoring coverage",
+          "rationale": "Defender for IoT or equivalent monitoring observability supports security monitoring coverage claims, subject to licensing and tenant permissions.",
+          "status": "candidate_pending_expert_review"
+        },
+        {
+          "outcome_id": "C2.a",
+          "name": "Proactive security event discovery",
+          "rationale": "IoT-specific security alerts can support proactive discovery where the service is licensed and observable.",
+          "status": "candidate_pending_expert_review"
+        }
       ],
       "ncsc_caf_objectives": [
         "C1 security monitoring",
@@ -117,6 +167,20 @@
         "network security",
         "secure configuration"
       ],
+      "nhs_dspt_outcome_candidates": [
+        {
+          "outcome_id": "B4.a",
+          "name": "Secure by design",
+          "rationale": "Public IoT ingestion exposure affects the secure design boundary for healthcare IoT cloud services.",
+          "status": "candidate_pending_expert_review"
+        },
+        {
+          "outcome_id": "C1.a",
+          "name": "Monitoring coverage",
+          "rationale": "Publicly reachable IoT endpoints increase the importance of observable boundary monitoring.",
+          "status": "candidate_pending_expert_review"
+        }
+      ],
       "ncsc_caf_objectives": [
         "B4 data security",
         "B5 resilient networks and systems"
@@ -139,6 +203,20 @@
       "nhs_dspt_themes": [
         "infrastructure security",
         "network security"
+      ],
+      "nhs_dspt_outcome_candidates": [
+        {
+          "outcome_id": "B4.a",
+          "name": "Secure by design",
+          "rationale": "Private endpoint coverage contributes to the secure architecture of sensitive healthcare IoT telemetry paths.",
+          "status": "candidate_pending_expert_review"
+        },
+        {
+          "outcome_id": "B5.a",
+          "name": "Resilient networks and systems",
+          "rationale": "Network isolation and private connectivity support resilience and segmentation for IoMT services.",
+          "status": "candidate_pending_expert_review"
+        }
       ],
       "ncsc_caf_objectives": [
         "B5 resilient networks and systems"
@@ -165,6 +243,20 @@
         "records retention",
         "auditability"
       ],
+      "nhs_dspt_outcome_candidates": [
+        {
+          "outcome_id": "B4.b",
+          "name": "Secure data management",
+          "rationale": "Telemetry routing and retention posture contributes to cloud-side healthcare IoT data governance.",
+          "status": "candidate_pending_expert_review"
+        },
+        {
+          "outcome_id": "E3.a",
+          "name": "Using and sharing information for direct care",
+          "rationale": "IoMT telemetry use may support direct care, but lawful sharing and clinical context require human validation.",
+          "status": "candidate_pending_expert_review"
+        }
+      ],
       "ncsc_caf_objectives": [
         "B4 data security",
         "D1 response and recovery planning"
@@ -189,6 +281,20 @@
         "access control",
         "data security"
       ],
+      "nhs_dspt_outcome_candidates": [
+        {
+          "outcome_id": "B2.a",
+          "name": "Identity verification, authentication and authorisation",
+          "rationale": "Secret governance affects automated access paths used by IoT integrations and backend services.",
+          "status": "candidate_pending_expert_review"
+        },
+        {
+          "outcome_id": "B4.b",
+          "name": "Secure data management",
+          "rationale": "Managed key and secret posture supports protection of healthcare IoT telemetry and integration credentials.",
+          "status": "candidate_pending_expert_review"
+        }
+      ],
       "ncsc_caf_objectives": [
         "B2 identity and access control",
         "B3 secure configuration"
@@ -212,6 +318,20 @@
       "nhs_dspt_themes": [
         "incident management",
         "business continuity"
+      ],
+      "nhs_dspt_outcome_candidates": [
+        {
+          "outcome_id": "C1.a",
+          "name": "Monitoring coverage",
+          "rationale": "Azure Monitor alert rules provide direct cloud evidence of operational monitoring for IoT Hub telemetry conditions.",
+          "status": "candidate_pending_expert_review"
+        },
+        {
+          "outcome_id": "D1.a",
+          "name": "Response plan",
+          "rationale": "Alert routing supports incident response activation, but clinical escalation paths require operational evidence.",
+          "status": "candidate_pending_expert_review"
+        }
       ],
       "ncsc_caf_objectives": [
         "C1 security monitoring",
@@ -238,6 +358,20 @@
         "governance",
         "assurance",
         "risk management"
+      ],
+      "nhs_dspt_outcome_candidates": [
+        {
+          "outcome_id": "A2.a",
+          "name": "Risk management process",
+          "rationale": "Clinical-operational ownership boundaries are part of the organisational risk process for healthcare IoT services.",
+          "status": "candidate_pending_expert_review"
+        },
+        {
+          "outcome_id": "D1.a",
+          "name": "Response plan",
+          "rationale": "Clinical ownership and escalation responsibility must be documented for incident response involving IoMT services.",
+          "status": "candidate_pending_expert_review"
+        }
       ],
       "ncsc_caf_objectives": [
         "A1 governance",

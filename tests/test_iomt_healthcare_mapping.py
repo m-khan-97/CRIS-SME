@@ -35,7 +35,35 @@ def test_iomt_mapping_has_research_grade_control_set() -> None:
         assert control["azure_evidence"]
         assert control["manual_or_external_evidence"]
         assert control["nhs_dspt_themes"]
+        assert control["nhs_dspt_outcome_candidates"]
         assert control["ncsc_caf_objectives"]
+
+
+def test_iomt_mapping_uses_candidate_dspt_outcomes_not_certification_claims() -> None:
+    mapping = json.loads(MAPPING_PATH.read_text(encoding="utf-8"))
+    controls_by_id = {control["control_id"]: control for control in mapping["controls"]}
+
+    assert mapping["certification_boundary"]
+    assert "not NHS DSPT certification" in mapping["certification_boundary"]
+    assert {
+        candidate["outcome_id"]
+        for candidate in controls_by_id["IOT-001"]["nhs_dspt_outcome_candidates"]
+    } >= {"B2.a", "B4.d"}
+    assert {
+        candidate["outcome_id"]
+        for candidate in controls_by_id["IOT-002"]["nhs_dspt_outcome_candidates"]
+    } >= {"B2.a", "B3.a"}
+    assert {
+        candidate["outcome_id"]
+        for candidate in controls_by_id["IOT-009"]["nhs_dspt_outcome_candidates"]
+    } >= {"C1.a", "D1.a"}
+
+    for control in mapping["controls"]:
+        for candidate in control["nhs_dspt_outcome_candidates"]:
+            assert candidate["status"] == "candidate_pending_expert_review"
+            assert candidate["outcome_id"]
+            assert candidate["name"]
+            assert candidate["rationale"]
 
 
 def test_iomt_research_pack_contains_core_documents() -> None:
@@ -54,4 +82,3 @@ def test_iomt_research_pack_contains_core_documents() -> None:
     assert "NHS DSPT" in paper_plan
     assert "NCSC CAF" in paper_plan
     assert "CRIS-IoMT" in paper_plan
-

@@ -22,6 +22,9 @@ This register records live Azure IoMT evidence runs used for the CRIS-IoMT resea
 ## Methodological Notes
 
 - The weak and simulated-clinic runs used resource-group-scoped assessment via `CRIS_SME_AZURE_RESOURCE_GROUP_SCOPE` to prevent the standing demo IoT Hub from contaminating scenario counts.
+- `IOT-009` is the strongest controlled signal: the weak baseline fired because no IoT alert rule was present; the simulated clinic did not fire because a real Azure Monitor metric alert was deployed.
+- `IOT-004` fired in all three runs because Defender for IoT or equivalent cloud security-monitoring evidence was not observable in the Azure for Students evaluation context. Report this as a monitoring-evidence gap, not as proof of no compensating monitoring.
+- Healthcare IoT is reported as a standalone optional category. The base CRIS SME model currently gives `IOT` a category weight of `0.0`, so IoMT findings do not change the standard SME overall score.
 - Temporary lab resources were created, assessed, and deleted by `scripts/azure_evidence_lab.py cycle`.
 - The clean standing demo resource group is intentionally retained for browser demos and should not be treated as an isolated paper experiment unless scanned with resource-group scope.
 - The IoMT evidence packs are generated artifacts and are intentionally not committed to the repository because they may contain live environment identifiers. The paper should report aggregate counts and control outcomes rather than raw resource identifiers.

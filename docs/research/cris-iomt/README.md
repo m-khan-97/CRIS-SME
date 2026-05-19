@@ -8,7 +8,7 @@ The purpose is to study how cloud control-plane evidence can support determinist
 
 Healthcare IoT risk is not only inside devices. It also exists in the cloud services that authenticate devices, route telemetry, store signals, expose management surfaces, monitor anomalies, and retain investigation evidence.
 
-CRIS-IoMT extends CRIS-SME by converting healthcare IoT cloud evidence into traceable assurance findings mapped to NHS DSPT, NCSC CAF, and healthcare safety boundaries.
+CRIS-IoMT extends CRIS-SME by converting healthcare IoT cloud evidence into traceable assurance findings mapped to candidate NHS DSPT 2025-26 CAF-aligned outcomes, NCSC CAF objectives, and healthcare safety boundaries.
 
 ## Recommended Reading Order
 
@@ -58,3 +58,5 @@ The first live Azure IoMT evaluation runs have been completed in `uaenorth`:
 - `20260519105038` simulated clinic
 
 Both runs were assessed with resource-group scope and cleaned up by the lab cycle command. See `live-run-register.md` for artifact paths and headline results.
+
+The key controlled result is `IOT-009`: the weak baseline had no IoT alert rule and triggered the finding, while the simulated clinic deployed a real Azure Monitor metric alert and did not trigger the finding. `IOT-004` should be treated differently: Defender for IoT was not observable in the Azure for Students evaluation environment, so that finding records a monitoring-evidence gap rather than proof that no compensating monitoring exists.

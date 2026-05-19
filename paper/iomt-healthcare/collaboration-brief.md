@@ -25,6 +25,7 @@ The current implementation has:
 - Azure IoT Hub live evidence collection
 - ten deterministic `IOT-*` controls
 - NHS DSPT and NCSC CAF-oriented mapping
+- candidate NHS DSPT 2025-26 CAF-aligned outcome mappings marked for expert review
 - live Azure controlled lab scenarios
 - scenario-scoped evidence collection
 - IoMT JSON and Markdown evidence pack exports
@@ -37,6 +38,8 @@ Live controlled runs completed:
 | Weak IoMT baseline | `20260519070105` | `10` | `26.64` | Missing diagnostics, no alerting, public IoT Hub, overbroad shared access policies. |
 | Simulated clinic | `20260519105038` | `9` | `27.32` | Diagnostics and alerting observed, but public exposure, private endpoint, Defender, shared-access, and clinical-boundary gaps remain. |
 
+The clearest controlled signal is `IOT-009`: the weak baseline had no IoT alert rule and triggered the finding; the simulated clinic deployed a real Azure Monitor IoT metric alert and did not trigger the finding. This is the result to foreground when discussing empirical validity.
+
 ## Collaboration Value
 
 A collaborator with expertise in sensing, healthcare systems, communications, biomedical engineering, and cyber-physical systems would strengthen:
@@ -45,6 +48,7 @@ A collaborator with expertise in sensing, healthcare systems, communications, bi
 - realism of simulated clinical architecture
 - distinction between cloud-side evidence and device/sensing evidence
 - NHS/clinical-operational assurance language
+- review of the candidate DSPT outcome mappings, especially `B2.a`, `C1.a`, and `D1.a`
 - evaluation design and reviewer credibility
 - venue selection for healthcare, sensors, and cyber-physical systems audiences
 
