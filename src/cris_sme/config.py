@@ -35,6 +35,7 @@ def get_azure_collector_settings() -> AzureCollectorSettings:
             "CRIS_SME_DATASET_USE",
             "live_case_study",
         ).strip(),
+        resource_group_scope=_get_optional_env("CRIS_SME_AZURE_RESOURCE_GROUP_SCOPE"),
     )
 
 

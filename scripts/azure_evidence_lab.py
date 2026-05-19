@@ -237,6 +237,7 @@ def assess(context: LabContext, output_root: Path) -> None:
     env["PYTHONPATH"] = str(REPO_ROOT / "src")
     env["CRIS_SME_AZURE_ORGANIZATION_NAME"] = str(context.scenario.get("title", "Azure Evidence Lab"))
     env["CRIS_SME_AZURE_SECTOR"] = "Research Lab"
+    env["CRIS_SME_AZURE_RESOURCE_GROUP_SCOPE"] = context.resource_group
 
     command = [
         sys.executable,
@@ -805,7 +806,7 @@ def create_iot_metric_alert(context: LabContext, hub_name: str, alert_name: str)
             "--scopes",
             hub_id,
             "--condition",
-            "count total_messages_used > 0",
+            "avg dailyMessageQuotaUsed > 0",
             "--window-size",
             "5m",
             "--evaluation-frequency",

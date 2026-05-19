@@ -42,6 +42,7 @@ class AzureCollectorSettings:
     dataset_source_type: str = "live_real"
     authorization_basis: str = "authorized_tenant_access"
     dataset_use: str = "live_case_study"
+    resource_group_scope: str | None = None
 
 
 @dataclass(frozen=True, slots=True)
@@ -311,6 +312,7 @@ class AzureCollector:
                 "subscription_display_name": display_name,
                 "subscription_state": subscription_record.get("state", "Unknown"),
                 "tenant_id": tenant_id,
+                "resource_group_scope": self.settings.resource_group_scope,
                 "iam_collection_mode": iam_metadata["iam_collection_mode"],
                 "privileged_assignment_count": iam_metadata[
                     "privileged_assignment_count"
@@ -1445,6 +1447,13 @@ class AzureCollector:
             ],
             timeout=25,
         )
+        if isinstance(iot_hubs, list) and self.settings.resource_group_scope:
+            scope = self.settings.resource_group_scope.lower()
+            iot_hubs = [
+                hub
+                for hub in iot_hubs
+                if str(hub.get("resourceGroup", "")).lower() == scope
+            ]
         if not isinstance(iot_hubs, list) or not iot_hubs:
             return (
                 None,

@@ -210,6 +210,7 @@ def _build_collection_details(profile: CloudProfile) -> dict[str, object]:
         "subscription_display_name",
         "subscription_state",
         "tenant_id",
+        "resource_group_scope",
         "iam_collection_mode",
         "identity_observability",
         "network_collection_mode",

@@ -180,6 +180,7 @@ def test_iot_evidence_is_visible_in_report_metadata() -> None:
     profile.metadata.update(
         {
             "collection_mode": "azure_sdk_subscription_inventory",
+            "resource_group_scope": "cris-lab-iomt-test",
             "iot_collection_mode": "azure_iot_hub_cli_inventory",
             "iot_hub_count": 1,
             "iot_device_identity_count": 0,
@@ -203,6 +204,7 @@ def test_iot_evidence_is_visible_in_report_metadata() -> None:
     coverage = build_collector_coverage([profile])[0]
 
     assert collection_details["iot_collection_mode"] == "azure_iot_hub_cli_inventory"
+    assert collection_details["resource_group_scope"] == "cris-lab-iomt-test"
     assert collection_details["evidence_counts"]["iot_hub_count"] == 1
     assert collection_details["evidence_counts"]["iot_public_network_hub_count"] == 1
     assert "azure_iot_hub_cli_inventory" in coverage.observed_domains
