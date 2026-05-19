@@ -8,8 +8,9 @@ Recommended reading order:
 
 1. `collaboration-brief.md`
 2. `methodology.md`
-3. `evaluation-results.md`
-4. `main.md`
+3. `threat-model.md`
+4. `evaluation-results.md`
+5. `main.md`
 
 The package is based on live Azure IoT Hub evidence runs recorded in `docs/research/cris-iomt/live-run-register.md`.
 
