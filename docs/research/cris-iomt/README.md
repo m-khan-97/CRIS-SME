@@ -24,6 +24,12 @@ CRIS-IoMT extends CRIS-SME by converting healthcare IoT cloud evidence into trac
 4. `collaboration-brief.md`  
    Short professional brief for discussing the track with a senior collaborator in sensing, healthcare, and cyber-physical systems.
 
+5. `live-run-register.md`  
+   Traceable register of live Azure IoMT runs, region policy context, generated reports, evidence packs, and cleanup state.
+
+6. `../../../paper/iomt-healthcare/`  
+   Paper-facing package containing the draft manuscript skeleton, methodology, evaluation results, and collaboration brief.
+
 ## Non-Goals
 
 - CRIS-IoMT does not certify NHS DSPT, CAF, CE, medical-device safety, or clinical safety case compliance.
@@ -44,3 +50,11 @@ The first implementation milestone should add:
 - NHS DSPT and NCSC CAF mapping
 - controlled healthcare IoT Azure lab scenario
 
+## Current Live Evidence Status
+
+The first live Azure IoMT evaluation runs have been completed in `uaenorth`:
+
+- `20260519070105` weak IoMT baseline
+- `20260519105038` simulated clinic
+
+Both runs were assessed with resource-group scope and cleaned up by the lab cycle command. See `live-run-register.md` for artifact paths and headline results.
