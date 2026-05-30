@@ -17,6 +17,19 @@ The package is based on live Azure IoT Hub evidence runs recorded in `docs/resea
 
 Generated CRIS reports and IoMT evidence packs are stored under `outputs/` and are not committed by default because live resource identifiers may appear in those artifacts.
 
+The paper evaluation suite can be reproduced with:
+
+```bash
+CRIS_SME_IOMT_IOTHUB_SKU=B1 \
+python3 scripts/azure_evidence_lab.py paper-iomt-suite \
+  --location uaenorth \
+  --yes
+```
+
+The suite creates the weak baseline, simulated clinic, and hardened clinic scenarios, runs CRIS-IoMT against each resource group, generates IoMT evidence packs automatically, writes a suite-level summary, and deletes the lab resources unless `--keep` is supplied.
+
+For a stronger `IOT-006` private endpoint experiment, set `CRIS_SME_IOMT_ENABLE_PRIVATE_ENDPOINT=true` before running the suite. This path is optional because IoT Hub private endpoint support can depend on subscription, SKU, and regional availability.
+
 Paper-grade caveats to preserve:
 
 - NHS DSPT references are candidate 2025-26 CAF-aligned outcome mappings for expert review, not compliance assertions.

@@ -39,24 +39,35 @@ def build_iomt_evidence_pack(
     control_rows = []
     for control_id, control_mapping in mapped_controls.items():
         matching_risks = [item for item in risks if item.get("control_id") == control_id]
+        status = "risk_found" if matching_risks else "not_triggered"
+        evidence_class = str(control_mapping.get("evidence_class") or "unknown")
         control_rows.append(
             {
                 "control_id": control_id,
                 "title": control_mapping.get("title"),
-                "status": "risk_found" if matching_risks else "not_triggered",
+                "status": status,
                 "risk_count": len(matching_risks),
                 "highest_score": max(
                     [float(item.get("score", 0.0)) for item in matching_risks],
                     default=0.0,
                 ),
-                "evidence_class": control_mapping.get("evidence_class"),
+                "evidence_assurance_status": _evidence_assurance_status(
+                    status,
+                    evidence_class,
+                ),
+                "evidence_class": evidence_class,
                 "azure_evidence": control_mapping.get("azure_evidence", []),
                 "manual_or_external_evidence": control_mapping.get(
                     "manual_or_external_evidence",
                     [],
                 ),
                 "nhs_dspt_themes": control_mapping.get("nhs_dspt_themes", []),
+                "nhs_dspt_outcome_candidates": control_mapping.get(
+                    "nhs_dspt_outcome_candidates",
+                    [],
+                ),
                 "ncsc_caf_objectives": control_mapping.get("ncsc_caf_objectives", []),
+                "mapping_review": control_mapping.get("mapping_review", {}),
                 "findings": [
                     {
                         "finding_id": item.get("finding_id"),
@@ -95,8 +106,15 @@ def build_iomt_evidence_pack(
         "iomt_findings_total": len(risks),
         "iomt_controls_triggered": sorted(triggered_ids),
         "certification_boundary": mapping.get("certification_boundary"),
+        "expert_review_status": mapping.get("expert_review_status"),
+        "mapping_precision_note": mapping.get("mapping_precision_note"),
         "lab_context": _lab_context(lab_manifest),
         "iot_collection_metadata": iot_metadata,
+        "evidence_summary": _evidence_summary(control_rows),
+        "scenario_result_summary": _scenario_result_summary(
+            control_rows,
+            lab_manifest,
+        ),
         "control_evidence": control_rows,
         "manual_evidence_backlog": evidence_gap_rows,
         "research_positioning": {
@@ -110,6 +128,7 @@ def build_iomt_evidence_pack(
                 "Does not certify NCSC CAF compliance.",
                 "Does not certify medical-device safety or firmware security.",
                 "Does not inspect patient data or clinical telemetry payloads.",
+                "Does not treat unavailable Defender for IoT evidence as proof that compensating monitoring is absent.",
             ],
         },
     }
@@ -147,7 +166,39 @@ def build_iomt_evidence_pack_markdown(pack: dict[str, Any]) -> str:
         "",
         str(pack.get("certification_boundary") or ""),
         "",
+        "## Evidence Summary",
+        "",
     ]
+
+    summary = pack.get("evidence_summary", {})
+    if isinstance(summary, dict):
+        lines.extend(
+            [
+                f"- Triggered controls: `{summary.get('triggered_control_count', 0)}`",
+                f"- Non-triggered controls: `{summary.get('non_triggered_control_count', 0)}`",
+                f"- Manual or external evidence items: `{summary.get('manual_evidence_item_count', 0)}`",
+                "",
+                "| Evidence class | Count |",
+                "| --- | ---: |",
+            ]
+        )
+        for key, value in sorted((summary.get("by_evidence_class") or {}).items()):
+            lines.append(f"| `{key}` | `{value}` |")
+        lines.append("")
+
+    scenario_summary = pack.get("scenario_result_summary", {})
+    if isinstance(scenario_summary, dict) and scenario_summary:
+        lines.extend(
+            [
+                "## Scenario Result Summary",
+                "",
+                f"- Scenario role: `{scenario_summary.get('scenario_role', 'unknown')}`",
+                f"- Expected control changes: `{', '.join(scenario_summary.get('expected_control_changes', []) or [])}`",
+                f"- Triggered expected controls: `{', '.join(scenario_summary.get('triggered_expected_controls', []) or []) or 'none'}`",
+                f"- Non-triggered expected controls: `{', '.join(scenario_summary.get('non_triggered_expected_controls', []) or []) or 'none'}`",
+                "",
+            ]
+        )
 
     lab_context = pack.get("lab_context", {})
     if isinstance(lab_context, dict) and lab_context:
@@ -183,23 +234,72 @@ def build_iomt_evidence_pack_markdown(pack: dict[str, Any]) -> str:
             [
                 "## Control Evidence",
                 "",
-                "| Control | Status | Evidence class | Highest score | NHS/DSPT themes | NCSC CAF objectives |",
-                "| --- | --- | --- | ---: | --- | --- |",
+                "| Control | Status | Assurance status | Evidence class | Highest score | DSPT candidates | NCSC CAF objectives |",
+                "| --- | --- | --- | --- | ---: | --- | --- |",
             ]
         )
         for row in control_rows:
             if not isinstance(row, dict):
                 continue
+            dspt_candidates = [
+                str(item.get("outcome_id"))
+                for item in row.get("nhs_dspt_outcome_candidates", []) or []
+                if isinstance(item, dict) and item.get("outcome_id")
+            ]
             lines.append(
                 "| "
                 f"{row.get('control_id', '')} | "
                 f"{row.get('status', '')} | "
+                f"{row.get('evidence_assurance_status', '')} | "
                 f"{row.get('evidence_class', '')} | "
                 f"{float(row.get('highest_score') or 0.0):.2f} | "
-                f"{', '.join(row.get('nhs_dspt_themes', []) or [])} | "
+                f"{', '.join(dspt_candidates)} | "
                 f"{', '.join(row.get('ncsc_caf_objectives', []) or [])} |"
             )
         lines.append("")
+
+        lines.extend(["## Mapping Review Questions", ""])
+        for row in control_rows:
+            if not isinstance(row, dict):
+                continue
+            review = row.get("mapping_review", {})
+            if not isinstance(review, dict):
+                continue
+            lines.extend(
+                [
+                    f"### {row.get('control_id', '')}: {row.get('title', '')}",
+                    "",
+                    f"- Cloud-supported claim: {review.get('cloud_supported_claim', '')}",
+                    f"- Evidence limitation: {review.get('evidence_limitation', '')}",
+                    f"- Expert review question: {review.get('expert_review_question', '')}",
+                    "",
+                ]
+            )
+
+        lines.extend(["## Triggered Finding Detail", ""])
+        triggered_detail_added = False
+        for row in control_rows:
+            if not isinstance(row, dict) or not row.get("findings"):
+                continue
+            triggered_detail_added = True
+            lines.append(f"### {row.get('control_id', '')}: {row.get('title', '')}")
+            for finding in row.get("findings", []):
+                if not isinstance(finding, dict):
+                    continue
+                evidence = "; ".join(finding.get("evidence", []) or [])
+                lines.extend(
+                    [
+                        "",
+                        f"- Finding: `{finding.get('finding_id', 'unknown')}`",
+                        f"- Severity / priority: `{finding.get('severity', 'unknown')}` / `{finding.get('priority', 'unknown')}`",
+                        f"- Score: `{float(finding.get('score') or 0.0):.2f}`",
+                        f"- Evidence: {evidence}",
+                        f"- Remediation: {finding.get('remediation_summary', '')}",
+                    ]
+                )
+            lines.append("")
+        if not triggered_detail_added:
+            lines.extend(["No IoMT findings were triggered in this report.", ""])
 
     backlog = pack.get("manual_evidence_backlog", [])
     if isinstance(backlog, list) and backlog:
@@ -273,3 +373,71 @@ def _iot_metadata_from_organizations(organizations: Any) -> dict[str, Any]:
                 if str(key).startswith("iot_"):
                     merged[str(key)] = value
     return merged
+
+
+def _evidence_assurance_status(status: str, evidence_class: str) -> str:
+    if evidence_class in {"clinical_operational_required", "device_required"}:
+        return "manual_validation_required"
+    if evidence_class == "unavailable_cloud":
+        return "cloud_signal_unavailable"
+    if status == "risk_found" and evidence_class == "direct_cloud":
+        return "cloud_observed_risk"
+    if status == "risk_found" and evidence_class == "inferred_cloud":
+        return "cloud_inferred_risk"
+    if status == "not_triggered" and evidence_class == "direct_cloud":
+        return "no_cloud_risk_triggered"
+    if status == "not_triggered" and evidence_class == "inferred_cloud":
+        return "no_inferred_risk_triggered"
+    return "review_required"
+
+
+def _evidence_summary(control_rows: list[dict[str, Any]]) -> dict[str, Any]:
+    by_evidence_class: dict[str, int] = {}
+    by_assurance_status: dict[str, int] = {}
+    manual_evidence_item_count = 0
+    triggered = 0
+    for row in control_rows:
+        evidence_class = str(row.get("evidence_class") or "unknown")
+        assurance_status = str(row.get("evidence_assurance_status") or "unknown")
+        by_evidence_class[evidence_class] = by_evidence_class.get(evidence_class, 0) + 1
+        by_assurance_status[assurance_status] = (
+            by_assurance_status.get(assurance_status, 0) + 1
+        )
+        manual_evidence_item_count += len(row.get("manual_or_external_evidence", []) or [])
+        if row.get("status") == "risk_found":
+            triggered += 1
+    return {
+        "control_count": len(control_rows),
+        "triggered_control_count": triggered,
+        "non_triggered_control_count": len(control_rows) - triggered,
+        "manual_evidence_item_count": manual_evidence_item_count,
+        "by_evidence_class": by_evidence_class,
+        "by_assurance_status": by_assurance_status,
+    }
+
+
+def _scenario_result_summary(
+    control_rows: list[dict[str, Any]],
+    lab_manifest: dict[str, Any] | None,
+) -> dict[str, Any]:
+    if not isinstance(lab_manifest, dict):
+        return {}
+    scenario = lab_manifest.get("scenario", {})
+    if not isinstance(scenario, dict):
+        return {}
+    expected = [
+        str(item.get("control_id"))
+        for item in scenario.get("expected_findings", []) or []
+        if isinstance(item, dict) and item.get("control_id")
+    ]
+    triggered = {
+        str(row.get("control_id"))
+        for row in control_rows
+        if row.get("status") == "risk_found"
+    }
+    return {
+        "scenario_role": scenario.get("dataset_use"),
+        "expected_control_changes": expected,
+        "triggered_expected_controls": sorted(set(expected) & triggered),
+        "non_triggered_expected_controls": sorted(set(expected) - triggered),
+    }

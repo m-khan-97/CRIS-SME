@@ -40,6 +40,18 @@ def test_main_requires_yes_for_resource_changes(monkeypatch) -> None:
     assert "without --yes" in str(exc.value)
 
 
+def test_paper_iomt_suite_requires_confirmation(monkeypatch) -> None:
+    monkeypatch.setattr(
+        "sys.argv",
+        ["azure_evidence_lab.py", "paper-iomt-suite"],
+    )
+
+    with pytest.raises(SystemExit) as exc:
+        lab.main()
+
+    assert "without --yes" in str(exc.value)
+
+
 def test_deploy_public_exposure_builds_expected_az_commands(monkeypatch, tmp_path) -> None:
     commands: list[list[str]] = []
     monkeypatch.setattr(lab, "DEFAULT_OUTPUT_ROOT", tmp_path)
@@ -131,6 +143,51 @@ def test_assess_sets_dataset_metadata(monkeypatch, tmp_path) -> None:
     assert call["env"]["CRIS_SME_AZURE_ORGANIZATION_NAME"] == "Data Protection Stress Lab"
 
 
+def test_paper_iomt_suite_runs_three_research_scenarios(monkeypatch, tmp_path) -> None:
+    events: list[tuple[str, str]] = []
+
+    def fake_deploy(context):
+        events.append(("deploy", context.scenario["id"]))
+
+    def fake_assess(context, output_root):
+        events.append(("assess", context.scenario["id"]))
+
+    def fake_cleanup(context):
+        events.append(("cleanup", context.scenario["id"]))
+
+    monkeypatch.setattr(lab, "deploy", fake_deploy)
+    monkeypatch.setattr(lab, "assess", fake_assess)
+    monkeypatch.setattr(lab, "cleanup", fake_cleanup)
+    monkeypatch.setattr(lab, "summarize_iomt_suite_output", lambda context, output_root: {
+        "scenario_id": context.scenario["id"],
+        "iomt_findings_total": 0,
+        "iomt_category_score": 0.0,
+        "iomt_controls_triggered": [],
+    })
+
+    lab.run_paper_iomt_suite(
+        catalog=lab.load_catalog(),
+        run_id="suite-001",
+        location="uaenorth",
+        output_root=tmp_path,
+        dry_run=False,
+        keep=False,
+    )
+
+    assert events == [
+        ("deploy", "iomt-weak-baseline"),
+        ("assess", "iomt-weak-baseline"),
+        ("cleanup", "iomt-weak-baseline"),
+        ("deploy", "iomt-simulated-clinic"),
+        ("assess", "iomt-simulated-clinic"),
+        ("cleanup", "iomt-simulated-clinic"),
+        ("deploy", "iomt-hardened-clinic"),
+        ("assess", "iomt-hardened-clinic"),
+        ("cleanup", "iomt-hardened-clinic"),
+    ]
+    assert (tmp_path / "suite-001" / "cris_iomt_paper_suite_summary.json").exists()
+
+
 def test_deploy_media_office_demo_builds_web_only_lab(monkeypatch, tmp_path) -> None:
     commands: list[list[str]] = []
     monkeypatch.setattr(lab, "DEFAULT_OUTPUT_ROOT", tmp_path)
@@ -199,6 +256,7 @@ def test_deploy_media_office_delegated_builds_segmented_architecture(monkeypatch
 def test_deploy_iomt_hardened_clinic_builds_stronger_iomt_signals(monkeypatch, tmp_path) -> None:
     commands: list[list[str]] = []
     monkeypatch.setattr(lab, "DEFAULT_OUTPUT_ROOT", tmp_path)
+    monkeypatch.setenv("CRIS_SME_IOMT_ENABLE_PRIVATE_ENDPOINT", "true")
 
     def fake_run(command, cwd=None, env=None, check=False, stdout=None, stderr=None, text=None):
         commands.append(command)
@@ -223,6 +281,8 @@ def test_deploy_iomt_hardened_clinic_builds_stronger_iomt_signals(monkeypatch, t
     assert any("storage container create" in command and "iomt-telemetry" in command for command in joined)
     assert any("iot hub routing-endpoint create" in command for command in joined)
     assert any("iot hub route create" in command for command in joined)
+    assert any("network private-endpoint create" in command for command in joined)
+    assert any("network private-dns zone create" in command for command in joined)
     assert any(
         "iot hub update" in command
         and "properties.publicNetworkAccess=Disabled" in command

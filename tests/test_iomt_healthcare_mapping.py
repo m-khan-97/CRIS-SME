@@ -37,6 +37,9 @@ def test_iomt_mapping_has_research_grade_control_set() -> None:
         assert control["nhs_dspt_themes"]
         assert control["nhs_dspt_outcome_candidates"]
         assert control["ncsc_caf_objectives"]
+        assert control["mapping_review"]["cloud_supported_claim"]
+        assert control["mapping_review"]["evidence_limitation"]
+        assert control["mapping_review"]["expert_review_question"]
 
 
 def test_iomt_mapping_uses_candidate_dspt_outcomes_not_certification_claims() -> None:
@@ -45,6 +48,9 @@ def test_iomt_mapping_uses_candidate_dspt_outcomes_not_certification_claims() ->
 
     assert mapping["certification_boundary"]
     assert "not NHS DSPT certification" in mapping["certification_boundary"]
+    assert mapping["expert_review_status"] == (
+        "candidate_mapping_pending_healthcare_domain_review"
+    )
     assert {
         candidate["outcome_id"]
         for candidate in controls_by_id["IOT-001"]["nhs_dspt_outcome_candidates"]

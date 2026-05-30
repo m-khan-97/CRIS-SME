@@ -3,6 +3,8 @@
   "name": "CRIS-IoMT healthcare cloud-control mapping",
   "scope": "Azure-first cloud-connected healthcare IoT and Internet of Medical Things assurance research mapping.",
   "certification_boundary": "This mapping supports evidence-informed readiness and research evaluation only. It is not NHS DSPT certification, NCSC CAF certification, medical-device certification, or clinical safety approval.",
+  "expert_review_status": "candidate_mapping_pending_healthcare_domain_review",
+  "mapping_precision_note": "Each control records the cloud evidence used, the assurance claim it can support, the evidence limitation that remains, and the exact expert-review question to preserve the boundary between cloud governance evidence and healthcare assurance.",
   "controls": [
     {
       "control_id": "IOT-001",
@@ -41,7 +43,12 @@
       "ncsc_caf_objectives": [
         "B2 identity and access control",
         "B4 data security"
-      ]
+      ],
+      "mapping_review": {
+        "cloud_supported_claim": "Azure IoT Hub device identity inventory and authentication metadata can support a cloud-side device identity governance claim.",
+        "evidence_limitation": "It does not validate device-side credential storage, firmware trust anchors, biomedical asset ownership, or whether a registered identity maps to an authorised clinical device.",
+        "expert_review_question": "Is device identity inventory a meaningful healthcare IoT assurance signal when explicitly bounded to cloud registration and authentication metadata?"
+      }
     },
     {
       "control_id": "IOT-002",
@@ -78,7 +85,12 @@
       ],
       "ncsc_caf_objectives": [
         "B2 identity and access control"
-      ]
+      ],
+      "mapping_review": {
+        "cloud_supported_claim": "IoT Hub shared access policy names, counts, and rights can support a least-privilege cloud access governance claim.",
+        "evidence_limitation": "It does not prove how applications use keys, whether secrets are rotated in practice, or whether emergency access procedures are clinically approved.",
+        "expert_review_question": "Are overbroad shared access policies a valid healthcare IoT governance risk when framed as non-human/application authority over ingestion and device-management paths?"
+      }
     },
     {
       "control_id": "IOT-003",
@@ -109,7 +121,12 @@
       ],
       "ncsc_caf_objectives": [
         "C1 security monitoring"
-      ]
+      ],
+      "mapping_review": {
+        "cloud_supported_claim": "Diagnostic settings and destinations can support a cloud-side logging coverage claim for IoT Hub telemetry and operations.",
+        "evidence_limitation": "It does not prove that logs are reviewed by a SOC, retained under an approved clinical investigation policy, or correlated with device-side telemetry.",
+        "expert_review_question": "Is diagnostic setting coverage sufficient evidence for a cloud governance monitoring control, subject to separate operational review?"
+      }
     },
     {
       "control_id": "IOT-004",
@@ -146,7 +163,12 @@
       "ncsc_caf_objectives": [
         "C1 security monitoring",
         "C2 proactive security event discovery"
-      ]
+      ],
+      "mapping_review": {
+        "cloud_supported_claim": "Observable Defender for IoT, Defender for Cloud, or equivalent alert integration can support a cloud-side security monitoring evidence claim.",
+        "evidence_limitation": "When licensing, permissions, or service availability prevent observation, the finding is an evidence gap rather than proof that compensating monitoring is absent.",
+        "expert_review_question": "Is it defensible to report unavailable Defender/equivalent monitoring evidence as an observability gap rather than a definitive monitoring failure?"
+      }
     },
     {
       "control_id": "IOT-005",
@@ -184,7 +206,12 @@
       "ncsc_caf_objectives": [
         "B4 data security",
         "B5 resilient networks and systems"
-      ]
+      ],
+      "mapping_review": {
+        "cloud_supported_claim": "IoT Hub public network access, firewall rules, allowed IP ranges, and private endpoint state can support a cloud boundary exposure claim.",
+        "evidence_limitation": "It does not prove whether public connectivity is clinically justified, protected by external controls, or required for remote-care workflows.",
+        "expert_review_question": "Is public IoT ingestion exposure a valid healthcare IoT risk signal when intentional-public and remote-care exceptions are handled by manual review?"
+      }
     },
     {
       "control_id": "IOT-006",
@@ -220,7 +247,12 @@
       ],
       "ncsc_caf_objectives": [
         "B5 resilient networks and systems"
-      ]
+      ],
+      "mapping_review": {
+        "cloud_supported_claim": "Private endpoint inventory and network isolation settings can support a sensitive telemetry path isolation claim.",
+        "evidence_limitation": "It does not prove end-to-end clinical network segmentation, gateway hardening, or whether public managed ingestion is an accepted design exception.",
+        "expert_review_question": "For cloud-connected healthcare IoT, when should private endpoint absence be treated as a risk versus an accepted architecture decision?"
+      }
     },
     {
       "control_id": "IOT-007",
@@ -260,7 +292,12 @@
       "ncsc_caf_objectives": [
         "B4 data security",
         "D1 response and recovery planning"
-      ]
+      ],
+      "mapping_review": {
+        "cloud_supported_claim": "IoT Hub message routes and governed storage destinations can support a telemetry routing and retention governance claim.",
+        "evidence_limitation": "It does not prove lawful basis, clinical record status, retention-period adequacy, privacy impact assessment approval, or patient-data minimisation.",
+        "expert_review_question": "Is telemetry routing to governed storage a useful assurance signal if privacy and clinical-record interpretation are kept outside cloud automation?"
+      }
     },
     {
       "control_id": "IOT-008",
@@ -298,7 +335,12 @@
       "ncsc_caf_objectives": [
         "B2 identity and access control",
         "B3 secure configuration"
-      ]
+      ],
+      "mapping_review": {
+        "cloud_supported_claim": "Key Vault and secret-management posture can support a cloud-side credential governance claim for IoT integrations.",
+        "evidence_limitation": "It does not prove which applications consume each secret, whether rotation is operationally followed, or whether third-party supplier secrets are managed outside Azure.",
+        "expert_review_question": "Is Key Vault/managed-secret posture a credible proxy for IoT integration credential governance when application usage remains manually validated?"
+      }
     },
     {
       "control_id": "IOT-009",
@@ -336,7 +378,12 @@
       "ncsc_caf_objectives": [
         "C1 security monitoring",
         "D2 lessons learned"
-      ]
+      ],
+      "mapping_review": {
+        "cloud_supported_claim": "Azure Monitor alert rules and action groups can support an operational alerting coverage claim for IoT Hub telemetry conditions.",
+        "evidence_limitation": "It does not prove clinical escalation ownership, incident response quality, alert fatigue, or whether alerts are acted on by accountable responders.",
+        "expert_review_question": "Is a deployed IoT-specific Azure Monitor alert a sufficient cloud-side signal for incident detection readiness, subject to clinical response validation?"
+      }
     },
     {
       "control_id": "IOT-010",
@@ -376,7 +423,12 @@
       "ncsc_caf_objectives": [
         "A1 governance",
         "A2 risk management"
-      ]
+      ],
+      "mapping_review": {
+        "cloud_supported_claim": "Evidence class counts, unavailable signal counts, and report caveats can support an explicit assurance-boundary claim.",
+        "evidence_limitation": "It does not replace clinical safety cases, medical-device safety review, biomedical engineering validation, or operational acceptance.",
+        "expert_review_question": "Does the explicit boundary control make the paper more defensible by preventing cloud evidence from being misread as clinical or medical-device assurance?"
+      }
     }
   ]
 }

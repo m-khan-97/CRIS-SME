@@ -61,10 +61,16 @@ def test_iomt_evidence_pack_extracts_findings_and_metadata() -> None:
     assert pack["iomt_findings_total"] == 1
     assert pack["iomt_category_score"] == 26.64
     assert pack["iomt_controls_triggered"] == ["IOT-005"]
+    assert pack["evidence_summary"]["triggered_control_count"] == 1
+    assert pack["evidence_summary"]["by_evidence_class"]["direct_cloud"] >= 1
+    assert pack["scenario_result_summary"]["scenario_role"] == "research_validation"
     assert pack["iot_collection_metadata"]["iot_collection_mode"] == (
         "azure_iot_hub_cli_inventory"
     )
     assert pack["iot_collection_metadata"]["iot_hub_count"] == 1
     assert pack["lab_context"]["scenario_id"] == "iomt-clean-baseline"
     assert "Certification Boundary" in markdown
+    assert "Evidence Summary" in markdown
+    assert "Mapping Review Questions" in markdown
+    assert "Triggered Finding Detail" in markdown
     assert "IOT-005" in markdown

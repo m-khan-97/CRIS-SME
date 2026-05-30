@@ -18,6 +18,11 @@ from typing import Any
 REPO_ROOT = Path(__file__).resolve().parent.parent
 SCENARIO_FILE = REPO_ROOT / "labs" / "azure-evidence-lab" / "scenarios.json"
 DEFAULT_OUTPUT_ROOT = REPO_ROOT / "outputs" / "evidence-lab"
+PAPER_IOMT_SCENARIOS = (
+    "iomt-weak-baseline",
+    "iomt-simulated-clinic",
+    "iomt-hardened-clinic",
+)
 
 
 @dataclass(frozen=True)
@@ -37,8 +42,11 @@ def main() -> int:
     )
     parser.add_argument(
         "action",
-        choices=("list", "deploy", "assess", "cleanup", "cycle"),
-        help="Action to perform. cycle = deploy, assess, then cleanup.",
+        choices=("list", "deploy", "assess", "cleanup", "cycle", "paper-iomt-suite"),
+        help=(
+            "Action to perform. cycle = deploy, assess, then cleanup. "
+            "paper-iomt-suite runs the three paper IoMT scenarios."
+        ),
     )
     parser.add_argument(
         "--scenario",
@@ -86,14 +94,29 @@ def main() -> int:
     if args.action == "list":
         print(json.dumps(summarize_catalog(catalog), indent=2))
         return 0
-    if args.action in {"deploy", "cleanup", "cycle"} and not args.dry_run and not args.yes:
+    if (
+        args.action in {"deploy", "cleanup", "cycle", "paper-iomt-suite"}
+        and not args.dry_run
+        and not args.yes
+    ):
         raise SystemExit(
             "Refusing to create or delete Azure resources without --yes. "
             "Use --dry-run to preview commands."
         )
 
-    scenario = find_scenario(catalog, args.scenario)
     run_id = normalize_run_id(args.run_id or datetime.now(UTC).strftime("%Y%m%d%H%M%S"))
+    if args.action == "paper-iomt-suite":
+        run_paper_iomt_suite(
+            catalog=catalog,
+            run_id=run_id,
+            location=args.location,
+            output_root=Path(args.output_root),
+            dry_run=args.dry_run,
+            keep=args.keep,
+        )
+        return 0
+
+    scenario = find_scenario(catalog, args.scenario)
     resource_group = args.resource_group or f"cris-lab-{scenario['id']}-{run_id}"
     context = build_context(
         scenario=scenario,
@@ -260,6 +283,7 @@ def assess(context: LabContext, output_root: Path) -> None:
     run_command(command, context, env=env, cwd=REPO_ROOT)
     if not context.dry_run:
         copy_manifest_to_output(context, output_dir)
+        build_iomt_evidence_pack_for_output(context, output_dir, env)
 
 
 def cleanup(context: LabContext) -> None:
@@ -286,6 +310,45 @@ def cleanup(context: LabContext) -> None:
         context,
     )
     write_manifest(context, status="cleanup_requested")
+
+
+def run_paper_iomt_suite(
+    *,
+    catalog: dict[str, Any],
+    run_id: str,
+    location: str,
+    output_root: Path,
+    dry_run: bool,
+    keep: bool,
+) -> None:
+    """Run the three controlled IoMT paper scenarios as one reproducible suite."""
+    suite_rows: list[dict[str, Any]] = []
+    for scenario_id in PAPER_IOMT_SCENARIOS:
+        scenario = find_scenario(catalog, scenario_id)
+        context = build_context(
+            scenario=scenario,
+            run_id=run_id,
+            location=location,
+            resource_group=f"cris-lab-{scenario_id}-{run_id}",
+            dry_run=dry_run,
+        )
+        deploy(context)
+        try:
+            assess(context, output_root)
+            if not dry_run:
+                suite_rows.append(summarize_iomt_suite_output(context, output_root))
+        finally:
+            if not keep:
+                cleanup(context)
+
+    if not dry_run:
+        write_iomt_suite_summary(
+            run_id=run_id,
+            location=location,
+            output_root=output_root,
+            rows=suite_rows,
+            keep=keep,
+        )
 
 
 def create_clean_baseline(context: LabContext) -> None:
@@ -511,7 +574,8 @@ def create_iomt_simulated_clinic(context: LabContext) -> None:
 
 def create_iomt_hardened_clinic(context: LabContext) -> None:
     workspace_name = create_log_analytics_workspace(context, "iomt-hard-law")
-    create_vnet_with_subnets(context, f"iomt-hard-vnet-{context.run_id}"[:64])
+    vnet_name = f"iomt-hard-vnet-{context.run_id}"[:64]
+    create_vnet_with_subnets(context, vnet_name)
     hub_name = create_iot_hub(context, "iomthardened", public_network_access="Enabled")
     for device_id in (
         "ward-monitor-001",
@@ -536,6 +600,17 @@ def create_iomt_hardened_clinic(context: LabContext) -> None:
         endpoint_name="hardenedTelemetryStorage",
         route_name="hardenedTelemetryRoute",
     )
+    if os.getenv("CRIS_SME_IOMT_ENABLE_PRIVATE_ENDPOINT", "").lower() in {
+        "1",
+        "true",
+        "yes",
+    }:
+        create_iot_private_endpoint(
+            context,
+            hub_name=hub_name,
+            vnet_name=vnet_name,
+            subnet_name="data",
+        )
     update_iot_hub_public_network_access(context, hub_name, "Disabled")
     vault_name = unique_name("crisiomthkv", context.suffix, max_len=24)
     run_az(
@@ -977,6 +1052,239 @@ def configure_iot_storage_route(
         ],
         context,
     )
+
+
+def create_iot_private_endpoint(
+    context: LabContext,
+    *,
+    hub_name: str,
+    vnet_name: str,
+    subnet_name: str,
+) -> None:
+    """Create optional IoT Hub private endpoint evidence for stronger labs."""
+    if context.dry_run:
+        print("Dry run: IoT private endpoint uses the hub resource ID resolved after deployment.")
+        return
+    hub_id = capture_az_text(
+        [
+            "iot",
+            "hub",
+            "show",
+            "--name",
+            hub_name,
+            "--resource-group",
+            context.resource_group,
+            "--query",
+            "id",
+            "--output",
+            "tsv",
+        ],
+        context,
+    )
+    endpoint_name = unique_name("iomt-pe", context.suffix, max_len=64)
+    connection_name = unique_name("iomt-pec", context.suffix, max_len=80)
+    dns_zone_name = "privatelink.azure-devices.net"
+    dns_link_name = unique_name("iomt-dnslink", context.suffix, max_len=80)
+    run_az(
+        [
+            "network",
+            "private-dns",
+            "zone",
+            "create",
+            "--resource-group",
+            context.resource_group,
+            "--name",
+            dns_zone_name,
+            *tag_args(context.tags),
+        ],
+        context,
+    )
+    run_az(
+        [
+            "network",
+            "private-dns",
+            "link",
+            "vnet",
+            "create",
+            "--resource-group",
+            context.resource_group,
+            "--zone-name",
+            dns_zone_name,
+            "--name",
+            dns_link_name,
+            "--virtual-network",
+            vnet_name,
+            "--registration-enabled",
+            "false",
+            *tag_args(context.tags),
+        ],
+        context,
+    )
+    run_az(
+        [
+            "network",
+            "private-endpoint",
+            "create",
+            "--name",
+            endpoint_name,
+            "--resource-group",
+            context.resource_group,
+            "--location",
+            context.location,
+            "--vnet-name",
+            vnet_name,
+            "--subnet",
+            subnet_name,
+            "--private-connection-resource-id",
+            hub_id,
+            "--group-id",
+            "iotHub",
+            "--connection-name",
+            connection_name,
+            *tag_args(context.tags),
+        ],
+        context,
+    )
+    run_az(
+        [
+            "network",
+            "private-endpoint",
+            "dns-zone-group",
+            "create",
+            "--resource-group",
+            context.resource_group,
+            "--endpoint-name",
+            endpoint_name,
+            "--name",
+            "default",
+            "--private-dns-zone",
+            dns_zone_name,
+            "--zone-name",
+            "iotHub",
+        ],
+        context,
+    )
+
+
+def build_iomt_evidence_pack_for_output(
+    context: LabContext,
+    output_dir: Path,
+    env: dict[str, str],
+) -> None:
+    report_path = output_dir / "cris_sme_report.json"
+    manifest = output_dir / "lab_manifest.json"
+    if not report_path.exists():
+        return
+    run_command(
+        [
+            sys.executable,
+            str(REPO_ROOT / "scripts" / "build_iomt_evidence_pack.py"),
+            "--report",
+            str(report_path),
+            "--manifest",
+            str(manifest),
+            "--output-dir",
+            str(output_dir),
+        ],
+        context,
+        env=env,
+        cwd=REPO_ROOT,
+    )
+
+
+def summarize_iomt_suite_output(
+    context: LabContext,
+    output_root: Path,
+) -> dict[str, Any]:
+    output_dir = output_root / context.run_id / str(context.scenario["id"]) / "reports"
+    report_path = output_dir / "cris_sme_report.json"
+    pack_path = output_dir / "cris_iomt_evidence_pack.json"
+    report = load_json_if_exists(report_path)
+    pack = load_json_if_exists(pack_path)
+    return {
+        "scenario_id": context.scenario["id"],
+        "scenario_title": context.scenario.get("title"),
+        "resource_group": context.resource_group,
+        "report": str(report_path),
+        "iomt_evidence_pack": str(pack_path),
+        "overall_risk_score": report.get("overall_risk_score"),
+        "iomt_category_score": (
+            report.get("category_scores", {}).get("Healthcare IoT")
+            if isinstance(report.get("category_scores"), dict)
+            else None
+        ),
+        "iomt_findings_total": pack.get("iomt_findings_total"),
+        "iomt_controls_triggered": pack.get("iomt_controls_triggered", []),
+        "evidence_summary": pack.get("evidence_summary", {}),
+        "scenario_result_summary": pack.get("scenario_result_summary", {}),
+    }
+
+
+def write_iomt_suite_summary(
+    *,
+    run_id: str,
+    location: str,
+    output_root: Path,
+    rows: list[dict[str, Any]],
+    keep: bool,
+) -> None:
+    suite_dir = output_root / run_id
+    suite_dir.mkdir(parents=True, exist_ok=True)
+    payload = {
+        "suite_schema_version": "1.0.0",
+        "suite_name": "CRIS-IoMT controlled paper evaluation suite",
+        "generated_at": datetime.now(UTC).isoformat().replace("+00:00", "Z"),
+        "run_id": run_id,
+        "location": location,
+        "resources_retained": keep,
+        "scenarios": rows,
+    }
+    json_path = suite_dir / "cris_iomt_paper_suite_summary.json"
+    markdown_path = suite_dir / "cris_iomt_paper_suite_summary.md"
+    json_path.write_text(json.dumps(payload, indent=2), encoding="utf-8")
+    markdown_path.write_text(build_iomt_suite_markdown(payload), encoding="utf-8")
+    print(f"Wrote IoMT paper suite summary: {json_path}")
+    print(f"Wrote IoMT paper suite summary: {markdown_path}")
+
+
+def build_iomt_suite_markdown(payload: dict[str, Any]) -> str:
+    lines = [
+        "# CRIS-IoMT Paper Evaluation Suite Summary",
+        "",
+        f"- Run ID: `{payload.get('run_id', 'unknown')}`",
+        f"- Location: `{payload.get('location', 'unknown')}`",
+        f"- Resources retained: `{payload.get('resources_retained', False)}`",
+        "",
+        "| Scenario | IoMT findings | Healthcare IoT score | Triggered controls |",
+        "| --- | ---: | ---: | --- |",
+    ]
+    for row in payload.get("scenarios", []) or []:
+        if not isinstance(row, dict):
+            continue
+        lines.append(
+            "| "
+            f"{row.get('scenario_id', '')} | "
+            f"{int(row.get('iomt_findings_total') or 0)} | "
+            f"{float(row.get('iomt_category_score') or 0.0):.2f} | "
+            f"{', '.join(row.get('iomt_controls_triggered', []) or [])} |"
+        )
+    lines.extend(
+        [
+            "",
+            "## Controlled Signal Interpretation",
+            "",
+            "The suite is designed to show whether CRIS-IoMT responds to controlled cloud-side changes across weak, simulated-clinic, and hardened-clinic scenarios. The strongest expected signals are public exposure (`IOT-005`), telemetry routing (`IOT-007`), and alerting (`IOT-009`).",
+            "",
+        ]
+    )
+    return "\n".join(lines)
+
+
+def load_json_if_exists(path: Path) -> dict[str, Any]:
+    if not path.exists():
+        return {}
+    payload = json.loads(path.read_text(encoding="utf-8"))
+    return payload if isinstance(payload, dict) else {}
 
 
 def create_vnet_with_subnets(context: LabContext, vnet_name: str) -> None:

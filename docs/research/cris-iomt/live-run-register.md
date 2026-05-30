@@ -32,6 +32,33 @@ This register records live Azure IoMT evidence runs used for the CRIS-IoMT resea
 
 ## Reproduction Commands
 
+One-command paper suite:
+
+```bash
+CRIS_SME_IOMT_IOTHUB_SKU=B1 \
+python3 scripts/azure_evidence_lab.py paper-iomt-suite \
+  --location uaenorth \
+  --yes
+```
+
+This deploys, assesses, and deletes the weak baseline, simulated clinic, and hardened clinic scenarios under one shared run ID. It writes:
+
+- per-scenario CRIS reports under `outputs/evidence-lab/<run-id>/<scenario>/reports/`
+- per-scenario `cris_iomt_evidence_pack.json` and `.md`
+- suite-level `cris_iomt_paper_suite_summary.json` and `.md`
+
+If the subscription/SKU supports IoT Hub private endpoint deployment, enable the optional private-link evidence path for the hardened clinic with:
+
+```bash
+CRIS_SME_IOMT_IOTHUB_SKU=B1 \
+CRIS_SME_IOMT_ENABLE_PRIVATE_ENDPOINT=true \
+python3 scripts/azure_evidence_lab.py paper-iomt-suite \
+  --location uaenorth \
+  --yes
+```
+
+Individual scenario reproduction remains available:
+
 ```bash
 CRIS_SME_IOMT_IOTHUB_SKU=B1 \
 python3 scripts/azure_evidence_lab.py cycle \
@@ -61,3 +88,5 @@ PYTHONPATH=src python3 scripts/build_iomt_evidence_pack.py \
   --report outputs/evidence-lab/<run-id>/<scenario>/reports/cris_sme_report.json \
   --manifest outputs/evidence-lab/<run-id>/<scenario>/lab_manifest.json
 ```
+
+The manual evidence-pack command is now optional for new lab runs because `azure_evidence_lab.py assess`, `cycle`, and `paper-iomt-suite` build the IoMT evidence pack automatically after the CRIS report is generated.

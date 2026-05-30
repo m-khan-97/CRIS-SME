@@ -79,6 +79,23 @@ The `IOT-*` confidence entries are provisional, not fully empirical. They use th
 
 `IOT-004` is a special case. Defender for IoT was not observable in the Azure for Students evaluation environment. A triggered `IOT-004` finding therefore records that cloud security-monitoring evidence was unavailable or absent in the observed scope; it must not be interpreted as proof that no compensating SIEM, SOC, or clinical operations monitoring exists.
 
+## Reproducibility Harness
+
+The controlled evaluation can be run through a single command:
+
+```bash
+CRIS_SME_IOMT_IOTHUB_SKU=B1 \
+python3 scripts/azure_evidence_lab.py paper-iomt-suite \
+  --location uaenorth \
+  --yes
+```
+
+The suite deploys the weak baseline, simulated clinic, and hardened clinic scenarios using the same run ID, assesses each resource group with the Azure collector, generates CRIS reports, builds per-scenario IoMT evidence packs, writes `cris_iomt_paper_suite_summary.json` and `.md`, and deletes the lab resources by default. Passing `--keep` retains resources for demonstration or manual inspection.
+
+Each IoMT evidence pack includes control-by-control evidence, evidence assurance status, candidate DSPT outcomes, NCSC CAF objectives, manual evidence backlog, mapping review questions, and triggered finding detail. This is intended to make the evaluation reproducible and reviewable without claiming certification.
+
+The hardened clinic can optionally deploy IoT Hub private endpoint evidence by setting `CRIS_SME_IOMT_ENABLE_PRIVATE_ENDPOINT=true`. This option is kept explicit because private-link support may vary by subscription, SKU, and region; without it, `IOT-006` remains a documented network-isolation gap rather than a failed deployment.
+
 ## Non-Claims
 
 CRIS-IoMT does not claim to:
