@@ -1,0 +1,57 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="840" height="420" viewBox="0 0 840 420" role="img" aria-labelledby="t d">
+  <title id="t">Scenario Score Comparison</title>
+  <desc id="d">Bar chart comparing CRIS overall risk score and Healthcare IoT category score across four controlled scenarios. The hardened clinic shows the lowest IoMT finding count after public exposure, telemetry routing, and alerting controls pass.</desc>
+  <rect width="840" height="420" fill="#ffffff"/>
+
+<text x="40.0" y="44.0" font-family="Inter, Arial, sans-serif" font-size="20" font-weight="700" fill="#172033" text-anchor="start">Scenario Score Comparison</text>
+<text x="40.0" y="64.0" font-family="Inter, Arial, sans-serif" font-size="13" font-weight="400" fill="#617083" text-anchor="start">Overall CRIS risk score and Healthcare IoT category score across controlled scenarios</text>
+<line x1="70.0" y1="320.0" x2="800.0" y2="320.0" stroke="#d8e2ec" stroke-width="0.8"/>
+<text x="62.0" y="324.0" font-family="Inter, Arial, sans-serif" font-size="11" font-weight="400" fill="#617083" text-anchor="end">0</text>
+<line x1="70.0" y1="265.0" x2="800.0" y2="265.0" stroke="#d8e2ec" stroke-width="0.8"/>
+<text x="62.0" y="269.0" font-family="Inter, Arial, sans-serif" font-size="11" font-weight="400" fill="#617083" text-anchor="end">10</text>
+<line x1="70.0" y1="210.0" x2="800.0" y2="210.0" stroke="#d8e2ec" stroke-width="0.8"/>
+<text x="62.0" y="214.0" font-family="Inter, Arial, sans-serif" font-size="11" font-weight="400" fill="#617083" text-anchor="end">20</text>
+<line x1="70.0" y1="155.0" x2="800.0" y2="155.0" stroke="#d8e2ec" stroke-width="0.8"/>
+<text x="62.0" y="159.0" font-family="Inter, Arial, sans-serif" font-size="11" font-weight="400" fill="#617083" text-anchor="end">30</text>
+<line x1="70.0" y1="100.0" x2="800.0" y2="100.0" stroke="#d8e2ec" stroke-width="0.8"/>
+<text x="62.0" y="104.0" font-family="Inter, Arial, sans-serif" font-size="11" font-weight="400" fill="#617083" text-anchor="end">40</text>
+<line x1="70.0" y1="100.0" x2="70.0" y2="320.0" stroke="#d8e2ec" stroke-width="1.0"/>
+<line x1="70.0" y1="320.0" x2="800.0" y2="320.0" stroke="#d8e2ec" stroke-width="1.5"/>
+<rect x="128.2" y="170.4" width="28.0" height="149.6" rx="4" fill="#1d4ed8" stroke="none"/>
+<text x="142.2" y="164.4" font-family="Inter, Arial, sans-serif" font-size="12" font-weight="700" fill="#1d4ed8" text-anchor="middle">27.20</text>
+<rect x="166.2" y="173.5" width="28.0" height="146.5" rx="4" fill="#0d9488" stroke="none"/>
+<text x="180.2" y="167.5" font-family="Inter, Arial, sans-serif" font-size="12" font-weight="700" fill="#0d9488" text-anchor="middle">26.64</text>
+<rect x="141.2" y="334.0" width="40.0" height="20.0" rx="4" fill="#f1f5f9" stroke="#d8e2ec"/>
+<text x="161.2" y="348.0" font-family="Inter, Arial, sans-serif" font-size="11" font-weight="600" fill="#475569" text-anchor="middle">IOT: 10</text>
+<text x="161.2" y="372.0" font-family="Inter, Arial, sans-serif" font-size="12" font-weight="600" fill="#172033" text-anchor="middle">Clean</text>
+<text x="161.2" y="387.0" font-family="Inter, Arial, sans-serif" font-size="12" font-weight="600" fill="#172033" text-anchor="middle">standing demo</text>
+<rect x="310.8" y="138.2" width="28.0" height="181.8" rx="4" fill="#1d4ed8" stroke="none"/>
+<text x="324.8" y="132.2" font-family="Inter, Arial, sans-serif" font-size="12" font-weight="700" fill="#1d4ed8" text-anchor="middle">33.06</text>
+<rect x="348.8" y="173.5" width="28.0" height="146.5" rx="4" fill="#0d9488" stroke="none"/>
+<text x="362.8" y="167.5" font-family="Inter, Arial, sans-serif" font-size="12" font-weight="700" fill="#0d9488" text-anchor="middle">26.64</text>
+<rect x="323.8" y="334.0" width="40.0" height="20.0" rx="4" fill="#f1f5f9" stroke="#d8e2ec"/>
+<text x="343.8" y="348.0" font-family="Inter, Arial, sans-serif" font-size="11" font-weight="600" fill="#475569" text-anchor="middle">IOT: 10</text>
+<text x="343.8" y="372.0" font-family="Inter, Arial, sans-serif" font-size="12" font-weight="600" fill="#172033" text-anchor="middle">Weak IoMT</text>
+<text x="343.8" y="387.0" font-family="Inter, Arial, sans-serif" font-size="12" font-weight="600" fill="#172033" text-anchor="middle">baseline</text>
+<rect x="493.2" y="143.1" width="28.0" height="176.9" rx="4" fill="#1d4ed8" stroke="none"/>
+<text x="507.2" y="137.1" font-family="Inter, Arial, sans-serif" font-size="12" font-weight="700" fill="#1d4ed8" text-anchor="middle">32.16</text>
+<rect x="531.2" y="169.7" width="28.0" height="150.3" rx="4" fill="#0d9488" stroke="none"/>
+<text x="545.2" y="163.7" font-family="Inter, Arial, sans-serif" font-size="12" font-weight="700" fill="#0d9488" text-anchor="middle">27.32</text>
+<rect x="506.2" y="334.0" width="40.0" height="20.0" rx="4" fill="#f1f5f9" stroke="#d8e2ec"/>
+<text x="526.2" y="348.0" font-family="Inter, Arial, sans-serif" font-size="11" font-weight="600" fill="#475569" text-anchor="middle">IOT: 9</text>
+<text x="526.2" y="372.0" font-family="Inter, Arial, sans-serif" font-size="12" font-weight="600" fill="#172033" text-anchor="middle">Simulated</text>
+<text x="526.2" y="387.0" font-family="Inter, Arial, sans-serif" font-size="12" font-weight="600" fill="#172033" text-anchor="middle">clinic</text>
+<rect x="675.8" y="143.1" width="28.0" height="176.9" rx="4" fill="#1d4ed8" stroke="none"/>
+<text x="689.8" y="137.1" font-family="Inter, Arial, sans-serif" font-size="12" font-weight="700" fill="#1d4ed8" text-anchor="middle">32.16</text>
+<rect x="713.8" y="182.9" width="28.0" height="137.1" rx="4" fill="#0d9488" stroke="none"/>
+<text x="727.8" y="176.9" font-family="Inter, Arial, sans-serif" font-size="12" font-weight="700" fill="#0d9488" text-anchor="middle">24.92</text>
+<rect x="688.8" y="334.0" width="40.0" height="20.0" rx="4" fill="#f1f5f9" stroke="#d8e2ec"/>
+<text x="708.8" y="348.0" font-family="Inter, Arial, sans-serif" font-size="11" font-weight="600" fill="#475569" text-anchor="middle">IOT: 7</text>
+<text x="708.8" y="372.0" font-family="Inter, Arial, sans-serif" font-size="12" font-weight="600" fill="#172033" text-anchor="middle">Hardened</text>
+<text x="708.8" y="387.0" font-family="Inter, Arial, sans-serif" font-size="12" font-weight="600" fill="#172033" text-anchor="middle">clinic</text>
+<rect x="70.0" y="388.0" width="12.0" height="12.0" rx="2" fill="#1d4ed8" stroke="none"/>
+<text x="86.0" y="398.0" font-family="Inter, Arial, sans-serif" font-size="12" font-weight="400" fill="#172033" text-anchor="start">Overall CRIS risk score</text>
+<rect x="270.0" y="388.0" width="12.0" height="12.0" rx="2" fill="#0d9488" stroke="none"/>
+<text x="286.0" y="398.0" font-family="Inter, Arial, sans-serif" font-size="12" font-weight="400" fill="#172033" text-anchor="start">Healthcare IoT category score (standalone, weight=0.0 in base model)</text>
+<text x="40.0" y="414.0" font-family="Inter, Arial, sans-serif" font-size="10" font-weight="400" fill="#617083" text-anchor="start">Figure 3. Score comparison across scenarios. The Healthcare IoT score is reported separately from the standard SME overall risk score.</text>
+</svg>

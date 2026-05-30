@@ -21,6 +21,7 @@ def test_catalog_lists_expected_lab_scenarios() -> None:
         "data-risk",
         "media-office-demo",
         "media-office-delegated",
+        "iomt-hardened-clinic",
     } <= ids
     public_exposure = next(item for item in summary["scenarios"] if item["id"] == "public-exposure")
     assert public_exposure["dataset_source_type"] == "vulnerable_lab"
@@ -193,6 +194,60 @@ def test_deploy_media_office_delegated_builds_segmented_architecture(monkeypatch
     assert any("monitor log-analytics workspace create" in command for command in joined)
     assert not any("Allow-Internet-22" in command for command in joined)
     assert not any("Allow-Internet-3389" in command for command in joined)
+
+
+def test_deploy_iomt_hardened_clinic_builds_stronger_iomt_signals(monkeypatch, tmp_path) -> None:
+    commands: list[list[str]] = []
+    monkeypatch.setattr(lab, "DEFAULT_OUTPUT_ROOT", tmp_path)
+
+    def fake_run(command, cwd=None, env=None, check=False, stdout=None, stderr=None, text=None):
+        commands.append(command)
+        return subprocess.CompletedProcess(command, 0, stdout="fake-output\n", stderr="")
+
+    monkeypatch.setattr(lab.subprocess, "run", fake_run)
+    scenario = lab.find_scenario(lab.load_catalog(), "iomt-hardened-clinic")
+    context = lab.build_context(
+        scenario=scenario,
+        run_id="iomt-hard-001",
+        location="uaenorth",
+        resource_group="cris-lab-iomt-hardened-clinic-iomt-hard-001",
+        dry_run=False,
+    )
+
+    lab.deploy(context)
+
+    joined = [" ".join(command) for command in commands]
+    assert any("iot hub create" in command and "iomthardened" in command for command in joined)
+    assert any("monitor diagnostic-settings create" in command for command in joined)
+    assert any("monitor metrics alert create" in command for command in joined)
+    assert any("storage container create" in command and "iomt-telemetry" in command for command in joined)
+    assert any("iot hub routing-endpoint create" in command for command in joined)
+    assert any("iot hub route create" in command for command in joined)
+    assert any(
+        "iot hub update" in command
+        and "properties.publicNetworkAccess=Disabled" in command
+        for command in joined
+    )
+
+
+def test_redact_command_for_logging_masks_sensitive_values() -> None:
+    command = [
+        "az",
+        "iot",
+        "hub",
+        "routing-endpoint",
+        "create",
+        "--connection-string",
+        "AccountKey=secret",
+        "--container-name",
+        "telemetry",
+    ]
+
+    redacted = lab.redact_command_for_logging(command)
+
+    assert "AccountKey=secret" not in redacted
+    assert redacted[redacted.index("--connection-string") + 1] == "[redacted]"
+    assert redacted[-1] == "telemetry"
 
 
 def test_cleanup_deletes_resource_group_and_waits(monkeypatch, tmp_path) -> None:

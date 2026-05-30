@@ -37,8 +37,9 @@ Live controlled runs completed:
 | --- | --- | ---: | ---: | --- |
 | Weak IoMT baseline | `20260519070105` | `10` | `26.64` | Missing diagnostics, no alerting, public IoT Hub, overbroad shared access policies. |
 | Simulated clinic | `20260519105038` | `9` | `27.32` | Diagnostics and alerting observed, but public exposure, private endpoint, Defender, shared-access, and clinical-boundary gaps remain. |
+| Hardened clinic | `20260530110548` | `7` | `24.92` | Public IoT Hub access disabled, telemetry storage route added, alerting observed, but private endpoint, Defender, shared-access, and clinical-boundary gaps remain. |
 
-The clearest controlled signal is `IOT-009`: the weak baseline had no IoT alert rule and triggered the finding; the simulated clinic deployed a real Azure Monitor IoT metric alert and did not trigger the finding. This is the result to foreground when discussing empirical validity.
+The clearest controlled signal now spans `IOT-005`, `IOT-007`, and `IOT-009`: the weak baseline had public access, no telemetry route, and no IoT alert rule; the hardened clinic disabled public access, added a storage route, and deployed a real Azure Monitor IoT metric alert. This is the result to foreground when discussing empirical validity.
 
 ## Collaboration Value
 

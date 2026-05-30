@@ -56,7 +56,8 @@ The first live Azure IoMT evaluation runs have been completed in `uaenorth`:
 
 - `20260519070105` weak IoMT baseline
 - `20260519105038` simulated clinic
+- `20260530110548` hardened clinic
 
-Both runs were assessed with resource-group scope and cleaned up by the lab cycle command. See `live-run-register.md` for artifact paths and headline results.
+All three paper scenarios were assessed with resource-group scope and cleaned up by the lab cycle command. See `live-run-register.md` for artifact paths and headline results.
 
-The key controlled result is `IOT-009`: the weak baseline had no IoT alert rule and triggered the finding, while the simulated clinic deployed a real Azure Monitor metric alert and did not trigger the finding. `IOT-004` should be treated differently: Defender for IoT was not observable in the Azure for Students evaluation environment, so that finding records a monitoring-evidence gap rather than proof that no compensating monitoring exists.
+The key controlled result now spans `IOT-005`, `IOT-007`, and `IOT-009`: the hardened clinic passed these controls after public IoT Hub access was disabled, telemetry storage routing was added, and a real Azure Monitor metric alert was deployed. `IOT-004` should be treated differently: Defender for IoT was not observable in the Azure for Students evaluation environment, so that finding records a monitoring-evidence gap rather than proof that no compensating monitoring exists.

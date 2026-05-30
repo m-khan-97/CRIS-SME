@@ -18,11 +18,12 @@ This register records live Azure IoMT evidence runs used for the CRIS-IoMT resea
 | `20260518231014` | Clean standing demo baseline | `uaenorth` | `cris-lab-iomt-clean-baseline-20260518231014` | retained for demos | `outputs/iomt-validation/live-20260519-fresh/cris_sme_report.json` | `outputs/iomt-validation/live-20260519-fresh/cris_iomt_evidence_pack.md` | Live collector validated IoT Hub evidence path; 10 `IOT-*` findings, Healthcare IoT score `26.64`. |
 | `20260519070105` | Weak IoMT baseline | `uaenorth` | `cris-lab-iomt-weak-baseline-20260519070105` | deleted by cycle command | `outputs/evidence-lab/20260519070105/iomt-weak-baseline/reports/cris_sme_report.json` | `outputs/evidence-lab/20260519070105/iomt-weak-baseline/reports/cris_iomt_evidence_pack.md` | Scenario-scoped weak posture: 1 IoT Hub, 1 device identity, 6 shared access policies, 2 overbroad policies, no diagnostics, no alert rule; 10 `IOT-*` findings. |
 | `20260519105038` | Simulated clinic | `uaenorth` | `cris-lab-iomt-simulated-clinic-20260519105038` | deleted by cycle command | `outputs/evidence-lab/20260519105038/iomt-simulated-clinic/reports/cris_sme_report.json` | `outputs/evidence-lab/20260519105038/iomt-simulated-clinic/reports/cris_iomt_evidence_pack.md` | Scenario-scoped simulated clinic: 1 IoT Hub, 3 device identities, diagnostics enabled, 1 alert rule, 1 overbroad policy; 9 `IOT-*` findings. |
+| `20260530110548` | Hardened clinic | `uaenorth` | `cris-lab-iomt-hardened-clinic-20260530110548` | deleted by cycle command | `outputs/evidence-lab/20260530110548/iomt-hardened-clinic/reports/cris_sme_report.json` | `outputs/evidence-lab/20260530110548/iomt-hardened-clinic/reports/cris_iomt_evidence_pack.md` | Scenario-scoped hardened clinic: 1 IoT Hub, public network disabled, 1 telemetry storage route, 1 alert rule, 7 `IOT-*` findings. |
 
 ## Methodological Notes
 
 - The weak and simulated-clinic runs used resource-group-scoped assessment via `CRIS_SME_AZURE_RESOURCE_GROUP_SCOPE` to prevent the standing demo IoT Hub from contaminating scenario counts.
-- `IOT-009` is the strongest controlled signal: the weak baseline fired because no IoT alert rule was present; the simulated clinic did not fire because a real Azure Monitor metric alert was deployed.
+- `IOT-005`, `IOT-007`, and `IOT-009` are the strongest controlled signals: the weak baseline fired all three; the hardened clinic passed all three after public IoT Hub access was disabled, telemetry storage routing was added, and a real Azure Monitor metric alert was deployed.
 - `IOT-004` fired in all three runs because Defender for IoT or equivalent cloud security-monitoring evidence was not observable in the Azure for Students evaluation context. Report this as a monitoring-evidence gap, not as proof of no compensating monitoring.
 - Healthcare IoT is reported as a standalone optional category. The base CRIS SME model currently gives `IOT` a category weight of `0.0`, so IoMT findings do not change the standard SME overall score.
 - Temporary lab resources were created, assessed, and deleted by `scripts/azure_evidence_lab.py cycle`.
@@ -43,6 +44,14 @@ python3 scripts/azure_evidence_lab.py cycle \
 CRIS_SME_IOMT_IOTHUB_SKU=B1 \
 python3 scripts/azure_evidence_lab.py cycle \
   --scenario iomt-simulated-clinic \
+  --location uaenorth \
+  --yes
+```
+
+```bash
+CRIS_SME_IOMT_IOTHUB_SKU=B1 \
+python3 scripts/azure_evidence_lab.py cycle \
+  --scenario iomt-hardened-clinic \
   --location uaenorth \
   --yes
 ```

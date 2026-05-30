@@ -88,6 +88,37 @@ Expected architecture:
 - Log Analytics workspace
 - Key Vault
 - dashboard or monitoring artifact
+
+### Track D: Hardened Clinic Architecture
+
+Purpose:
+
+Evaluate whether CRIS-IoMT reflects multiple controlled hardening changes, not only alert-rule deployment.
+
+Expected architecture:
+
+- IoT Hub with public network access disabled after configuration
+- diagnostic settings connected to Log Analytics
+- Azure Monitor alert rule and action group
+- storage routing endpoint and message route for telemetry governance
+- protected storage account and Key Vault
+- scenario-scoped resource group for clean evidence attribution
+
+Expected outcome:
+
+- `IOT-005`, `IOT-007`, and `IOT-009` should not trigger
+- residual findings should remain for private endpoint coverage, Defender for IoT observability, shared-access policy exposure, secret rotation evidence, and clinical-operational boundary validation
+- evidence output should explicitly distinguish cloud-side hardening from clinical or device-level assurance
+
+Evidence-lab command:
+
+```bash
+CRIS_SME_IOMT_IOTHUB_SKU=B1 \
+python3 scripts/azure_evidence_lab.py cycle \
+  --scenario iomt-hardened-clinic \
+  --location uaenorth \
+  --yes
+```
 - segmented network design
 - one intentional-public component with documented justification
 

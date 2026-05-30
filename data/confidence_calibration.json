@@ -240,7 +240,7 @@
     "benchmark_source": "azure_iomt_lab_scenarios",
     "empirical_agreement_rate": 0.72,
     "sample_size": 3,
-    "notes": "Calibrated from three Azure IoMT lab runs. Device identity posture remains provisional because device-side credential storage and firmware trust anchors require expert validation."
+    "notes": "Calibrated from three scenario-scoped Azure IoMT lab runs. Device identity posture remains provisional because device-side credential storage and firmware trust anchors require expert validation."
   },
   {
     "control_id": "IOT-002",
@@ -249,7 +249,7 @@
     "benchmark_source": "azure_iomt_lab_scenarios",
     "empirical_agreement_rate": 0.75,
     "sample_size": 3,
-    "notes": "Calibrated from three Azure IoMT lab runs. Shared-access policy rights are directly observable, while application usage and rotation processes remain outside cloud telemetry."
+    "notes": "Calibrated from three scenario-scoped Azure IoMT lab runs. Shared-access policy rights are directly observable, while application usage and rotation processes remain outside cloud telemetry."
   },
   {
     "control_id": "IOT-003",
@@ -258,7 +258,7 @@
     "benchmark_source": "azure_iomt_lab_scenarios",
     "empirical_agreement_rate": 0.78,
     "sample_size": 3,
-    "notes": "Calibrated from three Azure IoMT lab runs. Diagnostic settings are directly observable, but retention adequacy and SOC use remain deployment-specific."
+    "notes": "Calibrated from three scenario-scoped Azure IoMT lab runs. Diagnostic settings are directly observable, but category coverage, retention adequacy, and SOC use remain deployment-specific."
   },
   {
     "control_id": "IOT-004",
@@ -267,7 +267,7 @@
     "benchmark_source": "azure_iomt_lab_scenarios",
     "empirical_agreement_rate": 0.68,
     "sample_size": 3,
-    "notes": "Calibrated from three Azure IoMT lab runs. In the Azure for Students evaluation context, Defender for IoT was not observable; this finding should be interpreted as a monitoring-evidence gap, not proof that no compensating monitoring exists."
+    "notes": "Calibrated from three scenario-scoped Azure IoMT lab runs. In the Azure for Students evaluation context, Defender for IoT was not observable; this finding should be interpreted as a monitoring-evidence gap, not proof that no compensating monitoring exists."
   },
   {
     "control_id": "IOT-005",
@@ -276,7 +276,7 @@
     "benchmark_source": "azure_iomt_lab_scenarios",
     "empirical_agreement_rate": 0.8,
     "sample_size": 3,
-    "notes": "Calibrated from three Azure IoMT lab runs. Public access posture is directly observable where IoT Hub network configuration is visible."
+    "notes": "Calibrated from three scenario-scoped Azure IoMT lab runs. Public access posture is directly observable where IoT Hub network configuration is visible; the hardened clinic demonstrated this control passing after public network access was disabled."
   },
   {
     "control_id": "IOT-006",
@@ -285,7 +285,7 @@
     "benchmark_source": "azure_iomt_lab_scenarios",
     "empirical_agreement_rate": 0.74,
     "sample_size": 3,
-    "notes": "Calibrated from three Azure IoMT lab runs. Private endpoint requirement remains provisional because some healthcare IoT architectures intentionally expose managed ingestion endpoints."
+    "notes": "Calibrated from three scenario-scoped Azure IoMT lab runs. Private endpoint requirement remains provisional because some healthcare IoT architectures intentionally expose managed ingestion endpoints."
   },
   {
     "control_id": "IOT-007",
@@ -294,7 +294,7 @@
     "benchmark_source": "azure_iomt_lab_scenarios",
     "empirical_agreement_rate": 0.72,
     "sample_size": 3,
-    "notes": "Calibrated from three Azure IoMT lab runs. Routing and retention signals are partly inferred and require healthcare policy review."
+    "notes": "Calibrated from three scenario-scoped Azure IoMT lab runs. The hardened clinic demonstrated this control passing after a telemetry storage endpoint and message route were deployed; retention interpretation still requires healthcare policy review."
   },
   {
     "control_id": "IOT-008",
@@ -303,7 +303,7 @@
     "benchmark_source": "azure_iomt_lab_scenarios",
     "empirical_agreement_rate": 0.7,
     "sample_size": 3,
-    "notes": "Calibrated from three Azure IoMT lab runs. Credential governance is partly inferred until key-rotation workflows and application secret use are externally validated."
+    "notes": "Calibrated from three scenario-scoped Azure IoMT lab runs. Credential governance is partly inferred until key-rotation workflows and application secret use are externally validated."
   },
   {
     "control_id": "IOT-009",
@@ -312,7 +312,7 @@
     "benchmark_source": "azure_iomt_lab_scenarios",
     "empirical_agreement_rate": 0.76,
     "sample_size": 3,
-    "notes": "Calibrated from three Azure IoMT lab runs. The weak baseline fired and the simulated clinic passed after a real Azure Monitor alert rule was deployed; clinical response ownership still requires human validation."
+    "notes": "Calibrated from three scenario-scoped Azure IoMT lab runs. The weak baseline fired and the simulated and hardened clinics passed after real Azure Monitor alert rules were deployed; clinical response ownership still requires human validation."
   },
   {
     "control_id": "IOT-010",
@@ -321,6 +321,6 @@
     "benchmark_source": "azure_iomt_lab_scenarios",
     "empirical_agreement_rate": 0.65,
     "sample_size": 3,
-    "notes": "Calibrated from three Azure IoMT lab runs as a boundary control. It intentionally records evidence that cloud telemetry cannot certify without clinical-operational review."
+    "notes": "Calibrated from three scenario-scoped Azure IoMT lab runs as a boundary control. It intentionally records evidence that cloud telemetry cannot certify without clinical-operational review."
   }
 ]

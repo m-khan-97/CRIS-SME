@@ -274,6 +274,50 @@
         "storage_account_private_blob_access",
         "key_vault_with_purge_protection"
       ]
+    },
+    {
+      "id": "iomt-hardened-clinic",
+      "title": "IoMT Hardened Clinic Architecture",
+      "dataset_source_type": "live_lab",
+      "authorization_basis": "owned_controlled_lab",
+      "dataset_use": "iomt_hardened_clinic_simulation",
+      "risk_intent": "Create a hardened simulated clinic architecture that adds diagnostic logging, alert routing, governed telemetry storage routing, protected key management, and disables public IoT Hub network access after configuration.",
+      "expected_findings": [
+        {
+          "control_id": "IOT-003",
+          "expectation": "Should not fire when diagnostic settings are created successfully."
+        },
+        {
+          "control_id": "IOT-005",
+          "expectation": "Should not fire because public network access is disabled after hub configuration."
+        },
+        {
+          "control_id": "IOT-007",
+          "expectation": "Should improve because a storage routing endpoint and route are created."
+        },
+        {
+          "control_id": "IOT-009",
+          "expectation": "Should not fire because an IoT-specific metric alert and action group are created."
+        },
+        {
+          "control_id": "IOT-010",
+          "expectation": "Should still identify clinical-operational evidence requiring human confirmation."
+        }
+      ],
+      "resources": [
+        "resource_group",
+        "virtual_network_with_edge_editorial_data_monitoring_subnets",
+        "azure_iot_hub_public_network_disabled_after_configuration",
+        "three_simulated_iomt_device_identities",
+        "iot_hub_certificate_authority_placeholder",
+        "log_analytics_workspace",
+        "iot_hub_diagnostic_settings",
+        "iot_metric_alert_and_action_group",
+        "storage_account_private_blob_access",
+        "iot_hub_storage_routing_endpoint",
+        "iot_hub_message_route",
+        "key_vault_with_purge_protection"
+      ]
     }
   ]
 }

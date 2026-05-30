@@ -18,6 +18,8 @@ htmlcov/
 build/
 dist/
 *.egg-info/
+docs/research/*.zip
+paper/*.zip
 
 # Notebook checkpoints.
 .ipynb_checkpoints/

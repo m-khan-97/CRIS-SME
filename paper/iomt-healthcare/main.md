@@ -65,9 +65,10 @@ The first evaluation uses controlled Azure IoT Hub labs in `uaenorth`:
 
 - weak IoMT baseline
 - simulated clinic
+- hardened clinic
 - retained clean standing demo for browser demonstration and collector validation
 
-The weak and simulated-clinic assessments use resource-group scoped collection to isolate scenario resources from other subscription assets.
+The weak, simulated-clinic, and hardened-clinic assessments use resource-group scoped collection to isolate scenario resources from other subscription assets.
 
 Healthcare IoT findings are reported as an optional standalone category. The base CRIS SME overall score currently assigns the `IOT` category a weight of `0.0`, so IoMT findings do not change the standard SME overall risk score; the Healthcare IoT category score is reported separately for research evaluation.
 
@@ -79,10 +80,12 @@ Key results:
 
 - Weak IoMT baseline: 10 `IOT-*` findings, Healthcare IoT score `26.64`.
 - Simulated clinic: 9 `IOT-*` findings, Healthcare IoT score `27.32`.
+- Hardened clinic: 7 `IOT-*` findings, Healthcare IoT score `24.92`.
 - The simulated clinic included diagnostics and an alert rule, removing `IOT-009` compared with the weak baseline.
-- Both scenarios retained meaningful findings around public IoT Hub exposure, overbroad shared access policies, missing private endpoints, Defender for IoT observability, telemetry governance, secret governance, and clinical-operational ownership boundaries.
+- The hardened clinic disabled IoT Hub public network access and added storage routing, removing `IOT-005` and `IOT-007` in addition to `IOT-009`.
+- The scenarios still retain meaningful findings around overbroad shared access policies, missing private endpoints, Defender for IoT observability, secret governance, and clinical-operational ownership boundaries.
 
-The most important controlled difference is `IOT-009`: the weak baseline had no IoT alert rule and triggered the finding, while the simulated clinic deployed a real Azure Monitor metric alert and did not trigger the finding. This result is the clearest early evidence that CRIS-IoMT can distinguish weak and more operationally mature cloud-side IoMT monitoring posture.
+The most important controlled differences are now `IOT-005`, `IOT-007`, and `IOT-009`: the weak baseline had public IoT Hub access, no telemetry route, and no IoT alert rule; the hardened clinic disabled public access, added a storage route, and deployed a real Azure Monitor metric alert. These results are the clearest early evidence that CRIS-IoMT reflects controlled cloud-side configuration differences across multiple IoMT governance controls.
 
 ## 9. Discussion
 
@@ -96,7 +99,7 @@ The strongest framing is therefore not automation of healthcare IoT certificatio
 
 The evaluation currently uses controlled Azure labs, not production NHS environments. The scenarios are intentionally simplified and do not include real clinical devices, patient telemetry, biomedical instrumentation, or operational healthcare workflows. Azure IoT Hub evidence may not generalize directly to AWS IoT Core, Google Cloud IoT alternatives, on-premises gateways, or hybrid medical device networks.
 
-The scoring model is deterministic, but control weights and confidence values still require broader empirical calibration. IoMT controls are marked as provisional using the three controlled lab runs as early calibration evidence. The current live runs demonstrate feasibility and signal separation between scenarios, not complete validation of healthcare IoT assurance.
+The scoring model is deterministic, but control weights and confidence values still require broader empirical calibration. IoMT controls are marked as provisional using the three scenario-scoped lab runs as early calibration evidence. The current live runs demonstrate feasibility and signal separation between scenarios, not complete validation of healthcare IoT assurance.
 
 ## 11. Limitations
 

@@ -218,6 +218,8 @@ def deploy(context: LabContext) -> None:
         create_iomt_weak_baseline(context)
     elif scenario_id == "iomt-simulated-clinic":
         create_iomt_simulated_clinic(context)
+    elif scenario_id == "iomt-hardened-clinic":
+        create_iomt_hardened_clinic(context)
     else:
         raise ValueError(f"Scenario '{scenario_id}' has no deployer.")
 
@@ -487,6 +489,55 @@ def create_iomt_simulated_clinic(context: LabContext) -> None:
     create_iot_metric_alert(context, hub_name, "iomt-clinic-message-alert")
     create_storage(context, "iomtclinic", public_blob=False, tags=context.tags)
     vault_name = unique_name("crisiomtckv", context.suffix, max_len=24)
+    run_az(
+        [
+            "keyvault",
+            "create",
+            "--name",
+            vault_name,
+            "--resource-group",
+            context.resource_group,
+            "--location",
+            context.location,
+            "--enable-purge-protection",
+            "true",
+            "--retention-days",
+            "7",
+            *tag_args(context.tags),
+        ],
+        context,
+    )
+
+
+def create_iomt_hardened_clinic(context: LabContext) -> None:
+    workspace_name = create_log_analytics_workspace(context, "iomt-hard-law")
+    create_vnet_with_subnets(context, f"iomt-hard-vnet-{context.run_id}"[:64])
+    hub_name = create_iot_hub(context, "iomthardened", public_network_access="Enabled")
+    for device_id in (
+        "ward-monitor-001",
+        "bedside-sensor-002",
+        "mobile-cart-003",
+    ):
+        create_iot_device_identity(context, hub_name, device_id)
+    create_iot_certificate(context, hub_name, "hardened-clinic-root-ca")
+    configure_iot_diagnostics(context, hub_name, workspace_name)
+    create_iot_metric_alert(context, hub_name, "iomt-hardened-message-alert")
+    storage_account_name = create_storage(
+        context,
+        "iomthard",
+        public_blob=False,
+        tags=context.tags,
+    )
+    configure_iot_storage_route(
+        context,
+        hub_name=hub_name,
+        storage_account_name=storage_account_name,
+        container_name="iomt-telemetry",
+        endpoint_name="hardenedTelemetryStorage",
+        route_name="hardenedTelemetryRoute",
+    )
+    update_iot_hub_public_network_access(context, hub_name, "Disabled")
+    vault_name = unique_name("crisiomthkv", context.suffix, max_len=24)
     run_az(
         [
             "keyvault",
@@ -819,6 +870,115 @@ def create_iot_metric_alert(context: LabContext, hub_name: str, alert_name: str)
     )
 
 
+def configure_iot_storage_route(
+    context: LabContext,
+    *,
+    hub_name: str,
+    storage_account_name: str,
+    container_name: str,
+    endpoint_name: str,
+    route_name: str,
+) -> None:
+    if context.dry_run:
+        print("Dry run: IoT storage routing uses a storage connection string resolved after deployment.")
+        return
+    run_az(
+        [
+            "storage",
+            "container",
+            "create",
+            "--name",
+            container_name,
+            "--account-name",
+            storage_account_name,
+            "--auth-mode",
+            "login",
+        ],
+        context,
+    )
+    connection_string = capture_az_text(
+        [
+            "storage",
+            "account",
+            "show-connection-string",
+            "--name",
+            storage_account_name,
+            "--resource-group",
+            context.resource_group,
+            "--query",
+            "connectionString",
+            "--output",
+            "tsv",
+        ],
+        context,
+    )
+    subscription_id = capture_az_text(
+        [
+            "account",
+            "show",
+            "--query",
+            "id",
+            "--output",
+            "tsv",
+        ],
+        context,
+    )
+    run_az(
+        [
+            "iot",
+            "hub",
+            "routing-endpoint",
+            "create",
+            "--hub-name",
+            hub_name,
+            "--resource-group",
+            context.resource_group,
+            "--endpoint-name",
+            endpoint_name,
+            "--endpoint-type",
+            "azurestoragecontainer",
+            "--endpoint-resource-group",
+            context.resource_group,
+            "--endpoint-subscription-id",
+            subscription_id,
+            "--connection-string",
+            connection_string,
+            "--container-name",
+            container_name,
+            "--encoding",
+            "json",
+            "--batch-frequency",
+            "300",
+            "--chunk-size",
+            "100",
+        ],
+        context,
+    )
+    run_az(
+        [
+            "iot",
+            "hub",
+            "route",
+            "create",
+            "--hub-name",
+            hub_name,
+            "--resource-group",
+            context.resource_group,
+            "--endpoint-name",
+            endpoint_name,
+            "--source",
+            "devicemessages",
+            "--route-name",
+            route_name,
+            "--condition",
+            "true",
+            "--enabled",
+            "true",
+        ],
+        context,
+    )
+
+
 def create_vnet_with_subnets(context: LabContext, vnet_name: str) -> None:
     run_az(
         [
@@ -997,7 +1157,7 @@ def create_storage(
     public_blob: bool,
     tags: dict[str, str],
     intentional_public: bool = False,
-) -> None:
+) -> str:
     account_name = unique_name(f"cris{prefix}", context.suffix, max_len=24)
     storage_tags = dict(tags)
     if intentional_public:
@@ -1043,6 +1203,7 @@ def create_storage(
             ],
             context,
         )
+    return account_name
 
 
 def unique_name(prefix: str, suffix: str, *, max_len: int) -> str:
@@ -1077,7 +1238,7 @@ def run_az(args: list[str], context: LabContext) -> None:
 
 def capture_az_text(args: list[str], context: LabContext) -> str:
     command = ["az", *args]
-    printable = " ".join(command)
+    printable = " ".join(redact_command_for_logging(command))
     print(f"$ {printable}")
     completed = subprocess.run(
         command,
@@ -1096,11 +1257,27 @@ def run_command(
     env: dict[str, str] | None = None,
     cwd: Path | None = None,
 ) -> None:
-    printable = " ".join(command)
+    printable = " ".join(redact_command_for_logging(command))
     print(f"$ {printable}")
     if context.dry_run:
         return
     subprocess.run(command, cwd=cwd, env=env, check=True)
+
+
+def redact_command_for_logging(command: list[str]) -> list[str]:
+    redacted = list(command)
+    sensitive_flags = {
+        "--connection-string",
+        "--sas-token",
+        "--account-key",
+        "--key",
+        "--password",
+        "--client-secret",
+    }
+    for index, value in enumerate(redacted[:-1]):
+        if value in sensitive_flags:
+            redacted[index + 1] = "[redacted]"
+    return redacted
 
 
 def print_assessment_command(context: LabContext) -> None:
