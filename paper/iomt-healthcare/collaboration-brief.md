@@ -37,9 +37,11 @@ Live controlled runs completed:
 | --- | --- | ---: | ---: | --- |
 | Weak IoMT baseline | `20260519070105` | `10` | `26.64` | Missing diagnostics, no alerting, public IoT Hub, overbroad shared access policies. |
 | Simulated clinic | `20260519105038` | `9` | `27.32` | Diagnostics and alerting observed, but public exposure, private endpoint, Defender, shared-access, and clinical-boundary gaps remain. |
-| Hardened clinic | `20260530110548` | `7` | `24.92` | Public IoT Hub access disabled, telemetry storage route added, alerting observed, but private endpoint, Defender, shared-access, and clinical-boundary gaps remain. |
+| Hardened clinic | `20260530110548` | `7` | `24.92` | Public IoT Hub access disabled, telemetry storage route added, alerting observed, but Defender, shared-access, and clinical-boundary gaps remain. |
 
 The clearest controlled signal now spans `IOT-005`, `IOT-007`, and `IOT-009`: the weak baseline had public access, no telemetry route, and no IoT alert rule; the hardened clinic disabled public access, added a storage route, and deployed a real Azure Monitor IoT metric alert. This is the result to foreground when discussing empirical validity.
+
+The aggregate score is secondary. The simulated clinic originally had fewer findings than the weak baseline but a slightly higher Healthcare IoT score because the remaining findings carried different deterministic severity, confidence, exposure, and remediation factors. After expert review, `IOT-006` was narrowed to a conditional private-endpoint finding and the scenario suite should be regenerated before final submission.
 
 ## Collaboration Value
 
@@ -49,7 +51,7 @@ A collaborator with expertise in sensing, healthcare systems, communications, bi
 - realism of simulated clinical architecture
 - distinction between cloud-side evidence and device/sensing evidence
 - NHS/clinical-operational assurance language
-- review of the candidate DSPT outcome mappings, especially `B2.a`, `C1.a`, and `D1.a`
+- review of the candidate DSPT outcome mappings, especially identity, monitoring, secure-design, telemetry-governance, and clinical-boundary claims
 - evaluation design and reviewer credibility
 - venue selection for healthcare, sensors, and cyber-physical systems audiences
 

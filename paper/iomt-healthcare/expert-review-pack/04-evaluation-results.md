@@ -8,6 +8,8 @@ Healthcare IoT is reported as a standalone optional research category. The base 
 
 ## Scenario Comparison
 
+This table records the original controlled runs. Following expert review, `IOT-006` was narrowed so that private endpoint absence is only a finding when public ingestion is enabled and no compensating IP-filter or certificate-authority evidence is observed. Regenerate the suite before final submission so final counts and category scores match the revised control.
+
 | Scenario | Run ID | IoMT findings | Healthcare IoT score | Key observation |
 | --- | --- | ---: | ---: | --- |
 | Weak IoMT baseline | `20260519070105` | `10` | `26.64` | Public IoT Hub access, no telemetry route, no IoT alert rule, overbroad shared access policies. |
@@ -48,5 +50,5 @@ python3 scripts/azure_evidence_lab.py paper-iomt-suite \
 - The lab does not include real clinical devices or patient data.
 - Defender for IoT was not observable in the Azure for Students evaluation context.
 - Private endpoint evidence is optional because support may depend on subscription, SKU, and region.
+- The original table should be refreshed with the post-review `IOT-006` semantics before final submission.
 - The controlled runs demonstrate cloud-governance signal separation, not production healthcare security.
-

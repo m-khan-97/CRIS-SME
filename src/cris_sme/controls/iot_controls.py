@@ -222,7 +222,16 @@ def _evaluate_public_access(profile: CloudProfile, iot: IotProfile) -> list[Find
 
 
 def _evaluate_private_endpoint(profile: CloudProfile, iot: IotProfile) -> list[Finding]:
-    if not iot.private_endpoint_required or iot.private_endpoint_count > 0:
+    uncompensated_public_ingestion = (
+        iot.public_network_access_enabled
+        and iot.allowed_ip_rule_count == 0
+        and not iot.certificate_authority_configured
+    )
+    if (
+        not iot.private_endpoint_required
+        or iot.private_endpoint_count > 0
+        or not uncompensated_public_ingestion
+    ):
         return []
 
     return [
@@ -231,7 +240,8 @@ def _evaluate_private_endpoint(profile: CloudProfile, iot: IotProfile) -> list[F
             control_id="IOT-006",
             severity=FindingSeverity.MEDIUM,
             evidence=[
-                "A private endpoint is required for the assessed IoT workload",
+                "IoT Hub public network access is enabled without IP filter evidence",
+                "Certificate-authority based device authentication was not observed",
                 "No private endpoint was observed for the IoT Hub scope",
             ],
             is_compliant=False,
@@ -243,6 +253,13 @@ def _evaluate_private_endpoint(profile: CloudProfile, iot: IotProfile) -> list[F
                 iot,
                 private_endpoint_required=iot.private_endpoint_required,
                 private_endpoint_count=iot.private_endpoint_count,
+                public_network_access_enabled=iot.public_network_access_enabled,
+                allowed_ip_rule_count=iot.allowed_ip_rule_count,
+                certificate_authority_configured=iot.certificate_authority_configured,
+                decision_basis=(
+                    "conditional_private_endpoint_gap_requires_public_exposure_"
+                    "without_ip_filter_or_certificate_evidence"
+                ),
             ),
         )
     ]

@@ -10,16 +10,16 @@ This boundary is the main novelty. Existing systems provide valuable device disc
 
 ## Comparison Matrix
 
-| System or framework | Primary scope | Healthcare IoT specificity | Cloud control-plane evidence | Evidence-sufficiency boundary | DSPT/CAF readiness mapping | Deterministic reviewer-ready outputs | Open/reproducible artifact |
-|---|---|---:|---:|---:|---:|---:|---:|
-| CRIS-IoMT | Healthcare IoT cloud governance evidence | High | High | Explicit | Candidate mapping | Yes | Yes |
-| Microsoft Defender for IoT | OT/IoT asset discovery, monitoring, and threat detection | Medium to high | Medium | Product-dependent | Not its primary published framing | Product reports | No |
-| Microsoft Defender for Cloud | CSPM, cloud security posture, regulatory compliance, workload protection | Low to medium | High | Product-dependent | Broad compliance, not IoMT-specific | Product reports | No |
-| AWS IoT Device Defender | AWS IoT fleet auditing, detect rules, and abnormal behavior monitoring | Medium | High for AWS IoT | Product-dependent | No NHS-specific mapping in the base service | Product reports | No |
-| Wiz / Prisma-style CNAPP and CSPM platforms | Agentless cloud posture, graph context, compliance, risk prioritization | Low to medium | High | Product-dependent | Broad compliance, not IoMT-specific | Product reports | No |
-| Cisco Cyber Vision / OT visibility tools | Industrial and OT network visibility, asset discovery, anomaly detection | Medium for connected clinical/industrial networks | Low to medium | Product-dependent | Not cloud-governance specific | Product reports | No |
-| NHS DSPT and NCSC CAF | Assurance framework and self-assessment structure | High for UK healthcare/CNI assurance | None by itself | Guidance-driven | Native assurance target | Manual/self-assessment outputs | Public guidance, not live evidence tooling |
-| Academic IoMT security frameworks | Device, firmware, wireless, sensing, privacy, ML, anomaly detection | High | Usually low | Usually implicit | Rarely mapped to DSPT/CAF | Varies | Varies |
+| System or framework | Primary scope | Live cloud evidence collection | Explicit evidence boundary | UK healthcare assurance orientation | Open/reproducible artifact |
+|---|---|---:|---:|---:|---:|
+| CRIS-IoMT | Healthcare IoT cloud governance evidence | Yes | Yes | Candidate DSPT/CAF evidence | Yes |
+| Microsoft Defender for IoT | OT/IoT asset discovery, monitoring, and threat detection | Partial | Product-dependent | Not its primary published framing | No |
+| Microsoft Defender for Cloud | CSPM, cloud security posture, regulatory compliance, workload protection | Yes | Product-dependent | Broad compliance | No |
+| AWS IoT Device Defender | AWS IoT fleet auditing, detect rules, and abnormal behavior monitoring | AWS-only | Product-dependent | No NHS-specific base mapping | No |
+| Wiz / Prisma-style CNAPP and CSPM platforms | Agentless cloud posture, graph context, compliance, risk prioritization | Yes | Product-dependent | Broad compliance | No |
+| Cisco Cyber Vision / OT visibility tools | Industrial and OT network visibility, asset discovery, anomaly detection | Network/device layer | Product-dependent | Not cloud-governance specific | No |
+| IEC 80001 / NIST CSF / NHS DSPT / NCSC CAF | Risk management and assurance guidance | No | Guidance-driven | Native or adjacent assurance target | Public guidance, not live evidence tooling |
+| Academic IoMT security frameworks | Device, firmware, wireless, sensing, privacy, ML, anomaly detection | Usually no | Usually implicit | Rarely mapped to DSPT/CAF | Varies |
 
 ## What Existing Tooling Does Well
 
@@ -33,7 +33,7 @@ Commercial CNAPP and CSPM platforms such as Wiz and Prisma Cloud are strong at a
 
 OT and industrial IoT visibility products such as Cisco Cyber Vision provide asset discovery and network security visibility for connected operational environments. These tools are closer to the device and network-observation layer, while CRIS-IoMT focuses on cloud governance evidence from services such as IoT Hub, diagnostics, routing, storage, key management, and alerting.
 
-NHS DSPT and NCSC CAF define assurance expectations and outcomes, but they do not themselves collect Azure IoT Hub evidence, score findings, or generate cloud evidence packs. CRIS-IoMT should therefore be presented as a pre-assessment and evidence-organisation layer for expert review, not as an assurance authority.
+IEC 80001, NIST CSF, NHS DSPT, and NCSC CAF define risk-management or assurance expectations, but they do not themselves collect Azure IoT Hub evidence, score findings, or generate cloud evidence packs. CRIS-IoMT should therefore be presented as a pre-assessment and evidence-organisation layer for expert review, not as an assurance authority.
 
 ## Research Gap
 

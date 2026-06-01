@@ -166,6 +166,20 @@ def test_iot_controls_flag_weak_iomt_posture() -> None:
     assert public_access.metadata["control_category"] == "Healthcare IoT"
 
 
+def test_iot_private_endpoint_gap_is_conditional_on_uncompensated_public_access() -> None:
+    profile_with_certificate_auth = weak_iot_profile()
+    profile_with_certificate_auth.certificate_authority_configured = True
+    findings = evaluate_iot_controls([make_profile(iot=profile_with_certificate_auth)])
+
+    assert "IOT-006" not in {finding.control_id for finding in findings}
+
+    profile_with_ip_filter = weak_iot_profile()
+    profile_with_ip_filter.allowed_ip_rule_count = 1
+    findings = evaluate_iot_controls([make_profile(iot=profile_with_ip_filter)])
+
+    assert "IOT-006" not in {finding.control_id for finding in findings}
+
+
 def test_iot_controls_participate_in_replay_and_category_scoring() -> None:
     findings = evaluate_profiles([make_profile(iot=weak_iot_profile())])
     scored = score_findings(findings)

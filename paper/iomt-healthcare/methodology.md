@@ -26,12 +26,12 @@ CRIS-IoMT evaluates ten deterministic controls:
 
 | Control | Assurance question |
 | --- | --- |
-| `IOT-001` | Are IoMT device identities governed with strong authentication evidence? |
+| `IOT-001` | Is cloud device-identity registration governance observable and constrained? |
 | `IOT-002` | Are IoT shared access policies constrained to least privilege? |
 | `IOT-003` | Is IoT diagnostic logging sufficient for investigation? |
 | `IOT-004` | Is Defender for IoT or equivalent security monitoring evidenced? |
 | `IOT-005` | Is public IoT Hub exposure constrained? |
-| `IOT-006` | Are sensitive IoMT telemetry paths covered by private endpoints where required? |
+| `IOT-006` | Is private endpoint absence only accepted when public ingestion has compensating evidence? |
 | `IOT-007` | Are telemetry routing and retention governed? |
 | `IOT-008` | Are IoT credentials linked to managed secret governance? |
 | `IOT-009` | Is clinical IoT alert routing operationally evidenced? |
@@ -65,7 +65,7 @@ This distinction is central to the paper. CRIS-IoMT is not a certification engin
 
 IoMT controls are mapped to healthcare-readiness themes where cloud evidence is relevant. The mapping is treated as readiness support, not as compliance certification.
 
-The mapping now records candidate NHS DSPT 2025-26 CAF-aligned outcome IDs for each `IOT-*` control. Examples include `B2.a` for identity verification, authentication and authorisation, `C1.a` for monitoring coverage, and `D1.a` for response planning. These IDs are deliberately marked as `candidate_pending_expert_review` in the machine-readable mapping because healthcare DSPT interpretation should be validated by domain experts before publication as an assessment crosswalk.
+The mapping now records candidate NHS DSPT 2025-26 CAF-aligned outcome IDs for each `IOT-*` control. Examples include `B2.a` for identity verification, authentication and authorisation, `C1.a` for monitoring coverage, and `D1.a` for response planning. These IDs are deliberately marked as `candidate_pending_expert_review` in the machine-readable mapping because healthcare DSPT interpretation should be validated by domain experts before publication as an assessment crosswalk. The intended language is "contributes candidate evidence toward" an outcome, not "satisfies" or "certifies" an outcome.
 
 The paper should use language such as:
 
@@ -73,7 +73,9 @@ The paper should use language such as:
 
 ## Scoring and Calibration Boundary
 
-Healthcare IoT is treated as an optional research domain inside CRIS. The base SME risk model assigns the `IOT` category a weight of `0.0`; this prevents experimental IoMT findings from changing the standard CRIS SME overall score. The Healthcare IoT category score is reported separately as a standalone research metric.
+Healthcare IoT is treated as an optional research domain inside CRIS. The base SME risk model assigns the `IOT` category a weight of `0.0`; this prevents experimental IoMT findings from changing the standard CRIS SME overall score while the domain is still being validated. The Healthcare IoT category score is reported separately as a standalone research metric.
+
+Determinism means normalized evidence to finding and score is deterministic. It does not mean the cloud environment to evidence-collection step is perfectly deterministic, because Azure visibility may depend on RBAC permissions, SKU availability, API timing, and regional feature support.
 
 The `IOT-*` confidence entries are provisional, not fully empirical. They use the three scenario-scoped Azure IoMT lab runs as the initial calibration source and should be expanded through expert review, production-like healthcare scenarios, and licensed Defender for IoT validation.
 

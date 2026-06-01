@@ -16,6 +16,7 @@ The pack is designed for a healthcare IoT, sensing, biomedical engineering, cybe
 6. `05-related-work-comparison.md`
 7. `06-expert-review-ledger.csv`
 8. `07-review-request-message.md`
+9. `08-expert-review-response.md`
 
 ## Review Objective
 

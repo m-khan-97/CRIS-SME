@@ -1,12 +1,11 @@
 control_id,control_title,healthcare_relevance,evidence_sufficiency,dspt_caf_mapping_validity,review_decision,reviewer_comment
-IOT-001,Device identity and authentication posture,,,,,
+IOT-001,Cloud device-identity registration posture,,,,,
 IOT-002,Shared access policy and key exposure risk,,,,,
 IOT-003,IoT telemetry diagnostic logging,,,,,
 IOT-004,IoT security monitoring and Defender coverage,,,,,
 IOT-005,Public network exposure of IoT ingestion endpoints,,,,,
-IOT-006,Private endpoint and network isolation posture,,,,,
+IOT-006,Conditional private endpoint and network isolation posture,,,,,
 IOT-007,Telemetry storage and retention governance,,,,,
 IOT-008,Key Vault and secret management for IoT integrations,,,,,
 IOT-009,Incident detection and alerting coverage,,,,,
 IOT-010,Evidence sufficiency and clinical safety boundary,,,,,
-

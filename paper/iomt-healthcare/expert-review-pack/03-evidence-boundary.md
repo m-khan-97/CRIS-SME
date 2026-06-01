@@ -44,7 +44,6 @@ For example:
 
 - `IOT-004` records whether Defender for IoT or equivalent monitoring evidence is observable. If it is not observable, this is an evidence gap, not proof that no compensating monitoring exists.
 - `IOT-010` explicitly records that clinical-operational ownership, safety-case evidence, biomedical engineering validation, and operational acceptance require human review.
-- `IOT-006` treats private endpoint absence as a risk signal, but still allows expert review for accepted public managed-ingestion designs or remote-care architecture.
+- `IOT-006` treats private endpoint absence as a risk only when public ingestion is enabled and CRIS-IoMT does not observe compensating IP-filter or certificate-authority evidence; accepted public managed-ingestion designs still require expert review.
 
 This makes the paper's claim defensible: CRIS-IoMT provides evidence-informed pre-assessment of healthcare IoT cloud governance, not certification of the entire healthcare IoT system.
-

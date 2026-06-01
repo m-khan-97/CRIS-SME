@@ -38,7 +38,10 @@ The first evaluation uses controlled Azure IoT Hub labs in `uaenorth`.
 
 The strongest controlled result is that `IOT-005`, `IOT-007`, and `IOT-009` changed as expected when the hardened clinic disabled public access, added telemetry routing, and deployed a real Azure Monitor alert rule.
 
+The category score is secondary to per-control transitions. The simulated clinic has fewer findings than the weak baseline but a slightly higher category score because the remaining findings carry different deterministic severity, confidence, exposure, and remediation factors.
+
+Post-review note: `IOT-006` has been narrowed so that private endpoint absence is only a finding when public ingestion is enabled and no compensating IP-filter or certificate-authority evidence is observed. The scenario table records the original controlled runs and should be regenerated before final submission.
+
 ## Intended Venues
 
 Potential venues include IEEE JBHI, IEEE Sensors, IEEE IoT Journal, HealthCom, Computers & Security, or a healthcare cyber-physical systems workshop. The best venue depends on how strongly the paper is positioned around healthcare IoT assurance, cloud governance, sensing infrastructure, and clinical-operational boundaries.
-

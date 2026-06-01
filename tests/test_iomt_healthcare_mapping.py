@@ -54,7 +54,7 @@ def test_iomt_mapping_uses_candidate_dspt_outcomes_not_certification_claims() ->
     assert {
         candidate["outcome_id"]
         for candidate in controls_by_id["IOT-001"]["nhs_dspt_outcome_candidates"]
-    } >= {"B2.a", "B4.d"}
+    } == {"B2.a"}
     assert {
         candidate["outcome_id"]
         for candidate in controls_by_id["IOT-002"]["nhs_dspt_outcome_candidates"]
@@ -63,6 +63,14 @@ def test_iomt_mapping_uses_candidate_dspt_outcomes_not_certification_claims() ->
         candidate["outcome_id"]
         for candidate in controls_by_id["IOT-009"]["nhs_dspt_outcome_candidates"]
     } >= {"C1.a", "D1.a"}
+    assert {
+        candidate["outcome_id"]
+        for candidate in controls_by_id["IOT-005"]["nhs_dspt_outcome_candidates"]
+    } == {"B4.a"}
+    assert {
+        candidate["outcome_id"]
+        for candidate in controls_by_id["IOT-007"]["nhs_dspt_outcome_candidates"]
+    } == {"B4.b"}
 
     for control in mapping["controls"]:
         for candidate in control["nhs_dspt_outcome_candidates"]:

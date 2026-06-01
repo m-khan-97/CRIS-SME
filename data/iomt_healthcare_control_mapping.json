@@ -8,7 +8,7 @@
   "controls": [
     {
       "control_id": "IOT-001",
-      "title": "Device identity and authentication posture",
+      "title": "Cloud device-identity registration posture",
       "evidence_class": "direct_cloud",
       "azure_evidence": [
         "IoT Hub inventory",
@@ -23,29 +23,21 @@
       ],
       "nhs_dspt_themes": [
         "access control",
-        "asset management",
-        "data security"
+        "asset management"
       ],
       "nhs_dspt_outcome_candidates": [
         {
           "outcome_id": "B2.a",
           "name": "Identity verification, authentication and authorisation",
-          "rationale": "IoMT device identities and authentication metadata support assessment of device and system access to cloud-connected healthcare IoT services.",
-          "status": "candidate_pending_expert_review"
-        },
-        {
-          "outcome_id": "B4.d",
-          "name": "Vulnerability management",
-          "rationale": "Device identity inventory contributes to understanding exposed and unsupported technology in the IoMT environment, but device firmware validation remains external.",
+          "rationale": "Cloud-registered IoMT device identities and authentication metadata contribute candidate evidence toward device and system access governance for cloud-connected healthcare IoT services.",
           "status": "candidate_pending_expert_review"
         }
       ],
       "ncsc_caf_objectives": [
-        "B2 identity and access control",
-        "B4 data security"
+        "B2 identity and access control"
       ],
       "mapping_review": {
-        "cloud_supported_claim": "Azure IoT Hub device identity inventory and authentication metadata can support a cloud-side device identity governance claim.",
+        "cloud_supported_claim": "Azure IoT Hub device identity inventory and authentication metadata can support a cloud-side registration and device-access governance claim.",
         "evidence_limitation": "It does not validate device-side credential storage, firmware trust anchors, biomedical asset ownership, or whether a registered identity maps to an authorised clinical device.",
         "expert_review_question": "Is device identity inventory a meaningful healthcare IoT assurance signal when explicitly bounded to cloud registration and authentication metadata?"
       }
@@ -195,12 +187,6 @@
           "name": "Secure by design",
           "rationale": "Public IoT ingestion exposure affects the secure design boundary for healthcare IoT cloud services.",
           "status": "candidate_pending_expert_review"
-        },
-        {
-          "outcome_id": "C1.a",
-          "name": "Monitoring coverage",
-          "rationale": "Publicly reachable IoT endpoints increase the importance of observable boundary monitoring.",
-          "status": "candidate_pending_expert_review"
         }
       ],
       "ncsc_caf_objectives": [
@@ -215,13 +201,15 @@
     },
     {
       "control_id": "IOT-006",
-      "title": "Private endpoint and network isolation posture",
+      "title": "Conditional private endpoint and network isolation posture",
       "evidence_class": "direct_cloud",
       "azure_evidence": [
         "private endpoint inventory",
         "private endpoint connection state",
         "VNet and subnet association",
-        "firewall default action"
+        "firewall default action",
+        "public network access state",
+        "IP filter and certificate-authority evidence"
       ],
       "manual_or_external_evidence": [
         "network segmentation design",
@@ -249,7 +237,7 @@
         "B5 resilient networks and systems"
       ],
       "mapping_review": {
-        "cloud_supported_claim": "Private endpoint inventory and network isolation settings can support a sensitive telemetry path isolation claim.",
+        "cloud_supported_claim": "Private endpoint inventory and network isolation settings contribute candidate evidence toward sensitive telemetry path isolation, especially when public ingestion lacks compensating IP-filter or certificate evidence.",
         "evidence_limitation": "It does not prove end-to-end clinical network segmentation, gateway hardening, or whether public managed ingestion is an accepted design exception.",
         "expert_review_question": "For cloud-connected healthcare IoT, when should private endpoint absence be treated as a risk versus an accepted architecture decision?"
       }
@@ -281,12 +269,6 @@
           "name": "Secure data management",
           "rationale": "Telemetry routing and retention posture contributes to cloud-side healthcare IoT data governance.",
           "status": "candidate_pending_expert_review"
-        },
-        {
-          "outcome_id": "E3.a",
-          "name": "Using and sharing information for direct care",
-          "rationale": "IoMT telemetry use may support direct care, but lawful sharing and clinical context require human validation.",
-          "status": "candidate_pending_expert_review"
         }
       ],
       "ncsc_caf_objectives": [
@@ -294,7 +276,7 @@
         "D1 response and recovery planning"
       ],
       "mapping_review": {
-        "cloud_supported_claim": "IoT Hub message routes and governed storage destinations can support a telemetry routing and retention governance claim.",
+        "cloud_supported_claim": "IoT Hub message routes and governed storage destinations contribute candidate evidence toward cloud-side telemetry routing and retention governance.",
         "evidence_limitation": "It does not prove lawful basis, clinical record status, retention-period adequacy, privacy impact assessment approval, or patient-data minimisation.",
         "expert_review_question": "Is telemetry routing to governed storage a useful assurance signal if privacy and clinical-record interpretation are kept outside cloud automation?"
       }

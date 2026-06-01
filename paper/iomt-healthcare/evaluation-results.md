@@ -6,6 +6,8 @@ The first CRIS-IoMT evaluation uses controlled Azure IoT Hub labs in the `uaenor
 
 Healthcare IoT is reported as a standalone optional research category. The base CRIS SME overall score currently assigns the `IOT` category a weight of `0.0`, so the Healthcare IoT score should be interpreted separately from the standard SME risk score.
 
+The Healthcare IoT category score is secondary to the per-control transition table in this early evaluation. The simulated clinic has fewer findings than the weak baseline but a slightly higher category score because the remaining findings have different severity, confidence, exposure, and remediation factors. This is deterministic scoring behaviour, not a claim that the simulated clinic is globally weaker. For the paper's empirical claim, findings count and per-control state changes are the primary result.
+
 ## Scenario Comparison
 
 | Metric | Clean standing demo | Weak IoMT baseline | Simulated clinic | Hardened clinic |
@@ -50,7 +52,7 @@ This is the strongest empirical result in the current study. The scenario set no
 | `IOT-003` Diagnostic logging | Triggered | Triggered | Triggered | Diagnostics exist in the simulated and hardened runs, but Azure reports category coverage below the current 80% baseline. |
 | `IOT-004` Defender/security monitoring | Triggered | Triggered | Triggered | Defender for IoT or equivalent security monitoring was not observed. In this Azure for Students evaluation, this is a monitoring-evidence/observability gap rather than proof that no compensating monitoring could exist. |
 | `IOT-005` Public network access | Triggered | Triggered | Not triggered | The hardened clinic disabled public network access after configuration. |
-| `IOT-006` Private endpoint coverage | Triggered | Triggered | Triggered | No private endpoint coverage was observed for sensitive IoMT telemetry paths. |
+| `IOT-006` Conditional private endpoint posture | Triggered | Triggered | Triggered under original semantics | Historical result used the pre-review rule that treated private endpoint absence as sufficient; final submission should refresh this row under the conditional public-ingestion rule. |
 | `IOT-007` Telemetry routing and retention | Triggered | Triggered | Not triggered | The hardened clinic added a storage routing endpoint and message route. |
 | `IOT-008` Secret governance | Triggered | Triggered | Triggered | IoT credential governance was not linked to managed secret rotation evidence. |
 | `IOT-009` Clinical alert routing | Triggered | Not triggered | Not triggered | The simulated and hardened clinic scenarios added IoT metric alerts; the weak baseline did not. |
@@ -61,5 +63,7 @@ This is the strongest empirical result in the current study. The scenario set no
 The controlled runs support the central CRIS-IoMT claim: cloud control-plane telemetry can expose meaningful healthcare IoT governance weaknesses without inspecting patient data, clinical telemetry payloads, device firmware, or radio/sensing layers.
 
 The weak baseline, simulated clinic, and hardened clinic all produced deterministic IoMT findings. The simulated clinic removed the operational-alerting finding after adding an IoT-specific alert rule. The hardened clinic removed three cloud-side findings after adding alerting, adding telemetry routing, and disabling public IoT Hub network access. This is a useful early signal that CRIS-IoMT can reflect controlled cloud-side configuration differences across multiple IoMT governance controls.
+
+Post-review note: `IOT-006` has now been reframed as a conditional private-endpoint finding that fires only when public ingestion lacks compensating IP-filter or certificate-authority evidence. The historical run table above reflects the original pre-review control semantics. Final paper numbers should be refreshed with `paper-iomt-suite` before submission.
 
 The results should not be reported as evidence of full healthcare IoT security. They are evidence of cloud-side governance posture only.

@@ -19,9 +19,9 @@ CRIS-IoMT should classify each control result using evidence sufficiency:
 
 ## Proposed Controls
 
-### IOT-001: Device Identity and Authentication Posture
+### IOT-001: Cloud Device-Identity Registration Posture
 
-Assesses whether IoT device identity governance is observable and whether the environment avoids weak or unauditable device authentication posture.
+Assesses whether cloud-side IoT device identity registration governance is observable and whether the environment avoids weak or unauditable cloud registration posture. This control does not claim to validate device-side credential storage or firmware trust anchors.
 
 Evidence inputs:
 
@@ -39,8 +39,8 @@ Risk decision:
 
 Mapping:
 
-- NHS DSPT candidate outcomes: `B2.a` identity verification, authentication and authorisation; `B4.d` vulnerability management
-- NCSC CAF: B2 identity and access control, B4 data security
+- NHS DSPT candidate outcome: `B2.a` identity verification, authentication and authorisation
+- NCSC CAF: B2 identity and access control
 
 ### IOT-002: Shared Access Policy and Key Exposure Risk
 
@@ -129,25 +129,28 @@ Risk decision:
 
 Mapping:
 
-- NHS DSPT candidate outcomes: `B4.a` secure by design; `C1.a` monitoring coverage
+- NHS DSPT candidate outcome: `B4.a` secure by design
 - NCSC CAF: B4 data security, B5 resilient networks and systems
 
-### IOT-006: Private Endpoint and Network Isolation Posture
+### IOT-006: Conditional Private Endpoint and Network Isolation Posture
 
-Assesses whether sensitive healthcare IoT services use private connectivity or documented network isolation.
+Assesses whether sensitive healthcare IoT services have uncompensated public ingestion when private connectivity is absent. Private endpoint absence is only treated as a finding when public network access is enabled and CRIS-IoMT does not observe compensating IP-filter or certificate-authority evidence.
 
 Evidence inputs:
 
 - private endpoint count and connection state
 - VNet/subnet association
 - firewall/default action
+- public network access state
+- IP filter evidence
+- certificate-authority evidence
 - intentional-public exception metadata
 
 Risk decision:
 
-- fail when sensitive IoT services lack private endpoint or constrained network evidence
+- fail when sensitive IoT services lack private endpoint evidence and public ingestion is not compensated by observed IP filters or certificate-authority evidence
 - partial when public exposure is intentional but not documented
-- pass when isolation is configured and traceable
+- pass when isolation is configured, public access is disabled, or compensating cloud-side boundary evidence is observed
 
 Mapping:
 
@@ -174,7 +177,7 @@ Risk decision:
 
 Mapping:
 
-- NHS DSPT candidate outcomes: `B4.b` secure data management; `E3.a` using and sharing information for direct care
+- NHS DSPT candidate outcome: `B4.b` secure data management
 - NCSC CAF: B4 data security, D1 response and recovery planning
 
 ### IOT-008: Key Vault and Secret Management for IoT Integrations
@@ -258,3 +261,5 @@ IoMT controls should use the existing CRIS scoring model but adjust modifiers ca
 No IoMT control should imply clinical safety approval. Clinical and biomedical assurance remains outside deterministic cloud scoring.
 
 Healthcare IoT is an optional research category in the base CRIS scoring model. The `IOT` category currently has a weight of `0.0`, so IoMT findings are reported in a standalone Healthcare IoT category score without changing the standard SME overall risk score. This keeps the experimental IoMT extension visible without contaminating the original SME risk model.
+
+Determinism applies to the normalized evidence-to-finding and finding-to-score steps. The cloud environment-to-evidence collection step still depends on Azure permissions, regional feature support, SKU availability, service eventual consistency, and whether optional services such as Defender for IoT are licensed and observable.

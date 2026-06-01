@@ -1,8 +1,6 @@
-# Suggested Review Request Message
+# Suggested Review Request Prompt
 
-Dear Professor Abbasi,
 
-I hope you are well.
 
 I am developing CRIS-IoMT, an evidence-driven cloud governance assessment prototype for cloud-connected healthcare IoT and Internet of Medical Things environments.
 
@@ -18,8 +16,3 @@ I am not asking for a full paper review at this stage. The main questions are:
 4. What would make this work stronger for IEEE JBHI, IEEE Sensors, IEEE IoT Journal, HealthCom, or a healthcare cyber-physical systems venue?
 
 I have included a short expert review ledger to make feedback easier. Even brief comments on the control model and evidence boundary would be extremely valuable.
-
-Kind regards,
-
-Muhammad Ibrahim
-

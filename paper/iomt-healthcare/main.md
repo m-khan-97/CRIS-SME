@@ -35,19 +35,19 @@ RQ5. Can evidence-pack reporting make the boundary between cloud evidence and cl
 
 ## 4. Related Work and Positioning
 
-CRIS-IoMT sits between healthcare IoT security research, cloud security posture management, IoT/OT monitoring products, and UK healthcare assurance frameworks. Existing systems address important parts of this space. Microsoft Defender for IoT focuses on IoT/OT monitoring and threat detection. Microsoft Defender for Cloud provides cloud security posture management and regulatory-compliance views. AWS IoT Device Defender audits and monitors AWS IoT device fleets. Commercial CNAPP and CSPM platforms such as Wiz and Prisma Cloud provide broad agentless cloud inventory, graph-based context, compliance, and risk prioritisation. OT visibility tools such as Cisco Cyber Vision focus on industrial and operational-network visibility. NHS DSPT and NCSC CAF provide assurance structures and outcomes rather than live cloud evidence collection.
+CRIS-IoMT sits between healthcare IoT security research, cloud security posture management, IoT/OT monitoring products, healthcare risk-management standards, and UK healthcare assurance frameworks. Existing systems address important parts of this space. Microsoft Defender for IoT focuses on IoT/OT monitoring and threat detection. Microsoft Defender for Cloud provides cloud security posture management and regulatory-compliance views. AWS IoT Device Defender audits and monitors AWS IoT device fleets. Commercial CNAPP and CSPM platforms such as Wiz and Prisma Cloud provide broad agentless cloud inventory, graph-based context, compliance, and risk prioritisation. OT visibility tools such as Cisco Cyber Vision focus on industrial and operational-network visibility. Standards and frameworks such as IEC 80001, NIST CSF, NHS DSPT, and NCSC CAF provide risk-management or assurance structures rather than live Azure IoT evidence collection.
 
 CRIS-IoMT's research contribution is narrower. It asks whether cloud control-plane evidence can be converted into deterministic healthcare IoT governance findings while preserving the boundary around device, endpoint, clinical, and human-verification evidence.
 
-| System or framework | Primary scope | Healthcare IoT specificity | Cloud evidence | Explicit evidence boundary | DSPT/CAF-oriented output | Open research artifact |
-|---|---|---:|---:|---:|---:|---:|
-| CRIS-IoMT | Healthcare IoT cloud governance | High | High | Yes | Candidate mapping | Yes |
-| Defender for IoT | IoT/OT monitoring and detection | Medium to high | Medium | Product-dependent | Not primary framing | No |
-| Defender for Cloud | CSPM and cloud compliance | Low to medium | High | Product-dependent | Broad compliance | No |
-| AWS IoT Device Defender | AWS IoT fleet auditing and monitoring | Medium | High for AWS IoT | Product-dependent | No NHS-specific mapping | No |
-| Wiz / Prisma-style CSPM | Cloud risk prioritisation and compliance | Low to medium | High | Product-dependent | Broad compliance | No |
-| Cisco Cyber Vision-style OT visibility | Industrial and OT network visibility | Medium | Low to medium | Product-dependent | Not cloud-governance specific | No |
-| NHS DSPT / NCSC CAF | Assurance outcomes and self-assessment | High | None by itself | Guidance-driven | Native assurance target | Public guidance, not live evidence tooling |
+| System or framework | Primary scope | Live cloud evidence collection | Explicit evidence boundary | UK healthcare assurance orientation | Open research artifact |
+|---|---|---:|---:|---:|---:|
+| CRIS-IoMT | Healthcare IoT cloud governance | Yes | Yes | Candidate DSPT/CAF evidence | Yes |
+| Defender for IoT | IoT/OT monitoring and detection | Partial | Product-dependent | No published DSPT/CAF crosswalk in this artifact | No |
+| Defender for Cloud | CSPM and cloud compliance | Yes | Product-dependent | Broad compliance | No |
+| AWS IoT Device Defender | AWS IoT fleet auditing and monitoring | AWS-only | Product-dependent | No NHS-specific base mapping | No |
+| Wiz / Prisma-style CSPM | Cloud risk prioritisation and compliance | Yes | Product-dependent | Broad compliance | No |
+| Cisco Cyber Vision-style OT visibility | Industrial and OT network visibility | Network/device layer | Product-dependent | Not cloud-governance specific | No |
+| IEC 80001 / NIST CSF / NHS DSPT / NCSC CAF | Risk management and assurance guidance | No | Guidance-driven | Native or adjacent assurance target | Public guidance, not live evidence tooling |
 
 The novelty claim is therefore deliberately bounded: our review of official product and framework materials did not identify an open, reproducible artifact that combines healthcare IoT cloud-governance scope, deterministic evidence-to-control decisions, explicit evidence-sufficiency boundaries, and candidate NHS DSPT 2025-26 CAF-aligned plus NCSC CAF-oriented mapping. The fuller comparison is recorded in `related-work.md`.
 
@@ -71,7 +71,7 @@ The assurance boundary is strict. CRIS-IoMT does not assess physiological sensin
 
 Allowed claims include statements such as whether IoT Hub public access, shared access policies, diagnostic settings, alert rules, private endpoint posture, and security-monitoring observability were detected in the assessment scope. Forbidden claims include NHS DSPT certification, NCSC CAF certification, medical-device security certification, clinical safety approval, or end-to-end patient data protection.
 
-NHS DSPT references in this paper are candidate mappings to the 2025-26 CAF-aligned outcome structure, such as `B2.a` for identity verification, authentication and authorisation, `C1.a` for monitoring coverage, and `D1.a` for response planning. They are included to support expert review and readiness discussion, not to assert DSPT compliance.
+NHS DSPT references in this paper are candidate evidence contributions toward the 2025-26 CAF-aligned outcome structure, such as `B2.a` for identity verification, authentication and authorisation, `C1.a` for monitoring coverage, and `D1.a` for response planning. They are included to support expert review and readiness discussion, not to assert DSPT compliance or one-to-one outcome satisfaction.
 
 ## 7. Methodology
 
@@ -88,7 +88,7 @@ The first evaluation uses controlled Azure IoT Hub labs in `uaenorth`:
 
 The weak, simulated-clinic, and hardened-clinic assessments use resource-group scoped collection to isolate scenario resources from other subscription assets.
 
-Healthcare IoT findings are reported as an optional standalone category. The base CRIS SME overall score currently assigns the `IOT` category a weight of `0.0`, so IoMT findings do not change the standard SME overall risk score; the Healthcare IoT category score is reported separately for research evaluation.
+Healthcare IoT findings are reported as an optional standalone category. The base CRIS SME overall score currently assigns the `IOT` category a weight of `0.0`, so IoMT findings do not change the standard SME overall risk score. This is intentional: the IoMT controls are a provisional research extension and should not contaminate the already-defined SME aggregate score until broader empirical calibration is complete. The Healthcare IoT category score is reported separately for research evaluation.
 
 ## 9. Results
 
@@ -101,13 +101,17 @@ Key results:
 - Hardened clinic: 7 `IOT-*` findings, Healthcare IoT score `24.92`.
 - The simulated clinic included diagnostics and an alert rule, removing `IOT-009` compared with the weak baseline.
 - The hardened clinic disabled IoT Hub public network access and added storage routing, removing `IOT-005` and `IOT-007` in addition to `IOT-009`.
-- The scenarios still retain meaningful findings around overbroad shared access policies, missing private endpoints, Defender for IoT observability, secret governance, and clinical-operational ownership boundaries.
+- The scenarios still retain meaningful findings around overbroad shared access policies, Defender for IoT observability, secret governance, and clinical-operational ownership boundaries.
 
 The most important controlled differences are now `IOT-005`, `IOT-007`, and `IOT-009`: the weak baseline had public IoT Hub access, no telemetry route, and no IoT alert rule; the hardened clinic disabled public access, added a storage route, and deployed a real Azure Monitor metric alert. These results are the clearest early evidence that CRIS-IoMT reflects controlled cloud-side configuration differences across multiple IoMT governance controls.
 
+The aggregate Healthcare IoT score should be treated as secondary in this early evaluation. The simulated clinic removes one finding compared with the weak baseline, but its category score is slightly higher because the remaining findings carry different severities, confidence values, exposure factors, and remediation factors. This is a deterministic scoring artefact rather than a claim that the simulated clinic is globally weaker than the baseline. For the controlled-lab argument, the primary result is the per-control state transition, not the aggregate category score.
+
+Following expert review, `IOT-006` was narrowed to a conditional private-endpoint finding: private endpoint absence is treated as a risk only when public ingestion is enabled and no compensating IP-filter or certificate-authority evidence is observed. The table above records the original controlled runs and should be regenerated with the updated control semantics before final submission.
+
 ## 10. Discussion
 
-The results support the paper's central argument: cloud-side governance evidence can identify a meaningful subset of healthcare IoT assurance weaknesses without touching patient data or device firmware. The results also show why cloud evidence must be carefully bounded. A cloud report cannot certify clinical safety, device security, firmware integrity, or sensing reliability.
+The results support the paper's central argument: cloud-side governance evidence can identify a meaningful subset of healthcare IoT assurance weaknesses without touching patient data or device firmware. More precisely, the controlled scenarios show that deterministic controls respond to controlled configuration hardening across selected cloud-side controls. They do not establish statistical discrimination across production healthcare environments. The results also show why cloud evidence must be carefully bounded. A cloud report cannot certify clinical safety, device security, firmware integrity, or sensing reliability.
 
 The strongest framing is therefore not automation of healthcare IoT certification. It is evidence-sufficiency-aware pre-assessment of the cloud governance layer that supports healthcare IoT operations.
 
@@ -117,7 +121,7 @@ The strongest framing is therefore not automation of healthcare IoT certificatio
 
 The evaluation currently uses controlled Azure labs, not production NHS environments. The scenarios are intentionally simplified and do not include real clinical devices, patient telemetry, biomedical instrumentation, or operational healthcare workflows. Azure IoT Hub evidence may not generalize directly to AWS IoT Core, Google Cloud IoT alternatives, on-premises gateways, or hybrid medical device networks.
 
-The scoring model is deterministic, but control weights and confidence values still require broader empirical calibration. IoMT controls are marked as provisional using the three scenario-scoped lab runs as early calibration evidence. The current live runs demonstrate feasibility and signal separation between scenarios, not complete validation of healthcare IoT assurance.
+The scoring model is deterministic from normalized evidence to findings and scores, but cloud evidence collection itself can depend on Azure API visibility, RBAC permissions, SKU availability, service eventual consistency, and regional feature support. Control weights and confidence values still require broader empirical calibration. IoMT controls are marked as provisional using the three scenario-scoped lab runs as early calibration evidence. The current live runs demonstrate feasibility and signal separation between scenarios, not complete validation of healthcare IoT assurance.
 
 ## 12. Limitations
 
