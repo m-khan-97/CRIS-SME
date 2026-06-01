@@ -32,15 +32,13 @@ The first evaluation uses controlled Azure IoT Hub labs in `uaenorth`.
 
 | Scenario | IoMT findings | Healthcare IoT score | Key observation |
 | --- | ---: | ---: | --- |
-| Weak IoMT baseline | `10` | `26.64` | Public IoT Hub access, no telemetry route, no IoT alert rule. |
-| Simulated clinic | `9` | `27.32` | Alerting added, but public exposure and telemetry-governance gaps remain. |
-| Hardened clinic | `7` | `24.92` | Public access disabled, storage route added, IoT alerting observed. |
+| Weak IoMT baseline | `10` | `26.40` | Public IoT Hub access, no telemetry route, no IoT alert rule. |
+| Simulated clinic | `9` | `27.08` | Alerting added, but public exposure and telemetry-governance gaps remain. |
+| Hardened clinic | `6` | `25.19` | Public access disabled, storage route added, IoT alerting observed, conditional private endpoint finding removed. |
 
-The strongest controlled result is that `IOT-005`, `IOT-007`, and `IOT-009` changed as expected when the hardened clinic disabled public access, added telemetry routing, and deployed a real Azure Monitor alert rule.
+The strongest controlled result is that `IOT-005`, `IOT-006`, `IOT-007`, and `IOT-009` changed as expected when the hardened clinic disabled public access, removed uncompensated public ingestion, added telemetry routing, and deployed a real Azure Monitor alert rule.
 
 The category score is secondary to per-control transitions. The simulated clinic has fewer findings than the weak baseline but a slightly higher category score because the remaining findings carry different deterministic severity, confidence, exposure, and remediation factors.
-
-Post-review note: `IOT-006` has been narrowed so that private endpoint absence is only a finding when public ingestion is enabled and no compensating IP-filter or certificate-authority evidence is observed. The scenario table records the original controlled runs and should be regenerated before final submission.
 
 ## Intended Venues
 

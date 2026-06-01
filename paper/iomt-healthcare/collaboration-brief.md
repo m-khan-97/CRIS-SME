@@ -35,13 +35,13 @@ Live controlled runs completed:
 
 | Scenario | Run ID | IoMT findings | Healthcare IoT score | Key observation |
 | --- | --- | ---: | ---: | --- |
-| Weak IoMT baseline | `20260519070105` | `10` | `26.64` | Missing diagnostics, no alerting, public IoT Hub, overbroad shared access policies. |
-| Simulated clinic | `20260519105038` | `9` | `27.32` | Diagnostics and alerting observed, but public exposure, private endpoint, Defender, shared-access, and clinical-boundary gaps remain. |
-| Hardened clinic | `20260530110548` | `7` | `24.92` | Public IoT Hub access disabled, telemetry storage route added, alerting observed, but Defender, shared-access, and clinical-boundary gaps remain. |
+| Weak IoMT baseline | `20260601004646` | `10` | `26.40` | Missing diagnostics, no alerting, public IoT Hub, overbroad shared access policies. |
+| Simulated clinic | `20260601004646` | `9` | `27.08` | Diagnostics and alerting observed, but public exposure, private endpoint, Defender, shared-access, and clinical-boundary gaps remain. |
+| Hardened clinic | `20260601004646` | `6` | `25.19` | Public IoT Hub access disabled, telemetry storage route added, alerting observed, conditional private endpoint finding removed, but Defender, shared-access, and clinical-boundary gaps remain. |
 
-The clearest controlled signal now spans `IOT-005`, `IOT-007`, and `IOT-009`: the weak baseline had public access, no telemetry route, and no IoT alert rule; the hardened clinic disabled public access, added a storage route, and deployed a real Azure Monitor IoT metric alert. This is the result to foreground when discussing empirical validity.
+The clearest controlled signal now spans `IOT-005`, `IOT-006`, `IOT-007`, and `IOT-009`: the weak baseline had public access, uncompensated public ingestion, no telemetry route, and no IoT alert rule; the hardened clinic disabled public access, added a storage route, and deployed a real Azure Monitor IoT metric alert. This is the result to foreground when discussing empirical validity.
 
-The aggregate score is secondary. The simulated clinic originally had fewer findings than the weak baseline but a slightly higher Healthcare IoT score because the remaining findings carried different deterministic severity, confidence, exposure, and remediation factors. After expert review, `IOT-006` was narrowed to a conditional private-endpoint finding and the scenario suite should be regenerated before final submission.
+The aggregate score is secondary. The simulated clinic has fewer findings than the weak baseline but a slightly higher Healthcare IoT score because the remaining findings carry different deterministic severity, confidence, exposure, and remediation factors.
 
 ## Collaboration Value
 

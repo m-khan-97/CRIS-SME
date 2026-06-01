@@ -52,12 +52,12 @@ The first implementation milestone should add:
 
 ## Current Live Evidence Status
 
-The first live Azure IoMT evaluation runs have been completed in `uaenorth`:
+The latest live Azure IoMT paper-suite run completed in `uaenorth`:
 
-- `20260519070105` weak IoMT baseline
-- `20260519105038` simulated clinic
-- `20260530110548` hardened clinic
+- `20260601004646` weak IoMT baseline: 10 `IOT-*` findings, Healthcare IoT score `26.40`
+- `20260601004646` simulated clinic: 9 `IOT-*` findings, Healthcare IoT score `27.08`
+- `20260601004646` hardened clinic: 6 `IOT-*` findings, Healthcare IoT score `25.19`
 
 All three paper scenarios were assessed with resource-group scope and cleaned up by the lab cycle command. See `live-run-register.md` for artifact paths and headline results.
 
-The key controlled result now spans `IOT-005`, `IOT-007`, and `IOT-009`: the hardened clinic passed these controls after public IoT Hub access was disabled, telemetry storage routing was added, and a real Azure Monitor metric alert was deployed. `IOT-004` should be treated differently: Defender for IoT was not observable in the Azure for Students evaluation environment, so that finding records a monitoring-evidence gap rather than proof that no compensating monitoring exists.
+The key controlled result now spans `IOT-005`, `IOT-006`, `IOT-007`, and `IOT-009`: the hardened clinic passed these controls after public IoT Hub access was disabled, uncompensated public ingestion was removed, telemetry storage routing was added, and a real Azure Monitor metric alert was deployed. `IOT-004` should be treated differently: Defender for IoT was not observable in the Azure for Students evaluation environment, so that finding records a monitoring-evidence gap rather than proof that no compensating monitoring exists.

@@ -96,18 +96,16 @@ Detailed results are recorded in `evaluation-results.md`.
 
 Key results:
 
-- Weak IoMT baseline: 10 `IOT-*` findings, Healthcare IoT score `26.64`.
-- Simulated clinic: 9 `IOT-*` findings, Healthcare IoT score `27.32`.
-- Hardened clinic: 7 `IOT-*` findings, Healthcare IoT score `24.92`.
+- Weak IoMT baseline: 10 `IOT-*` findings, Healthcare IoT score `26.40`.
+- Simulated clinic: 9 `IOT-*` findings, Healthcare IoT score `27.08`.
+- Hardened clinic: 6 `IOT-*` findings, Healthcare IoT score `25.19`.
 - The simulated clinic included diagnostics and an alert rule, removing `IOT-009` compared with the weak baseline.
-- The hardened clinic disabled IoT Hub public network access and added storage routing, removing `IOT-005` and `IOT-007` in addition to `IOT-009`.
+- The hardened clinic disabled IoT Hub public network access and added storage routing, removing `IOT-005`, `IOT-006`, and `IOT-007` in addition to `IOT-009`.
 - The scenarios still retain meaningful findings around overbroad shared access policies, Defender for IoT observability, secret governance, and clinical-operational ownership boundaries.
 
-The most important controlled differences are now `IOT-005`, `IOT-007`, and `IOT-009`: the weak baseline had public IoT Hub access, no telemetry route, and no IoT alert rule; the hardened clinic disabled public access, added a storage route, and deployed a real Azure Monitor metric alert. These results are the clearest early evidence that CRIS-IoMT reflects controlled cloud-side configuration differences across multiple IoMT governance controls.
+The most important controlled differences are now `IOT-005`, `IOT-006`, `IOT-007`, and `IOT-009`: the weak baseline had public IoT Hub access, no compensating boundary evidence, no telemetry route, and no IoT alert rule; the hardened clinic disabled public access, added a storage route, and deployed a real Azure Monitor metric alert. These results are the clearest early evidence that CRIS-IoMT reflects controlled cloud-side configuration differences across multiple IoMT governance controls.
 
 The aggregate Healthcare IoT score should be treated as secondary in this early evaluation. The simulated clinic removes one finding compared with the weak baseline, but its category score is slightly higher because the remaining findings carry different severities, confidence values, exposure factors, and remediation factors. This is a deterministic scoring artefact rather than a claim that the simulated clinic is globally weaker than the baseline. For the controlled-lab argument, the primary result is the per-control state transition, not the aggregate category score.
-
-Following expert review, `IOT-006` was narrowed to a conditional private-endpoint finding: private endpoint absence is treated as a risk only when public ingestion is enabled and no compensating IP-filter or certificate-authority evidence is observed. The table above records the original controlled runs and should be regenerated with the updated control semantics before final submission.
 
 ## 10. Discussion
 

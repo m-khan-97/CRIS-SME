@@ -202,23 +202,24 @@ def fig_control_matrix() -> str:
     W, H = 820, 520
 
     controls = [
-        ("IOT-001", "Device identity authentication"),
+        ("IOT-001", "Cloud device identity"),
         ("IOT-002", "Shared access policy least privilege"),
         ("IOT-003", "Diagnostic logging"),
         ("IOT-004", "Security monitoring observability"),
         ("IOT-005", "Public network access"),
-        ("IOT-006", "Private endpoint coverage"),
+        ("IOT-006", "Conditional private endpoint"),
         ("IOT-007", "Telemetry routing and retention"),
         ("IOT-008", "Secret governance"),
         ("IOT-009", "Clinical alert routing"),
         ("IOT-010", "Clinical-operational boundary"),
     ]
     # Weak baseline all fire. Simulated clinic passes alerting. Hardened clinic
-    # additionally passes public-access and telemetry-routing controls.
+    # additionally passes public-access, conditional private endpoint, and
+    # telemetry-routing controls.
     results = {
         "Weak\nbaseline":    [True] * 10,
         "Simulated\nclinic": [True, True, True, True, True, True, True, True, False, True],
-        "Hardened\nclinic":  [True, True, True, True, False, True, False, True, False, True],
+        "Hardened\nclinic":  [True, True, True, True, False, False, False, True, False, True],
     }
     scenarios = list(results.keys())
 
@@ -231,7 +232,7 @@ def fig_control_matrix() -> str:
     desc = (
         "Heatmap of CRIS-IoMT control outcomes across three paper scenarios. "
         "Red = finding triggered. Green = control passes. "
-        "IOT-005, IOT-007, and IOT-009 are the core controlled results."
+        "IOT-005, IOT-006, IOT-007, and IOT-009 are the core controlled results."
     )
     parts = [svg_open(W, H, "CRIS-IoMT Control Firing Matrix", desc)]
 
@@ -250,7 +251,7 @@ def fig_control_matrix() -> str:
     # Row labels and cells
     for i, (cid, desc_short) in enumerate(controls):
         ry = top + i * cell_h
-        is_key = cid in {"IOT-005", "IOT-007", "IOT-009"}
+        is_key = cid in {"IOT-005", "IOT-006", "IOT-007", "IOT-009"}
 
         # Row background for key result
         if is_key:
@@ -288,9 +289,9 @@ def fig_control_matrix() -> str:
     parts.append(rect(40, ly + 22, 14, 14, "#f0fdf4", GREEN, 3))
     parts.append(text(60, ly + 33, "Control passes — no cloud-observable weakness detected", 12, INK))
     parts.append(text(40, ly + 54,
-        "Figure 2. IoMT control outcomes. The hardened clinic passes IOT-005, IOT-007, "
-        "and IOT-009 after public access is disabled, telemetry routing is added, and "
-        "an Azure Monitor alert is deployed.", 11, MUTED))
+        "Figure 2. IoMT control outcomes. The hardened clinic passes IOT-005, IOT-006, "
+        "IOT-007, and IOT-009 after public access is disabled, telemetry routing is "
+        "added, and an Azure Monitor alert is deployed.", 11, MUTED))
 
     parts.append("</svg>")
     return "\n".join(parts) + "\n"
@@ -308,8 +309,8 @@ def fig_scenario_scores() -> str:
         "Hardened\nclinic",
     ]
     overall  = [27.20, 33.06, 32.16, 32.16]
-    iot_cat  = [26.64, 26.64, 27.32, 24.92]
-    iot_cnt  = [10,    10,    9,     7]
+    iot_cat  = [26.64, 26.40, 27.08, 25.19]
+    iot_cnt  = [10,    10,    9,     6]
 
     left, right, top, bottom = 70, W - 40, 100, H - 100
     pw = right - left

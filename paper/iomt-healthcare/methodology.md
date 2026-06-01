@@ -96,7 +96,7 @@ The suite deploys the weak baseline, simulated clinic, and hardened clinic scena
 
 Each IoMT evidence pack includes control-by-control evidence, evidence assurance status, candidate DSPT outcomes, NCSC CAF objectives, manual evidence backlog, mapping review questions, and triggered finding detail. This is intended to make the evaluation reproducible and reviewable without claiming certification.
 
-The hardened clinic can optionally deploy IoT Hub private endpoint evidence by setting `CRIS_SME_IOMT_ENABLE_PRIVATE_ENDPOINT=true`. This option is kept explicit because private-link support may vary by subscription, SKU, and region; without it, `IOT-006` remains a documented network-isolation gap rather than a failed deployment.
+The hardened clinic can optionally deploy IoT Hub private endpoint evidence by setting `CRIS_SME_IOMT_ENABLE_PRIVATE_ENDPOINT=true`. This option is kept explicit because private-link support may vary by subscription, SKU, and region. Without it, `IOT-006` is evaluated conditionally: private endpoint absence is a finding only when public ingestion remains enabled and no compensating IP-filter or certificate-authority evidence is observed.
 
 ## Non-Claims
 

@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="820" height="520" viewBox="0 0 820 520" role="img" aria-labelledby="t d">
   <title id="t">CRIS-IoMT Control Firing Matrix</title>
-  <desc id="d">Heatmap of CRIS-IoMT control outcomes across three paper scenarios. Red = finding triggered. Green = control passes. IOT-005, IOT-007, and IOT-009 are the core controlled results.</desc>
+  <desc id="d">Heatmap of CRIS-IoMT control outcomes across three paper scenarios. Red = finding triggered. Green = control passes. IOT-005, IOT-006, IOT-007, and IOT-009 are the core controlled results.</desc>
   <rect width="820" height="520" fill="#ffffff"/>
 
 <text x="40.0" y="44.0" font-family="Inter, Arial, sans-serif" font-size="20" font-weight="700" fill="#172033" text-anchor="start">CRIS-IoMT Control Outcomes by Scenario</text>
@@ -14,7 +14,7 @@
 <rect x="0.0" y="100.0" width="820.0" height="34.0" rx="0" fill="#f8fafc" stroke="none"/>
 <line x1="0.0" y1="100.0" x2="820.0" y2="100.0" stroke="#d8e2ec" stroke-width="0.8"/>
 <text x="40.0" y="121.0" font-family="Inter, Arial, sans-serif" font-size="12" font-weight="700" fill="#1d4ed8" text-anchor="start">IOT-001</text>
-<text x="108.0" y="121.0" font-family="Inter, Arial, sans-serif" font-size="12" font-weight="400" fill="#172033" text-anchor="start">Device identity authentication</text>
+<text x="108.0" y="121.0" font-family="Inter, Arial, sans-serif" font-size="12" font-weight="400" fill="#172033" text-anchor="start">Cloud device identity</text>
 <rect x="334.0" y="104.0" width="112.0" height="26.0" rx="5" fill="#fef2f2" stroke="#dc2626"/>
 <text x="390.0" y="121.0" font-family="Inter, Arial, sans-serif" font-size="11" font-weight="700" fill="#dc2626" text-anchor="middle">Triggered</text>
 <rect x="454.0" y="104.0" width="112.0" height="26.0" rx="5" fill="#fef2f2" stroke="#dc2626"/>
@@ -60,15 +60,17 @@
 <text x="510.0" y="257.0" font-family="Inter, Arial, sans-serif" font-size="11" font-weight="700" fill="#dc2626" text-anchor="middle">Triggered</text>
 <rect x="574.0" y="240.0" width="112.0" height="26.0" rx="5" fill="#f0fdf4" stroke="#059669"/>
 <text x="630.0" y="257.0" font-family="Inter, Arial, sans-serif" font-size="11" font-weight="700" fill="#059669" text-anchor="middle">Passes</text>
+<rect x="0.0" y="270.0" width="820.0" height="34.0" rx="0" fill="#fffbeb" stroke="none"/>
+<text x="320.0" y="292.0" font-family="Inter, Arial, sans-serif" font-size="14" font-weight="700" fill="#d97706" text-anchor="end">★</text>
 <line x1="0.0" y1="270.0" x2="820.0" y2="270.0" stroke="#d8e2ec" stroke-width="0.8"/>
 <text x="40.0" y="291.0" font-family="Inter, Arial, sans-serif" font-size="12" font-weight="700" fill="#1d4ed8" text-anchor="start">IOT-006</text>
-<text x="108.0" y="291.0" font-family="Inter, Arial, sans-serif" font-size="12" font-weight="400" fill="#172033" text-anchor="start">Private endpoint coverage</text>
+<text x="108.0" y="291.0" font-family="Inter, Arial, sans-serif" font-size="12" font-weight="400" fill="#172033" text-anchor="start">Conditional private endpoint</text>
 <rect x="334.0" y="274.0" width="112.0" height="26.0" rx="5" fill="#fef2f2" stroke="#dc2626"/>
 <text x="390.0" y="291.0" font-family="Inter, Arial, sans-serif" font-size="11" font-weight="700" fill="#dc2626" text-anchor="middle">Triggered</text>
 <rect x="454.0" y="274.0" width="112.0" height="26.0" rx="5" fill="#fef2f2" stroke="#dc2626"/>
 <text x="510.0" y="291.0" font-family="Inter, Arial, sans-serif" font-size="11" font-weight="700" fill="#dc2626" text-anchor="middle">Triggered</text>
-<rect x="574.0" y="274.0" width="112.0" height="26.0" rx="5" fill="#fef2f2" stroke="#dc2626"/>
-<text x="630.0" y="291.0" font-family="Inter, Arial, sans-serif" font-size="11" font-weight="700" fill="#dc2626" text-anchor="middle">Triggered</text>
+<rect x="574.0" y="274.0" width="112.0" height="26.0" rx="5" fill="#f0fdf4" stroke="#059669"/>
+<text x="630.0" y="291.0" font-family="Inter, Arial, sans-serif" font-size="11" font-weight="700" fill="#059669" text-anchor="middle">Passes</text>
 <rect x="0.0" y="304.0" width="820.0" height="34.0" rx="0" fill="#fffbeb" stroke="none"/>
 <text x="320.0" y="326.0" font-family="Inter, Arial, sans-serif" font-size="14" font-weight="700" fill="#d97706" text-anchor="end">★</text>
 <line x1="0.0" y1="304.0" x2="820.0" y2="304.0" stroke="#d8e2ec" stroke-width="0.8"/>
@@ -114,5 +116,5 @@
 <text x="60.0" y="473.0" font-family="Inter, Arial, sans-serif" font-size="12" font-weight="400" fill="#172033" text-anchor="start">Finding triggered — governance weakness observed</text>
 <rect x="40.0" y="484.0" width="14.0" height="14.0" rx="3" fill="#f0fdf4" stroke="#059669"/>
 <text x="60.0" y="495.0" font-family="Inter, Arial, sans-serif" font-size="12" font-weight="400" fill="#172033" text-anchor="start">Control passes — no cloud-observable weakness detected</text>
-<text x="40.0" y="516.0" font-family="Inter, Arial, sans-serif" font-size="11" font-weight="400" fill="#617083" text-anchor="start">Figure 2. IoMT control outcomes. The hardened clinic passes IOT-005, IOT-007, and IOT-009 after public access is disabled, telemetry routing is added, and an Azure Monitor alert is deployed.</text>
+<text x="40.0" y="516.0" font-family="Inter, Arial, sans-serif" font-size="11" font-weight="400" fill="#617083" text-anchor="start">Figure 2. IoMT control outcomes. The hardened clinic passes IOT-005, IOT-006, IOT-007, and IOT-009 after public access is disabled, telemetry routing is added, and an Azure Monitor alert is deployed.</text>
 </svg>

@@ -16,7 +16,7 @@ This note records how the first expert-review feedback was incorporated into CRI
 
 ## Remaining Pre-Submission Actions
 
-- Regenerate the controlled Azure IoMT suite with the revised `IOT-006` semantics so final scenario counts and Healthcare IoT scores match the reviewed control model.
+- Completed: the controlled Azure IoMT suite was regenerated after the revised `IOT-006` semantics. Run `20260601004646` produced 10 findings for the weak baseline, 9 for the simulated clinic, and 6 for the hardened clinic. The hardened clinic now passes `IOT-005`, `IOT-006`, `IOT-007`, and `IOT-009`.
 - Ask a healthcare IoT/domain expert to review the narrowed DSPT/CAF candidate mappings, especially `B2.a`, `B4.a`, `B4.b`, `C1.a`, and `D1.a` claims.
 - If possible, run a licensed environment where Defender for IoT is observable so `IOT-004` can be evaluated as a discriminating monitoring signal rather than only an observability boundary.
 - Add device-side or endpoint/MDM evidence in a later extension if the paper scope expands beyond cloud governance.
