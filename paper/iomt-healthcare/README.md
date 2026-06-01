@@ -13,6 +13,8 @@ Recommended reading order:
 5. `evaluation-results.md`
 6. `main.md`
 
+For external domain review, use `expert-review-pack/README.md` as the entry point. That folder contains the cover brief, paper summary, control matrix, evidence boundary note, evaluation summary, related-work comparison, review ledger, and suggested review request message.
+
 The package is based on live Azure IoT Hub evidence runs recorded in `docs/research/cris-iomt/live-run-register.md`.
 
 Generated CRIS reports and IoMT evidence packs are stored under `outputs/` and are not committed by default because live resource identifiers may appear in those artifacts.
