@@ -1,0 +1,256 @@
+{
+  "Framework": "GDPR",
+  "Name": "GDPR technical measures framework (Azure)",
+  "Version": "",
+  "Provider": "Azure",
+  "Description": "The General Data Protection Regulation (EU) 2016/679 requires controllers and processors to implement appropriate technical and organisational measures. This framework maps the technical-measures articles (5(1)(f), 25, 30, 32, 33, 34, and 35) to automated Prowler checks for Microsoft Azure. Automated checks verify technical proxies for legal requirements: a passing check supports, but never by itself establishes, GDPR compliance, and legal interpretation remains the responsibility of the controller. Requirements that are organisational or procedural in nature are included with an explicit evidence classification (policy_required or manual_required) in the Type attribute rather than omitted, so reports state what cannot be automatically verified.",
+  "Requirements": [
+    {
+      "Id": "article_5_1_f",
+      "Name": "Article 5(1)(f) Integrity and confidentiality",
+      "Description": "Personal data must be processed in a manner that ensures appropriate security, including protection against unauthorised or unlawful processing and against accidental loss, destruction or damage, using appropriate technical or organisational measures. Official text: https://gdpr-info.eu/art-5-gdpr/",
+      "Attributes": [
+        {
+          "ItemId": "article_5_1_f",
+          "Section": "Article 5 Principles relating to processing of personal data",
+          "Service": "storage",
+          "Type": "direct_cloud",
+          "Comment": "Encryption at rest and in transit for data stores is directly verifiable from resource configuration."
+        }
+      ],
+      "Checks": [
+        "storage_infrastructure_encryption_is_enabled",
+        "storage_secure_transfer_required_is_enabled",
+        "storage_ensure_minimum_tls_version_12",
+        "sqlserver_tde_encryption_enabled",
+        "vm_ensure_attached_disks_encrypted_with_cmk",
+        "vm_ensure_unattached_disks_encrypted_with_cmk",
+        "databricks_workspace_cmk_encryption_enabled",
+        "mysql_flexible_server_ssl_connection_enabled",
+        "postgresql_flexible_server_enforce_ssl_enabled",
+        "app_ensure_http_is_redirected_to_https"
+      ]
+    },
+    {
+      "Id": "article_25",
+      "Name": "Article 25 Data protection by design and by default",
+      "Description": "Appropriate technical and organisational measures must ensure that, by default, only personal data necessary for each specific purpose is processed, and that personal data is not made accessible to an indefinite number of persons without the individual's intervention. Official text: https://gdpr-info.eu/art-25-gdpr/",
+      "Attributes": [
+        {
+          "ItemId": "article_25",
+          "Section": "Article 25 Data protection by design and by default",
+          "Service": "storage",
+          "Type": "direct_cloud",
+          "Comment": "Default-deny network posture, disabled public access, and least-privilege authorisation defaults are directly verifiable. The design process itself (DPIA integration, data minimisation decisions) is policy_required."
+        }
+      ],
+      "Checks": [
+        "storage_blob_public_access_level_is_disabled",
+        "storage_account_public_network_access_disabled",
+        "storage_default_network_access_rule_is_denied",
+        "entra_security_defaults_enabled",
+        "network_ssh_internet_access_restricted",
+        "network_rdp_internet_access_restricted",
+        "network_http_internet_access_restricted",
+        "sqlserver_unrestricted_inbound_access",
+        "cosmosdb_account_firewall_use_selected_networks",
+        "containerregistry_not_publicly_accessible",
+        "aisearch_service_not_publicly_accessible",
+        "keyvault_rbac_enabled",
+        "storage_default_to_entra_authorization_enabled",
+        "entra_policy_guest_users_access_restrictions",
+        "entra_policy_guest_invite_only_for_admin_roles",
+        "entra_user_with_vm_access_has_mfa",
+        "iam_custom_role_has_permissions_to_administer_resource_locks",
+        "monitor_alert_create_policy_assignment",
+        "monitor_alert_delete_policy_assignment",
+        "network_flow_log_more_than_90_days",
+        "network_watcher_enabled"
+      ]
+    },
+    {
+      "Id": "article_30",
+      "Name": "Article 30 Records of processing activities",
+      "Description": "Controllers and processors must maintain records of processing activities under their responsibility, including purposes, categories, recipients, and where possible a general description of the technical and organisational security measures. Official text: https://gdpr-info.eu/art-30-gdpr/",
+      "Attributes": [
+        {
+          "ItemId": "article_30",
+          "Section": "Article 30 Records of processing activities",
+          "Service": "monitor",
+          "Type": "inferred_cloud",
+          "Comment": "Audit logging and diagnostic settings provide supporting evidence of processing visibility, but the Article 30 record itself is an organisational document (policy_required) that logging cannot substitute."
+        }
+      ],
+      "Checks": [
+        "monitor_diagnostic_settings_exists",
+        "monitor_diagnostic_setting_with_appropriate_categories",
+        "sqlserver_auditing_enabled",
+        "sqlserver_auditing_retention_90_days",
+        "mysql_flexible_server_audit_log_enabled",
+        "mysql_flexible_server_audit_log_connection_activated",
+        "postgresql_flexible_server_log_connections_on",
+        "postgresql_flexible_server_log_disconnections_on",
+        "postgresql_flexible_server_log_retention_days_greater_3",
+        "keyvault_logging_enabled",
+        "app_http_logs_enabled",
+        "network_flow_log_captured_sent",
+        "monitor_storage_account_with_activity_logs_is_private",
+        "postgresql_flexible_server_log_checkpoints_on"
+      ]
+    },
+    {
+      "Id": "article_32_1_a",
+      "Name": "Article 32(1)(a) Pseudonymisation and encryption",
+      "Description": "Taking into account the state of the art and the risks, the controller and processor must implement measures including the pseudonymisation and encryption of personal data. Official text: https://gdpr-info.eu/art-32-gdpr/",
+      "Attributes": [
+        {
+          "ItemId": "article_32_1_a",
+          "Section": "Article 32 Security of processing",
+          "Service": "keyvault",
+          "Type": "direct_cloud",
+          "Comment": "Encryption configuration and key management hygiene are directly verifiable; whether pseudonymisation is applied within application data models is manual_required."
+        }
+      ],
+      "Checks": [
+        "storage_ensure_encryption_with_customer_managed_keys",
+        "sqlserver_tde_encrypted_with_cmk",
+        "monitor_storage_account_with_activity_logs_cmk_encrypted",
+        "keyvault_key_rotation_enabled",
+        "keyvault_rbac_key_expiration_set",
+        "keyvault_non_rbac_secret_expiration_set",
+        "storage_key_rotation_90_days",
+        "keyvault_rbac_secret_expiration_set"
+      ]
+    },
+    {
+      "Id": "article_32_1_b",
+      "Name": "Article 32(1)(b) Confidentiality, integrity, availability and resilience",
+      "Description": "Measures must ensure the ongoing confidentiality, integrity, availability and resilience of processing systems and services. Official text: https://gdpr-info.eu/art-32-gdpr/",
+      "Attributes": [
+        {
+          "ItemId": "article_32_1_b",
+          "Section": "Article 32 Security of processing",
+          "Service": "entra",
+          "Type": "direct_cloud",
+          "Comment": "Access control enforcement (MFA, privileged-role limits) and resilience configuration (redundancy, failover) are directly verifiable."
+        }
+      ],
+      "Checks": [
+        "entra_privileged_user_has_mfa",
+        "entra_non_privileged_user_has_mfa",
+        "entra_conditional_access_policy_require_mfa_for_admin_portals",
+        "entra_conditional_access_policy_require_mfa_for_management_api",
+        "entra_global_admin_in_less_than_five_users",
+        "iam_subscription_roles_owner_custom_not_created",
+        "iam_role_user_access_admin_restricted",
+        "sqlserver_azuread_administrator_enabled",
+        "cosmosdb_account_use_aad_and_rbac",
+        "storage_geo_redundant_enabled",
+        "cosmosdb_account_automatic_failover_enabled",
+        "vm_ensure_using_managed_disks",
+        "app_minimum_tls_version_12",
+        "mysql_flexible_server_minimum_tls_version_12",
+        "sqlserver_recommended_minimal_tls_version"
+      ]
+    },
+    {
+      "Id": "article_32_1_c",
+      "Name": "Article 32(1)(c) Restore availability and access after incidents",
+      "Description": "Measures must provide the ability to restore the availability and access to personal data in a timely manner in the event of a physical or technical incident. Official text: https://gdpr-info.eu/art-32-gdpr/",
+      "Attributes": [
+        {
+          "ItemId": "article_32_1_c",
+          "Section": "Article 32 Security of processing",
+          "Service": "vm",
+          "Type": "direct_cloud",
+          "Comment": "Backup enablement, retention, and recoverability settings are directly verifiable; restore-time objectives and tested recovery procedures are policy_required."
+        }
+      ],
+      "Checks": [
+        "vm_backup_enabled",
+        "vm_sufficient_daily_backup_retention_period",
+        "storage_ensure_soft_delete_is_enabled",
+        "storage_ensure_file_shares_soft_delete_is_enabled",
+        "storage_blob_versioning_is_enabled",
+        "keyvault_recoverable"
+      ]
+    },
+    {
+      "Id": "article_32_1_d",
+      "Name": "Article 32(1)(d) Regular testing and evaluation of measures",
+      "Description": "There must be a process for regularly testing, assessing and evaluating the effectiveness of technical and organisational measures for ensuring the security of the processing. Official text: https://gdpr-info.eu/art-32-gdpr/",
+      "Attributes": [
+        {
+          "ItemId": "article_32_1_d",
+          "Section": "Article 32 Security of processing",
+          "Service": "defender",
+          "Type": "inferred_cloud",
+          "Comment": "Continuous assessment tooling (vulnerability scanning, posture management) is verifiable as enabled; the organisational testing and evaluation process it feeds is policy_required."
+        }
+      ],
+      "Checks": [
+        "defender_auto_provisioning_vulnerabilty_assessments_machines_on",
+        "sqlserver_va_periodic_recurring_scans_enabled",
+        "sqlserver_vulnerability_assessment_enabled",
+        "sqlserver_va_scan_reports_configured",
+        "defender_ensure_defender_for_server_is_on",
+        "defender_ensure_system_updates_are_applied",
+        "policy_ensure_asc_enforcement_enabled"
+      ]
+    },
+    {
+      "Id": "article_33",
+      "Name": "Article 33 Notification of a personal data breach to the supervisory authority",
+      "Description": "In the case of a personal data breach, the controller must without undue delay and, where feasible, not later than 72 hours after having become aware of it, notify the competent supervisory authority. Official text: https://gdpr-info.eu/art-33-gdpr/",
+      "Attributes": [
+        {
+          "ItemId": "article_33",
+          "Section": "Article 33 Breach notification",
+          "Service": "defender",
+          "Type": "inferred_cloud",
+          "Comment": "Alerting and security-contact configuration evidence detection capability, a precondition for the 72-hour obligation; the notification process itself is policy_required."
+        }
+      ],
+      "Checks": [
+        "defender_additional_email_configured_with_a_security_contact",
+        "defender_ensure_notify_alerts_severity_is_high",
+        "defender_ensure_notify_emails_to_owners",
+        "defender_attack_path_notifications_properly_configured",
+        "monitor_alert_create_update_security_solution",
+        "monitor_alert_delete_security_solution",
+        "monitor_alert_create_update_nsg",
+        "monitor_alert_delete_nsg"
+      ]
+    },
+    {
+      "Id": "article_34",
+      "Name": "Article 34 Communication of a personal data breach to the data subject",
+      "Description": "When a personal data breach is likely to result in a high risk to the rights and freedoms of natural persons, the controller must communicate the breach to the data subject without undue delay. Official text: https://gdpr-info.eu/art-34-gdpr/",
+      "Attributes": [
+        {
+          "ItemId": "article_34",
+          "Section": "Article 34 Breach notification",
+          "Service": "n/a",
+          "Type": "policy_required",
+          "Comment": "Data-subject communication is an organisational process. Article 34(3)(a) makes encryption a mitigating factor, so the encryption checks under Article 32(1)(a) provide supporting evidence, but no automated check verifies the communication obligation."
+        }
+      ],
+      "Checks": []
+    },
+    {
+      "Id": "article_35",
+      "Name": "Article 35 Data protection impact assessment",
+      "Description": "Where processing is likely to result in a high risk to the rights and freedoms of natural persons, the controller must carry out a data protection impact assessment prior to the processing. Official text: https://gdpr-info.eu/art-35-gdpr/",
+      "Attributes": [
+        {
+          "ItemId": "article_35",
+          "Section": "Article 35 Data protection impact assessment",
+          "Service": "n/a",
+          "Type": "manual_required",
+          "Comment": "A DPIA is a documented organisational assessment that cannot be verified from cloud configuration; included so reports explicitly state this boundary."
+        }
+      ],
+      "Checks": []
+    }
+  ]
+}

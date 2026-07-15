@@ -1,0 +1,355 @@
+{
+  "Framework": "CyberEssentials",
+  "Name": "UK Cyber Essentials v3.3 (Azure cloud infrastructure scope)",
+  "Version": "3.3",
+  "Provider": "Azure",
+  "Description": "The UK Cyber Essentials scheme (NCSC Requirements for IT Infrastructure v3.3) defines five technical control themes: firewalls, secure configuration, user access control, malware protection, and security update management. This framework maps the cloud-infrastructure slice of those requirements to automated Prowler checks for Microsoft Azure. Cyber Essentials also covers end-user devices, BYOD, and organisational process; requirements that cannot be verified from the Azure control plane are included with an explicit evidence classification (endpoint_required, policy_required, or manual_required) in the Type attribute instead of being omitted, so assessment reports state what remains to be evidenced rather than implying full coverage. Requirement descriptions are paraphrased from the public NCSC requirements document; verbatim IASME question text is intentionally not reproduced. Passing every automated check in this framework does not constitute Cyber Essentials certification.",
+  "Requirements": [
+    {
+      "Id": "ce-1.1",
+      "Name": "Internet-exposed administration services are restricted",
+      "Description": "Services used to administer systems (such as SSH and RDP) must not be reachable from the open internet; inbound access must be blocked or restricted to authorised sources.",
+      "Attributes": [
+        {
+          "ItemId": "ce-1.1",
+          "Section": "1. Firewalls",
+          "Service": "network",
+          "Type": "direct_cloud",
+          "Comment": "Directly verifiable from Network Security Group rules in the Azure control plane."
+        }
+      ],
+      "Checks": [
+        "network_ssh_internet_access_restricted",
+        "network_rdp_internet_access_restricted",
+        "network_udp_internet_access_restricted",
+        "vm_jit_access_enabled",
+        "network_bastion_host_exists"
+      ]
+    },
+    {
+      "Id": "ce-1.2",
+      "Name": "Default deny for inbound connections to services",
+      "Description": "Inbound connections must be denied by default, with open services limited to those with a documented business need.",
+      "Attributes": [
+        {
+          "ItemId": "ce-1.2",
+          "Section": "1. Firewalls",
+          "Service": "network",
+          "Type": "direct_cloud",
+          "Comment": "Network reachability is directly verifiable; the documented business need for each remaining open service is an organisational record (policy_required) that automated checks cannot confirm."
+        }
+      ],
+      "Checks": [
+        "network_http_internet_access_restricted",
+        "sqlserver_unrestricted_inbound_access",
+        "storage_account_public_network_access_disabled",
+        "storage_default_network_access_rule_is_denied",
+        "cosmosdb_account_firewall_use_selected_networks",
+        "aks_clusters_public_access_disabled",
+        "containerregistry_not_publicly_accessible",
+        "app_function_not_publicly_accessible",
+        "aisearch_service_not_publicly_accessible",
+        "postgresql_flexible_server_allow_access_services_disabled",
+        "keyvault_access_only_through_private_endpoints"
+      ]
+    },
+    {
+      "Id": "ce-1.3",
+      "Name": "Host-based firewalls on end-user devices",
+      "Description": "A software firewall must be enabled on end-user devices used outside the protected network boundary.",
+      "Attributes": [
+        {
+          "ItemId": "ce-1.3",
+          "Section": "1. Firewalls",
+          "Service": "n/a",
+          "Type": "endpoint_required",
+          "Comment": "End-user device firewall state is not observable from the Azure control plane; requires endpoint management (MDM/EDR) evidence."
+        }
+      ],
+      "Checks": []
+    },
+    {
+      "Id": "ce-2.1",
+      "Name": "Insecure and unnecessary service configurations removed",
+      "Description": "Services must be configured securely: legacy transfer protocols disabled, transport encryption enforced, and current TLS versions required.",
+      "Attributes": [
+        {
+          "ItemId": "ce-2.1",
+          "Section": "2. Secure configuration",
+          "Service": "app",
+          "Type": "direct_cloud",
+          "Comment": "Service configuration state is directly verifiable from resource properties."
+        }
+      ],
+      "Checks": [
+        "app_ftp_deployment_disabled",
+        "app_function_ftps_deployment_disabled",
+        "app_ensure_http_is_redirected_to_https",
+        "storage_secure_transfer_required_is_enabled",
+        "storage_ensure_minimum_tls_version_12",
+        "app_minimum_tls_version_12",
+        "mysql_flexible_server_minimum_tls_version_12",
+        "sqlserver_recommended_minimal_tls_version",
+        "postgresql_flexible_server_enforce_ssl_enabled",
+        "mysql_flexible_server_ssl_connection_enabled"
+      ]
+    },
+    {
+      "Id": "ce-2.2",
+      "Name": "Default and shared credentials removed or disabled",
+      "Description": "Default accounts and shared access credentials must be changed, disabled, or replaced with identity-based authentication.",
+      "Attributes": [
+        {
+          "ItemId": "ce-2.2",
+          "Section": "2. Secure configuration",
+          "Service": "storage",
+          "Type": "direct_cloud",
+          "Comment": "Admin-user and shared-key settings are directly verifiable on Azure resources."
+        }
+      ],
+      "Checks": [
+        "containerregistry_admin_user_disabled",
+        "storage_account_key_access_disabled",
+        "storage_default_to_entra_authorization_enabled",
+        "vm_linux_enforce_ssh_authentication",
+        "keyvault_rbac_enabled"
+      ]
+    },
+    {
+      "Id": "ce-2.3",
+      "Name": "Publicly accessible data stores are intentional only",
+      "Description": "Anonymous or public read access to data stores must be disabled unless there is a documented business need.",
+      "Attributes": [
+        {
+          "ItemId": "ce-2.3",
+          "Section": "2. Secure configuration",
+          "Service": "storage",
+          "Type": "direct_cloud",
+          "Comment": "Public access configuration is directly verifiable; any documented business exception is policy_required."
+        }
+      ],
+      "Checks": [
+        "storage_blob_public_access_level_is_disabled"
+      ]
+    },
+    {
+      "Id": "ce-2.4",
+      "Name": "Device locking and auto-run controls on end-user devices",
+      "Description": "End-user devices must require authentication to unlock and must not automatically execute software from removable media or downloads.",
+      "Attributes": [
+        {
+          "ItemId": "ce-2.4",
+          "Section": "2. Secure configuration",
+          "Service": "n/a",
+          "Type": "endpoint_required",
+          "Comment": "Device unlock and auto-run settings require endpoint management evidence; not observable from the Azure control plane."
+        }
+      ],
+      "Checks": []
+    },
+    {
+      "Id": "ce-3.1",
+      "Name": "Multi-factor authentication for administrative access",
+      "Description": "Accounts with administrative access to cloud services must use multi-factor authentication.",
+      "Attributes": [
+        {
+          "ItemId": "ce-3.1",
+          "Section": "3. User access control",
+          "Service": "entra",
+          "Type": "direct_cloud",
+          "Comment": "MFA registration and conditional access enforcement for privileged identities are directly verifiable via Microsoft Entra."
+        }
+      ],
+      "Checks": [
+        "entra_privileged_user_has_mfa",
+        "entra_conditional_access_policy_require_mfa_for_admin_portals",
+        "entra_conditional_access_policy_require_mfa_for_management_api",
+        "entra_user_with_vm_access_has_mfa"
+      ]
+    },
+    {
+      "Id": "ce-3.2",
+      "Name": "Multi-factor authentication for all cloud service users",
+      "Description": "All user accounts on cloud services must use multi-factor authentication where the service supports it.",
+      "Attributes": [
+        {
+          "ItemId": "ce-3.2",
+          "Section": "3. User access control",
+          "Service": "entra",
+          "Type": "direct_cloud",
+          "Comment": "Per-user MFA state is directly verifiable via Microsoft Entra; security defaults provide a tenant-wide baseline signal."
+        }
+      ],
+      "Checks": [
+        "entra_non_privileged_user_has_mfa",
+        "entra_security_defaults_enabled"
+      ]
+    },
+    {
+      "Id": "ce-3.3",
+      "Name": "Administrative privilege is limited and separated",
+      "Description": "Administrative accounts must be limited to those who need them, kept to the minimum privilege required, and not used for day-to-day activity.",
+      "Attributes": [
+        {
+          "ItemId": "ce-3.3",
+          "Section": "3. User access control",
+          "Service": "iam",
+          "Type": "inferred_cloud",
+          "Comment": "Privileged role counts and custom-role hygiene are directly verifiable; whether admin accounts are also used for routine activity requires sign-in log analysis or organisational confirmation."
+        }
+      ],
+      "Checks": [
+        "entra_global_admin_in_less_than_five_users",
+        "iam_subscription_roles_owner_custom_not_created",
+        "iam_role_user_access_admin_restricted",
+        "iam_custom_role_has_permissions_to_administer_resource_locks",
+        "sqlserver_azuread_administrator_enabled",
+        "cosmosdb_account_use_aad_and_rbac"
+      ]
+    },
+    {
+      "Id": "ce-3.4",
+      "Name": "Guest and external account access is controlled",
+      "Description": "External or guest accounts must be restricted, reviewed, and removed when no longer required.",
+      "Attributes": [
+        {
+          "ItemId": "ce-3.4",
+          "Section": "3. User access control",
+          "Service": "entra",
+          "Type": "inferred_cloud",
+          "Comment": "Guest restriction policies are directly verifiable; the joiner/mover/leaver process behind account lifecycle is policy_required."
+        }
+      ],
+      "Checks": [
+        "entra_policy_guest_users_access_restrictions",
+        "entra_policy_guest_invite_only_for_admin_roles",
+        "entra_policy_restricts_user_consent_for_apps"
+      ]
+    },
+    {
+      "Id": "ce-3.5",
+      "Name": "Account creation and removal process",
+      "Description": "There must be a defined process to create accounts on business need and to disable or remove them promptly when no longer required.",
+      "Attributes": [
+        {
+          "ItemId": "ce-3.5",
+          "Section": "3. User access control",
+          "Service": "n/a",
+          "Type": "policy_required",
+          "Comment": "Account lifecycle process is an organisational control; cloud telemetry can support but not evidence the process itself."
+        }
+      ],
+      "Checks": []
+    },
+    {
+      "Id": "ce-4.1",
+      "Name": "Malware protection on cloud-hosted servers",
+      "Description": "Cloud-hosted virtual machines and workloads in scope must run anti-malware protection or equivalent workload protection.",
+      "Attributes": [
+        {
+          "ItemId": "ce-4.1",
+          "Section": "4. Malware protection",
+          "Service": "defender",
+          "Type": "inferred_cloud",
+          "Comment": "Defender plan enablement and endpoint-protection assessments are control-plane signals; they indicate but do not fully prove per-host anti-malware state."
+        }
+      ],
+      "Checks": [
+        "defender_ensure_defender_for_server_is_on",
+        "defender_assessments_vm_endpoint_protection_installed",
+        "defender_ensure_wdatp_is_enabled",
+        "defender_ensure_defender_for_storage_is_on",
+        "defender_ensure_defender_for_containers_is_on",
+        "defender_container_images_scan_enabled",
+        "defender_ensure_mcas_is_enabled"
+      ]
+    },
+    {
+      "Id": "ce-4.2",
+      "Name": "Malware protection on end-user devices",
+      "Description": "End-user devices in scope must run anti-malware software or use application allow-listing.",
+      "Attributes": [
+        {
+          "ItemId": "ce-4.2",
+          "Section": "4. Malware protection",
+          "Service": "n/a",
+          "Type": "endpoint_required",
+          "Comment": "End-user device anti-malware state requires endpoint management (MDM/EDR) evidence; not observable from the Azure control plane."
+        }
+      ],
+      "Checks": []
+    },
+    {
+      "Id": "ce-5.1",
+      "Name": "Cloud workloads receive security updates",
+      "Description": "Operating systems and platform runtimes on cloud workloads must be supported and have security updates applied promptly.",
+      "Attributes": [
+        {
+          "ItemId": "ce-5.1",
+          "Section": "5. Security update management",
+          "Service": "defender",
+          "Type": "inferred_cloud",
+          "Comment": "Missing system updates and outdated runtimes are verifiable from control-plane assessments; the 14-day high/critical patch SLA requires update timestamps that these point-in-time checks approximate."
+        }
+      ],
+      "Checks": [
+        "defender_ensure_system_updates_are_applied",
+        "app_ensure_java_version_is_latest",
+        "app_ensure_php_version_is_latest",
+        "app_ensure_python_version_is_latest",
+        "app_function_latest_runtime_version",
+        "vm_ensure_using_approved_images"
+      ]
+    },
+    {
+      "Id": "ce-5.2",
+      "Name": "Vulnerability identification is in place",
+      "Description": "There must be a mechanism to identify vulnerabilities in in-scope systems so that high and critical fixes can be applied within 14 days.",
+      "Attributes": [
+        {
+          "ItemId": "ce-5.2",
+          "Section": "5. Security update management",
+          "Service": "defender",
+          "Type": "direct_cloud",
+          "Comment": "Vulnerability assessment provisioning and recurring scan configuration are directly verifiable."
+        }
+      ],
+      "Checks": [
+        "defender_auto_provisioning_vulnerabilty_assessments_machines_on",
+        "sqlserver_va_periodic_recurring_scans_enabled",
+        "sqlserver_vulnerability_assessment_enabled",
+        "defender_container_images_resolved_vulnerabilities"
+      ]
+    },
+    {
+      "Id": "ce-5.3",
+      "Name": "Unsupported software removed from end-user devices",
+      "Description": "Software that no longer receives security updates must be removed from in-scope devices, and all software must be licensed and supported.",
+      "Attributes": [
+        {
+          "ItemId": "ce-5.3",
+          "Section": "5. Security update management",
+          "Service": "n/a",
+          "Type": "endpoint_required",
+          "Comment": "End-user device software inventory requires endpoint management evidence; not observable from the Azure control plane."
+        }
+      ],
+      "Checks": []
+    },
+    {
+      "Id": "ce-0.1",
+      "Name": "Scope definition and asset ownership",
+      "Description": "The assessment scope (organisation, networks, devices, and cloud services in scope) must be defined and agreed by a responsible person.",
+      "Attributes": [
+        {
+          "ItemId": "ce-0.1",
+          "Section": "0. Scope",
+          "Service": "n/a",
+          "Type": "manual_required",
+          "Comment": "Scope boundaries and accountability are human declarations; automated discovery can inform but never determine them."
+        }
+      ],
+      "Checks": []
+    }
+  ]
+}
