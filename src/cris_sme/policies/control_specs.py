@@ -149,12 +149,12 @@ def _default_provider_support(domain: str) -> dict[str, str]:
     if "iot" in domain.lower():
         return {
             "azure": "research_preview",
-            "aws": "planned",
+            "aws": "research_preview",
             "gcp": "planned",
         }
     return {
         "azure": "active",
-        "aws": "planned",
+        "aws": "research_preview",
         "gcp": "planned",
     }
 

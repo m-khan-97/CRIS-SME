@@ -1,0 +1,140 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://cris-sme.local/schemas/control_metadata_v2.schema.json",
+  "title": "CRIS-SME Control Metadata v2",
+  "type": "array",
+  "items": {
+    "type": "object",
+    "required": [
+      "control_id",
+      "version",
+      "title",
+      "domain",
+      "severity",
+      "provider_support",
+      "resource_type",
+      "resource_group",
+      "description",
+      "risk",
+      "evidence_requirements",
+      "freshness_hours",
+      "confidence_penalties",
+      "compliance_mappings",
+      "remediation",
+      "related_controls",
+      "dependencies",
+      "assurance_claims"
+    ],
+    "additionalProperties": false,
+    "properties": {
+      "control_id": {"type": "string", "minLength": 3},
+      "version": {"type": "string", "minLength": 3},
+      "title": {"type": "string", "minLength": 5},
+      "domain": {
+        "type": "string",
+        "enum": [
+          "IAM",
+          "Network",
+          "Data",
+          "Monitoring/Logging",
+          "Compute/Workloads",
+          "Cost/Governance Hygiene",
+          "Healthcare IoT"
+        ]
+      },
+      "severity": {
+        "type": "string",
+        "enum": ["Critical", "High", "Medium", "Low"]
+      },
+      "provider_support": {
+        "type": "object",
+        "minProperties": 1,
+        "additionalProperties": {
+          "type": "string",
+          "enum": ["active", "planned", "research_preview", "unsupported"]
+        }
+      },
+      "resource_type": {"type": "string", "minLength": 3},
+      "resource_group": {"type": "string", "minLength": 3},
+      "description": {"type": "string", "minLength": 8},
+      "risk": {"type": "string", "minLength": 8},
+      "evidence_requirements": {
+        "type": "array",
+        "items": {"type": "string", "minLength": 3},
+        "minItems": 1,
+        "uniqueItems": true
+      },
+      "freshness_hours": {"type": "integer", "minimum": 1},
+      "confidence_penalties": {
+        "type": "array",
+        "items": {"type": "string", "minLength": 3},
+        "uniqueItems": true
+      },
+      "compliance_mappings": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "required": ["framework", "reference_id", "title", "relevance"],
+          "additionalProperties": false,
+          "properties": {
+            "framework": {"type": "string", "minLength": 2},
+            "reference_id": {"type": "string", "minLength": 1},
+            "title": {"type": "string", "minLength": 3},
+            "relevance": {"type": "string", "minLength": 3}
+          }
+        },
+        "minItems": 1
+      },
+      "remediation": {
+        "type": "object",
+        "required": ["summary", "cost_tier", "manual_steps", "code"],
+        "additionalProperties": false,
+        "properties": {
+          "summary": {"type": "string", "minLength": 8},
+          "cost_tier": {
+            "type": "string",
+            "enum": ["free", "low", "medium", "high"]
+          },
+          "manual_steps": {
+            "type": "array",
+            "items": {"type": "string", "minLength": 3},
+            "minItems": 1
+          },
+          "code": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": ["kind", "label", "snippet"],
+              "additionalProperties": false,
+              "properties": {
+                "kind": {"type": "string", "minLength": 2},
+                "label": {"type": "string", "minLength": 3},
+                "snippet": {"type": "string", "minLength": 3}
+              }
+            }
+          }
+        }
+      },
+      "related_controls": {
+        "type": "array",
+        "items": {"type": "string", "minLength": 3},
+        "uniqueItems": true
+      },
+      "dependencies": {
+        "type": "array",
+        "items": {"type": "string", "minLength": 3},
+        "uniqueItems": true
+      },
+      "assurance_claims": {
+        "type": "array",
+        "items": {"type": "string", "minLength": 3},
+        "minItems": 1,
+        "uniqueItems": true
+      },
+      "metadata": {
+        "type": "object",
+        "additionalProperties": true
+      }
+    }
+  }
+}

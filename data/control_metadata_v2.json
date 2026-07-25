@@ -1,0 +1,403 @@
+[
+  {
+    "control_id": "IAM-001",
+    "version": "2.0.0",
+    "title": "Privileged role assignments without MFA enforcement",
+    "domain": "IAM",
+    "severity": "Critical",
+    "provider_support": {
+      "azure": "active",
+      "aws": "research_preview",
+      "gcp": "planned"
+    },
+    "resource_type": "identity/principal",
+    "resource_group": "identity-access",
+    "description": "Evaluates whether privileged users and administrative role assignments are protected by MFA and admin-focused conditional access.",
+    "risk": "An attacker who compromises an unprotected privileged identity can alter cloud resources, disable controls, exfiltrate data, or create persistence.",
+    "evidence_requirements": [
+      "privileged assignment inventory",
+      "privileged account MFA state",
+      "admin conditional access policy state",
+      "identity governance visibility context"
+    ],
+    "freshness_hours": 24,
+    "confidence_penalties": [
+      "reduce confidence when tenant-wide Conditional Access is not observable",
+      "reduce confidence when MFA state is inferred from partial role inventory"
+    ],
+    "compliance_mappings": [
+      {
+        "framework": "CIS Azure Foundations Benchmark",
+        "reference_id": "1.4",
+        "title": "Ensure multi-factor authentication is enabled for all privileged users",
+        "relevance": "Privileged access protection"
+      },
+      {
+        "framework": "ISO 27001",
+        "reference_id": "A.5.17",
+        "title": "Authentication information",
+        "relevance": "Administrative authentication governance"
+      },
+      {
+        "framework": "NIST CSF 2.0",
+        "reference_id": "PR.AA-02",
+        "title": "Identities are proofed and bound to credentials",
+        "relevance": "Identity and access control assurance"
+      },
+      {
+        "framework": "Cyber Essentials",
+        "reference_id": "Access control",
+        "title": "Use access controls to protect accounts and services",
+        "relevance": "SME-oriented baseline for privileged access protection"
+      },
+      {
+        "framework": "UK GDPR",
+        "reference_id": "Article 32",
+        "title": "Security of processing",
+        "relevance": "Protection of administrative access to systems handling personal data"
+      },
+      {
+        "framework": "FCA SYSC",
+        "reference_id": "SYSC 3.2.6R",
+        "title": "A firm must establish and maintain effective systems and controls",
+        "relevance": "Identity control baseline for regulated SME environments"
+      }
+    ],
+    "remediation": {
+      "summary": "Require MFA and admin-focused conditional access for privileged identities.",
+      "cost_tier": "free",
+      "manual_steps": [
+        "Review all privileged role assignments and confirm each principal has a named owner.",
+        "Require MFA for privileged users and emergency access accounts through an approved policy.",
+        "Create a decision record for any exception, including expiry and compensating control."
+      ],
+      "code": [
+        {
+          "kind": "azure_cli",
+          "label": "List Azure role assignments for review",
+          "snippet": "az role assignment list --all --include-inherited --output table"
+        }
+      ]
+    },
+    "related_controls": [
+      "IAM-002",
+      "IAM-004",
+      "IAM-005"
+    ],
+    "dependencies": [],
+    "assurance_claims": [
+      "privileged-access-is-strongly-authenticated",
+      "identity-evidence-boundary-is-explicit"
+    ],
+    "metadata": {
+      "evaluator": "iam_controls",
+      "first_v2_seed": true
+    }
+  },
+  {
+    "control_id": "NET-001",
+    "version": "2.0.0",
+    "title": "Administrative services are exposed to the public internet",
+    "domain": "Network",
+    "severity": "Critical",
+    "provider_support": {
+      "azure": "active",
+      "aws": "research_preview",
+      "gcp": "planned"
+    },
+    "resource_type": "network/exposure",
+    "resource_group": "internet-exposure",
+    "description": "Evaluates whether SSH or RDP administrative services are reachable from the public internet.",
+    "risk": "Public administrative ports increase the likelihood of brute-force access, credential stuffing, exploitation, and rapid compromise of cloud workloads.",
+    "evidence_requirements": [
+      "inbound exposure inventory",
+      "administrative port inventory",
+      "network rule source scope",
+      "administrative path restriction evidence"
+    ],
+    "freshness_hours": 24,
+    "confidence_penalties": [
+      "reduce confidence when network rules are observed without resolved workload context",
+      "reduce confidence when exposure is aggregated rather than asset-specific"
+    ],
+    "compliance_mappings": [
+      {
+        "framework": "CIS Azure Foundations Benchmark",
+        "reference_id": "6.1",
+        "title": "Restrict network access to management ports",
+        "relevance": "Public admin port exposure"
+      },
+      {
+        "framework": "ISO 27001",
+        "reference_id": "A.8.20",
+        "title": "Network security",
+        "relevance": "Protection of administrative interfaces"
+      },
+      {
+        "framework": "Cyber Essentials",
+        "reference_id": "Firewalls",
+        "title": "Use firewalls to secure internet connections",
+        "relevance": "SME baseline for restricting internet-reachable admin services"
+      },
+      {
+        "framework": "FCA SYSC",
+        "reference_id": "SYSC 3.2.6R",
+        "title": "A firm must establish and maintain effective systems and controls",
+        "relevance": "Boundary control expectation for regulated environments"
+      }
+    ],
+    "remediation": {
+      "summary": "Restrict SSH and RDP exposure with private access paths, VPN, or just-in-time controls.",
+      "cost_tier": "medium",
+      "manual_steps": [
+        "Identify the exposed workload, rule, source range, and business owner.",
+        "Replace public administrative access with VPN, private endpoint, bastion, or just-in-time access.",
+        "Record any temporary exposure as a time-bound governance exception."
+      ],
+      "code": [
+        {
+          "kind": "azure_cli",
+          "label": "List NSG rules for administrative ports",
+          "snippet": "az network nsg rule list --resource-group <resource-group> --nsg-name <nsg-name> --output table"
+        }
+      ]
+    },
+    "related_controls": [
+      "NET-002",
+      "CMP-005"
+    ],
+    "dependencies": [],
+    "assurance_claims": [
+      "internet-facing-administration-is-restricted",
+      "sme-firewall-boundary-is-evidenced"
+    ],
+    "metadata": {
+      "evaluator": "network_controls",
+      "first_v2_seed": true
+    }
+  },
+  {
+    "control_id": "DATA-001",
+    "version": "2.0.0",
+    "title": "Public storage access increases data exposure risk",
+    "domain": "Data",
+    "severity": "High",
+    "provider_support": {
+      "azure": "active",
+      "aws": "research_preview",
+      "gcp": "planned"
+    },
+    "resource_type": "data/storage",
+    "resource_group": "data-exposure",
+    "description": "Evaluates whether storage services allow public or anonymous access that could expose sensitive SME data.",
+    "risk": "Public data paths can expose personal, financial, or operational records and weaken the defensibility of GDPR and customer assurance claims.",
+    "evidence_requirements": [
+      "public data-path and encryption evidence",
+      "storage account public access configuration",
+      "sensitive data context",
+      "exception or compensating-control evidence"
+    ],
+    "freshness_hours": 48,
+    "confidence_penalties": [
+      "reduce confidence when data sensitivity is sector-inferred rather than asset-specific",
+      "reduce confidence when storage exposure is visible but container-level access is unavailable"
+    ],
+    "compliance_mappings": [
+      {
+        "framework": "GDPR",
+        "reference_id": "Article 32",
+        "title": "Security of processing",
+        "relevance": "Control of public data exposure"
+      },
+      {
+        "framework": "ISO 27001",
+        "reference_id": "A.8.12",
+        "title": "Data leakage prevention",
+        "relevance": "Public storage exposure management"
+      },
+      {
+        "framework": "UK GDPR",
+        "reference_id": "Article 32",
+        "title": "Security of processing",
+        "relevance": "Protection of personal data from public cloud exposure"
+      }
+    ],
+    "remediation": {
+      "summary": "Disable anonymous or public storage access and review data exposure paths.",
+      "cost_tier": "free",
+      "manual_steps": [
+        "Confirm whether public storage access is intentional and documented.",
+        "Disable public access for sensitive storage unless a signed exception exists.",
+        "Review exposed data paths and notify accountable business owners where required."
+      ],
+      "code": [
+        {
+          "kind": "azure_cli",
+          "label": "Disable blob public access on a storage account",
+          "snippet": "az storage account update --name <storage-account> --resource-group <resource-group> --allow-blob-public-access false"
+        }
+      ]
+    },
+    "related_controls": [
+      "NET-003",
+      "DATA-002",
+      "DATA-004"
+    ],
+    "dependencies": [],
+    "assurance_claims": [
+      "sensitive-data-public-exposure-is-controlled",
+      "data-protection-evidence-is-current"
+    ],
+    "metadata": {
+      "evaluator": "data_controls",
+      "first_v2_seed": true
+    }
+  },
+  {
+    "control_id": "MON-001",
+    "version": "2.0.0",
+    "title": "Activity log retention is below governance and investigation expectations",
+    "domain": "Monitoring/Logging",
+    "severity": "Medium",
+    "provider_support": {
+      "azure": "active",
+      "aws": "research_preview",
+      "gcp": "planned"
+    },
+    "resource_type": "monitoring/logging",
+    "resource_group": "evidence-retention",
+    "description": "Evaluates whether activity log retention supports investigation, governance review, and evidence preservation.",
+    "risk": "Short retention windows can prevent incident reconstruction, weaken assurance evidence, and leave board or insurer questions unanswered.",
+    "evidence_requirements": [
+      "log retention and alerting evidence",
+      "activity log retention setting",
+      "diagnostic destination evidence",
+      "incident runbook or workflow evidence"
+    ],
+    "freshness_hours": 24,
+    "confidence_penalties": [
+      "reduce confidence when only default platform retention is visible",
+      "reduce confidence when diagnostic destination coverage is unavailable"
+    ],
+    "compliance_mappings": [
+      {
+        "framework": "CIS Azure Foundations Benchmark",
+        "reference_id": "5.2",
+        "title": "Ensure that activity log alerts exist for create, update, or delete operations",
+        "relevance": "Governance visibility and retention"
+      },
+      {
+        "framework": "NIST CSF 2.0",
+        "reference_id": "DE.CM-01",
+        "title": "Networks and network services are monitored",
+        "relevance": "Baseline monitoring and evidence retention"
+      },
+      {
+        "framework": "DSPT",
+        "reference_id": "NDG Standard 6",
+        "title": "Personal confidential data is handled in secure and supported systems",
+        "relevance": "Monitoring evidence and secure operational visibility for health-related environments"
+      }
+    ],
+    "remediation": {
+      "summary": "Increase log retention to support investigation, governance review, and evidence preservation.",
+      "cost_tier": "low",
+      "manual_steps": [
+        "Set an activity log retention period that matches the SME governance and incident review window.",
+        "Route important logs to a monitored workspace or archive destination.",
+        "Document retention costs and any constrained-scope exception."
+      ],
+      "code": [
+        {
+          "kind": "azure_cli",
+          "label": "List diagnostic settings for a subscription",
+          "snippet": "az monitor diagnostic-settings subscription list --output table"
+        }
+      ]
+    },
+    "related_controls": [
+      "MON-002",
+      "MON-003",
+      "MON-004"
+    ],
+    "dependencies": [],
+    "assurance_claims": [
+      "security-events-are-retained-for-review",
+      "monitoring-evidence-supports-investigation"
+    ],
+    "metadata": {
+      "evaluator": "monitoring_controls",
+      "first_v2_seed": true
+    }
+  },
+  {
+    "control_id": "GOV-001",
+    "version": "2.0.0",
+    "title": "Resource tagging coverage falls below governance expectations",
+    "domain": "Cost/Governance Hygiene",
+    "severity": "Low",
+    "provider_support": {
+      "azure": "active",
+      "aws": "research_preview",
+      "gcp": "planned"
+    },
+    "resource_type": "governance/asset-inventory",
+    "resource_group": "asset-governance",
+    "description": "Evaluates whether cloud resources carry enough tags to support ownership, cost accountability, and assurance drilldown.",
+    "risk": "Weak tagging makes it harder to identify resource owners, explain spending, assign remediation, or support asset inventory claims.",
+    "evidence_requirements": [
+      "resource inventory evidence",
+      "tagging coverage summary",
+      "required tag policy evidence",
+      "governance owner evidence"
+    ],
+    "freshness_hours": 168,
+    "confidence_penalties": [
+      "reduce confidence when resource inventory is sampled rather than complete",
+      "reduce confidence when required tag policy is not observable"
+    ],
+    "compliance_mappings": [
+      {
+        "framework": "Azure CAF",
+        "reference_id": "Governance",
+        "title": "Governance discipline and resource consistency",
+        "relevance": "Tagging and ownership hygiene"
+      },
+      {
+        "framework": "ISO 27001",
+        "reference_id": "A.5.9",
+        "title": "Inventory of information and other associated assets",
+        "relevance": "Asset accountability and labeling"
+      }
+    ],
+    "remediation": {
+      "summary": "Apply and enforce required resource tags across the environment.",
+      "cost_tier": "free",
+      "manual_steps": [
+        "Define required ownership, environment, service, and data-classification tags.",
+        "Prioritize tagging resources linked to open findings or sensitive data paths.",
+        "Use policy or review workflow evidence to show tagging remains current."
+      ],
+      "code": [
+        {
+          "kind": "azure_cli",
+          "label": "Apply a tag to a resource",
+          "snippet": "az resource tag --ids <resource-id> --tags owner=<owner> environment=<environment>"
+        }
+      ]
+    },
+    "related_controls": [
+      "GOV-003",
+      "GOV-004"
+    ],
+    "dependencies": [],
+    "assurance_claims": [
+      "assets-have-accountable-owners",
+      "remediation-work-can-be-assigned"
+    ],
+    "metadata": {
+      "evaluator": "governance_controls",
+      "first_v2_seed": true
+    }
+  }
+]

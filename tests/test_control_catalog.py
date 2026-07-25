@@ -27,8 +27,8 @@ def test_provider_evidence_contract_catalog_reflects_active_and_planned_support(
     assert catalog.control_count == 36
     assert catalog.contract_count == 108
     assert catalog.support_status_counts["active"] == 26
-    assert catalog.support_status_counts["planned"] == 72
-    assert catalog.support_status_counts["research_preview"] == 10
+    assert catalog.support_status_counts["planned"] == 36
+    assert catalog.support_status_counts["research_preview"] == 46
 
     azure_net = next(
         contract
@@ -44,9 +44,19 @@ def test_provider_evidence_contract_catalog_reflects_active_and_planned_support(
     assert azure_net.support_status == "active"
     assert azure_net.evidence_requirements
     assert azure_net.freshness_hours == 24
+    assert azure_net.identity.identity_type == "azure_subscription_tenant"
+    assert "subscription" in azure_net.scopes.supported_scopes
+    assert azure_net.auth.preferred_auth_mode == "azure_cli"
+    assert "Microsoft.Network/*/read" in azure_net.permissions.required_permissions
+    assert azure_net.evidence_capabilities[0].supports_resource_level_evidence is True
+    assert azure_net.freshness_policy.stale_after_hours == 48
+    assert azure_net.limitations
     assert "directly observed" in azure_net.sufficiency_policy
-    assert aws_net.support_status == "planned"
-    assert "collector evidence" in aws_net.activation_gate
+    assert aws_net.support_status == "research_preview"
+    assert aws_net.identity.account_scope_label == "account"
+    assert aws_net.permissions.permission_model == "aws_research_preview_permissions"
+    assert aws_net.evidence_capabilities[0].supports_resource_level_evidence is True
+    assert "research-preview evidence" in aws_net.activation_gate
 
     azure_iot = next(
         contract

@@ -4,7 +4,7 @@
     "intent": "Make identity observability boundaries explicit so decision-makers do not over-trust partial IAM visibility.",
     "provider_support": {
       "azure": "active",
-      "aws": "planned",
+      "aws": "research_preview",
       "gcp": "planned"
     },
     "known_limitations": [
@@ -28,7 +28,7 @@
     "applicability": "healthcare_iot_research_preview",
     "provider_support": {
       "azure": "research_preview",
-      "aws": "planned",
+      "aws": "research_preview",
       "gcp": "planned"
     },
     "known_limitations": [
