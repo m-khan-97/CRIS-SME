@@ -19,7 +19,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--collector",
         default="mock",
-        choices=("mock", "azure"),
+        choices=("mock", "azure", "aws"),
         help="Collector mode for the assessment step (default: mock).",
     )
     parser.add_argument(
@@ -65,6 +65,14 @@ def main() -> None:
             args.figures_dir,
         ],
         cwd=repo_root,
+        env=env,
+        stdout=run_stdout,
+        check=True,
+    )
+
+    subprocess.run(
+        ["npm", "run", "build"],
+        cwd=repo_root / "frontend" / "console",
         env=env,
         stdout=run_stdout,
         check=True,

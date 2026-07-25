@@ -69,12 +69,12 @@ def main() -> None:
     manifest_dir = dist_dir / "manifests"
     site_data_dir = site_dir / "data"
     site_assets_figures_dir = site_dir / "assets" / "figures"
-    demo_source_dir = repo_root / "frontend" / "demo-console"
-    demo_site_dir = site_dir / "demo"
+    console_dist_dir = repo_root / "frontend" / "console" / "dist"
+    console_site_dir = site_dir / "console"
 
     _prepare_directories(dist_dir, site_dir, manifest_dir, site_data_dir, site_assets_figures_dir)
     _assert_required_reports_exist(reports_dir)
-    _assert_demo_console_exists(demo_source_dir)
+    _assert_console_build_exists(console_dist_dir)
 
     _copy_file(reports_dir / "cris_sme_dashboard.html", site_dir / "dashboard.html")
     _copy_file(reports_dir / "cris_sme_assurance_portal.html", site_dir / "assurance.html")
@@ -122,7 +122,8 @@ def main() -> None:
         reports_dir / "cris_sme_ce_chart_data.json",
         site_data_dir / "cris_sme_ce_chart_data.json",
     )
-    _copy_demo_console(demo_source_dir, demo_site_dir)
+    _copy_console(console_dist_dir, console_site_dir)
+    _copy_console_outputs(reports_dir, console_site_dir / "outputs")
 
     for figure in sorted(figures_dir.glob("*")):
         if figure.is_file() and figure.suffix.lower() in {".svg", ".png"}:
@@ -137,6 +138,7 @@ def main() -> None:
     )
 
     (site_dir / "index.html").write_text(_build_index_html(manifest), encoding="utf-8")
+    (site_dir / "vercel.json").write_text(_build_vercel_config(), encoding="utf-8")
     print(json.dumps({"site_dir": str(site_dir), "manifest": str(manifest_path)}, indent=2))
 
 
@@ -165,28 +167,32 @@ def _assert_required_reports_exist(reports_dir: Path) -> None:
         )
 
 
-def _assert_demo_console_exists(demo_source_dir: Path) -> None:
-    missing = [
-        name
-        for name in ("index.html", "styles.css", "app.js")
-        if not (demo_source_dir / name).exists()
-    ]
-    if missing:
-        joined = ", ".join(missing)
-        raise FileNotFoundError(
-            f"Missing demo console assets in {demo_source_dir}: {joined}."
-        )
-
-
 def _copy_file(src: Path, dst: Path) -> None:
     dst.parent.mkdir(parents=True, exist_ok=True)
     shutil.copy2(src, dst)
 
 
-def _copy_demo_console(src_dir: Path, dst_dir: Path) -> None:
+def _assert_console_build_exists(console_dist_dir: Path) -> None:
+    if not (console_dist_dir / "index.html").exists():
+        raise FileNotFoundError(
+            f"Missing React console build in {console_dist_dir}. "
+            "Run `npm run build` in frontend/console before building the Pages site."
+        )
+
+
+def _copy_console(src_dir: Path, dst_dir: Path) -> None:
+    shutil.copytree(src_dir, dst_dir, dirs_exist_ok=True)
+    # SPA fallback so deep links (e.g. /console/findings) resolve on static
+    # hosts that serve 404.html for unmatched paths (GitHub Pages, Vercel).
+    shutil.copy2(dst_dir / "index.html", dst_dir / "404.html")
+
+
+def _copy_console_outputs(reports_dir: Path, dst_dir: Path) -> None:
+    """Bundle report artifacts so the static console can fetch them at console/outputs/."""
     dst_dir.mkdir(parents=True, exist_ok=True)
-    for name in ("index.html", "styles.css", "app.js"):
-        _copy_file(src_dir / name, dst_dir / name)
+    for path in reports_dir.iterdir():
+        if path.is_file():
+            _copy_file(path, dst_dir / path.name)
 
 
 def _build_manifest(*, repo_root: Path, site_dir: Path) -> dict[str, object]:
@@ -202,9 +208,7 @@ def _build_manifest(*, repo_root: Path, site_dir: Path) -> dict[str, object]:
     checksums = {}
     for relative_path in [
         Path("dashboard.html"),
-        Path("demo/index.html"),
-        Path("demo/styles.css"),
-        Path("demo/app.js"),
+        Path("console/index.html"),
         Path("assurance.html"),
         Path("evidence-room.html"),
         Path("report.html"),
@@ -240,7 +244,7 @@ def _build_manifest(*, repo_root: Path, site_dir: Path) -> dict[str, object]:
         },
         "artifacts": {
             "site_entrypoint": "index.html",
-            "demo_console": "demo/index.html",
+            "console": "console/index.html",
             "dashboard": "dashboard.html",
             "assurance_portal": "assurance.html",
             "evidence_room": "evidence-room.html",
@@ -394,9 +398,9 @@ def _build_index_html(manifest: dict[str, object]) -> str:
         </p>
         <div class="grid">
           <article class="card">
-            <h2>Demo Console</h2>
-            <p>Interactive product workspace for assessment overview, findings, provenance, assurance, disclosure, and remediation.</p>
-            <a class="link" href="./demo/">Open Demo Console</a>
+            <h2>Assurance Console</h2>
+            <p>The primary CRIS-SME workspace: executive overview, findings workbench, trust &amp; assurance center, remediation, evidence &amp; provenance, and Cyber Essentials review.</p>
+            <a class="link" href="./console/">Open Assurance Console</a>
           </article>
           <article class="card">
             <h2>Interactive Dashboard</h2>
@@ -421,7 +425,7 @@ def _build_index_html(manifest: dict[str, object]) -> str:
           <article class="card">
             <h2>Cyber Essentials Workflow</h2>
             <p>Question-level CE pre-population, human review, evaluation metrics, and paper-ready evidence tables.</p>
-            <a class="link" href="./demo/#ce-workflow">Open CE Workflow</a>
+            <a class="link" href="./console/cyber-essentials">Open CE Workflow</a>
           </article>
           <article class="card">
             <h2>Machine-Readable Data</h2>
@@ -442,6 +446,15 @@ def _build_index_html(manifest: dict[str, object]) -> str:
   </body>
 </html>
 """
+
+
+def _build_vercel_config() -> str:
+    config = {
+        "rewrites": [
+            {"source": "/console/(.*)", "destination": "/console/index.html"},
+        ],
+    }
+    return json.dumps(config, indent=2) + "\n"
 
 
 if __name__ == "__main__":
