@@ -2,13 +2,16 @@
 from __future__ import annotations
 
 import json
+import socket
 
 import pytest
 
 from cris_sme.engine.public_exposure import (
     PublicExposureScanner,
+    PublicExposureSettings,
     build_public_exposure_markdown,
     normalize_targets,
+    probe_common_ports,
     write_public_exposure_outputs,
 )
 
@@ -169,6 +172,132 @@ def test_public_exposure_excludes_private_targets_by_default() -> None:
 
     assert report["findings"][0]["id"] == "PE-000"
     assert report["targets"][0]["https"]["skipped"] is True
+
+
+def test_public_exposure_skips_port_scan_by_default() -> None:
+    """scan_common_ports must default to off so existing callers' risk profile is unchanged."""
+    port_probe_called = False
+
+    def port_probe(host: str, ports: list[int], timeout: float) -> dict:
+        nonlocal port_probe_called
+        port_probe_called = True
+        return {"checked_ports": ports, "open_ports": ports}
+
+    report = PublicExposureScanner(
+        resolver=lambda host: ["93.184.216.34"],
+        http_probe=lambda url, timeout: {"reachable": False, "headers": {}},
+        tls_probe=lambda host, port, timeout: {"available": False},
+        port_probe=port_probe,
+    ).assess(["example.com"], authorization_confirmed=True)
+
+    assert port_probe_called is False
+    assert not any(finding["id"] == "PE-010" for finding in report["findings"])
+    assert report["targets"][0]["ports"]["scanned"] is False
+
+
+def test_public_exposure_flags_open_common_ports_when_enabled() -> None:
+    def port_probe(host: str, ports: list[int], timeout: float) -> dict:
+        return {"checked_ports": ports, "open_ports": [22, 6379]}
+
+    report = PublicExposureScanner(
+        settings=PublicExposureSettings(scan_common_ports=True),
+        resolver=lambda host: ["93.184.216.34"],
+        http_probe=lambda url, timeout: {"reachable": False, "headers": {}},
+        tls_probe=lambda host, port, timeout: {"available": False},
+        port_probe=port_probe,
+    ).assess(["example.com"], authorization_confirmed=True)
+
+    finding = next(item for item in report["findings"] if item["id"] == "PE-010")
+    assert finding["severity"] == "critical"
+    assert finding["evidence"]["open_ports"] == [22, 6379]
+
+
+def test_public_exposure_never_port_scans_private_targets_even_when_enabled() -> None:
+    """The private-target skip-guard must apply uniformly, including to the new port probe."""
+    port_probe_called = False
+
+    def port_probe(host: str, ports: list[int], timeout: float) -> dict:
+        nonlocal port_probe_called
+        port_probe_called = True
+        return {"checked_ports": ports, "open_ports": ports}
+
+    report = PublicExposureScanner(
+        settings=PublicExposureSettings(scan_common_ports=True),
+        resolver=lambda host: ["10.0.0.4"],
+        http_probe=lambda url, timeout: {"reachable": True},
+        tls_probe=lambda host, port, timeout: {"available": True},
+        port_probe=port_probe,
+    ).assess(["internal.example.test"], authorization_confirmed=True)
+
+    assert port_probe_called is False
+    assert report["findings"][0]["id"] == "PE-000"
+    assert report["targets"][0]["ports"]["skipped"] is True
+
+
+def test_public_exposure_flags_deprecated_tls_version_support() -> None:
+    def tls_probe(host: str, port: int, timeout: float) -> dict:
+        return {
+            "available": True,
+            "protocol": "TLSv1.3",
+            "days_until_expiry": 60,
+            "deprecated_versions_supported": ["TLSv1"],
+            "deprecated_version_probe_state": {"TLSv1": "supported", "TLSv1.1": "rejected"},
+        }
+
+    report = PublicExposureScanner(
+        resolver=lambda host: ["93.184.216.34"],
+        http_probe=lambda url, timeout: {"reachable": False, "headers": {}},
+        tls_probe=tls_probe,
+    ).assess(["example.com"], authorization_confirmed=True)
+
+    finding = next(item for item in report["findings"] if item["id"] == "PE-011")
+    assert finding["severity"] == "high"
+    assert finding["evidence"]["deprecated_versions_supported"] == ["TLSv1"]
+
+
+def test_public_exposure_does_not_flag_unavailable_deprecated_tls_probe() -> None:
+    """A local-capability probe failure must never be reported as a real finding."""
+
+    def tls_probe(host: str, port: int, timeout: float) -> dict:
+        return {
+            "available": True,
+            "protocol": "TLSv1.3",
+            "days_until_expiry": 60,
+            "deprecated_versions_supported": [],
+            "deprecated_version_probe_state": {
+                "TLSv1": "probe_unavailable",
+                "TLSv1.1": "probe_unavailable",
+            },
+        }
+
+    report = PublicExposureScanner(
+        resolver=lambda host: ["93.184.216.34"],
+        http_probe=lambda url, timeout: {"reachable": False, "headers": {}},
+        tls_probe=tls_probe,
+    ).assess(["example.com"], authorization_confirmed=True)
+
+    assert not any(finding["id"] == "PE-011" for finding in report["findings"])
+
+
+def test_probe_common_ports_detects_real_open_and_closed_ports() -> None:
+    """Exercise the real socket implementation, not just the mocked finding logic."""
+    listener = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    listener.bind(("127.0.0.1", 0))
+    listener.listen(1)
+    open_port = listener.getsockname()[1]
+
+    closed_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    closed_socket.bind(("127.0.0.1", 0))
+    closed_port = closed_socket.getsockname()[1]
+    closed_socket.close()  # frees the port without anything listening on it
+
+    try:
+        result = probe_common_ports("127.0.0.1", [open_port, closed_port], 1.0)
+    finally:
+        listener.close()
+
+    assert result["open_ports"] == [open_port]
+    assert result["checked_ports"] == [open_port, closed_port]
 
 
 def test_write_public_exposure_outputs(tmp_path) -> None:

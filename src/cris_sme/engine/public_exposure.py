@@ -7,6 +7,7 @@ import shutil
 import socket
 import ssl
 import subprocess
+from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass, field
 from datetime import UTC, datetime
 from pathlib import Path
@@ -18,6 +19,7 @@ Resolver = Callable[[str], list[str]]
 HttpProbe = Callable[[str, float], dict[str, Any]]
 TlsProbe = Callable[[str, int, float], dict[str, Any]]
 DnsRecordLookup = Callable[[str, str, float], dict[str, Any]]
+PortProbe = Callable[[str, list[int], float], dict[str, Any]]
 
 SECURITY_HEADERS = {
     "strict-transport-security": "HSTS",
@@ -25,6 +27,18 @@ SECURITY_HEADERS = {
     "x-frame-options": "Clickjacking protection",
     "x-content-type-options": "MIME sniffing protection",
 }
+
+# A small, named list of "should never be reachable from the internet" ports
+# (FTP, SSH, Telnet, SMTP, SMB, MySQL, RDP, PostgreSQL, Redis, Elasticsearch,
+# MongoDB) -- deliberately not a sweep of an arbitrary/full port range.
+COMMON_PORTS = [21, 22, 23, 25, 445, 3306, 3389, 5432, 6379, 9200, 27017]
+
+# Deprecated TLS protocol versions to explicitly probe for, beyond whatever
+# version the default handshake happens to negotiate.
+DEPRECATED_TLS_VERSIONS = [
+    ("TLSv1", ssl.TLSVersion.TLSv1),
+    ("TLSv1.1", ssl.TLSVersion.TLSv1_1),
+]
 
 
 @dataclass(frozen=True)
@@ -34,6 +48,10 @@ class PublicExposureSettings:
     timeout_seconds: float = 5.0
     allow_private_targets: bool = False
     max_targets: int = 10
+    # Off by default: scanning a fixed, named port list is an explicit
+    # opt-in, not a default-behaviour change -- this keeps "does not sweep
+    # ports by default" true for every caller that doesn't ask for it.
+    scan_common_ports: bool = False
 
 
 @dataclass
@@ -45,6 +63,7 @@ class PublicExposureScanner:
     http_probe: HttpProbe | None = None
     tls_probe: TlsProbe | None = None
     dns_record_lookup: DnsRecordLookup | None = None
+    port_probe: PortProbe | None = None
 
     def assess(self, targets: list[str], *, authorization_confirmed: bool) -> dict[str, Any]:
         """Return a deterministic public exposure report for the supplied targets."""
@@ -102,6 +121,7 @@ class PublicExposureScanner:
                 "https": {"reachable": False, "skipped": True},
                 "http": {"reachable": False, "skipped": True},
                 "tls": {"available": False, "skipped": True},
+                "ports": {"scanned": False, "skipped": True},
                 "findings": findings,
             }
 
@@ -112,6 +132,10 @@ class PublicExposureScanner:
         tls = self._tls(host, 443)
         dns_records = self._dns_records(host)
         security_txt = self._http(f"https://{host}/.well-known/security.txt")
+
+        ports: dict[str, Any] = {"scanned": False}
+        if self.settings.scan_common_ports:
+            ports = self._ports(host)
 
         if not dns["addresses"]:
             findings.append(
@@ -227,6 +251,33 @@ class PublicExposureScanner:
                     evidence=security_txt,
                 )
             )
+        if ports.get("scanned") and ports.get("open_ports"):
+            findings.append(
+                build_finding(
+                    "PE-010",
+                    "Common administrative/database port reachable from the internet",
+                    "critical",
+                    host,
+                    f"Port(s) {', '.join(str(port) for port in ports['open_ports'])} accepted a connection from the internet.",
+                    "Restrict these ports to a VPN/bastion or private network; they should not be directly internet-reachable.",
+                    evidence=ports,
+                )
+            )
+        if tls.get("deprecated_versions_supported"):
+            findings.append(
+                build_finding(
+                    "PE-011",
+                    "Deprecated TLS protocol version accepted by server",
+                    "high",
+                    host,
+                    f"The server completed a TLS handshake using deprecated protocol version(s): {', '.join(tls['deprecated_versions_supported'])}.",
+                    "Disable TLS 1.0/1.1 support and require TLS 1.2 or newer.",
+                    evidence={
+                        "deprecated_versions_supported": tls.get("deprecated_versions_supported"),
+                        "deprecated_version_probe_state": tls.get("deprecated_version_probe_state"),
+                    },
+                )
+            )
 
         return {
             **target,
@@ -236,6 +287,7 @@ class PublicExposureScanner:
             "http": http,
             "tls": tls,
             "security_txt": security_txt,
+            "ports": ports,
             "findings": findings,
         }
 
@@ -260,6 +312,14 @@ class PublicExposureScanner:
             return probe(host, port, self.settings.timeout_seconds)
         except Exception as exc:
             return {"host": host, "port": port, "available": False, "error": str(exc)}
+
+    def _ports(self, host: str) -> dict[str, Any]:
+        probe = self.port_probe or probe_common_ports
+        try:
+            result = probe(host, COMMON_PORTS, self.settings.timeout_seconds)
+            return {"scanned": True, **result}
+        except Exception as exc:
+            return {"scanned": True, "checked_ports": COMMON_PORTS, "open_ports": [], "error": str(exc)}
 
     def _dns_records(self, host: str) -> dict[str, Any]:
         lookup = self.dns_record_lookup or lookup_dns_records
@@ -352,17 +412,88 @@ def probe_tls(host: str, port: int, timeout_seconds: float) -> dict[str, Any]:
             if not_after:
                 expires = datetime.strptime(not_after, "%b %d %H:%M:%S %Y %Z").replace(tzinfo=UTC)
                 days_until_expiry = (expires - datetime.now(UTC)).days
+            negotiated_protocol = tls_sock.version()
+            deprecated_probe_state = _probe_deprecated_tls_versions(host, port, timeout_seconds)
+            deprecated_supported = [
+                version
+                for version, state in deprecated_probe_state.items()
+                if state == "supported"
+            ]
             return {
                 "host": host,
                 "port": port,
                 "available": True,
-                "protocol": tls_sock.version(),
+                "protocol": negotiated_protocol,
                 "cipher": tls_sock.cipher()[0] if tls_sock.cipher() else "",
                 "not_after": not_after,
                 "days_until_expiry": days_until_expiry,
                 "subject": _name_tuple_to_dict(cert.get("subject", [])),
                 "issuer": _name_tuple_to_dict(cert.get("issuer", [])),
+                "supported_versions": sorted({negotiated_protocol, *deprecated_supported}),
+                "deprecated_versions_supported": deprecated_supported,
+                "deprecated_version_probe_state": deprecated_probe_state,
             }
+
+
+def _probe_deprecated_tls_versions(host: str, port: int, timeout_seconds: float) -> dict[str, str]:
+    """Return, per deprecated TLS version, one of "supported"/"rejected"/"probe_unavailable".
+
+    A handshake failure has two very different causes that must not be
+    conflated: the *server* refusing that protocol version (a real,
+    reportable fact), versus the *local* OpenSSL build refusing to even
+    attempt it client-side (common on modern systems where TLS1.0/1.1 are
+    disabled at the OpenSSL config level). Concluding "not supported" from
+    the second case would be a false negative, not an observed fact.
+    """
+    states: dict[str, str] = {}
+    for label, version in DEPRECATED_TLS_VERSIONS:
+        try:
+            context = ssl.SSLContext(ssl.PROTOCOL_TLS_CLIENT)
+            context.check_hostname = False
+            context.verify_mode = ssl.CERT_NONE
+            context.minimum_version = version
+            context.maximum_version = version
+        except (ssl.SSLError, ValueError):
+            states[label] = "probe_unavailable"
+            continue
+
+        try:
+            with socket.create_connection((host, port), timeout=timeout_seconds) as sock:
+                with context.wrap_socket(sock, server_hostname=host):
+                    states[label] = "supported"
+        except ssl.SSLError:
+            states[label] = "rejected"
+        except OSError:
+            states[label] = "rejected"
+
+    return states
+
+
+def probe_common_ports(host: str, ports: list[int], timeout_seconds: float) -> dict[str, Any]:
+    """Return which of the supplied ports accept a TCP connection.
+
+    Connect-or-fail only: no banner is read and no payload is sent on any
+    port. This is deliberately narrower than a real port scanner -- it only
+    answers "is something listening here," not what it is.
+
+    Checked concurrently rather than one port at a time: a filtered
+    (dropped, not refused) port has to wait out the full timeout before
+    failing, and doing that sequentially across ~10 ports would mean tens
+    of seconds added to every assessed target.
+    """
+
+    def _check(port: int) -> int | None:
+        try:
+            with socket.create_connection((host, port), timeout=timeout_seconds):
+                return port
+        except OSError:
+            return None
+
+    with ThreadPoolExecutor(max_workers=max(len(ports), 1)) as executor:
+        results = list(executor.map(_check, ports))
+
+    open_ports = sorted(port for port in results if port is not None)
+    return {"checked_ports": list(ports), "open_ports": open_ports}
 
 
 def lookup_dns_records(name: str, record_type: str, timeout_seconds: float) -> dict[str, Any]:
