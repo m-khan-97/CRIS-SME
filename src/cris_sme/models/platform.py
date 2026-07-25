@@ -89,6 +89,19 @@ class AssetRelationship(BaseModel):
     metadata: dict[str, Any] = Field(default_factory=dict)
 
 
+class FindingAssetLink(BaseModel):
+    """Join record connecting a finding to normalized asset and evidence IDs."""
+
+    link_id: str = Field(..., min_length=8)
+    finding_id: str = Field(..., min_length=6)
+    control_id: str = Field(..., min_length=3)
+    asset_id: str = Field(..., min_length=5)
+    link_type: str = Field(..., min_length=3)
+    evidence_ids: list[str] = Field(default_factory=list)
+    confidence: float = Field(default=1.0, ge=0.0, le=1.0)
+    metadata: dict[str, Any] = Field(default_factory=dict)
+
+
 class CollectorCoverage(BaseModel):
     """Coverage summary of what a collector could and could not observe."""
 
@@ -159,6 +172,22 @@ class ExceptionRecord(BaseModel):
     compensating_control: str | None = None
     notes: str | None = None
     created_at: str = Field(..., min_length=10)
+
+
+class MuteRule(BaseModel):
+    """Operational rule that suppresses matching findings from active scoring."""
+
+    rule_id: str = Field(..., min_length=4)
+    name: str = Field(..., min_length=3)
+    enabled: bool = True
+    control_id: str | None = None
+    provider: str | None = None
+    scope_pattern: str = Field(default="*", min_length=1)
+    finding_id_pattern: str | None = None
+    reason: str = Field(..., min_length=8)
+    created_by: str = Field(..., min_length=3)
+    created_at: str = Field(..., min_length=10)
+    expires_at: str | None = None
 
 
 class ActionItem(BaseModel):
@@ -306,6 +335,72 @@ class RiskBillOfMaterialsVerificationResult(BaseModel):
     errors: list[str] = Field(default_factory=list)
 
 
+class ProviderIdentityContract(BaseModel):
+    """Provider identity context required to interpret collected evidence."""
+
+    identity_type: str = Field(..., min_length=3)
+    account_scope_label: str = Field(..., min_length=3)
+    tenant_scope_label: str = Field(..., min_length=3)
+    principal_ref: str = Field(..., min_length=3)
+    identity_sources: list[str] = Field(default_factory=list)
+
+
+class ProviderScopeContract(BaseModel):
+    """Provider scoping rules for evidence collection and reporting."""
+
+    scope_type: str = Field(..., min_length=3)
+    supported_scopes: list[str] = Field(default_factory=list)
+    default_scope: str = Field(..., min_length=3)
+    scope_limitations: list[str] = Field(default_factory=list)
+
+
+class ProviderAuthContract(BaseModel):
+    """Authentication modes and secret-handling expectations for a provider."""
+
+    auth_modes: list[str] = Field(default_factory=list)
+    preferred_auth_mode: str = Field(..., min_length=3)
+    secret_handling: str = Field(..., min_length=8)
+
+
+class ProviderPermissionContract(BaseModel):
+    """Least-privilege permissions needed for one provider/control path."""
+
+    permission_model: str = Field(..., min_length=3)
+    required_permissions: list[str] = Field(default_factory=list)
+    optional_permissions: list[str] = Field(default_factory=list)
+    least_privilege_notes: list[str] = Field(default_factory=list)
+
+
+class ProviderEvidenceCapability(BaseModel):
+    """One provider evidence capability used by a control contract."""
+
+    capability_id: str = Field(..., min_length=6)
+    capability_type: str = Field(..., min_length=3)
+    collection_method: str = Field(..., min_length=3)
+    resource_types: list[str] = Field(default_factory=list)
+    supports_resource_level_evidence: bool = False
+    supports_freshness_check: bool = False
+    limitations: list[str] = Field(default_factory=list)
+
+
+class ProviderFreshnessPolicy(BaseModel):
+    """Freshness expectations for evidence collected through a provider path."""
+
+    freshness_hours: int = Field(..., ge=1)
+    stale_after_hours: int = Field(..., ge=1)
+    clock_source: str = Field(default="collector_utc", min_length=3)
+    policy: str = Field(..., min_length=8)
+
+
+class ProviderLimitation(BaseModel):
+    """Visible limitation for a provider evidence path."""
+
+    limitation_id: str = Field(..., min_length=6)
+    severity: str = Field(..., min_length=3)
+    description: str = Field(..., min_length=8)
+    affected_evidence: list[str] = Field(default_factory=list)
+
+
 class ProviderEvidenceContract(BaseModel):
     """Per-provider evidence contract for one CRIS-SME control."""
 
@@ -321,6 +416,13 @@ class ProviderEvidenceContract(BaseModel):
     confidence_penalty_rules: list[str] = Field(default_factory=list)
     known_limitations: list[str] = Field(default_factory=list)
     activation_gate: str = Field(..., min_length=8)
+    identity: ProviderIdentityContract
+    scopes: ProviderScopeContract
+    auth: ProviderAuthContract
+    permissions: ProviderPermissionContract
+    evidence_capabilities: list[ProviderEvidenceCapability] = Field(default_factory=list)
+    freshness_policy: ProviderFreshnessPolicy
+    limitations: list[ProviderLimitation] = Field(default_factory=list)
 
 
 class ProviderEvidenceContractCatalog(BaseModel):

@@ -20,7 +20,7 @@ def build_graph_context_summary(
     prioritized_findings: list[ScoredFinding],
 ) -> dict[str, Any]:
     """Build context-aware exposure summaries from normalized assets and findings."""
-    graph = _build_asset_graph(profiles)
+    graph = build_asset_graph(profiles)
     control_ids = {item.finding.control_id for item in prioritized_findings}
     toxic_combinations = _detect_toxic_combinations(control_ids)
     exposure_chains = _build_exposure_chains(toxic_combinations)
@@ -61,7 +61,8 @@ def build_graph_context_summary(
     }
 
 
-def _build_asset_graph(profiles: list[CloudProfile]) -> _GraphBuildResult:
+def build_asset_graph(profiles: list[CloudProfile]) -> _GraphBuildResult:
+    """Build normalized aggregate assets and relationships for assessment profiles."""
     assets: list[Asset] = []
     relationships: list[AssetRelationship] = []
 

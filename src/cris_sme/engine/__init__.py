@@ -8,6 +8,7 @@ from .assessment_replay import (
     replay_evidence_snapshot,
 )
 from .assessment_assurance import build_assessment_assurance
+from .assessment_summary import AssessmentSummary, build_assessment_summary
 from .assurance_case import build_assurance_case, write_assurance_case
 from .claim_verification import (
     build_claim_verification_pack,
@@ -52,7 +53,12 @@ from .decision_provenance import (
 from .decision_review import build_decision_review_queue
 from .evidence_gap_backlog import build_evidence_gap_backlog
 from .graph_context import build_graph_context_summary
-from .lifecycle import enrich_report_finding_lifecycle, load_exception_registry
+from .lifecycle import (
+    compute_adjusted_risk_scores,
+    enrich_report_finding_lifecycle,
+    load_exception_registry,
+    load_mute_rules,
+)
 from .lineage import (
     build_collector_coverage,
     build_confidence_assessment,
@@ -104,6 +110,7 @@ from .trust_badge import build_report_trust_badge
 __all__ = [
     "assess_compliance_mappings",
     "ActionPlan30DayResult",
+    "AssessmentSummary",
     "CATEGORY_WEIGHTS",
     "build_collector_coverage",
     "build_confidence_assessment",
@@ -112,6 +119,7 @@ __all__ = [
     "build_decision_provenance_graph",
     "build_decision_review_queue",
     "build_assessment_assurance",
+    "build_assessment_summary",
     "build_assurance_case",
     "build_claim_verification_pack",
     "build_claim_bound_narrative",
@@ -137,9 +145,11 @@ __all__ = [
     "build_report_replay_summary",
     "build_report_trust_badge",
     "build_selective_disclosure_package",
+    "compute_adjusted_risk_scores",
     "enrich_report_finding_lifecycle",
     "evaluate_profiles",
     "load_exception_registry",
+    "load_mute_rules",
     "load_compliance_mappings",
     "load_ce_question_mapping",
     "load_ce_review_decisions",

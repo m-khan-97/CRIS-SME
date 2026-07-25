@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import os
 
+from cris_sme.collectors.aws_collector import AwsCollectorSettings
 from cris_sme.collectors.azure_collector import AzureCollectorSettings
 from cris_sme.reporting.narrator import NarratorSettings
 
@@ -36,6 +37,41 @@ def get_azure_collector_settings() -> AzureCollectorSettings:
             "live_case_study",
         ).strip(),
         resource_group_scope=_get_optional_env("CRIS_SME_AZURE_RESOURCE_GROUP_SCOPE"),
+    )
+
+
+def get_aws_collector_settings() -> AwsCollectorSettings:
+    """Build AWS collector settings from environment variables."""
+    regions_raw = _get_optional_env("CRIS_SME_AWS_REGIONS")
+    regions = (
+        tuple(region.strip() for region in regions_raw.split(",") if region.strip())
+        if regions_raw
+        else None
+    )
+    return AwsCollectorSettings(
+        account_id=_get_optional_env("AWS_ACCOUNT_ID"),
+        organization_name=os.getenv(
+            "CRIS_SME_AWS_ORGANIZATION_NAME",
+            "AWS SME Account",
+        ),
+        sector=os.getenv("CRIS_SME_AWS_SECTOR", "SME"),
+        tenant_scope=_get_optional_env("CRIS_SME_AWS_TENANT_SCOPE"),
+        organization_id=_get_optional_env("CRIS_SME_AWS_ORGANIZATION_ID"),
+        dataset_source_type=os.getenv(
+            "CRIS_SME_DATASET_SOURCE_TYPE",
+            "live_real",
+        ).strip(),
+        authorization_basis=os.getenv(
+            "CRIS_SME_AUTHORIZATION_BASIS",
+            "authorized_account_access",
+        ).strip(),
+        dataset_use=os.getenv(
+            "CRIS_SME_DATASET_USE",
+            "live_case_study",
+        ).strip(),
+        regions=regions,
+        role_arn=_get_optional_env("CRIS_SME_AWS_ROLE_ARN"),
+        external_id=_get_optional_env("CRIS_SME_AWS_EXTERNAL_ID"),
     )
 
 

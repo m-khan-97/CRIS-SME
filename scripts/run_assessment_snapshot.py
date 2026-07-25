@@ -7,6 +7,8 @@ import subprocess
 import sys
 from pathlib import Path
 
+SUPPORTED_COLLECTORS = ("mock", "azure", "aws")
+
 
 def main() -> None:
     """Run the CRIS-SME assessment with explicit collector and output settings."""
@@ -16,7 +18,7 @@ def main() -> None:
     parser.add_argument(
         "--collector",
         default="mock",
-        choices=("mock", "azure"),
+        choices=SUPPORTED_COLLECTORS,
         help="Collector mode to execute.",
     )
     parser.add_argument(

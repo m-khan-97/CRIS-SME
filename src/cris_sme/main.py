@@ -6,26 +6,14 @@ import os
 from datetime import UTC, datetime
 from pathlib import Path
 
-from cris_sme.collectors.azure_collector import AzureCollector
-from cris_sme.collectors.mock_collector import MockCollector
 from cris_sme.config import (
-    get_azure_collector_settings,
     get_collector_mode,
     get_narrator_settings,
 )
-from cris_sme.controls import (
-    evaluate_compute_controls,
-    evaluate_data_controls,
-    evaluate_governance_controls,
-    evaluate_iam_controls,
-    evaluate_iot_controls,
-    evaluate_monitoring_controls,
-    evaluate_network_controls,
-)
 from cris_sme.engine import (
-    assess_compliance_mappings,
     build_30_day_action_plan,
     build_assessment_assurance,
+    build_assessment_summary,
     build_assurance_case,
     build_claim_bound_narrative,
     build_claim_verification_pack,
@@ -44,9 +32,10 @@ from cris_sme.engine import (
     build_remediation_simulation,
     build_run_metadata,
     build_selective_disclosure_package,
+    compute_adjusted_risk_scores,
     enrich_report_finding_lifecycle,
-    load_compliance_mappings,
     load_exception_registry,
+    load_mute_rules,
     write_risk_bill_of_materials,
     write_claim_verification_pack,
     write_assurance_case,
@@ -57,12 +46,12 @@ from cris_sme.engine import (
     write_decision_provenance_graph,
     write_selective_disclosure_package,
 )
+from cris_sme.engine.assessment_runner import AssessmentRunner
 from cris_sme.engine.benchmark import (
     build_benchmark_comparison,
     build_benchmark_observation,
     load_benchmark_dataset,
 )
-from cris_sme.engine.scoring import score_findings
 from cris_sme.engine.uk_readiness import build_cyber_essentials_readiness
 from cris_sme.policies import load_policy_pack_metadata
 from cris_sme.reporting import (
@@ -89,6 +78,7 @@ from cris_sme.reporting import (
     write_appendix_tables,
     write_benchmark_outputs,
     write_cyber_insurance_evidence_pack,
+    write_csv_export_bundle,
     write_ce_evaluation_metrics_html,
     write_ce_paper_exports,
     write_ce_review_console_html,
@@ -100,8 +90,11 @@ from cris_sme.reporting import (
     write_history_figures,
     write_html_report,
     write_json_report,
+    write_ocsf_findings,
     write_plain_language_reports,
+    write_remediation_script_pack,
     write_report_figures,
+    write_sarif_report,
     write_summary_report,
 )
 
@@ -113,29 +106,34 @@ DEFAULT_FIGURE_DIR = Path("outputs/figures")
 def main() -> None:
     """Run the MVP flow from posture collection to scored risk output."""
     collector_mode = get_collector_mode()
-    profiles = _collect_profiles()
-    findings = [
-        *evaluate_iam_controls(profiles),
-        *evaluate_network_controls(profiles),
-        *evaluate_data_controls(profiles),
-        *evaluate_monitoring_controls(profiles),
-        *evaluate_compute_controls(profiles),
-        *evaluate_governance_controls(profiles),
-        *evaluate_iot_controls(profiles),
-    ]
-    result = score_findings(findings)
-    mapping_catalog = load_compliance_mappings()
-    compliance_result = assess_compliance_mappings(findings, mapping_catalog)
+    runner_result = AssessmentRunner(
+        collector_mode=collector_mode,
+        event_handler=_build_runner_event_handler(),
+    ).run()
+    profiles = runner_result.profiles
+    findings = runner_result.findings
+    result = runner_result.scoring_result
+    compliance_result = runner_result.compliance_result
 
     output = build_json_report(
         profiles=profiles,
         findings=findings,
         scoring_result=result,
         compliance_result=compliance_result,
+        resource_context=runner_result.resource_context,
     )
     generated_at = datetime.now(UTC)
     output["generated_at"] = generated_at.isoformat().replace("+00:00", "Z")
     output["collector_mode"] = collector_mode
+    output["assessment_runner"] = {
+        "events": [
+            event.model_dump(mode="json") for event in runner_result.events
+        ],
+        "control_selection": runner_result.control_selection.model_dump(mode="json"),
+        "evidence_sufficiency": runner_result.evidence_sufficiency.model_dump(
+            mode="json"
+        ),
+    }
 
     summary = build_summary_report(
         profiles=profiles,
@@ -174,7 +172,9 @@ def main() -> None:
         output,
         history_reports_before,
         exception_registry=load_exception_registry(),
+        mute_rule_registry=load_mute_rules(),
     )
+    output["adjusted_risk_scores"] = compute_adjusted_risk_scores(output)
 
     narrator_output = maybe_generate_plain_language_narrative(
         output,
@@ -251,6 +251,14 @@ def main() -> None:
         build_html_report(output),
         output_dir / "cris_sme_report.html",
     )
+    sarif_report_path = write_sarif_report(
+        output,
+        output_dir / "cris_sme_report.sarif",
+    )
+    ocsf_findings_path = write_ocsf_findings(
+        output,
+        output_dir / "cris_sme_findings_ocsf.json",
+    )
     figure_paths = write_report_figures(output, figure_dir)
     history_figure_paths = write_history_figures(history_reports, figure_dir)
     appendix_paths = write_appendix_tables(output, output_dir)
@@ -260,6 +268,8 @@ def main() -> None:
     action_plan_paths = write_action_plan_outputs(
         output["action_plan_30_day"], output_dir
     )
+    csv_export_paths = write_csv_export_bundle(output, output_dir)
+    remediation_pack_paths = write_remediation_script_pack(output, output_dir)
     benchmark_paths = write_benchmark_outputs(
         output["benchmark_observation"],
         output["benchmark_comparison"],
@@ -276,11 +286,17 @@ def main() -> None:
         "json_report": str(json_report_path),
         "evidence_snapshot": str(evidence_snapshot_path),
         "html_report": str(html_report_path),
+        "sarif_report": str(sarif_report_path),
+        "ocsf_findings": str(ocsf_findings_path),
         "summary_report": str(summary_report_path),
         "history_snapshot": str(history_snapshot_path),
         "appendix_tables": {key: str(value) for key, value in appendix_paths.items()},
         "cyber_insurance_pack": {key: str(value) for key, value in insurance_paths.items()},
         "action_plan_30_day": {key: str(value) for key, value in action_plan_paths.items()},
+        "csv_exports": {key: str(value) for key, value in csv_export_paths.items()},
+        "remediation_script_pack": {
+            key: str(value) for key, value in remediation_pack_paths.items()
+        },
         "benchmark_outputs": {key: str(value) for key, value in benchmark_paths.items()},
         "executive_pack": {key: str(value) for key, value in executive_pack_paths.items()},
         "dashboard": {
@@ -422,6 +438,15 @@ def main() -> None:
             )
         ),
     }
+    output["assessment_summary"] = build_assessment_summary(output).model_dump(
+        mode="json"
+    )
+    assessment_summary_path = output_dir / "cris_sme_assessment_summary.json"
+    assessment_summary_path.write_text(
+        json.dumps(output["assessment_summary"], indent=2),
+        encoding="utf-8",
+    )
+    output["report_artifacts"]["assessment_summary"] = str(assessment_summary_path)
     rbom = build_risk_bill_of_materials(
         output,
         artifact_paths=_flatten_artifact_paths(output["report_artifacts"]),
@@ -435,21 +460,26 @@ def main() -> None:
     print(json.dumps(output, indent=2))
 
 
-def _collect_profiles() -> list:
-    """Select the configured collector implementation."""
-    collector_mode = get_collector_mode()
+def _build_runner_event_handler():
+    """Build an event handler that appends AssessmentEvents to a JSONL sink.
 
-    if collector_mode == "azure":
-        return AzureCollector(
-            settings=get_azure_collector_settings()
-        ).collect_profiles()
+    If CRIS_SME_RUNNER_EVENTS_PATH is set, each AssessmentRunner phase event is
+    appended as a JSON line so a caller (e.g. the local API) can tail live
+    assessment progress while this process runs.
+    """
+    events_path = os.getenv("CRIS_SME_RUNNER_EVENTS_PATH")
+    if not events_path:
+        return None
 
-    if collector_mode == "mock":
-        return MockCollector().collect_profiles()
+    path = Path(events_path)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text("", encoding="utf-8")
 
-    raise ValueError(
-        f"Unsupported collector mode '{collector_mode}'. Use 'mock' or 'azure'."
-    )
+    def handler(event) -> None:
+        with path.open("a", encoding="utf-8") as handle:
+            handle.write(json.dumps(event.model_dump(mode="json")) + "\n")
+
+    return handler
 
 
 def _flatten_artifact_paths(artifacts: dict[str, object]) -> dict[str, Path]:

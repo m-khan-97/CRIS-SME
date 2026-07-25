@@ -93,12 +93,20 @@ class Finding(BaseModel):
         default_factory=list,
         description="Compliance or governance mappings related to the finding.",
     )
+    asset_ids: list[str] = Field(
+        default_factory=list,
+        description="Normalized asset IDs linked to this finding where available.",
+    )
+    evidence_ids: list[str] = Field(
+        default_factory=list,
+        description="Normalized evidence record IDs supporting this finding.",
+    )
     metadata: dict[str, Any] = Field(
         default_factory=dict,
         description="Optional structured context for downstream analysis.",
     )
 
-    @field_validator("evidence", "mapping")
+    @field_validator("evidence", "mapping", "asset_ids", "evidence_ids")
     @classmethod
     def strip_empty_items(cls, values: list[str]) -> list[str]:
         """Normalize list fields by trimming whitespace and dropping empty values."""

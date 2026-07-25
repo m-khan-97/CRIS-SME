@@ -39,7 +39,7 @@ def build_stable_finding_id(finding: Finding) -> str:
 def build_finding_trace(item: ScoredFinding) -> FindingTrace:
     """Build a structured finding trace from one scored finding."""
     finding = item.finding
-    evidence_refs = [
+    evidence_refs = finding.evidence_ids or [
         f"evidence:{build_stable_finding_id(finding)}:{index + 1}"
         for index in range(len(finding.evidence))
     ]
