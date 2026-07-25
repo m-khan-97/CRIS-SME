@@ -1,0 +1,13 @@
+services:
+  cris-sme:
+    build: .
+    ports:
+      - "8080:8080"
+    volumes:
+      - cris-sme-data:/data
+    # Azure CLI / AWS credential discovery happens inside the container via
+    # environment variables or a mounted credentials file; see
+    # docs/azure-least-privilege-setup.md and docs/aws-least-privilege-setup.md.
+
+volumes:
+  cris-sme-data:

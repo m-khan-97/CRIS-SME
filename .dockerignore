@@ -1,0 +1,14 @@
+.git
+.github
+node_modules
+frontend/console/node_modules
+frontend/console/dist
+outputs
+.venv
+__pycache__
+*.pyc
+.pytest_cache
+tests
+docs
+labs
+outputs/compliance-paper-pack.zip
