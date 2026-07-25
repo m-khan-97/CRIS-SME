@@ -5,6 +5,10 @@ import json
 from pathlib import Path
 
 from cris_sme.engine.graph_context import build_graph_context_summary
+from cris_sme.engine.assessment_context import (
+    AssessmentResourceContext,
+    build_assessment_resource_context,
+)
 from cris_sme.engine.lineage import (
     build_collector_coverage,
     build_confidence_assessment,
@@ -49,8 +53,13 @@ def build_json_report(
     findings: list[Finding],
     scoring_result: ScoringResult,
     compliance_result: ComplianceAssessmentResult | None = None,
+    resource_context: AssessmentResourceContext | None = None,
 ) -> dict[str, object]:
     """Build a stable JSON-style report for demos, notebooks, and export."""
+    resource_context = resource_context or build_assessment_resource_context(
+        profiles,
+        findings,
+    )
     remediation_plan = build_budget_aware_remediation_plan(
         scoring_result.prioritized_findings
     )
@@ -75,6 +84,7 @@ def build_json_report(
             profiles,
             scoring_result.prioritized_findings,
         ),
+        "resource_context": resource_context.model_dump(mode="json"),
         "evaluation_context": {
             "evaluated_profiles": len(profiles),
             "generated_findings": len(findings),
@@ -154,6 +164,8 @@ def _prioritized_risk_item(item: ScoredFinding) -> dict[str, object]:
         "priority": item.priority,
         "resource_scope": item.finding.resource_scope,
         "evidence": item.finding.evidence,
+        "asset_ids": item.finding.asset_ids,
+        "evidence_ids": item.finding.evidence_ids,
         "evidence_quality": {
             "observation_class": trace.observation_class.value,
             "sufficiency": evidence_sufficiency.sufficiency.value,
@@ -206,6 +218,7 @@ def _build_collection_details(profile: CloudProfile) -> dict[str, object]:
         "dataset_use",
         "collection_mode",
         "collector_stage",
+        "organization_name_source",
         "subscription_id",
         "subscription_display_name",
         "subscription_state",

@@ -169,7 +169,7 @@ def test_build_json_report_includes_context_and_prioritized_risks() -> None:
     assert report["provider_evidence_contracts"]["support_status_counts"]["active"] == 26
     assert report["provider_contract_conformance"]["passed"] is True
     assert report["provider_contract_conformance"]["active_contract_count"] == 26
-    assert report["provider_contract_conformance"]["planned_contract_count"] == 72
+    assert report["provider_contract_conformance"]["planned_contract_count"] == 36
     assert report["graph_context"]["graph_model"] == "cris_sme_lightweight_asset_context_v1"
     assert report["evaluation_dataset"]["source_types"] == ["live_real"]
     assert report["evaluation_dataset"]["authorization_bases"] == [
@@ -178,6 +178,10 @@ def test_build_json_report_includes_context_and_prioritized_risks() -> None:
     assert report["evaluation_dataset"]["dataset_uses"] == ["live_case_study"]
     assert report["confidence_calibration"]["controls_with_calibration"] >= 1
     assert report["native_validation"]["controls_mapped"] >= 1
+    assert report["resource_context"]["context_model"] == "cris_sme_resource_evidence_context_v1"
+    assert report["resource_context"]["assets"]
+    assert report["resource_context"]["evidence_records"]
+    assert report["resource_context"]["finding_asset_links"]
     assert report["benchmark_observation"]["provider"] == "azure"
     assert report["benchmark_comparison"]["dataset_size"] >= 1
     assert report["cyber_essentials_readiness"]["pillar_count"] == 5
@@ -199,6 +203,9 @@ def test_build_json_report_includes_context_and_prioritized_risks() -> None:
     first_risk = report["prioritized_risks"][0]
     assert first_risk["finding_id"].startswith("fdg_")
     assert first_risk["finding_trace"]["finding_id"] == first_risk["finding_id"]
+    assert first_risk["asset_ids"]
+    assert first_risk["evidence_ids"]
+    assert first_risk["finding_trace"]["evidence_refs"] == first_risk["evidence_ids"]
     assert first_risk["lifecycle"]["status"] == "open"
     assert first_risk["remediation_summary"]
     assert first_risk["remediation_cost_tier"] in {"free", "low", "medium", "high"}
