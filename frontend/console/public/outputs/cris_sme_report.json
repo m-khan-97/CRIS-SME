@@ -1,0 +1,1732 @@
+{
+  "report_schema_version": "2.0.0",
+  "generated_at": "2026-06-30T09:14:22Z",
+  "collector_mode": "azure_live_enriched",
+  "summary": "Overall risk score: 27.20/100 across 24 non-compliant findings.",
+  "overall_risk_score": 27.2,
+  "category_scores": {
+    "IAM": 32.51,
+    "Network": 0.0,
+    "Data": 37.58,
+    "Monitoring/Logging": 36.38,
+    "Compute/Workloads": 38.29,
+    "Cost/Governance Hygiene": 22.67,
+    "Healthcare IoT": 26.64
+  },
+  "organizations": [
+    {
+      "organization_id": "org:demo-contoso-healthcare",
+      "organization_name": "Contoso Healthcare Ltd",
+      "provider": "azure",
+      "sector": "Healthcare",
+      "tenant_scope": "single_tenant",
+      "collection_details": {
+        "profile_source": "azure_live",
+        "dataset_source_type": "demo",
+        "authorization_basis": "authorized_tenant_access",
+        "collection_mode": "azure_sdk_subscription_inventory",
+        "collector_stage": "azure_live_enriched",
+        "subscription_id": "xxxxxxxx-demo-0000-0000-contoso0demo",
+        "subscription_display_name": "Contoso Healthcare \u2013 Production",
+        "subscription_state": "Enabled",
+        "tenant_id": "xxxxxxxx-demo-0000-0000-tenantxxxxxx",
+        "iot_hub_count": 2,
+        "iot_device_identity_count": 47,
+        "iot_shared_access_policy_count": 5,
+        "iot_overbroad_shared_access_policy_count": 1,
+        "iot_private_endpoint_count": 0,
+        "iot_alert_rule_count": 1,
+        "iot_defender_enabled": false,
+        "conditional_access_accessible": false,
+        "conditional_access_enforced_for_admins": false,
+        "signed_in_user_is_directory_admin": false,
+        "evidence_counts": {
+          "privileged_assignment_count": 2,
+          "privileged_principal_count": 1,
+          "privileged_user_assignment_count": 2,
+          "privileged_service_principal_assignment_count": 0,
+          "conditional_access_policy_count": 0,
+          "storage_account_count": 3,
+          "sql_server_count": 1,
+          "sql_database_count": 2,
+          "activity_log_alert_count": 0,
+          "virtual_machine_count": 4,
+          "vm_backup_protected_count": 1,
+          "governance_resource_count": 4,
+          "policy_assignment_count": 2,
+          "native_security_recommendation_count": 21,
+          "native_unhealthy_recommendation_count": 6
+        }
+      }
+    }
+  ],
+  "prioritized_risks": [
+    {
+      "finding_id": "fdg_dd3f044cbc5ade",
+      "control_id": "IAM-001",
+      "rule_version": "1.0.0",
+      "title": "Privileged role assignments without MFA enforcement",
+      "organization": "Contoso Healthcare Ltd",
+      "organization_id": "org:demo-contoso-healthcare",
+      "provider": "azure",
+      "category": "IAM",
+      "severity": "Critical",
+      "score": 67.97,
+      "priority": "High",
+      "resource_scope": "6f0b9487-4fa8-42a8-aeb4-bf2e2c22d4e8",
+      "evidence": [
+        "Conditional access for privileged administrators was not observable and is treated as unmet for deterministic scoring"
+      ],
+      "evidence_quality": {
+        "observation_class": "observed",
+        "sufficiency": "partial",
+        "direct_evidence_count": 1,
+        "inferred_evidence_count": 0,
+        "unavailable_evidence_count": 0,
+        "provider_support": "active",
+        "missing_requirements": [
+          "identity governance visibility context"
+        ]
+      },
+      "evidence_sufficiency": {
+        "sufficiency": "partial",
+        "provider_support": "active",
+        "evidence_requirements": [
+          "privileged assignment inventory",
+          "identity governance visibility context"
+        ],
+        "satisfied_requirements": [
+          "privileged assignment inventory"
+        ],
+        "missing_requirements": [
+          "identity governance visibility context"
+        ],
+        "limitation_notes": [
+          "tenant-wide identity controls can be partially observable depending on Entra permissions"
+        ],
+        "explanation": "Some direct evidence is available, but not all declared evidence requirements are satisfied. Direct=1, inferred=0, unavailable=0."
+      },
+      "remediation_summary": "Require MFA and admin-focused conditional access for privileged identities.",
+      "remediation_cost_tier": "free",
+      "mapping": [
+        "CIS Azure Foundations Benchmark 1.4",
+        "ISO 27001 A.5.17",
+        "NIST PR.AA-02",
+        "Cyber Essentials Access control",
+        "UK GDPR Article 32",
+        "FCA SYSC 3.2.6R"
+      ],
+      "asset_ids": [
+        "asset:azure:iam:demo-admin-sp"
+      ]
+    },
+    {
+      "finding_id": "fdg_c06619dc2d64b5",
+      "control_id": "IOT-005",
+      "rule_version": "1.0.0",
+      "title": "IoT Hub public network access is not sufficiently constrained",
+      "organization": "Contoso Healthcare Ltd",
+      "organization_id": "org:demo-contoso-healthcare",
+      "provider": "azure",
+      "category": "Healthcare IoT",
+      "severity": "High",
+      "score": 47.61,
+      "priority": "Planned",
+      "resource_scope": "6f0b9487-4fa8-42a8-aeb4-bf2e2c22d4e8",
+      "evidence": [
+        "IoT Hub public network access is enabled",
+        "No IP filter rules or private endpoints were observed for the hub scope"
+      ],
+      "evidence_quality": {
+        "observation_class": "observed",
+        "sufficiency": "unsupported",
+        "direct_evidence_count": 2,
+        "inferred_evidence_count": 0,
+        "unavailable_evidence_count": 0,
+        "provider_support": "research_preview",
+        "missing_requirements": [
+          "IoT platform configuration evidence",
+          "device identity, telemetry, and clinical boundary evidence"
+        ]
+      },
+      "evidence_sufficiency": {
+        "sufficiency": "unsupported",
+        "provider_support": "research_preview",
+        "evidence_requirements": [
+          "IoT platform configuration evidence",
+          "device identity, telemetry, and clinical boundary evidence"
+        ],
+        "satisfied_requirements": [],
+        "missing_requirements": [
+          "IoT platform configuration evidence",
+          "device identity, telemetry, and clinical boundary evidence"
+        ],
+        "limitation_notes": [],
+        "explanation": "The control is not actively supported for provider 'azure' because provider support is marked 'research_preview'."
+      },
+      "remediation_summary": "Restrict IoT Hub public access using IP filters, private endpoints, or documented clinical network boundaries.",
+      "remediation_cost_tier": "low",
+      "mapping": [
+        "NCSC CAF B4 System security",
+        "NHS DSPT Network security",
+        "Cyber Essentials Firewalls"
+      ],
+      "asset_ids": [
+        "asset:azure:iot:demo-iot-hub-01",
+        "asset:azure:iot:demo-iot-hub-02"
+      ]
+    },
+    {
+      "finding_id": "fdg_b63bbef9ebe28c",
+      "control_id": "IOT-002",
+      "rule_version": "1.0.0",
+      "title": "IoT shared access policies exceed least-privilege expectations",
+      "organization": "Contoso Healthcare Ltd",
+      "organization_id": "org:demo-contoso-healthcare",
+      "provider": "azure",
+      "category": "Healthcare IoT",
+      "severity": "High",
+      "score": 42.03,
+      "priority": "Planned",
+      "resource_scope": "6f0b9487-4fa8-42a8-aeb4-bf2e2c22d4e8",
+      "evidence": [
+        "5 IoT shared access policie(s) were observed",
+        "1 shared access policie(s) appear overbroad"
+      ],
+      "evidence_quality": {
+        "observation_class": "observed",
+        "sufficiency": "unsupported",
+        "direct_evidence_count": 2,
+        "inferred_evidence_count": 0,
+        "unavailable_evidence_count": 0,
+        "provider_support": "research_preview",
+        "missing_requirements": [
+          "IoT platform configuration evidence",
+          "device identity, telemetry, and clinical boundary evidence"
+        ]
+      },
+      "evidence_sufficiency": {
+        "sufficiency": "unsupported",
+        "provider_support": "research_preview",
+        "evidence_requirements": [
+          "IoT platform configuration evidence",
+          "device identity, telemetry, and clinical boundary evidence"
+        ],
+        "satisfied_requirements": [],
+        "missing_requirements": [
+          "IoT platform configuration evidence",
+          "device identity, telemetry, and clinical boundary evidence"
+        ],
+        "limitation_notes": [],
+        "explanation": "The control is not actively supported for provider 'azure' because provider support is marked 'research_preview'."
+      },
+      "remediation_summary": "Reduce IoT shared access policies, remove overbroad permissions, and rotate keys through governed operations.",
+      "remediation_cost_tier": "free",
+      "mapping": [
+        "NCSC CAF B2 Identity and access control",
+        "NHS DSPT Security management",
+        "IEC 62443 account management"
+      ],
+      "asset_ids": [
+        "asset:azure:iot:demo-iot-hub-01"
+      ]
+    },
+    {
+      "finding_id": "fdg_23c234c401da76",
+      "control_id": "IOT-001",
+      "rule_version": "0.1.0",
+      "title": "IoMT device identities lack strong authentication evidence",
+      "organization": "Contoso Healthcare Ltd",
+      "organization_id": "org:demo-contoso-healthcare",
+      "provider": "azure",
+      "category": "Healthcare IoT",
+      "severity": "High",
+      "score": 41.11,
+      "priority": "Planned",
+      "resource_scope": "6f0b9487-4fa8-42a8-aeb4-bf2e2c22d4e8",
+      "evidence": [
+        "Certificate-authority based device authentication was not observed"
+      ],
+      "evidence_quality": {
+        "observation_class": "observed",
+        "sufficiency": "unsupported",
+        "direct_evidence_count": 1,
+        "inferred_evidence_count": 0,
+        "unavailable_evidence_count": 0,
+        "provider_support": "research_preview",
+        "missing_requirements": [
+          "IoT platform configuration evidence",
+          "device identity, telemetry, and clinical boundary evidence"
+        ]
+      },
+      "evidence_sufficiency": {
+        "sufficiency": "unsupported",
+        "provider_support": "research_preview",
+        "evidence_requirements": [
+          "IoT platform configuration evidence",
+          "device identity, telemetry, and clinical boundary evidence"
+        ],
+        "satisfied_requirements": [],
+        "missing_requirements": [
+          "IoT platform configuration evidence",
+          "device identity, telemetry, and clinical boundary evidence"
+        ],
+        "limitation_notes": [
+          "device-level certificate posture may require IoT Hub registry permissions or device-management integration"
+        ],
+        "explanation": "The control is not actively supported for provider 'azure' because provider support is marked 'research_preview'."
+      },
+      "remediation_summary": "Inventory IoMT device identities and prefer certificate-based authentication for clinical device connections.",
+      "remediation_cost_tier": "medium",
+      "mapping": [
+        "NCSC CAF B2 Identity and access control",
+        "NHS DSPT Access control",
+        "IEC 80001-1 risk management"
+      ],
+      "asset_ids": [
+        "asset:azure:iot:demo-iot-hub-01",
+        "asset:azure:iot:demo-iot-hub-02"
+      ]
+    },
+    {
+      "finding_id": "fdg_e31cae64b89bcb",
+      "control_id": "CMP-002",
+      "rule_version": "1.0.0",
+      "title": "Endpoint protection coverage is below the expected workload baseline",
+      "organization": "Contoso Healthcare Ltd",
+      "organization_id": "org:demo-contoso-healthcare",
+      "provider": "azure",
+      "category": "Compute/Workloads",
+      "severity": "High",
+      "score": 39.53,
+      "priority": "Planned",
+      "resource_scope": "6f0b9487-4fa8-42a8-aeb4-bf2e2c22d4e8",
+      "evidence": [
+        "Endpoint protection coverage is approximately 0%"
+      ],
+      "evidence_quality": {
+        "observation_class": "observed",
+        "sufficiency": "partial",
+        "direct_evidence_count": 1,
+        "inferred_evidence_count": 0,
+        "unavailable_evidence_count": 0,
+        "provider_support": "active",
+        "missing_requirements": [
+          "workload hardening and endpoint coverage evidence"
+        ]
+      },
+      "evidence_sufficiency": {
+        "sufficiency": "partial",
+        "provider_support": "active",
+        "evidence_requirements": [
+          "patch posture proxy evidence",
+          "workload hardening and endpoint coverage evidence"
+        ],
+        "satisfied_requirements": [
+          "patch posture proxy evidence"
+        ],
+        "missing_requirements": [
+          "workload hardening and endpoint coverage evidence"
+        ],
+        "limitation_notes": [],
+        "explanation": "Some direct evidence is available, but not all declared evidence requirements are satisfied. Direct=1, inferred=0, unavailable=0."
+      },
+      "remediation_summary": "Deploy endpoint protection or security agents to uncovered workloads.",
+      "remediation_cost_tier": "medium",
+      "mapping": [
+        "Microsoft Cloud Security Benchmark LT-4",
+        "NIST PR.PS-01",
+        "Cyber Essentials Malware protection"
+      ],
+      "asset_ids": [
+        "asset:azure:compute:demo-vm-01",
+        "asset:azure:compute:demo-vm-02"
+      ]
+    },
+    {
+      "finding_id": "fdg_3a2913d1bf0a74",
+      "control_id": "CMP-003",
+      "rule_version": "1.0.0",
+      "title": "Workload hardening baseline coverage is incomplete",
+      "organization": "Contoso Healthcare Ltd",
+      "organization_id": "org:demo-contoso-healthcare",
+      "provider": "azure",
+      "category": "Compute/Workloads",
+      "severity": "High",
+      "score": 38.49,
+      "priority": "Planned",
+      "resource_scope": "6f0b9487-4fa8-42a8-aeb4-bf2e2c22d4e8",
+      "evidence": [
+        "Hardened baseline coverage is approximately 0%"
+      ],
+      "evidence_quality": {
+        "observation_class": "observed",
+        "sufficiency": "partial",
+        "direct_evidence_count": 1,
+        "inferred_evidence_count": 0,
+        "unavailable_evidence_count": 0,
+        "provider_support": "active",
+        "missing_requirements": [
+          "workload hardening and endpoint coverage evidence"
+        ]
+      },
+      "evidence_sufficiency": {
+        "sufficiency": "partial",
+        "provider_support": "active",
+        "evidence_requirements": [
+          "patch posture proxy evidence",
+          "workload hardening and endpoint coverage evidence"
+        ],
+        "satisfied_requirements": [
+          "patch posture proxy evidence"
+        ],
+        "missing_requirements": [
+          "workload hardening and endpoint coverage evidence"
+        ],
+        "limitation_notes": [
+          "this control currently relies on conservative proxy or heuristic evidence paths"
+        ],
+        "explanation": "Some direct evidence is available, but not all declared evidence requirements are satisfied. Direct=1, inferred=0, unavailable=0."
+      },
+      "remediation_summary": "Apply a hardened workload baseline across compute resources and administrative settings.",
+      "remediation_cost_tier": "medium",
+      "mapping": [
+        "CIS Controls 4.1",
+        "NIST PR.IP-01"
+      ],
+      "asset_ids": [
+        "asset:azure:compute:demo-vm-01"
+      ]
+    },
+    {
+      "finding_id": "fdg_a1b19effffed75",
+      "control_id": "MON-002",
+      "rule_version": "1.0.0",
+      "title": "Critical security alert coverage is incomplete",
+      "organization": "Contoso Healthcare Ltd",
+      "organization_id": "org:demo-contoso-healthcare",
+      "provider": "azure",
+      "category": "Monitoring/Logging",
+      "severity": "High",
+      "score": 38.32,
+      "priority": "Planned",
+      "resource_scope": "6f0b9487-4fa8-42a8-aeb4-bf2e2c22d4e8",
+      "evidence": [
+        "Critical alert coverage is approximately 0%"
+      ],
+      "evidence_quality": {
+        "observation_class": "observed",
+        "sufficiency": "partial",
+        "direct_evidence_count": 1,
+        "inferred_evidence_count": 0,
+        "unavailable_evidence_count": 0,
+        "provider_support": "active",
+        "missing_requirements": [
+          "incident runbook or workflow evidence"
+        ]
+      },
+      "evidence_sufficiency": {
+        "sufficiency": "partial",
+        "provider_support": "active",
+        "evidence_requirements": [
+          "log retention and alerting evidence",
+          "incident runbook or workflow evidence"
+        ],
+        "satisfied_requirements": [
+          "log retention and alerting evidence"
+        ],
+        "missing_requirements": [
+          "incident runbook or workflow evidence"
+        ],
+        "limitation_notes": [],
+        "explanation": "Some direct evidence is available, but not all declared evidence requirements are satisfied. Direct=1, inferred=0, unavailable=0."
+      },
+      "remediation_summary": "Add or expand critical alerts for administrative, exposure, and security events.",
+      "remediation_cost_tier": "low",
+      "mapping": [
+        "NIST DE.CM-01",
+        "ISO 27001 A.8.16"
+      ],
+      "asset_ids": [
+        "asset:azure:monitor:demo-log-workspace"
+      ]
+    },
+    {
+      "finding_id": "fdg_17572b3be3866c",
+      "control_id": "DATA-003",
+      "rule_version": "1.0.0",
+      "title": "Backup and retention coverage fall below resilience expectations",
+      "organization": "Contoso Healthcare Ltd",
+      "organization_id": "org:demo-contoso-healthcare",
+      "provider": "azure",
+      "category": "Data",
+      "severity": "High",
+      "score": 37.58,
+      "priority": "Planned",
+      "resource_scope": "6f0b9487-4fa8-42a8-aeb4-bf2e2c22d4e8",
+      "evidence": [
+        "Backup coverage is only 0%",
+        "Retention policy coverage is only 0%"
+      ],
+      "evidence_quality": {
+        "observation_class": "observed",
+        "sufficiency": "sufficient",
+        "direct_evidence_count": 2,
+        "inferred_evidence_count": 0,
+        "unavailable_evidence_count": 0,
+        "provider_support": "active",
+        "missing_requirements": []
+      },
+      "evidence_sufficiency": {
+        "sufficiency": "sufficient",
+        "provider_support": "active",
+        "evidence_requirements": [
+          "public data-path and encryption evidence",
+          "backup/retention control-state evidence"
+        ],
+        "satisfied_requirements": [
+          "public data-path and encryption evidence",
+          "backup/retention control-state evidence"
+        ],
+        "missing_requirements": [],
+        "limitation_notes": [],
+        "explanation": "Direct evidence satisfies the currently declared control evidence requirements for this provider path."
+      },
+      "remediation_summary": "Increase backup and retention coverage for business-critical data stores.",
+      "remediation_cost_tier": "medium",
+      "mapping": [
+        "ISO 27001 A.8.13",
+        "NIST PR.DS-04",
+        "DSPT NDG Standard 7"
+      ],
+      "asset_ids": [
+        "asset:azure:storage:demo-patient-storage"
+      ]
+    },
+    {
+      "finding_id": "fdg_5b006cc3a4c2b3",
+      "control_id": "MON-003",
+      "rule_version": "1.0.0",
+      "title": "Security monitoring coverage is below the expected baseline",
+      "organization": "Contoso Healthcare Ltd",
+      "organization_id": "org:demo-contoso-healthcare",
+      "provider": "azure",
+      "category": "Monitoring/Logging",
+      "severity": "High",
+      "score": 36.94,
+      "priority": "Planned",
+      "resource_scope": "6f0b9487-4fa8-42a8-aeb4-bf2e2c22d4e8",
+      "evidence": [
+        "Security monitoring coverage is approximately 0%"
+      ],
+      "evidence_quality": {
+        "observation_class": "observed",
+        "sufficiency": "partial",
+        "direct_evidence_count": 1,
+        "inferred_evidence_count": 0,
+        "unavailable_evidence_count": 0,
+        "provider_support": "active",
+        "missing_requirements": [
+          "incident runbook or workflow evidence"
+        ]
+      },
+      "evidence_sufficiency": {
+        "sufficiency": "partial",
+        "provider_support": "active",
+        "evidence_requirements": [
+          "log retention and alerting evidence",
+          "incident runbook or workflow evidence"
+        ],
+        "satisfied_requirements": [
+          "log retention and alerting evidence"
+        ],
+        "missing_requirements": [
+          "incident runbook or workflow evidence"
+        ],
+        "limitation_notes": [],
+        "explanation": "Some direct evidence is available, but not all declared evidence requirements are satisfied. Direct=1, inferred=0, unavailable=0."
+      },
+      "remediation_summary": "Expand security monitoring coverage across workloads and key cloud services.",
+      "remediation_cost_tier": "medium",
+      "mapping": [
+        "Microsoft Cloud Security Benchmark LT-1",
+        "NIST DE.CM-02"
+      ],
+      "asset_ids": [
+        "asset:azure:monitor:demo-log-workspace"
+      ]
+    },
+    {
+      "finding_id": "fdg_4a77773e1921aa",
+      "control_id": "CMP-004",
+      "rule_version": "1.0.0",
+      "title": "Workload backup agent coverage is below resilience expectations",
+      "organization": "Contoso Healthcare Ltd",
+      "organization_id": "org:demo-contoso-healthcare",
+      "provider": "azure",
+      "category": "Compute/Workloads",
+      "severity": "High",
+      "score": 36.85,
+      "priority": "Planned",
+      "resource_scope": "6f0b9487-4fa8-42a8-aeb4-bf2e2c22d4e8",
+      "evidence": [
+        "Workload backup agent coverage is approximately 0%"
+      ],
+      "evidence_quality": {
+        "observation_class": "observed",
+        "sufficiency": "partial",
+        "direct_evidence_count": 1,
+        "inferred_evidence_count": 0,
+        "unavailable_evidence_count": 0,
+        "provider_support": "active",
+        "missing_requirements": [
+          "workload hardening and endpoint coverage evidence"
+        ]
+      },
+      "evidence_sufficiency": {
+        "sufficiency": "partial",
+        "provider_support": "active",
+        "evidence_requirements": [
+          "patch posture proxy evidence",
+          "workload hardening and endpoint coverage evidence"
+        ],
+        "satisfied_requirements": [
+          "patch posture proxy evidence"
+        ],
+        "missing_requirements": [
+          "workload hardening and endpoint coverage evidence"
+        ],
+        "limitation_notes": [],
+        "explanation": "Some direct evidence is available, but not all declared evidence requirements are satisfied. Direct=1, inferred=0, unavailable=0."
+      },
+      "remediation_summary": "Enable workload backup protections for critical virtual machines and services.",
+      "remediation_cost_tier": "medium",
+      "mapping": [
+        "ISO 27001 A.8.13",
+        "NIST PR.DS-04"
+      ],
+      "asset_ids": [
+        "asset:azure:compute:demo-vm-01",
+        "asset:azure:compute:demo-vm-02"
+      ]
+    },
+    {
+      "finding_id": "fdg_711e3441230b55",
+      "control_id": "MON-001",
+      "rule_version": "1.0.0",
+      "title": "Activity log retention is below governance and investigation expectations",
+      "organization": "Contoso Healthcare Ltd",
+      "organization_id": "org:demo-contoso-healthcare",
+      "provider": "azure",
+      "category": "Monitoring/Logging",
+      "severity": "High",
+      "score": 35.79,
+      "priority": "Planned",
+      "resource_scope": "6f0b9487-4fa8-42a8-aeb4-bf2e2c22d4e8",
+      "evidence": [
+        "Activity logs are retained for only 0 day(s)"
+      ],
+      "evidence_quality": {
+        "observation_class": "observed",
+        "sufficiency": "partial",
+        "direct_evidence_count": 1,
+        "inferred_evidence_count": 0,
+        "unavailable_evidence_count": 0,
+        "provider_support": "active",
+        "missing_requirements": [
+          "incident runbook or workflow evidence"
+        ]
+      },
+      "evidence_sufficiency": {
+        "sufficiency": "partial",
+        "provider_support": "active",
+        "evidence_requirements": [
+          "log retention and alerting evidence",
+          "incident runbook or workflow evidence"
+        ],
+        "satisfied_requirements": [
+          "log retention and alerting evidence"
+        ],
+        "missing_requirements": [
+          "incident runbook or workflow evidence"
+        ],
+        "limitation_notes": [],
+        "explanation": "Some direct evidence is available, but not all declared evidence requirements are satisfied. Direct=1, inferred=0, unavailable=0."
+      },
+      "remediation_summary": "Increase log retention to support investigation, governance review, and evidence preservation.",
+      "remediation_cost_tier": "low",
+      "mapping": [
+        "CIS Azure Foundations Benchmark 5.2",
+        "NIST DE.CM-01",
+        "DSPT NDG Standard 6"
+      ],
+      "asset_ids": [
+        "asset:azure:monitor:demo-log-workspace"
+      ]
+    },
+    {
+      "finding_id": "fdg_a4190d3d81a468",
+      "control_id": "MON-004",
+      "rule_version": "1.0.0",
+      "title": "Monitoring operations are missing centralized logging or response runbooks",
+      "organization": "Contoso Healthcare Ltd",
+      "organization_id": "org:demo-contoso-healthcare",
+      "provider": "azure",
+      "category": "Monitoring/Logging",
+      "severity": "High",
+      "score": 34.47,
+      "priority": "Planned",
+      "resource_scope": "6f0b9487-4fa8-42a8-aeb4-bf2e2c22d4e8",
+      "evidence": [
+        "Centralized logging is not enabled",
+        "Incident response runbooks are not defined or enabled"
+      ],
+      "evidence_quality": {
+        "observation_class": "observed",
+        "sufficiency": "sufficient",
+        "direct_evidence_count": 2,
+        "inferred_evidence_count": 0,
+        "unavailable_evidence_count": 0,
+        "provider_support": "active",
+        "missing_requirements": []
+      },
+      "evidence_sufficiency": {
+        "sufficiency": "sufficient",
+        "provider_support": "active",
+        "evidence_requirements": [
+          "log retention and alerting evidence",
+          "incident runbook or workflow evidence"
+        ],
+        "satisfied_requirements": [
+          "log retention and alerting evidence",
+          "incident runbook or workflow evidence"
+        ],
+        "missing_requirements": [],
+        "limitation_notes": [],
+        "explanation": "Direct evidence satisfies the currently declared control evidence requirements for this provider path."
+      },
+      "remediation_summary": "Enable centralized logging and define response playbooks for priority events.",
+      "remediation_cost_tier": "medium",
+      "mapping": [
+        "ISO 27001 A.5.24",
+        "NIST RS.RP-01"
+      ],
+      "asset_ids": [
+        "asset:azure:monitor:demo-log-workspace"
+      ]
+    },
+    {
+      "finding_id": "fdg_7bbd00a16f27e8",
+      "control_id": "GOV-003",
+      "rule_version": "1.0.0",
+      "title": "Policy assignment coverage is below the baseline governance threshold",
+      "organization": "Contoso Healthcare Ltd",
+      "organization_id": "org:demo-contoso-healthcare",
+      "provider": "azure",
+      "category": "Cost/Governance Hygiene",
+      "severity": "High",
+      "score": 33.88,
+      "priority": "Planned",
+      "resource_scope": "6f0b9487-4fa8-42a8-aeb4-bf2e2c22d4e8",
+      "evidence": [
+        "Baseline policy assignment coverage is approximately 40%"
+      ],
+      "evidence_quality": {
+        "observation_class": "observed",
+        "sufficiency": "partial",
+        "direct_evidence_count": 1,
+        "inferred_evidence_count": 0,
+        "unavailable_evidence_count": 0,
+        "provider_support": "active",
+        "missing_requirements": [
+          "governance policy/budget/tagging control evidence"
+        ]
+      },
+      "evidence_sufficiency": {
+        "sufficiency": "partial",
+        "provider_support": "active",
+        "evidence_requirements": [
+          "resource inventory evidence",
+          "governance policy/budget/tagging control evidence"
+        ],
+        "satisfied_requirements": [
+          "resource inventory evidence"
+        ],
+        "missing_requirements": [
+          "governance policy/budget/tagging control evidence"
+        ],
+        "limitation_notes": [],
+        "explanation": "Some direct evidence is available, but not all declared evidence requirements are satisfied. Direct=1, inferred=0, unavailable=0."
+      },
+      "remediation_summary": "Increase baseline policy assignment coverage for governance and compliance controls.",
+      "remediation_cost_tier": "free",
+      "mapping": [
+        "Azure Policy Baseline",
+        "NIST GV.PO-01"
+      ],
+      "asset_ids": [
+        "asset:azure:governance:demo-rg-prod"
+      ]
+    },
+    {
+      "finding_id": "fdg_32d2a7ac140246",
+      "control_id": "IAM-002",
+      "rule_version": "1.0.0",
+      "title": "Overprivileged accounts exceed least-privilege expectations",
+      "organization": "Contoso Healthcare Ltd",
+      "organization_id": "org:demo-contoso-healthcare",
+      "provider": "azure",
+      "category": "IAM",
+      "severity": "Medium",
+      "score": 24.98,
+      "priority": "Monitor",
+      "resource_scope": "6f0b9487-4fa8-42a8-aeb4-bf2e2c22d4e8",
+      "evidence": [
+        "1 account(s) appear to hold privileges above operational need",
+        "Observed privileged assignment mix: 2 user assignment(s), 0 service principal assignment(s)"
+      ],
+      "evidence_quality": {
+        "observation_class": "observed",
+        "sufficiency": "sufficient",
+        "direct_evidence_count": 2,
+        "inferred_evidence_count": 0,
+        "unavailable_evidence_count": 0,
+        "provider_support": "active",
+        "missing_requirements": []
+      },
+      "evidence_sufficiency": {
+        "sufficiency": "sufficient",
+        "provider_support": "active",
+        "evidence_requirements": [
+          "privileged assignment inventory",
+          "identity governance visibility context"
+        ],
+        "satisfied_requirements": [
+          "privileged assignment inventory",
+          "identity governance visibility context"
+        ],
+        "missing_requirements": [],
+        "limitation_notes": [
+          "tenant-wide identity controls can be partially observable depending on Entra permissions"
+        ],
+        "explanation": "Direct evidence satisfies the currently declared control evidence requirements for this provider path."
+      },
+      "remediation_summary": "Review privileged assignments and remove duplicate or unnecessary high-privilege access.",
+      "remediation_cost_tier": "free",
+      "mapping": [
+        "ISO 27001 A.8.2",
+        "NIST PR.AA-05",
+        "Cyber Essentials Access control",
+        "FCA SYSC 3.2.6R"
+      ],
+      "asset_ids": [
+        "asset:azure:iam:demo-admin-sp",
+        "asset:azure:iam:demo-devops-sp"
+      ]
+    },
+    {
+      "finding_id": "fdg_584d1bbf8099e3",
+      "control_id": "IOT-006",
+      "rule_version": "1.0.0",
+      "title": "Private endpoint coverage is missing for sensitive IoMT telemetry paths",
+      "organization": "Contoso Healthcare Ltd",
+      "organization_id": "org:demo-contoso-healthcare",
+      "provider": "azure",
+      "category": "Healthcare IoT",
+      "severity": "Medium",
+      "score": 23.51,
+      "priority": "Monitor",
+      "resource_scope": "6f0b9487-4fa8-42a8-aeb4-bf2e2c22d4e8",
+      "evidence": [
+        "A private endpoint is required for the assessed IoT workload",
+        "No private endpoint was observed for the IoT Hub scope"
+      ],
+      "evidence_quality": {
+        "observation_class": "observed",
+        "sufficiency": "unsupported",
+        "direct_evidence_count": 2,
+        "inferred_evidence_count": 0,
+        "unavailable_evidence_count": 0,
+        "provider_support": "research_preview",
+        "missing_requirements": [
+          "IoT platform configuration evidence",
+          "device identity, telemetry, and clinical boundary evidence"
+        ]
+      },
+      "evidence_sufficiency": {
+        "sufficiency": "unsupported",
+        "provider_support": "research_preview",
+        "evidence_requirements": [
+          "IoT platform configuration evidence",
+          "device identity, telemetry, and clinical boundary evidence"
+        ],
+        "satisfied_requirements": [],
+        "missing_requirements": [
+          "IoT platform configuration evidence",
+          "device identity, telemetry, and clinical boundary evidence"
+        ],
+        "limitation_notes": [],
+        "explanation": "The control is not actively supported for provider 'azure' because provider support is marked 'research_preview'."
+      },
+      "remediation_summary": "Deploy private endpoints for sensitive IoMT telemetry services where public routing is not justified.",
+      "remediation_cost_tier": "medium",
+      "mapping": [
+        "NCSC CAF B4 System security",
+        "NHS DSPT Network security",
+        "UK GDPR Article 32"
+      ],
+      "asset_ids": [
+        "asset:azure:iot:demo-iot-hub-01"
+      ]
+    },
+    {
+      "finding_id": "fdg_c3dc8572ac651e",
+      "control_id": "IOT-008",
+      "rule_version": "1.0.0",
+      "title": "IoT credential governance is not linked to managed secret controls",
+      "organization": "Contoso Healthcare Ltd",
+      "organization_id": "org:demo-contoso-healthcare",
+      "provider": "azure",
+      "category": "Healthcare IoT",
+      "severity": "Medium",
+      "score": 22.06,
+      "priority": "Monitor",
+      "resource_scope": "6f0b9487-4fa8-42a8-aeb4-bf2e2c22d4e8",
+      "evidence": [
+        "IoT credentials were not linked to a governed key vault path",
+        "IoT credential rotation evidence was not observable"
+      ],
+      "evidence_quality": {
+        "observation_class": "observed",
+        "sufficiency": "unsupported",
+        "direct_evidence_count": 2,
+        "inferred_evidence_count": 0,
+        "unavailable_evidence_count": 0,
+        "provider_support": "research_preview",
+        "missing_requirements": [
+          "IoT platform configuration evidence",
+          "device identity, telemetry, and clinical boundary evidence"
+        ]
+      },
+      "evidence_sufficiency": {
+        "sufficiency": "unsupported",
+        "provider_support": "research_preview",
+        "evidence_requirements": [
+          "IoT platform configuration evidence",
+          "device identity, telemetry, and clinical boundary evidence"
+        ],
+        "satisfied_requirements": [],
+        "missing_requirements": [
+          "IoT platform configuration evidence",
+          "device identity, telemetry, and clinical boundary evidence"
+        ],
+        "limitation_notes": [],
+        "explanation": "The control is not actively supported for provider 'azure' because provider support is marked 'research_preview'."
+      },
+      "remediation_summary": "Store and rotate IoT credentials through governed key-management services with owner accountability.",
+      "remediation_cost_tier": "low",
+      "mapping": [
+        "NCSC CAF B2 Identity and access control",
+        "NHS DSPT Access control",
+        "ISO 27001 A.8.24"
+      ],
+      "asset_ids": [
+        "asset:azure:iot:demo-iot-hub-01",
+        "asset:azure:iot:demo-iot-hub-02"
+      ]
+    },
+    {
+      "finding_id": "fdg_1fd6f719d09b5c",
+      "control_id": "IOT-003",
+      "rule_version": "1.0.0",
+      "title": "IoT diagnostic logging is incomplete for clinical telemetry investigation",
+      "organization": "Contoso Healthcare Ltd",
+      "organization_id": "org:demo-contoso-healthcare",
+      "provider": "azure",
+      "category": "Healthcare IoT",
+      "severity": "Medium",
+      "score": 22.02,
+      "priority": "Monitor",
+      "resource_scope": "6f0b9487-4fa8-42a8-aeb4-bf2e2c22d4e8",
+      "evidence": [
+        "IoT diagnostic category coverage is below the 80% baseline"
+      ],
+      "evidence_quality": {
+        "observation_class": "observed",
+        "sufficiency": "unsupported",
+        "direct_evidence_count": 1,
+        "inferred_evidence_count": 0,
+        "unavailable_evidence_count": 0,
+        "provider_support": "research_preview",
+        "missing_requirements": [
+          "IoT platform configuration evidence",
+          "device identity, telemetry, and clinical boundary evidence"
+        ]
+      },
+      "evidence_sufficiency": {
+        "sufficiency": "unsupported",
+        "provider_support": "research_preview",
+        "evidence_requirements": [
+          "IoT platform configuration evidence",
+          "device identity, telemetry, and clinical boundary evidence"
+        ],
+        "satisfied_requirements": [],
+        "missing_requirements": [
+          "IoT platform configuration evidence",
+          "device identity, telemetry, and clinical boundary evidence"
+        ],
+        "limitation_notes": [],
+        "explanation": "The control is not actively supported for provider 'azure' because provider support is marked 'research_preview'."
+      },
+      "remediation_summary": "Enable IoT Hub diagnostic settings and route core diagnostic categories to a monitored destination.",
+      "remediation_cost_tier": "low",
+      "mapping": [
+        "NCSC CAF C1 Security monitoring",
+        "NHS DSPT Logging and monitoring",
+        "ISO 27001 A.8.15"
+      ],
+      "asset_ids": [
+        "asset:azure:iot:demo-iot-hub-01",
+        "asset:azure:iot:demo-iot-hub-02"
+      ]
+    },
+    {
+      "finding_id": "fdg_402505ee2b4899",
+      "control_id": "IOT-004",
+      "rule_version": "0.1.0",
+      "title": "Defender for IoT or equivalent security monitoring is not evidenced",
+      "organization": "Contoso Healthcare Ltd",
+      "organization_id": "org:demo-contoso-healthcare",
+      "provider": "azure",
+      "category": "Healthcare IoT",
+      "severity": "Medium",
+      "score": 21.66,
+      "priority": "Monitor",
+      "resource_scope": "6f0b9487-4fa8-42a8-aeb4-bf2e2c22d4e8",
+      "evidence": [
+        "Defender for IoT coverage was not observed for the hub scope"
+      ],
+      "evidence_quality": {
+        "observation_class": "observed",
+        "sufficiency": "unsupported",
+        "direct_evidence_count": 1,
+        "inferred_evidence_count": 0,
+        "unavailable_evidence_count": 0,
+        "provider_support": "research_preview",
+        "missing_requirements": [
+          "IoT platform configuration evidence",
+          "device identity, telemetry, and clinical boundary evidence"
+        ]
+      },
+      "evidence_sufficiency": {
+        "sufficiency": "unsupported",
+        "provider_support": "research_preview",
+        "evidence_requirements": [
+          "IoT platform configuration evidence",
+          "device identity, telemetry, and clinical boundary evidence"
+        ],
+        "satisfied_requirements": [],
+        "missing_requirements": [
+          "IoT platform configuration evidence",
+          "device identity, telemetry, and clinical boundary evidence"
+        ],
+        "limitation_notes": [
+          "Defender for IoT state is a control-plane signal and does not prove complete medical-device sensor coverage"
+        ],
+        "explanation": "The control is not actively supported for provider 'azure' because provider support is marked 'research_preview'."
+      },
+      "remediation_summary": "Enable Defender for IoT or document an equivalent monitoring path for clinical IoT assets.",
+      "remediation_cost_tier": "medium",
+      "mapping": [
+        "NCSC CAF C1 Security monitoring",
+        "NHS DSPT Security operations",
+        "IEC 62443 security monitoring"
+      ],
+      "asset_ids": [
+        "asset:azure:iot:demo-iot-hub-01"
+      ]
+    },
+    {
+      "finding_id": "fdg_92000462d44959",
+      "control_id": "IOT-007",
+      "rule_version": "1.0.0",
+      "title": "IoMT telemetry routing and retention are below clinical evidence expectations",
+      "organization": "Contoso Healthcare Ltd",
+      "organization_id": "org:demo-contoso-healthcare",
+      "provider": "azure",
+      "category": "Healthcare IoT",
+      "severity": "Medium",
+      "score": 21.09,
+      "priority": "Monitor",
+      "resource_scope": "6f0b9487-4fa8-42a8-aeb4-bf2e2c22d4e8",
+      "evidence": [
+        "No IoT telemetry message route was observed",
+        "Telemetry storage governance was not observed"
+      ],
+      "evidence_quality": {
+        "observation_class": "observed",
+        "sufficiency": "unsupported",
+        "direct_evidence_count": 2,
+        "inferred_evidence_count": 0,
+        "unavailable_evidence_count": 0,
+        "provider_support": "research_preview",
+        "missing_requirements": [
+          "IoT platform configuration evidence",
+          "device identity, telemetry, and clinical boundary evidence"
+        ]
+      },
+      "evidence_sufficiency": {
+        "sufficiency": "unsupported",
+        "provider_support": "research_preview",
+        "evidence_requirements": [
+          "IoT platform configuration evidence",
+          "device identity, telemetry, and clinical boundary evidence"
+        ],
+        "satisfied_requirements": [],
+        "missing_requirements": [
+          "IoT platform configuration evidence",
+          "device identity, telemetry, and clinical boundary evidence"
+        ],
+        "limitation_notes": [],
+        "explanation": "The control is not actively supported for provider 'azure' because provider support is marked 'research_preview'."
+      },
+      "remediation_summary": "Route IoMT telemetry to governed storage and retain sufficient logs for investigation and clinical safety review.",
+      "remediation_cost_tier": "low",
+      "mapping": [
+        "NCSC CAF C1 Security monitoring",
+        "NHS DSPT Records management",
+        "ISO 27001 A.8.15"
+      ],
+      "asset_ids": [
+        "asset:azure:iot:demo-iot-hub-02"
+      ]
+    },
+    {
+      "finding_id": "fdg_ead93fd929bb25",
+      "control_id": "IOT-009",
+      "rule_version": "1.0.0",
+      "title": "Clinical IoT alert routing is not operationally evidenced",
+      "organization": "Contoso Healthcare Ltd",
+      "organization_id": "org:demo-contoso-healthcare",
+      "provider": "azure",
+      "category": "Healthcare IoT",
+      "severity": "Medium",
+      "score": 20.44,
+      "priority": "Monitor",
+      "resource_scope": "6f0b9487-4fa8-42a8-aeb4-bf2e2c22d4e8",
+      "evidence": [
+        "No IoT-specific clinical or operational alert rule was observed",
+        "No action group was observed for IoT alert routing"
+      ],
+      "evidence_quality": {
+        "observation_class": "observed",
+        "sufficiency": "unsupported",
+        "direct_evidence_count": 2,
+        "inferred_evidence_count": 0,
+        "unavailable_evidence_count": 0,
+        "provider_support": "research_preview",
+        "missing_requirements": [
+          "IoT platform configuration evidence",
+          "device identity, telemetry, and clinical boundary evidence"
+        ]
+      },
+      "evidence_sufficiency": {
+        "sufficiency": "unsupported",
+        "provider_support": "research_preview",
+        "evidence_requirements": [
+          "IoT platform configuration evidence",
+          "device identity, telemetry, and clinical boundary evidence"
+        ],
+        "satisfied_requirements": [],
+        "missing_requirements": [
+          "IoT platform configuration evidence",
+          "device identity, telemetry, and clinical boundary evidence"
+        ],
+        "limitation_notes": [],
+        "explanation": "The control is not actively supported for provider 'azure' because provider support is marked 'research_preview'."
+      },
+      "remediation_summary": "Create IoT-specific alert rules and route them to accountable clinical or operational responders.",
+      "remediation_cost_tier": "low",
+      "mapping": [
+        "NCSC CAF C2 Proactive security event discovery",
+        "NHS DSPT Incident management",
+        "IEC 80001-1 operational risk"
+      ],
+      "asset_ids": [
+        "asset:azure:iot:demo-iot-hub-01"
+      ]
+    },
+    {
+      "finding_id": "fdg_07b45305de0b86",
+      "control_id": "GOV-001",
+      "rule_version": "1.0.0",
+      "title": "Resource tagging coverage falls below governance expectations",
+      "organization": "Contoso Healthcare Ltd",
+      "organization_id": "org:demo-contoso-healthcare",
+      "provider": "azure",
+      "category": "Cost/Governance Hygiene",
+      "severity": "Medium",
+      "score": 17.74,
+      "priority": "Monitor",
+      "resource_scope": "6f0b9487-4fa8-42a8-aeb4-bf2e2c22d4e8",
+      "evidence": [
+        "Required tagging coverage is approximately 75%"
+      ],
+      "evidence_quality": {
+        "observation_class": "observed",
+        "sufficiency": "partial",
+        "direct_evidence_count": 1,
+        "inferred_evidence_count": 0,
+        "unavailable_evidence_count": 0,
+        "provider_support": "active",
+        "missing_requirements": [
+          "governance policy/budget/tagging control evidence"
+        ]
+      },
+      "evidence_sufficiency": {
+        "sufficiency": "partial",
+        "provider_support": "active",
+        "evidence_requirements": [
+          "resource inventory evidence",
+          "governance policy/budget/tagging control evidence"
+        ],
+        "satisfied_requirements": [
+          "resource inventory evidence"
+        ],
+        "missing_requirements": [
+          "governance policy/budget/tagging control evidence"
+        ],
+        "limitation_notes": [],
+        "explanation": "Some direct evidence is available, but not all declared evidence requirements are satisfied. Direct=1, inferred=0, unavailable=0."
+      },
+      "remediation_summary": "Apply and enforce required resource tags across the environment.",
+      "remediation_cost_tier": "free",
+      "mapping": [
+        "Azure CAF Governance Discipline",
+        "ISO 27001 A.5.9"
+      ],
+      "asset_ids": [
+        "asset:azure:governance:demo-rg-prod"
+      ]
+    },
+    {
+      "finding_id": "fdg_5a350ff4ec074d",
+      "control_id": "GOV-002",
+      "rule_version": "1.1.0",
+      "title": "Budget alerting is not enabled for cloud cost governance",
+      "organization": "Contoso Healthcare Ltd",
+      "organization_id": "org:demo-contoso-healthcare",
+      "provider": "azure",
+      "category": "Cost/Governance Hygiene",
+      "severity": "Medium",
+      "score": 16.39,
+      "priority": "Monitor",
+      "resource_scope": "6f0b9487-4fa8-42a8-aeb4-bf2e2c22d4e8",
+      "evidence": [
+        "Budget or spend alerting is not configured"
+      ],
+      "evidence_quality": {
+        "observation_class": "observed",
+        "sufficiency": "partial",
+        "direct_evidence_count": 1,
+        "inferred_evidence_count": 0,
+        "unavailable_evidence_count": 0,
+        "provider_support": "active",
+        "missing_requirements": [
+          "governance policy/budget/tagging control evidence"
+        ]
+      },
+      "evidence_sufficiency": {
+        "sufficiency": "partial",
+        "provider_support": "active",
+        "evidence_requirements": [
+          "resource inventory evidence",
+          "governance policy/budget/tagging control evidence"
+        ],
+        "satisfied_requirements": [
+          "resource inventory evidence"
+        ],
+        "missing_requirements": [
+          "governance policy/budget/tagging control evidence"
+        ],
+        "limitation_notes": [
+          "live budget-alert evidence is currently conservative in some collection contexts"
+        ],
+        "explanation": "Some direct evidence is available, but not all declared evidence requirements are satisfied. Direct=1, inferred=0, unavailable=0."
+      },
+      "remediation_summary": "Configure budget thresholds and spend alerts for cost oversight.",
+      "remediation_cost_tier": "free",
+      "mapping": [
+        "FinOps Cost Governance",
+        "ISO 27001 A.5.36"
+      ],
+      "asset_ids": [
+        "asset:azure:governance:demo-rg-prod"
+      ]
+    },
+    {
+      "finding_id": "fdg_d5b8b50c2d0acc",
+      "control_id": "IOT-010",
+      "rule_version": "0.1.0",
+      "title": "Clinical-operational ownership boundaries require human validation",
+      "organization": "Contoso Healthcare Ltd",
+      "organization_id": "org:demo-contoso-healthcare",
+      "provider": "azure",
+      "category": "Healthcare IoT",
+      "severity": "Low",
+      "score": 4.83,
+      "priority": "Monitor",
+      "resource_scope": "6f0b9487-4fa8-42a8-aeb4-bf2e2c22d4e8",
+      "evidence": [
+        "Clinical and operational ownership boundary was not documented in collected evidence",
+        "1 operational evidence item(s) require human confirmation"
+      ],
+      "evidence_quality": {
+        "observation_class": "observed",
+        "sufficiency": "unsupported",
+        "direct_evidence_count": 2,
+        "inferred_evidence_count": 0,
+        "unavailable_evidence_count": 0,
+        "provider_support": "research_preview",
+        "missing_requirements": [
+          "IoT platform configuration evidence",
+          "device identity, telemetry, and clinical boundary evidence"
+        ]
+      },
+      "evidence_sufficiency": {
+        "sufficiency": "unsupported",
+        "provider_support": "research_preview",
+        "evidence_requirements": [
+          "IoT platform configuration evidence",
+          "device identity, telemetry, and clinical boundary evidence"
+        ],
+        "satisfied_requirements": [],
+        "missing_requirements": [
+          "IoT platform configuration evidence",
+          "device identity, telemetry, and clinical boundary evidence"
+        ],
+        "limitation_notes": [
+          "clinical ownership, supplier accountability, and patient-safety workflow evidence require human validation"
+        ],
+        "explanation": "The control is not actively supported for provider 'azure' because provider support is marked 'research_preview'."
+      },
+      "remediation_summary": "Document clinical, operational, and supplier ownership boundaries for IoMT assets and validate device-level evidence manually.",
+      "remediation_cost_tier": "free",
+      "mapping": [
+        "NCSC CAF A1 Governance",
+        "NHS DSPT Leadership and governance",
+        "IEC 80001-1 responsibility agreements"
+      ],
+      "asset_ids": [
+        "asset:azure:iot:demo-iot-hub-01",
+        "asset:azure:iot:demo-iot-hub-02"
+      ]
+    },
+    {
+      "finding_id": "fdg_0a0c96c4f68724",
+      "control_id": "IAM-005",
+      "rule_version": "1.1.0",
+      "title": "Identity governance observability is partial for this assessment scope",
+      "organization": "Contoso Healthcare Ltd",
+      "organization_id": "org:demo-contoso-healthcare",
+      "provider": "azure",
+      "category": "IAM",
+      "severity": "Low",
+      "score": 4.57,
+      "priority": "Monitor",
+      "resource_scope": "6f0b9487-4fa8-42a8-aeb4-bf2e2c22d4e8",
+      "evidence": [
+        "Subscription-scoped evidence was collected for privileged role assignments",
+        "Tenant-wide Entra controls such as conditional access were not directly observable in this run",
+        "The tenant directory-role catalog was partially visible with 60 active role entry(ies)"
+      ],
+      "evidence_quality": {
+        "observation_class": "inferred",
+        "sufficiency": "unavailable",
+        "direct_evidence_count": 3,
+        "inferred_evidence_count": 0,
+        "unavailable_evidence_count": 1,
+        "provider_support": "active",
+        "missing_requirements": []
+      },
+      "evidence_sufficiency": {
+        "sufficiency": "unavailable",
+        "provider_support": "active",
+        "evidence_requirements": [
+          "privileged assignment inventory",
+          "identity governance visibility context"
+        ],
+        "satisfied_requirements": [
+          "privileged assignment inventory",
+          "identity governance visibility context"
+        ],
+        "missing_requirements": [],
+        "limitation_notes": [
+          "tenant-wide Conditional Access evidence remains partially observable in the current Azure collector path"
+        ],
+        "explanation": "Required evidence is unavailable in the current assessment scope, so the decision is retained with an explicit observability boundary."
+      },
+      "remediation_summary": "Broaden tenant-level identity evidence collection before treating IAM coverage as complete.",
+      "remediation_cost_tier": "low",
+      "mapping": [
+        "ISO 27001 A.5.15",
+        "NIST GV.RM-01"
+      ],
+      "asset_ids": [
+        "asset:azure:iam:demo-admin-sp"
+      ]
+    }
+  ],
+  "resource_context": {
+    "context_model": "cris_asset_graph_v1",
+    "assets": [
+      {
+        "asset_id": "asset:azure:governance:demo-rg-prod",
+        "provider": "azure",
+        "asset_type": "ResourceGroup",
+        "name": "rg-prod",
+        "scope": "org:demo-contoso-healthcare",
+        "criticality": "high",
+        "internet_exposed": false,
+        "tags": {}
+      },
+      {
+        "asset_id": "asset:azure:iam:demo-admin-sp",
+        "provider": "azure",
+        "asset_type": "ServicePrincipal",
+        "name": "admin-sp",
+        "scope": "org:demo-contoso-healthcare",
+        "criticality": "critical",
+        "internet_exposed": false,
+        "tags": {}
+      },
+      {
+        "asset_id": "asset:azure:iam:demo-devops-sp",
+        "provider": "azure",
+        "asset_type": "ServicePrincipal",
+        "name": "devops-sp",
+        "scope": "org:demo-contoso-healthcare",
+        "criticality": "high",
+        "internet_exposed": false,
+        "tags": {}
+      },
+      {
+        "asset_id": "asset:azure:monitor:demo-log-workspace",
+        "provider": "azure",
+        "asset_type": "LogAnalyticsWorkspace",
+        "name": "log-analytics-prod",
+        "scope": "org:demo-contoso-healthcare",
+        "criticality": "medium",
+        "internet_exposed": false,
+        "tags": {}
+      },
+      {
+        "asset_id": "asset:azure:storage:demo-patient-storage",
+        "provider": "azure",
+        "asset_type": "StorageAccount",
+        "name": "stpatientdata",
+        "scope": "org:demo-contoso-healthcare",
+        "criticality": "critical",
+        "internet_exposed": true,
+        "tags": {
+          "classification": "PHI"
+        }
+      },
+      {
+        "asset_id": "asset:azure:compute:demo-vm-01",
+        "provider": "azure",
+        "asset_type": "VirtualMachine",
+        "name": "vm-clinical-01",
+        "scope": "org:demo-contoso-healthcare",
+        "criticality": "high",
+        "internet_exposed": false,
+        "tags": {
+          "env": "prod"
+        }
+      },
+      {
+        "asset_id": "asset:azure:compute:demo-vm-02",
+        "provider": "azure",
+        "asset_type": "VirtualMachine",
+        "name": "vm-clinical-02",
+        "scope": "org:demo-contoso-healthcare",
+        "criticality": "high",
+        "internet_exposed": false,
+        "tags": {
+          "env": "prod"
+        }
+      },
+      {
+        "asset_id": "asset:azure:iot:demo-iot-hub-01",
+        "provider": "azure",
+        "asset_type": "IoTHub",
+        "name": "iot-hub-clinic-a",
+        "scope": "org:demo-contoso-healthcare",
+        "criticality": "critical",
+        "internet_exposed": true,
+        "tags": {
+          "dept": "clinical"
+        }
+      },
+      {
+        "asset_id": "asset:azure:iot:demo-iot-hub-02",
+        "provider": "azure",
+        "asset_type": "IoTHub",
+        "name": "iot-hub-clinic-b",
+        "scope": "org:demo-contoso-healthcare",
+        "criticality": "high",
+        "internet_exposed": true,
+        "tags": {
+          "dept": "clinical"
+        }
+      }
+    ],
+    "relationships": [
+      {
+        "relationship_id": "rel-001",
+        "from_asset_id": "asset:azure:governance:demo-rg-prod",
+        "to_asset_id": "asset:azure:storage:demo-patient-storage",
+        "relationship_type": "contains_resource",
+        "confidence": 1.0
+      },
+      {
+        "relationship_id": "rel-002",
+        "from_asset_id": "asset:azure:governance:demo-rg-prod",
+        "to_asset_id": "asset:azure:compute:demo-vm-01",
+        "relationship_type": "contains_resource",
+        "confidence": 1.0
+      },
+      {
+        "relationship_id": "rel-003",
+        "from_asset_id": "asset:azure:governance:demo-rg-prod",
+        "to_asset_id": "asset:azure:compute:demo-vm-02",
+        "relationship_type": "contains_resource",
+        "confidence": 1.0
+      },
+      {
+        "relationship_id": "rel-004",
+        "from_asset_id": "asset:azure:governance:demo-rg-prod",
+        "to_asset_id": "asset:azure:iot:demo-iot-hub-01",
+        "relationship_type": "contains_resource",
+        "confidence": 1.0
+      },
+      {
+        "relationship_id": "rel-005",
+        "from_asset_id": "asset:azure:governance:demo-rg-prod",
+        "to_asset_id": "asset:azure:iot:demo-iot-hub-02",
+        "relationship_type": "contains_resource",
+        "confidence": 1.0
+      },
+      {
+        "relationship_id": "rel-006",
+        "from_asset_id": "asset:azure:iot:demo-iot-hub-01",
+        "to_asset_id": "asset:azure:storage:demo-patient-storage",
+        "relationship_type": "writes_to",
+        "confidence": 0.85
+      },
+      {
+        "relationship_id": "rel-007",
+        "from_asset_id": "asset:azure:iot:demo-iot-hub-02",
+        "to_asset_id": "asset:azure:storage:demo-patient-storage",
+        "relationship_type": "writes_to",
+        "confidence": 0.85
+      },
+      {
+        "relationship_id": "rel-008",
+        "from_asset_id": "asset:azure:iot:demo-iot-hub-01",
+        "to_asset_id": "asset:azure:monitor:demo-log-workspace",
+        "relationship_type": "emits_logs_to",
+        "confidence": 0.7
+      },
+      {
+        "relationship_id": "rel-009",
+        "from_asset_id": "asset:azure:compute:demo-vm-01",
+        "to_asset_id": "asset:azure:storage:demo-patient-storage",
+        "relationship_type": "accesses",
+        "confidence": 0.8
+      },
+      {
+        "relationship_id": "rel-010",
+        "from_asset_id": "asset:azure:iam:demo-admin-sp",
+        "to_asset_id": "asset:azure:governance:demo-rg-prod",
+        "relationship_type": "manages",
+        "confidence": 1.0
+      },
+      {
+        "relationship_id": "rel-011",
+        "from_asset_id": "asset:azure:iam:demo-devops-sp",
+        "to_asset_id": "asset:azure:compute:demo-vm-01",
+        "relationship_type": "accesses",
+        "confidence": 0.9
+      },
+      {
+        "relationship_id": "rel-012",
+        "from_asset_id": "asset:azure:iam:demo-devops-sp",
+        "to_asset_id": "asset:azure:iot:demo-iot-hub-01",
+        "relationship_type": "exposes",
+        "confidence": 0.75
+      },
+      {
+        "relationship_id": "rel-013",
+        "from_asset_id": "asset:azure:governance:demo-rg-prod",
+        "to_asset_id": "asset:azure:monitor:demo-log-workspace",
+        "relationship_type": "contains_resource",
+        "confidence": 1.0
+      },
+      {
+        "relationship_id": "rel-014",
+        "from_asset_id": "asset:azure:governance:demo-rg-prod",
+        "to_asset_id": "asset:azure:iam:demo-admin-sp",
+        "relationship_type": "contains_resource",
+        "confidence": 1.0
+      },
+      {
+        "relationship_id": "rel-015",
+        "from_asset_id": "asset:azure:governance:demo-rg-prod",
+        "to_asset_id": "asset:azure:iam:demo-devops-sp",
+        "relationship_type": "contains_resource",
+        "confidence": 1.0
+      }
+    ],
+    "evidence_records": [],
+    "finding_asset_links": []
+  },
+  "assessment_runner": {
+    "events": [
+      {
+        "sequence": 1,
+        "phase": "collection",
+        "status": "completed",
+        "message": "Azure subscription inventory collected",
+        "generated_at": "2026-06-30T09:11:00Z",
+        "detail": {}
+      },
+      {
+        "sequence": 2,
+        "phase": "evaluation",
+        "status": "completed",
+        "message": "24 controls evaluated",
+        "generated_at": "2026-06-30T09:12:30Z",
+        "detail": {}
+      },
+      {
+        "sequence": 3,
+        "phase": "scoring",
+        "status": "completed",
+        "message": "Risk scoring and calibration complete",
+        "generated_at": "2026-06-30T09:13:45Z",
+        "detail": {}
+      },
+      {
+        "sequence": 4,
+        "phase": "reporting",
+        "status": "completed",
+        "message": "Report generated",
+        "generated_at": "2026-06-30T09:14:22Z",
+        "detail": {}
+      }
+    ],
+    "control_selection": {
+      "requested_control_ids": [],
+      "selected_control_ids": [
+        "IAM-001",
+        "IOT-005",
+        "IOT-002",
+        "IOT-001",
+        "CMP-002",
+        "CMP-003",
+        "MON-002",
+        "DATA-003",
+        "MON-003",
+        "CMP-004",
+        "MON-001",
+        "MON-004",
+        "GOV-003",
+        "IAM-002",
+        "IOT-006",
+        "IOT-008",
+        "IOT-003",
+        "IOT-004",
+        "IOT-007",
+        "IOT-009",
+        "GOV-001",
+        "GOV-002",
+        "IOT-010",
+        "IAM-005"
+      ],
+      "selected_domains": [
+        "IAM",
+        "Network",
+        "Data",
+        "Monitoring/Logging",
+        "Compute/Workloads",
+        "Cost/Governance Hygiene",
+        "Healthcare IoT"
+      ],
+      "registry_filtered": false
+    },
+    "evidence_sufficiency": {
+      "sufficiency_counts": {
+        "supported": 14,
+        "unsupported": 10
+      },
+      "sufficient_ratio": 0.58,
+      "findings_requiring_attention": [
+        "IOT-001",
+        "IOT-002",
+        "IOT-003",
+        "IOT-004",
+        "IOT-005"
+      ]
+    }
+  },
+  "compliance": {
+    "frameworks_covered": [
+      "Azure CAF",
+      "Azure Policy Baseline",
+      "CIS Azure Foundations Benchmark",
+      "CIS Controls",
+      "Cyber Essentials",
+      "DSPT",
+      "FCA SYSC",
+      "FinOps Foundation",
+      "ISO 27001",
+      "Microsoft Cloud Security Benchmark",
+      "NIST CSF 2.0",
+      "UK GDPR"
+    ],
+    "control_reference_counts": {
+      "IAM-001": 6,
+      "IAM-002": 4,
+      "IAM-005": 2,
+      "DATA-003": 3,
+      "MON-001": 3,
+      "MON-002": 2,
+      "MON-003": 2,
+      "MON-004": 2,
+      "CMP-002": 3,
+      "CMP-003": 2,
+      "CMP-004": 2,
+      "GOV-001": 2,
+      "GOV-002": 2,
+      "GOV-003": 2
+    },
+    "findings_by_framework": {
+      "Azure CAF": 1,
+      "Azure Policy Baseline": 1,
+      "CIS Azure Foundations Benchmark": 2,
+      "CIS Controls": 1,
+      "Cyber Essentials": 3,
+      "DSPT": 2,
+      "FCA SYSC": 2,
+      "FinOps Foundation": 1,
+      "ISO 27001": 9,
+      "Microsoft Cloud Security Benchmark": 2,
+      "NIST CSF 2.0": 12,
+      "UK GDPR": 1
+    },
+    "mapped_findings": [],
+    "uk_sme_profile": null
+  },
+  "executive_summary": "Contoso Healthcare Ltd presents a high-risk posture with an overall score of 27.2/100. Critical gaps in identity security (no MFA for privileged roles) and Healthcare IoT cloud governance require immediate attention. The IoMT domain shows 10 open findings, with IoT Hub network exposure and over-permissive shared access policies as the most urgent remediation targets."
+}

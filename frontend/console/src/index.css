@@ -1,0 +1,159 @@
+@import "tailwindcss";
+
+@import "@fontsource/manrope/400.css";
+@import "@fontsource/manrope/500.css";
+@import "@fontsource/manrope/600.css";
+@import "@fontsource/manrope/700.css";
+@import "@fontsource/manrope/800.css";
+@import "@fontsource/jetbrains-mono/400.css";
+@import "@fontsource/jetbrains-mono/500.css";
+@import "@fontsource/jetbrains-mono/600.css";
+
+/* CRIS-SME "Clarion" design system tokens — see docs/frontend-console.md
+   and the design handoff this was ported from (tokens.css / tokens.md). */
+@theme {
+  --font-ui: "Manrope", system-ui, -apple-system, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, "SF Mono", monospace;
+
+  --color-primary: #4f46e5;
+  --color-primary-hover: #4338ca;
+  --color-primary-tint: #f5f5ff;
+  --color-primary-tint-border: #e5e0fb;
+  --color-primary-on-tint: #5b48b8;
+  --color-violet: #7c3aed;
+  --color-violet-soft: #8b5cf6;
+
+  --color-sidebar-bg-top: #181826;
+  --color-sidebar-bg-bottom: #13131e;
+  --color-sidebar-section-label: #5b5f7c;
+  --color-sidebar-item: #9296b3;
+  --color-sidebar-item-active-bg: rgba(99, 102, 241, 0.16);
+  --color-sidebar-item-active-border: rgba(129, 132, 255, 0.22);
+  --color-sidebar-icon-active: #a5a0f5;
+  --color-sidebar-brand-sub: #7b7f9c;
+
+  --color-surface-app: #f3f1fa;
+  --color-surface-card: #ffffff;
+  --color-surface-subtle: #f7f5fc;
+  --color-surface-rail: #ece9f6;
+
+  --color-border-card: #ebedf3;
+  --color-border-strong: #e2e5ee;
+  --color-border-divider: #eef0f4;
+  --color-border-row: #f3f4f8;
+
+  --color-text-strong: #181b25;
+  --color-text-body: #5b6172;
+  --color-text-muted: #9499a8;
+  --color-text-faint: #b3b8c6;
+
+  --color-sev-critical: #e5484d;
+  --color-sev-critical-text: #c2353a;
+  --color-sev-critical-bg: #fdecec;
+  --color-sev-critical-border: #f6cfd1;
+  --color-sev-high: #f76808;
+  --color-sev-high-text: #c15a06;
+  --color-sev-high-bg: #fdeee2;
+  --color-sev-high-border: #f3d9c4;
+  --color-sev-medium: #f5a623;
+  --color-sev-medium-text: #b06d05;
+  --color-sev-medium-bg: #fdf4e3;
+  --color-sev-medium-border: #f6e2bd;
+  --color-sev-low: #3b82f6;
+  --color-sev-low-text: #3b6fd4;
+  --color-sev-low-bg: #eaf1fe;
+  --color-sev-low-border: #cfe0fb;
+
+  --color-status-good: #16a34a;
+  --color-status-good-text: #157f3b;
+  --color-status-good-bg: #e8f6ec;
+  --color-status-good-border: #c7ead0;
+
+  --radius-xs: 5px;
+  --radius-sm: 6px;
+  --radius-md: 9px;
+  --radius-lg: 11px;
+  --radius-xl: 13px;
+  --radius-2xl: 14px;
+  --radius-3xl: 16px;
+
+  --shadow-card: 0 1px 2px rgba(20, 22, 40, 0.04);
+  --shadow-primary: 0 4px 12px -3px rgba(79, 70, 229, 0.5);
+  --shadow-brandmark: 0 4px 14px -2px rgba(79, 70, 229, 0.6);
+}
+
+:root {
+  color-scheme: light;
+}
+
+/* Dark theme: overrides the same semantic tokens every component already
+   reads through Tailwind utilities (bg-surface-card, text-text-strong,
+   etc.), so no component code needs a dark: variant -- the cascade does
+   the re-theming. Sidebar tokens are deliberately omitted: the sidebar is
+   already dark in the light theme. */
+.dark {
+  color-scheme: dark;
+
+  --color-primary: #6366f1;
+  --color-primary-hover: #818cf8;
+  --color-primary-tint: #23223f;
+  --color-primary-tint-border: #393568;
+  --color-primary-on-tint: #b4b0f5;
+  --color-violet: #a78bfa;
+  --color-violet-soft: #9f7aea;
+
+  --color-surface-app: #11121a;
+  --color-surface-card: #1a1c27;
+  --color-surface-subtle: #20222e;
+  --color-surface-rail: #262836;
+
+  --color-border-card: #2c2e3d;
+  --color-border-strong: #383b4d;
+  --color-border-divider: #2a2c3a;
+  --color-border-row: #252734;
+
+  --color-text-strong: #f2f3f7;
+  --color-text-body: #b4b8c7;
+  --color-text-muted: #80849a;
+  --color-text-faint: #595d71;
+
+  --color-sev-critical: #f0656a;
+  --color-sev-critical-text: #fca5ab;
+  --color-sev-critical-bg: #3a1d21;
+  --color-sev-critical-border: #5a2c32;
+  --color-sev-high: #fb8a3c;
+  --color-sev-high-text: #fcb182;
+  --color-sev-high-bg: #3a2716;
+  --color-sev-high-border: #5a3d22;
+  --color-sev-medium: #f7bb4d;
+  --color-sev-medium-text: #fad596;
+  --color-sev-medium-bg: #3a2f16;
+  --color-sev-medium-border: #5a4a23;
+  --color-sev-low: #5b9bf6;
+  --color-sev-low-text: #a0c4fa;
+  --color-sev-low-bg: #1c2940;
+  --color-sev-low-border: #2a3d5c;
+
+  --color-status-good: #34d27a;
+  --color-status-good-text: #7fe6a8;
+  --color-status-good-bg: #15311f;
+  --color-status-good-border: #1f4a30;
+
+  --shadow-card: 0 1px 2px rgba(0, 0, 0, 0.35);
+  --shadow-primary: 0 4px 14px -3px rgba(99, 102, 241, 0.55);
+  --shadow-brandmark: 0 4px 14px -2px rgba(99, 102, 241, 0.6);
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-ui);
+  background-color: var(--color-surface-app);
+  color: var(--color-text-body);
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
