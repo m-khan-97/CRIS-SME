@@ -1,0 +1,130 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "CrisSmeIdentityRead",
+      "Effect": "Allow",
+      "Action": [
+        "sts:GetCallerIdentity",
+        "iam:ListUsers",
+        "iam:ListRoles",
+        "iam:ListAttachedUserPolicies",
+        "iam:ListAttachedRolePolicies",
+        "iam:ListUserPolicies",
+        "iam:ListRolePolicies",
+        "iam:GetUserPolicy",
+        "iam:GetRolePolicy",
+        "iam:ListGroupsForUser",
+        "iam:ListAttachedGroupPolicies",
+        "iam:ListMFADevices",
+        "iam:ListAccessKeys",
+        "iam:GetAccessKeyLastUsed",
+        "iam:GetAccountPasswordPolicy",
+        "iam:GetAccountSummary",
+        "access-analyzer:ListAnalyzers"
+      ],
+      "Resource": "*"
+    },
+    {
+      "Sid": "CrisSmeNetworkRead",
+      "Effect": "Allow",
+      "Action": [
+        "ec2:DescribeRegions",
+        "ec2:DescribeSecurityGroups",
+        "ec2:DescribeVpcEndpoints",
+        "elasticloadbalancing:DescribeLoadBalancers",
+        "elasticloadbalancing:DescribeListeners"
+      ],
+      "Resource": "*"
+    },
+    {
+      "Sid": "CrisSmeDataRead",
+      "Effect": "Allow",
+      "Action": [
+        "s3:ListAllMyBuckets",
+        "s3:GetBucketLocation",
+        "s3:GetBucketPolicyStatus",
+        "s3:GetBucketAcl",
+        "s3:GetEncryptionConfiguration",
+        "s3:GetBucketVersioning",
+        "s3:GetBucketTagging",
+        "s3:GetBucketPublicAccessBlock",
+        "rds:DescribeDBInstances",
+        "kms:ListKeys",
+        "kms:DescribeKey",
+        "secretsmanager:ListSecrets"
+      ],
+      "Resource": "*"
+    },
+    {
+      "Sid": "CrisSmeMonitoringRead",
+      "Effect": "Allow",
+      "Action": [
+        "cloudtrail:DescribeTrails",
+        "cloudtrail:GetTrailStatus",
+        "logs:DescribeLogGroups",
+        "cloudwatch:DescribeAlarms",
+        "guardduty:ListDetectors",
+        "guardduty:ListFindings",
+        "securityhub:GetEnabledStandards",
+        "securityhub:GetFindings",
+        "ssm:ListDocuments"
+      ],
+      "Resource": "*"
+    },
+    {
+      "Sid": "CrisSmeComputeRead",
+      "Effect": "Allow",
+      "Action": [
+        "ec2:DescribeInstances",
+        "ssm:DescribeInstanceInformation",
+        "ssm:DescribeInstancePatchStates",
+        "backup:ListProtectedResources",
+        "lambda:ListFunctions",
+        "lambda:GetFunctionUrlConfig",
+        "lambda:GetPolicy",
+        "ecs:ListClusters",
+        "ecs:DescribeClusters",
+        "eks:ListClusters",
+        "eks:DescribeCluster"
+      ],
+      "Resource": "*"
+    },
+    {
+      "Sid": "CrisSmeGovernanceRead",
+      "Effect": "Allow",
+      "Action": [
+        "tag:GetResources",
+        "ec2:DescribeVolumes",
+        "ec2:DescribeAddresses",
+        "config:DescribeConfigurationRecorderStatus",
+        "config:GetComplianceSummaryByConfigRule"
+      ],
+      "Resource": "*"
+    },
+    {
+      "Sid": "CrisSmeGovernanceOptionalRead",
+      "Effect": "Allow",
+      "Action": [
+        "budgets:ViewBudget",
+        "organizations:ListPolicies"
+      ],
+      "Resource": "*"
+    },
+    {
+      "Sid": "CrisSmeIotRead",
+      "Effect": "Allow",
+      "Action": [
+        "iot:ListThings",
+        "iot:ListThingGroups",
+        "iot:ListCertificates",
+        "iot:ListPolicies",
+        "iot:GetPolicy",
+        "iot:ListTopicRules",
+        "iot:GetTopicRule",
+        "iot:ListSecurityProfiles"
+      ],
+      "Resource": "*"
+    }
+  ]
+}

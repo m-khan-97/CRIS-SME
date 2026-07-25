@@ -1,0 +1,30 @@
+{
+  "Name": "CRIS-SME Assessment Reader",
+  "IsCustom": true,
+  "Description": "Least-privilege Azure control-plane read role for CRIS-SME assessment evidence collection. Microsoft Graph permissions must be granted separately.",
+  "Actions": [
+    "Microsoft.Authorization/policyAssignments/read",
+    "Microsoft.Authorization/roleAssignments/read",
+    "Microsoft.Compute/virtualMachines/read",
+    "Microsoft.Consumption/budgets/read",
+    "Microsoft.Devices/IotHubs/read",
+    "Microsoft.Insights/activityLogAlerts/read",
+    "Microsoft.Insights/diagnosticSettings/read",
+    "Microsoft.Insights/logProfiles/read",
+    "Microsoft.Insights/metricAlerts/read",
+    "Microsoft.KeyVault/vaults/read",
+    "Microsoft.Network/*/read",
+    "Microsoft.PolicyInsights/policyStates/summarize/action",
+    "Microsoft.RecoveryServices/*/read",
+    "Microsoft.Resources/subscriptions/resources/read",
+    "Microsoft.Security/*/read",
+    "Microsoft.Sql/servers/read",
+    "Microsoft.Storage/storageAccounts/read"
+  ],
+  "NotActions": [],
+  "DataActions": [],
+  "NotDataActions": [],
+  "AssignableScopes": [
+    "/subscriptions/<subscription-id>"
+  ]
+}
