@@ -1,0 +1,223 @@
+{
+  "plan_name": "CRIS-SME 30-Day SME Action Plan",
+  "planning_basis": "Actions are phased by deterministic risk score, remediation cost tier, and SME-operational practicality so free and low-friction improvements land first.",
+  "phases": [
+    {
+      "phase_id": "days_1_7",
+      "label": "Fix this week",
+      "time_window": "Days 1-7",
+      "goal": "Prioritize zero-cost or low-friction fixes that reduce immediate exposure.",
+      "total_actions": 5,
+      "cumulative_risk_score": 236.51,
+      "actions": [
+        {
+          "control_id": "IAM-001",
+          "title": "Privileged role assignments without MFA enforcement",
+          "organization": "SIGI Technologies",
+          "category": "IAM",
+          "priority": "High",
+          "score": 67.97,
+          "remediation_cost_tier": "free",
+          "remediation_summary": "Require MFA and admin-focused conditional access for privileged identities.",
+          "action_rationale": "Placed in 'Fix this week' because it carries high urgency, a 67.97 risk score, and a free remediation cost profile."
+        },
+        {
+          "control_id": "DATA-001",
+          "title": "Public storage access increases data exposure risk",
+          "organization": "SIGI Technologies",
+          "category": "Data",
+          "priority": "Planned",
+          "score": 48.35,
+          "remediation_cost_tier": "free",
+          "remediation_summary": "Disable anonymous or public storage access and review data exposure paths.",
+          "action_rationale": "Placed in 'Fix this week' because it carries planned urgency, a 48.35 risk score, and a free remediation cost profile."
+        },
+        {
+          "control_id": "NET-002",
+          "title": "Network security group rules are broader than expected",
+          "organization": "SIGI Technologies",
+          "category": "Network",
+          "priority": "Planned",
+          "score": 44.71,
+          "remediation_cost_tier": "free",
+          "remediation_summary": "Tighten overly permissive network rules to least-privilege source and port scopes.",
+          "action_rationale": "Placed in 'Fix this week' because it carries planned urgency, a 44.71 risk score, and a free remediation cost profile."
+        },
+        {
+          "control_id": "IOT-002",
+          "title": "IoT shared access policies exceed least-privilege expectations",
+          "organization": "SIGI Technologies",
+          "category": "Healthcare IoT",
+          "priority": "Planned",
+          "score": 41.6,
+          "remediation_cost_tier": "free",
+          "remediation_summary": "Reduce IoT shared access policies, remove overbroad permissions, and rotate keys through governed operations.",
+          "action_rationale": "Placed in 'Fix this week' because it carries planned urgency, a 41.60 risk score, and a free remediation cost profile."
+        },
+        {
+          "control_id": "GOV-003",
+          "title": "Policy assignment coverage is below the baseline governance threshold",
+          "organization": "SIGI Technologies",
+          "category": "Cost/Governance Hygiene",
+          "priority": "Planned",
+          "score": 33.88,
+          "remediation_cost_tier": "free",
+          "remediation_summary": "Increase baseline policy assignment coverage for governance and compliance controls.",
+          "action_rationale": "Placed in 'Fix this week' because it carries planned urgency, a 33.88 risk score, and a free remediation cost profile."
+        }
+      ]
+    },
+    {
+      "phase_id": "days_8_30",
+      "label": "Complete this month",
+      "time_window": "Days 8-30",
+      "goal": "Deliver the best remaining low-cost improvements within a lean SME operating window.",
+      "total_actions": 7,
+      "cumulative_risk_score": 187.72,
+      "actions": [
+        {
+          "control_id": "IAM-003",
+          "title": "Stale service principals or credentials require review",
+          "organization": "SIGI Technologies",
+          "category": "IAM",
+          "priority": "Monitor",
+          "score": 23.34,
+          "remediation_cost_tier": "free",
+          "remediation_summary": "Rotate or remove stale service principal credentials and disable unused identities.",
+          "action_rationale": "Placed in 'Complete this month' because it carries monitor urgency, a 23.34 risk score, and a free remediation cost profile."
+        },
+        {
+          "control_id": "GOV-004",
+          "title": "Orphaned resources increase governance and cost hygiene risk",
+          "organization": "SIGI Technologies",
+          "category": "Cost/Governance Hygiene",
+          "priority": "Monitor",
+          "score": 17.87,
+          "remediation_cost_tier": "free",
+          "remediation_summary": "Review and remove unused or orphaned resources to reduce cost and governance noise.",
+          "action_rationale": "Placed in 'Complete this month' because it carries monitor urgency, a 17.87 risk score, and a free remediation cost profile."
+        },
+        {
+          "control_id": "GOV-002",
+          "title": "Budget alerting is not enabled for cloud cost governance",
+          "organization": "SIGI Technologies",
+          "category": "Cost/Governance Hygiene",
+          "priority": "Monitor",
+          "score": 16.39,
+          "remediation_cost_tier": "free",
+          "remediation_summary": "Configure budget thresholds and spend alerts for cost oversight.",
+          "action_rationale": "Placed in 'Complete this month' because it carries monitor urgency, a 16.39 risk score, and a free remediation cost profile."
+        },
+        {
+          "control_id": "IOT-010",
+          "title": "Clinical-operational ownership boundaries require human validation",
+          "organization": "SIGI Technologies",
+          "category": "Healthcare IoT",
+          "priority": "Monitor",
+          "score": 4.72,
+          "remediation_cost_tier": "free",
+          "remediation_summary": "Document clinical, operational, and supplier ownership boundaries for IoMT assets and validate device-level evidence manually.",
+          "action_rationale": "Placed in 'Complete this month' because it carries monitor urgency, a 4.72 risk score, and a free remediation cost profile."
+        },
+        {
+          "control_id": "IOT-005",
+          "title": "IoT Hub public network access is not sufficiently constrained",
+          "organization": "SIGI Technologies",
+          "category": "Healthcare IoT",
+          "priority": "Planned",
+          "score": 47.25,
+          "remediation_cost_tier": "low",
+          "remediation_summary": "Restrict IoT Hub public access using IP filters, private endpoints, or documented clinical network boundaries.",
+          "action_rationale": "Placed in 'Complete this month' because it carries planned urgency, a 47.25 risk score, and a low remediation cost profile."
+        },
+        {
+          "control_id": "DATA-002",
+          "title": "Data stores lack expected encryption protections",
+          "organization": "SIGI Technologies",
+          "category": "Data",
+          "priority": "Planned",
+          "score": 42.36,
+          "remediation_cost_tier": "low",
+          "remediation_summary": "Enable encryption at rest for affected storage and database services.",
+          "action_rationale": "Placed in 'Complete this month' because it carries planned urgency, a 42.36 risk score, and a low remediation cost profile."
+        },
+        {
+          "control_id": "MON-001",
+          "title": "Activity log retention is below governance and investigation expectations",
+          "organization": "SIGI Technologies",
+          "category": "Monitoring/Logging",
+          "priority": "Planned",
+          "score": 35.79,
+          "remediation_cost_tier": "low",
+          "remediation_summary": "Increase log retention to support investigation, governance review, and evidence preservation.",
+          "action_rationale": "Placed in 'Complete this month' because it carries planned urgency, a 35.79 risk score, and a low remediation cost profile."
+        }
+      ]
+    },
+    {
+      "phase_id": "carry_forward",
+      "label": "Plan next",
+      "time_window": "After day 30",
+      "goal": "Schedule higher-effort items that likely need architecture, tooling, or procurement support.",
+      "total_actions": 5,
+      "cumulative_risk_score": 89.55,
+      "actions": [
+        {
+          "control_id": "IOT-008",
+          "title": "IoT credential governance is not linked to managed secret controls",
+          "organization": "SIGI Technologies",
+          "category": "Healthcare IoT",
+          "priority": "Monitor",
+          "score": 21.98,
+          "remediation_cost_tier": "low",
+          "remediation_summary": "Store and rotate IoT credentials through governed key-management services with owner accountability.",
+          "action_rationale": "Placed in 'Plan next' because it carries monitor urgency, a 21.98 risk score, and a low remediation cost profile."
+        },
+        {
+          "control_id": "IOT-003",
+          "title": "IoT diagnostic logging is incomplete for clinical telemetry investigation",
+          "organization": "SIGI Technologies",
+          "category": "Healthcare IoT",
+          "priority": "Monitor",
+          "score": 21.77,
+          "remediation_cost_tier": "low",
+          "remediation_summary": "Enable IoT Hub diagnostic settings and route core diagnostic categories to a monitored destination.",
+          "action_rationale": "Placed in 'Plan next' because it carries monitor urgency, a 21.77 risk score, and a low remediation cost profile."
+        },
+        {
+          "control_id": "IOT-007",
+          "title": "IoMT telemetry routing and retention are below clinical evidence expectations",
+          "organization": "SIGI Technologies",
+          "category": "Healthcare IoT",
+          "priority": "Monitor",
+          "score": 20.93,
+          "remediation_cost_tier": "low",
+          "remediation_summary": "Route IoMT telemetry to governed storage and retain sufficient logs for investigation and clinical safety review.",
+          "action_rationale": "Placed in 'Plan next' because it carries monitor urgency, a 20.93 risk score, and a low remediation cost profile."
+        },
+        {
+          "control_id": "IOT-009",
+          "title": "Clinical IoT alert routing is not operationally evidenced",
+          "organization": "SIGI Technologies",
+          "category": "Healthcare IoT",
+          "priority": "Monitor",
+          "score": 20.3,
+          "remediation_cost_tier": "low",
+          "remediation_summary": "Create IoT-specific alert rules and route them to accountable clinical or operational responders.",
+          "action_rationale": "Placed in 'Plan next' because it carries monitor urgency, a 20.30 risk score, and a low remediation cost profile."
+        },
+        {
+          "control_id": "IAM-005",
+          "title": "Identity governance observability is partial for this assessment scope",
+          "organization": "SIGI Technologies",
+          "category": "IAM",
+          "priority": "Monitor",
+          "score": 4.57,
+          "remediation_cost_tier": "low",
+          "remediation_summary": "Broaden tenant-level identity evidence collection before treating IAM coverage as complete.",
+          "action_rationale": "Placed in 'Plan next' because it carries monitor urgency, a 4.57 risk score, and a low remediation cost profile."
+        }
+      ]
+    }
+  ]
+}

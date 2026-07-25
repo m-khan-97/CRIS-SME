@@ -1,0 +1,304 @@
+{
+  "chart_schema_version": "0.1.0",
+  "question_set": {
+    "name": "Danzell",
+    "version": "16.2",
+    "effective_from": "2026-04-27",
+    "requirements_version": "3.3",
+    "source_page": "https://iasme.co.uk/cyber-essentials/preview-the-self-assessment-questions-for-cyber-essentials/",
+    "source_note": "Paraphrased local research mapping derived from the official IASME preparation question set. Verbatim question text is intentionally not reproduced."
+  },
+  "headline": {
+    "question_count": 106,
+    "technical_question_count": 62,
+    "cloud_supported_rate": 26.42,
+    "technical_cloud_supported_rate": 35.48,
+    "agreement_rate": 0.0,
+    "draft_accepted_rate": 0.0
+  },
+  "series": {
+    "observability_by_evidence_class": [
+      {
+        "label": "direct_cloud",
+        "count": 5,
+        "rate": 4.72
+      },
+      {
+        "label": "endpoint_required",
+        "count": 24,
+        "rate": 22.64
+      },
+      {
+        "label": "inferred_cloud",
+        "count": 23,
+        "rate": 21.7
+      },
+      {
+        "label": "manual_required",
+        "count": 35,
+        "rate": 33.02
+      },
+      {
+        "label": "policy_required",
+        "count": 19,
+        "rate": 17.92
+      }
+    ],
+    "technical_observability_by_evidence_class": [
+      {
+        "label": "direct_cloud",
+        "count": 5,
+        "rate": 8.06
+      },
+      {
+        "label": "endpoint_required",
+        "count": 21,
+        "rate": 33.87
+      },
+      {
+        "label": "inferred_cloud",
+        "count": 17,
+        "rate": 27.42
+      },
+      {
+        "label": "manual_required",
+        "count": 1,
+        "rate": 1.61
+      },
+      {
+        "label": "policy_required",
+        "count": 18,
+        "rate": 29.03
+      }
+    ],
+    "gap_taxonomy": [
+      {
+        "evidence_class": "endpoint_required",
+        "count": 24,
+        "rate": 22.64,
+        "description": "Endpoint, MDM, EDR, patch, or local device evidence required.",
+        "sample_question_ids": [
+          "A2.6",
+          "A2.6.1",
+          "A2.8",
+          "A4.1.1",
+          "A4.1.2",
+          "A5.1",
+          "A5.3",
+          "A5.8"
+        ]
+      },
+      {
+        "evidence_class": "manual_required",
+        "count": 35,
+        "rate": 33.02,
+        "description": "Applicant scoping, company context, or final attestation required.",
+        "sample_question_ids": [
+          "A1.1",
+          "A1.2",
+          "A1.3",
+          "A1.4",
+          "A1.5",
+          "A1.5.1",
+          "A1.6",
+          "A1.6.1"
+        ]
+      },
+      {
+        "evidence_class": "not_observable",
+        "count": 0,
+        "rate": 0.0,
+        "description": "Required signal is outside current CRIS-SME observable evidence paths.",
+        "sample_question_ids": []
+      },
+      {
+        "evidence_class": "policy_required",
+        "count": 19,
+        "rate": 17.92,
+        "description": "Policy, process, approval, or business-need evidence required.",
+        "sample_question_ids": [
+          "A1.16",
+          "A4.2",
+          "A4.2.1",
+          "A4.3",
+          "A4.4",
+          "A4.5",
+          "A4.6",
+          "A4.8"
+        ]
+      }
+    ],
+    "proposed_answers": [
+      {
+        "label": "Cannot determine",
+        "count": 78,
+        "rate": 73.58
+      },
+      {
+        "label": "No",
+        "count": 24,
+        "rate": 22.64
+      },
+      {
+        "label": "Yes",
+        "count": 4,
+        "rate": 3.77
+      }
+    ],
+    "final_answers": [
+      {
+        "label": "pending_human_review",
+        "count": 106,
+        "rate": 100.0
+      }
+    ],
+    "section_coverage": [
+      {
+        "section": "certificates",
+        "question_count": 2,
+        "cloud_supported_count": 0,
+        "cloud_supported_rate": 0.0,
+        "reviewed_count": 0
+      },
+      {
+        "section": "firewalls",
+        "question_count": 14,
+        "cloud_supported_count": 4,
+        "cloud_supported_rate": 28.57,
+        "reviewed_count": 0
+      },
+      {
+        "section": "insurance",
+        "question_count": 3,
+        "cloud_supported_count": 0,
+        "cloud_supported_rate": 0.0,
+        "reviewed_count": 0
+      },
+      {
+        "section": "malware_protection",
+        "question_count": 5,
+        "cloud_supported_count": 0,
+        "cloud_supported_rate": 0.0,
+        "reviewed_count": 0
+      },
+      {
+        "section": "scope_of_assessment",
+        "question_count": 18,
+        "cloud_supported_count": 6,
+        "cloud_supported_rate": 33.33,
+        "reviewed_count": 0
+      },
+      {
+        "section": "secure_configuration",
+        "question_count": 10,
+        "cloud_supported_count": 4,
+        "cloud_supported_rate": 40.0,
+        "reviewed_count": 0
+      },
+      {
+        "section": "security_update_management",
+        "question_count": 16,
+        "cloud_supported_count": 3,
+        "cloud_supported_rate": 18.75,
+        "reviewed_count": 0
+      },
+      {
+        "section": "user_access_control",
+        "question_count": 17,
+        "cloud_supported_count": 11,
+        "cloud_supported_rate": 64.71,
+        "reviewed_count": 0
+      },
+      {
+        "section": "your_company",
+        "question_count": 21,
+        "cloud_supported_count": 0,
+        "cloud_supported_rate": 0.0,
+        "reviewed_count": 0
+      }
+    ],
+    "control_failure_contribution": [
+      {
+        "control_id": "IAM-001",
+        "affected_question_count": 9,
+        "max_linked_score": 67.97,
+        "sample_finding_titles": [
+          "Privileged role assignments without MFA enforcement"
+        ]
+      },
+      {
+        "control_id": "NET-002",
+        "affected_question_count": 6,
+        "max_linked_score": 44.71,
+        "sample_finding_titles": [
+          "Network security group rules are broader than expected"
+        ]
+      },
+      {
+        "control_id": "NET-001",
+        "affected_question_count": 5,
+        "max_linked_score": 72.12,
+        "sample_finding_titles": [
+          "Administrative services are exposed to the public internet"
+        ]
+      },
+      {
+        "control_id": "CMP-001",
+        "affected_question_count": 4,
+        "max_linked_score": 42.69,
+        "sample_finding_titles": [
+          "Critical workloads remain unpatched beyond acceptable risk tolerance"
+        ]
+      },
+      {
+        "control_id": "IAM-003",
+        "affected_question_count": 3,
+        "max_linked_score": 23.34,
+        "sample_finding_titles": [
+          "Stale service principals or credentials require review"
+        ]
+      },
+      {
+        "control_id": "IAM-005",
+        "affected_question_count": 3,
+        "max_linked_score": 4.57,
+        "sample_finding_titles": [
+          "Identity governance observability is partial for this assessment scope"
+        ]
+      },
+      {
+        "control_id": "DATA-001",
+        "affected_question_count": 2,
+        "max_linked_score": 48.35,
+        "sample_finding_titles": [
+          "Public storage access increases data exposure risk"
+        ]
+      },
+      {
+        "control_id": "CMP-003",
+        "affected_question_count": 1,
+        "max_linked_score": 38.49,
+        "sample_finding_titles": [
+          "Workload hardening baseline coverage is incomplete"
+        ]
+      },
+      {
+        "control_id": "GOV-003",
+        "affected_question_count": 1,
+        "max_linked_score": 33.88,
+        "sample_finding_titles": [
+          "Policy assignment coverage is below the baseline governance threshold"
+        ]
+      },
+      {
+        "control_id": "GOV-004",
+        "affected_question_count": 1,
+        "max_linked_score": 17.87,
+        "sample_finding_titles": [
+          "Orphaned resources increase governance and cost hygiene risk"
+        ]
+      }
+    ]
+  },
+  "deterministic_score_impact": "No impact. CE evaluation metrics are downstream measurements and never change CRIS-SME deterministic findings, priorities, or scores."
+}

@@ -1,0 +1,1879 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>CRIS-SME Risk Report</title>
+    <style>
+      :root {
+        --bg: #eef4f7;
+        --bg-soft: #f8fbfd;
+        --panel: rgba(255, 255, 255, 0.88);
+        --panel-strong: #f4f8fb;
+        --ink: #10212b;
+        --muted: #5a6c78;
+        --line: rgba(73, 100, 115, 0.16);
+        --navy: #102230;
+        --navy-soft: #183547;
+        --accent: #007a78;
+        --accent-soft: rgba(0, 122, 120, 0.12);
+        --sky: #417dff;
+        --sky-soft: rgba(65, 125, 255, 0.12);
+        --risk: #c44536;
+        --risk-soft: rgba(196, 69, 54, 0.14);
+        --warn: #b97807;
+        --warn-soft: rgba(185, 120, 7, 0.14);
+        --ok: #2b8761;
+        --ok-soft: rgba(43, 135, 97, 0.14);
+        --shadow: 0 24px 64px rgba(16, 33, 43, 0.12);
+        --radius: 24px;
+        --radius-tight: 16px;
+      }
+
+      :root {--accent: #007a78;--accent-soft: color-mix(in srgb, #007a78 14%, white);--sky: #417dff;--sky-soft: color-mix(in srgb, #417dff 14%, white);}
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html {
+        scroll-behavior: smooth;
+      }
+
+      body {
+        margin: 0;
+        font-family: "IBM Plex Sans", "Aptos", "Segoe UI", sans-serif;
+        color: var(--ink);
+        background:
+          radial-gradient(circle at top left, rgba(0, 122, 120, 0.13), transparent 28%),
+          radial-gradient(circle at 85% 10%, rgba(65, 125, 255, 0.14), transparent 26%),
+          linear-gradient(180deg, #f8fbfd 0%, var(--bg) 52%, #ecf3f7 100%);
+      }
+
+      body::before {
+        content: "";
+        position: fixed;
+        inset: 0;
+        background-image:
+          linear-gradient(rgba(16, 33, 43, 0.025) 1px, transparent 1px),
+          linear-gradient(90deg, rgba(16, 33, 43, 0.025) 1px, transparent 1px);
+        background-size: 36px 36px;
+        pointer-events: none;
+        mask-image: radial-gradient(circle at center, black, transparent 78%);
+      }
+
+      .page-shell {
+        position: relative;
+        max-width: 1440px;
+        margin: 0 auto;
+        padding: 28px 18px 64px;
+        display: grid;
+        grid-template-columns: 252px minmax(0, 1fr);
+        gap: 22px;
+      }
+
+      .nav-rail {
+        position: sticky;
+        top: 18px;
+        align-self: start;
+        max-height: calc(100vh - 36px);
+        padding: 22px;
+        background: linear-gradient(180deg, rgba(16, 34, 48, 0.98), rgba(24, 53, 71, 0.96));
+        color: #f2f8fb;
+        border-radius: 30px;
+        box-shadow: var(--shadow);
+        overflow-x: hidden;
+        overflow-y: auto;
+      }
+
+      .nav-rail::after {
+        content: "";
+        position: absolute;
+        inset: auto -34% -38% auto;
+        width: 240px;
+        height: 240px;
+        background: radial-gradient(circle, rgba(65, 125, 255, 0.24), transparent 68%);
+        pointer-events: none;
+      }
+
+      .nav-kicker {
+        margin: 0 0 8px;
+        font-size: 0.74rem;
+        font-weight: 600;
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+        color: rgba(242, 248, 251, 0.6);
+      }
+
+      .nav-title {
+        margin: 0;
+        font-family: "IBM Plex Serif", Georgia, serif;
+        font-size: 1.55rem;
+        line-height: 1.1;
+      }
+
+      .nav-summary {
+        margin: 12px 0 0;
+        color: rgba(242, 248, 251, 0.8);
+        line-height: 1.58;
+        font-size: 0.94rem;
+      }
+
+      .nav-score {
+        margin-top: 18px;
+        padding: 14px 16px;
+        border-radius: 18px;
+        background: rgba(255, 255, 255, 0.08);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+      }
+
+      .nav-score strong {
+        display: block;
+        font-size: 2rem;
+        line-height: 1;
+      }
+
+      .nav-score span {
+        display: block;
+        margin-top: 6px;
+        color: rgba(242, 248, 251, 0.72);
+        font-size: 0.9rem;
+      }
+
+      .nav-links {
+        margin: 20px 0 0;
+        padding: 0;
+        list-style: none;
+        display: grid;
+        gap: 8px;
+      }
+
+      .nav-links a {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
+        padding: 10px 12px;
+        border-radius: 14px;
+        color: #f2f8fb;
+        text-decoration: none;
+        background: rgba(255, 255, 255, 0.04);
+        transition: transform 0.2s ease, background 0.2s ease;
+      }
+
+      .nav-links a:hover {
+        transform: translateX(3px);
+        background: rgba(255, 255, 255, 0.1);
+      }
+
+      .nav-links a span {
+        color: rgba(242, 248, 251, 0.62);
+        font-size: 0.8rem;
+      }
+
+      .screen-only {
+        display: block;
+      }
+
+      .print-only {
+        display: none;
+      }
+
+      main {
+        min-width: 0;
+      }
+
+      .report-section {
+        margin-top: 26px;
+      }
+
+      .hero {
+        position: relative;
+        overflow: hidden;
+        background:
+          radial-gradient(circle at 12% 18%, rgba(46, 212, 191, 0.24), transparent 24%),
+          radial-gradient(circle at 88% 24%, rgba(115, 163, 255, 0.28), transparent 26%),
+          linear-gradient(140deg, rgba(16, 34, 48, 0.98), rgba(22, 50, 68, 0.95) 58%, rgba(26, 63, 79, 0.93));
+        color: #f2f8fb;
+        border-radius: 32px;
+        padding: 30px;
+        box-shadow: var(--shadow);
+      }
+
+      .hero-shell {
+        display: grid;
+        grid-template-columns: minmax(0, 1.45fr) minmax(320px, 0.95fr);
+        gap: 22px;
+        align-items: start;
+      }
+
+      .eyebrow {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 7px 11px;
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.08);
+        color: rgba(242, 248, 251, 0.86);
+        font-size: 0.76rem;
+        font-weight: 600;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+      }
+
+      .hero h1 {
+        margin: 18px 0 10px;
+        font-family: "IBM Plex Serif", Georgia, serif;
+        font-size: clamp(2.2rem, 4.2vw, 4rem);
+        line-height: 0.98;
+        max-width: 12ch;
+      }
+
+      .hero p {
+        margin: 0;
+        max-width: 72ch;
+        font-size: 1.02rem;
+        line-height: 1.72;
+        color: rgba(242, 248, 251, 0.82);
+      }
+
+      .hero-meta,
+      .metric-grid,
+      .org-grid,
+      .summary-grid,
+      .bento-grid,
+      .trend-grid {
+        display: grid;
+        gap: 16px;
+      }
+
+      .hero-meta {
+        margin-top: 24px;
+        grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+      }
+
+      .metric-grid,
+      .org-grid {
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      }
+
+      .summary-grid {
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      }
+
+      .bento-grid {
+        grid-template-columns: minmax(0, 1.08fr) minmax(300px, 0.92fr);
+      }
+
+      .trend-grid {
+        grid-template-columns: minmax(0, 1.15fr) minmax(260px, 0.85fr);
+        margin-bottom: 18px;
+      }
+
+      .hero-side {
+        display: grid;
+        gap: 16px;
+      }
+
+      .score-card,
+      .top-actions {
+        padding: 22px;
+        border-radius: 26px;
+        background: rgba(255, 255, 255, 0.09);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+      }
+
+      .hero-card,
+      .metric-card,
+      .org-card,
+      .table-panel,
+      .section-panel {
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: var(--radius);
+        box-shadow: var(--shadow);
+        backdrop-filter: blur(12px);
+      }
+
+      .hero-card,
+      .metric-card,
+      .org-card,
+      .section-panel {
+        padding: 20px;
+      }
+
+      .hero-card {
+        background: rgba(255, 255, 255, 0.08);
+        border-color: rgba(255, 255, 255, 0.1);
+      }
+
+      .hero-card .label {
+        display: block;
+        font-size: 0.8rem;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: rgba(242, 248, 251, 0.66);
+      }
+
+      .hero-card .value {
+        display: block;
+        margin-top: 8px;
+        font-size: 1.95rem;
+        font-weight: 700;
+      }
+
+      .hero-card .subvalue {
+        display: block;
+        margin-top: 8px;
+        color: rgba(242, 248, 251, 0.74);
+        font-size: 0.92rem;
+        line-height: 1.45;
+      }
+
+      .score-card h2,
+      .top-actions h2 {
+        margin: 0 0 10px;
+        font-family: "IBM Plex Sans", "Aptos", "Segoe UI", sans-serif;
+        font-size: 1.05rem;
+        color: #f2f8fb;
+      }
+
+      .trend-card {
+        padding: 20px;
+        border-radius: 24px;
+        background: var(--panel);
+        border: 1px solid var(--line);
+        box-shadow: var(--shadow);
+      }
+
+      .trend-card h3 {
+        margin: 0;
+        font-size: 0.98rem;
+        color: var(--muted);
+      }
+
+      .trend-card p {
+        margin: 8px 0 0;
+        color: var(--muted);
+        line-height: 1.55;
+      }
+
+      .trend-art {
+        margin-top: 16px;
+      }
+
+      .sparkline-svg {
+        display: block;
+        width: 100%;
+        height: auto;
+      }
+
+      .score-dial-shell {
+        margin-top: 18px;
+        display: flex;
+        align-items: center;
+        gap: 18px;
+      }
+
+      .score-dial-wrap {
+        position: relative;
+        width: 132px;
+        height: 132px;
+      }
+
+      .score-dial {
+        width: 132px;
+        height: 132px;
+        border-radius: 50%;
+        display: grid;
+        place-items: center;
+        background:
+          conic-gradient(
+            var(--risk) 0deg 139.64deg,
+            rgba(255, 255, 255, 0.12) 139.64deg 360deg
+          );
+      }
+
+      .score-dial::before {
+        content: "";
+        width: 94px;
+        height: 94px;
+        border-radius: 50%;
+        background: rgba(16, 34, 48, 0.98);
+        box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.06);
+      }
+
+      .score-dial-value {
+        position: absolute;
+        inset: 0;
+        display: grid;
+        place-items: center;
+        text-align: center;
+      }
+
+      .score-dial-value strong {
+        display: block;
+        font-size: 2rem;
+        line-height: 1;
+      }
+
+      .score-dial-value span {
+        display: block;
+        margin-top: 6px;
+        font-size: 0.78rem;
+        color: rgba(242, 248, 251, 0.66);
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+      }
+
+      .score-copy p {
+        margin: 4px 0 0;
+        font-size: 0.95rem;
+        line-height: 1.55;
+      }
+
+      .score-status,
+      .pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 6px 10px;
+        border-radius: 999px;
+        font-size: 0.8rem;
+        font-weight: 600;
+      }
+
+      .score-status {
+        margin-top: 10px;
+      }
+
+      .score-status-critical,
+      .pill-high,
+      .pill-immediate,
+      .pill-status_gap {
+        background: var(--risk-soft);
+        color: var(--risk);
+      }
+
+      .score-status-elevated,
+      .pill-planned,
+      .pill-status_partial {
+        background: var(--warn-soft);
+        color: var(--warn);
+      }
+
+      .score-status-managed,
+      .pill-monitor,
+      .pill-status_ready {
+        background: var(--accent-soft);
+        color: var(--accent);
+      }
+
+      .score-status-low,
+      .pill-low {
+        background: var(--ok-soft);
+        color: var(--ok);
+      }
+
+      .action-list {
+        margin: 0;
+        padding: 0;
+        list-style: none;
+        display: grid;
+        gap: 10px;
+      }
+
+      .action-list li {
+        padding: 12px 13px;
+        border-radius: 16px;
+        background: rgba(255, 255, 255, 0.08);
+      }
+
+      .action-list strong {
+        display: block;
+        font-size: 0.95rem;
+      }
+
+      .action-list span {
+        display: block;
+        margin-top: 4px;
+        color: rgba(242, 248, 251, 0.74);
+        font-size: 0.9rem;
+        line-height: 1.45;
+      }
+
+      .section-heading {
+        display: flex;
+        align-items: end;
+        justify-content: space-between;
+        gap: 18px;
+        margin-bottom: 16px;
+      }
+
+      .section-heading h2 {
+        margin: 0;
+        font-family: "IBM Plex Serif", Georgia, serif;
+        font-size: 1.55rem;
+      }
+
+      .section-heading p {
+        margin: 8px 0 0;
+        max-width: 72ch;
+        color: var(--muted);
+        line-height: 1.62;
+      }
+
+      .section-kicker {
+        display: inline-block;
+        margin-bottom: 8px;
+        font-size: 0.76rem;
+        font-weight: 600;
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+        color: var(--accent);
+      }
+
+      .section-anchor {
+        color: var(--muted);
+        text-decoration: none;
+        font-size: 0.88rem;
+        white-space: nowrap;
+      }
+
+      .section-anchor:hover {
+        color: var(--ink);
+      }
+
+      .metric-card {
+        position: relative;
+        overflow: hidden;
+      }
+
+      .metric-card::after {
+        content: "";
+        position: absolute;
+        inset: auto -10% -22% auto;
+        width: 120px;
+        height: 120px;
+        background: radial-gradient(circle, rgba(65, 125, 255, 0.12), transparent 68%);
+        pointer-events: none;
+      }
+
+      .metric-card h3,
+      .org-card h3 {
+        margin: 0;
+        font-size: 0.98rem;
+        color: var(--muted);
+      }
+
+      .metric-value {
+        margin: 10px 0 0;
+        font-size: 2rem;
+        font-weight: 700;
+      }
+
+      .metric-bar {
+        margin-top: 16px;
+        width: 100%;
+        height: 10px;
+        border-radius: 999px;
+        background: rgba(16, 33, 43, 0.08);
+        overflow: hidden;
+      }
+
+      .metric-bar span {
+        display: block;
+        height: 100%;
+        border-radius: inherit;
+        background: linear-gradient(90deg, var(--accent), var(--sky));
+      }
+
+      .metric-foot {
+        margin-top: 10px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 8px;
+        color: var(--muted);
+        font-size: 0.88rem;
+      }
+
+      .org-card p,
+      .section-panel p {
+        margin: 8px 0 0;
+        color: var(--muted);
+        line-height: 1.55;
+      }
+
+      .detail-list {
+        margin: 16px 0 0;
+        padding: 0;
+        list-style: none;
+        display: grid;
+        gap: 10px;
+      }
+
+      .detail-list li {
+        padding: 10px 12px;
+        background: var(--panel-strong);
+        border-radius: 12px;
+        font-size: 0.95rem;
+      }
+
+      .detail-label {
+        font-weight: 600;
+        color: var(--ink);
+      }
+
+      .table-panel {
+        overflow-x: auto;
+        overflow-y: hidden;
+        border-radius: 24px;
+      }
+
+      table {
+        width: 100%;
+        min-width: 1520px;
+        border-collapse: collapse;
+      }
+
+      th:nth-child(1),
+      td:nth-child(1) {
+        min-width: 230px;
+      }
+
+      th:nth-child(7),
+      td:nth-child(7) {
+        min-width: 220px;
+      }
+
+      th:nth-child(8),
+      td:nth-child(8) {
+        min-width: 260px;
+      }
+
+      th:nth-child(9),
+      td:nth-child(9) {
+        min-width: 260px;
+      }
+
+      thead {
+        background: linear-gradient(90deg, rgba(16, 34, 48, 0.98), rgba(24, 53, 71, 0.96));
+      }
+
+      th,
+      td {
+        padding: 14px 16px;
+        text-align: left;
+        vertical-align: top;
+        border-bottom: 1px solid var(--line);
+        font-size: 0.95rem;
+      }
+
+      th {
+        font-size: 0.82rem;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: rgba(242, 248, 251, 0.74);
+      }
+
+      tbody tr:nth-child(even) {
+        background: rgba(244, 248, 251, 0.72);
+      }
+
+      .evidence,
+      .mapping {
+        margin: 0;
+        padding-left: 18px;
+      }
+
+      .score-breakdown {
+        margin-top: 8px;
+        color: var(--muted);
+        font-size: 0.84rem;
+      }
+
+      .score-breakdown summary {
+        cursor: pointer;
+        color: var(--accent);
+        font-weight: 700;
+      }
+
+      .score-breakdown ul {
+        margin: 8px 0 0;
+        padding-left: 18px;
+      }
+
+      .score-breakdown li {
+        margin-bottom: 4px;
+      }
+
+      .footnote {
+        margin-top: 22px;
+        color: var(--muted);
+        font-size: 0.92rem;
+      }
+
+      .board-brief {
+        padding: 22px;
+        border-radius: 28px;
+        background:
+          linear-gradient(135deg, rgba(16, 34, 48, 0.98), rgba(24, 53, 71, 0.95));
+        color: #f2f8fb;
+        box-shadow: var(--shadow);
+      }
+
+      .board-brief h2 {
+        margin: 0;
+        font-family: "IBM Plex Serif", Georgia, serif;
+        font-size: 1.8rem;
+      }
+
+      .board-brief p {
+        color: rgba(242, 248, 251, 0.82);
+      }
+
+      .board-brief-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 14px;
+        margin-top: 18px;
+      }
+
+      .board-brief-card {
+        padding: 16px;
+        border-radius: 18px;
+        background: rgba(255, 255, 255, 0.08);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+      }
+
+      .board-brief-card h3 {
+        margin: 0;
+        font-size: 0.95rem;
+        color: rgba(242, 248, 251, 0.72);
+      }
+
+      .board-brief-card strong {
+        display: block;
+        margin-top: 8px;
+        font-size: 1.8rem;
+        line-height: 1;
+      }
+
+      .board-brief .action-list li {
+        background: rgba(255, 255, 255, 0.06);
+      }
+
+      @media (max-width: 1120px) {
+        .page-shell {
+          grid-template-columns: 1fr;
+        }
+
+        .nav-rail {
+          position: static;
+        }
+
+        .hero-shell,
+        .bento-grid,
+        .trend-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      @media (max-width: 860px) {
+        th:nth-child(4),
+        td:nth-child(4),
+        th:nth-child(9),
+        td:nth-child(9) {
+          display: none;
+        }
+      }
+
+      @media (max-width: 640px) {
+        .page-shell {
+          padding: 16px 12px 42px;
+        }
+
+        .hero {
+          padding: 22px;
+        }
+
+        .score-dial-shell {
+          flex-direction: column;
+          align-items: flex-start;
+        }
+
+        th:nth-child(3),
+        td:nth-child(3),
+        th:nth-child(6),
+        td:nth-child(6),
+        th:nth-child(9),
+        td:nth-child(9) {
+          display: none;
+        }
+      }
+
+      @media print {
+        body {
+          background: white;
+        }
+
+        body::before,
+        .nav-rail,
+        .screen-only,
+        .section-anchor {
+          display: none !important;
+        }
+
+        .print-only {
+          display: block !important;
+        }
+
+        .page-shell {
+          display: block;
+          max-width: none;
+          padding: 0;
+        }
+
+        main {
+          width: 100%;
+        }
+
+        .hero,
+        .section-panel,
+        .table-panel,
+        .board-brief {
+          box-shadow: none;
+          break-inside: avoid;
+        }
+
+        .report-section {
+          margin-top: 16px;
+        }
+
+        .hero,
+        .board-brief {
+          color: #10212b;
+          background: white;
+          border: 1px solid #d3dce2;
+        }
+
+        .hero p,
+        .board-brief p,
+        .hero-card .subvalue,
+        .hero-card .label {
+          color: #435460;
+        }
+
+        .hero-card,
+        .score-card,
+        .top-actions,
+        .board-brief-card {
+          background: #f7fafc;
+          border: 1px solid #dde6ec;
+          color: #10212b;
+        }
+
+        .hero-card .value,
+        .score-card h2,
+        .top-actions h2,
+        .board-brief-card h3 {
+          color: #10212b;
+        }
+
+        .score-dial::before {
+          background: white;
+        }
+
+        .score-dial-value span,
+        .action-list span {
+          color: #435460;
+        }
+
+        .print-primary {
+          display: block !important;
+        }
+
+        .print-condensed {
+          display: none !important;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="page-shell">
+      <aside class="nav-rail">
+        <p class="nav-kicker">CRIS-SME</p>
+        <h2 class="nav-title">UK SME cloud risk reporting with product-grade clarity</h2>
+        <p class="nav-summary">
+          This report is designed around the strongest modern posture-report patterns:
+          security at a glance, top actions, longitudinal context, and evidence-backed
+          explanation for non-enterprise teams.
+        </p>
+        <div class="nav-score">
+          <strong>38.79</strong>
+          <span>Managed but material risk overall risk | 28 non-compliant findings</span>
+        </div>
+        <ul class="nav-links">
+          <li><a href="#overview">Overview <span>01</span></a></li>
+          <li><a href="#posture">Posture & actions <span>02</span></a></li>
+          <li><a href="#evidence">Evidence & provenance <span>03</span></a></li>
+          <li><a href="#assurance">Assurance & benchmark <span>04</span></a></li>
+          <li><a href="#uk">UK obligations <span>05</span></a></li>
+          <li><a href="#risks">Prioritized risks <span>06</span></a></li>
+        </ul>
+      </aside>
+
+      <main>
+        <section class="board-brief print-only report-section">
+          
+    <span class="section-kicker" style="color: rgba(242, 248, 251, 0.72);">Board Brief</span>
+    <h2>Executive Briefing Snapshot</h2>
+    <p>CRIS-SME highlights the highest-risk cloud governance issues, the most practical fixes for the next 30 days, and the organisation&#x27;s current UK-readiness signals.</p>
+    <div class="board-brief-grid">
+      <div class="board-brief-card">
+        <h3>Overall risk</h3>
+        <strong>38.79</strong>
+        <p>Managed but material risk</p>
+      </div>
+      <div class="board-brief-card">
+        <h3>Cyber Essentials</h3>
+        <strong>33.33</strong>
+        <p>Current readiness score across the five technical themes.</p>
+      </div>
+      <div class="board-brief-card">
+        <h3>Insurance readiness</h3>
+        <strong>25.0</strong>
+        <p>Evidence-pack readiness score for insurer-style questions.</p>
+      </div>
+      <div class="board-brief-card">
+        <h3>Benchmark position</h3>
+        <strong style="font-size: 1.15rem; line-height: 1.2;">insufficient dataset</strong>
+        <p>Benchmark comparison is scaffolded, but fewer than three comparable peer observations are currently available for a meaningful percentile ranking.</p>
+      </div>
+    </div>
+    <div style="margin-top: 18px;">
+      <h3 style="margin: 0 0 12px; font-size: 1rem; color: rgba(242, 248, 251, 0.82);">Immediate actions</h3>
+      <ul class="action-list">
+            <li>
+              <strong>NET-001 | Administrative services are exposed to the public internet</strong>
+              <span>High priority, 72.12 risk score, medium remediation cost.</span>
+            </li>
+            
+            <li>
+              <strong>IAM-001 | Privileged role assignments without MFA enforcement</strong>
+              <span>High priority, 67.97 risk score, free remediation cost.</span>
+            </li>
+            
+            <li>
+              <strong>DATA-001 | Public storage access increases data exposure risk</strong>
+              <span>Planned priority, 48.35 risk score, free remediation cost.</span>
+            </li>
+            
+                        <li>
+                          <strong>Free this week</strong>
+                          <span>5 recommended free actions covering 236.51 cumulative risk score.</span>
+                        </li>
+                        </ul>
+    </div>
+    
+        </section>
+
+        <section id="overview" class="hero report-section">
+          <div class="hero-shell">
+            <div>
+              <span class="eyebrow">Cloud Risk Intelligence Report</span>
+              <h1>CRIS-SME Risk Intelligence Report</h1>
+              <p>Overall risk score: 38.79/100 across 28 non-compliant findings.</p>
+              <div class="hero-meta">
+                <div class="hero-card">
+                  <span class="label">Profiles Evaluated</span>
+                  <span class="value">1</span>
+                  <span class="subvalue">Tenant or synthetic posture profiles assessed in this run.</span>
+                </div>
+                <div class="hero-card">
+                  <span class="label">Generated Findings</span>
+                  <span class="value">28</span>
+                  <span class="subvalue">Deterministic control outcomes converted into scored findings.</span>
+                </div>
+                <div class="hero-card">
+                  <span class="label">Non-Compliant</span>
+                  <span class="value">28</span>
+                  <span class="subvalue">Issues currently driving the SME risk posture upward.</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="hero-side">
+              <div class="score-card">
+                <h2>Security at a glance</h2>
+                <div class="score-dial-shell">
+                  <div class="score-dial-wrap">
+                    <div class="score-dial"></div>
+                    <div class="score-dial-value">
+                      <div>
+                        <strong>38.79</strong>
+                        <span>Risk / 100</span>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="score-copy">
+                    <p>CRIS-SME keeps the model explainable, evidence-based, and transparent enough for research reviewers, security teams, and SME decision-makers to read from the same artifact.</p>
+                    <div class="score-status score-status-managed">Managed but material risk</div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="top-actions">
+                <h2>Top actions</h2>
+                <ul class="action-list">
+            <li>
+              <strong>NET-001 | Administrative services are exposed to the public internet</strong>
+              <span>High priority, 72.12 risk score, medium remediation cost.</span>
+            </li>
+            
+            <li>
+              <strong>IAM-001 | Privileged role assignments without MFA enforcement</strong>
+              <span>High priority, 67.97 risk score, free remediation cost.</span>
+            </li>
+            
+            <li>
+              <strong>DATA-001 | Public storage access increases data exposure risk</strong>
+              <span>Planned priority, 48.35 risk score, free remediation cost.</span>
+            </li>
+            
+                        <li>
+                          <strong>Free this week</strong>
+                          <span>5 recommended free actions covering 236.51 cumulative risk score.</span>
+                        </li>
+                        </ul>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="report-section">
+          <div class="bento-grid">
+            <article class="section-panel">
+              <div class="section-heading">
+                <div>
+                  <span class="section-kicker">Executive Summary</span>
+                  <h2>What matters most right now</h2>
+                  <p>CRIS-SME evaluated 1 profile(s): SIGI Technologies (aws). The overall risk score is 38.79/100, with 28 non-compliant finding(s). Collection context: SIGI Technologies uses live aws evidence with aws_iam_user_role_inventory, aws_ec2_security_group_inventory, aws_s3_and_rds_inventory, aws_cloudtrail_and_cloudwatch_inventory, aws_ec2_inventory, aws_resource_tagging_inventory; observed 1 VM(s), 4 storage account(s), 1 SQL database(s), 0 policy assignment(s). Confidence calibration: average observed confidence 0.86, average calibrated confidence 0.84, statuses: provisional: 18, validated: 10. Budget-aware remediation: 5 free fix(es) can be prioritized immediately, and 7 action(s) fit within GBP200/month. 30-day action plan: 5 action(s) land in the first week, 7 action(s) in days 8-30, and 5 action(s) are queued beyond day 30. Native validation: 0 mapped control(s) agree with native recommendations, 6 appear only in CRIS-SME, and 0 appear only in native recommendations. Graph context: blast-radius score 37.50 (low), with 2 toxic combination(s). Cyber insurance evidence: 0 question(s) are met, 3 are partial, and 3 are not met (readiness score 25.00). Benchmarking: export-ready observation available for future peer comparison. UK readiness: Cyber Essentials summary available for board and assurance reporting. Priority distribution: High: 2, Monitor: 11, Planned: 15. Top risk observations: NET-001 in SIGI Technologies scored 72.12 (High); IAM-001 in SIGI Technologies scored 67.97 (High); DATA-001 in SIGI Technologies scored 48.35 (Planned)</p>
+                </div>
+              </div>
+            </article>
+
+            <article class="section-panel">
+              <div class="section-heading">
+                <div>
+                  <span class="section-kicker">Board Snapshot</span>
+                  <h2>Fast-reading decision context</h2>
+                  <p>The report is structured to feel closer to the best posture platforms: quick orientation first, then action paths, then evidence and compliance detail.</p>
+                </div>
+              </div>
+              <div class="summary-grid">
+                <div class="metric-card">
+                  <h3>Calibration controls</h3>
+                  <p class="metric-value">28</p>
+                </div>
+                <div class="metric-card">
+                  <h3>Native mappings</h3>
+                  <p class="metric-value">7</p>
+                </div>
+                <div class="metric-card">
+                  <h3>Benchmark status</h3>
+                  <p class="metric-value" style="font-size:1.3rem;">insufficient dataset</p>
+                </div>
+              </div>
+            </article>
+          </div>
+        </section>
+
+        <section id="posture" class="report-section">
+          <div class="section-heading">
+            <div>
+              <span class="section-kicker">Posture & Priority</span>
+              <h2>Category Scores</h2>
+              <p>Borrowing from better market experiences, the emphasis here is on readability: where risk clusters, how much it matters, and which domains need attention first.</p>
+            </div>
+            <a class="section-anchor" href="#overview">Back to top</a>
+          </div>
+          <div class="trend-grid screen-only">
+            <article class="trend-card">
+              <h3>Category posture trend strip</h3>
+              <p>A compact visual pass across the current domain scores so the report scans more like a posture platform dashboard than a static export.</p>
+              <div class="trend-art">
+    <svg class="sparkline-svg" viewBox="0 0 480 140" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Category score trend strip">
+      <defs>
+        <linearGradient id="scoreFill" x1="0%" y1="0%" x2="0%" y2="100%">
+          <stop offset="0%" stop-color="var(--sky)" stop-opacity="0.28" />
+          <stop offset="100%" stop-color="var(--sky)" stop-opacity="0.02" />
+        </linearGradient>
+      </defs>
+      <line x1="18" y1="106.0" x2="464" y2="106.0" stroke="rgba(73, 100, 115, 0.25)" stroke-width="1" />
+      <polygon points="18.0,106.0 18.0,77.9 92.3,59.4 166.7,68.4 241.0,74.0 315.3,71.3 389.7,86.0 464.0,82.8 464.0,106.0" fill="url(#scoreFill)" />
+      <polyline points="18.0,77.9 92.3,59.4 166.7,68.4 241.0,74.0 315.3,71.3 389.7,86.0 464.0,82.8" fill="none" stroke="var(--accent)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" />
+      <circle cx="18.0" cy="77.9" r="4" fill="var(--sky)" stroke="white" stroke-width="2" /><circle cx="92.3" cy="59.4" r="4" fill="var(--sky)" stroke="white" stroke-width="2" /><circle cx="166.7" cy="68.4" r="4" fill="var(--sky)" stroke="white" stroke-width="2" /><circle cx="241.0" cy="74.0" r="4" fill="var(--sky)" stroke="white" stroke-width="2" /><circle cx="315.3" cy="71.3" r="4" fill="var(--sky)" stroke="white" stroke-width="2" /><circle cx="389.7" cy="86.0" r="4" fill="var(--sky)" stroke="white" stroke-width="2" /><circle cx="464.0" cy="82.8" r="4" fill="var(--sky)" stroke="white" stroke-width="2" />
+      <text x="18.0" y="130" text-anchor="middle" fill="#5a6c78" font-size="10">IAM</text><text x="92.3" y="130" text-anchor="middle" fill="#5a6c78" font-size="10">Network</text><text x="166.7" y="130" text-anchor="middle" fill="#5a6c78" font-size="10">Data</text><text x="241.0" y="130" text-anchor="middle" fill="#5a6c78" font-size="10">Monitoring</text><text x="315.3" y="130" text-anchor="middle" fill="#5a6c78" font-size="10">Compute/Wo</text><text x="389.7" y="130" text-anchor="middle" fill="#5a6c78" font-size="10">Cost/Gover</text><text x="464.0" y="130" text-anchor="middle" fill="#5a6c78" font-size="10">Healthcare</text>
+    </svg>
+    </div>
+            </article>
+            <article class="trend-card">
+              <h3>Sector lens</h3>
+              <p>This report skin adapts to the assessed primary sector: <strong>Technology Services</strong>. That makes demos and stakeholder packs feel less generic across finance, healthcare, retail, and future sector packs.</p>
+            </article>
+          </div>
+          <div class="metric-grid">
+            <article class="metric-card">
+              <h3>IAM</h3>
+              <p class="metric-value">31.96</p>
+              <div class="metric-bar"><span style="width: 31.96%;"></span></div>
+              <div class="metric-foot">
+                <span>Managed but material risk</span>
+                <span>32% of risk scale</span>
+              </div>
+            </article>
+            
+            <article class="metric-card">
+              <h3>Network</h3>
+              <p class="metric-value">52.92</p>
+              <div class="metric-bar"><span style="width: 52.92%;"></span></div>
+              <div class="metric-foot">
+                <span>Elevated posture exposure</span>
+                <span>53% of risk scale</span>
+              </div>
+            </article>
+            
+            <article class="metric-card">
+              <h3>Data</h3>
+              <p class="metric-value">42.76</p>
+              <div class="metric-bar"><span style="width: 42.76%;"></span></div>
+              <div class="metric-foot">
+                <span>Managed but material risk</span>
+                <span>43% of risk scale</span>
+              </div>
+            </article>
+            
+            <article class="metric-card">
+              <h3>Monitoring/Logging</h3>
+              <p class="metric-value">36.36</p>
+              <div class="metric-bar"><span style="width: 36.36%;"></span></div>
+              <div class="metric-foot">
+                <span>Managed but material risk</span>
+                <span>36% of risk scale</span>
+              </div>
+            </article>
+            
+            <article class="metric-card">
+              <h3>Compute/Workloads</h3>
+              <p class="metric-value">39.39</p>
+              <div class="metric-bar"><span style="width: 39.39%;"></span></div>
+              <div class="metric-foot">
+                <span>Managed but material risk</span>
+                <span>39% of risk scale</span>
+              </div>
+            </article>
+            
+            <article class="metric-card">
+              <h3>Cost/Governance Hygiene</h3>
+              <p class="metric-value">22.71</p>
+              <div class="metric-bar"><span style="width: 22.71%;"></span></div>
+              <div class="metric-foot">
+                <span>Managed but material risk</span>
+                <span>23% of risk scale</span>
+              </div>
+            </article>
+            
+            <article class="metric-card">
+              <h3>Healthcare IoT</h3>
+              <p class="metric-value">26.40</p>
+              <div class="metric-bar"><span style="width: 26.40%;"></span></div>
+              <div class="metric-foot">
+                <span>Managed but material risk</span>
+                <span>26% of risk scale</span>
+              </div>
+            </article>
+            </div>
+        </section>
+
+        <section id="evidence" class="report-section">
+          <div class="section-heading">
+            <div>
+              <span class="section-kicker">Collection Provenance</span>
+              <h2>Collection Provenance</h2>
+              <p>Strong reports separate conclusions from the telemetry that created them. This section keeps collection mode and evidence counts visible, not hidden.</p>
+            </div>
+            <a class="section-anchor" href="#overview">Back to top</a>
+          </div>
+          <div class="org-grid">
+    <article class="org-card">
+      <h3>SIGI Technologies</h3>
+      <p>aws | Technology Services</p>
+      <ul class="detail-list"><li><span class="detail-label">Source:</span> aws_live</li><li><span class="detail-label">IAM:</span> aws_iam_user_role_inventory</li><li><span class="detail-label">Network:</span> aws_ec2_security_group_inventory</li><li><span class="detail-label">Data:</span> aws_s3_and_rds_inventory</li><li><span class="detail-label">Monitoring:</span> aws_cloudtrail_and_cloudwatch_inventory</li><li><span class="detail-label">Compute:</span> aws_ec2_inventory</li><li><span class="detail-label">Governance:</span> aws_resource_tagging_inventory</li><li><span class="detail-label">Identity observability:</span> partial</li><li><span class="detail-label">conditional access policy count:</span> 0</li><li><span class="detail-label">storage account count:</span> 4</li><li><span class="detail-label">sql server count:</span> 1</li><li><span class="detail-label">sql database count:</span> 1</li><li><span class="detail-label">activity log alert count:</span> 3</li><li><span class="detail-label">virtual machine count:</span> 1</li><li><span class="detail-label">vm backup protected count:</span> 0</li><li><span class="detail-label">linux password auth enabled vm count:</span> 0</li><li><span class="detail-label">governance resource count:</span> 26</li><li><span class="detail-label">policy assignment count:</span> 0</li><li><span class="detail-label">iot hub count:</span> 1</li><li><span class="detail-label">iot device identity count:</span> 3</li><li><span class="detail-label">iot device identity observable:</span> True</li><li><span class="detail-label">iot shared access policy count:</span> 1</li><li><span class="detail-label">iot overbroad shared access policy count:</span> 1</li><li><span class="detail-label">iot diagnostic destination count:</span> 0</li><li><span class="detail-label">iot defender enabled:</span> False</li><li><span class="detail-label">iot public network hub count:</span> 1</li><li><span class="detail-label">iot private endpoint count:</span> 0</li><li><span class="detail-label">iot alert rule count:</span> 0</li></ul>
+      <p>This profile was created from live AWS account context via boto3. IAM, network, data, monitoring, compute, and governance posture include live AWS evidence where available. Several fields are best-effort analogs of Azure concepts with no exact AWS equivalent (e.g. Key Vault posture is approximated from KMS/Secrets Manager, IoT Hub posture from AWS IoT Core); this collector is a research preview and has not yet been verified against a live AWS account.</p>
+    </article>
+    </div>
+        </section>
+
+        <section id="assurance" class="section-panel report-section">
+          <div class="section-heading">
+            <div>
+              <span class="section-kicker">Model Assurance</span>
+              <h2>Confidence Calibration</h2>
+              <p>Confidence is surfaced as part of the scoring story, so the report reads as measured and defensible rather than opaque.</p>
+            </div>
+            <a class="section-anchor" href="#overview">Back to top</a>
+          </div>
+          <ul class="detail-list"><li><span class="detail-label">Controls with calibration:</span> 28</li><li><span class="detail-label">Average observed confidence:</span> 0.8575</li><li><span class="detail-label">Average calibrated confidence:</span> 0.8431</li><li><span class="detail-label">Method summary:</span> Observed per-control confidence is blended with a lightweight empirical agreement profile derived from live Azure validation, synthetic regression testing, and documented review.</li><li><span class="detail-label">validated controls:</span> 10</li><li><span class="detail-label">provisional controls:</span> 18</li></ul>
+        </section>
+
+        <section class="section-panel report-section">
+          <div class="section-heading">
+            <div>
+              <span class="section-kicker">Native Baseline</span>
+              <h2>Native Recommendation Validation</h2>
+              <p>Alignment against Microsoft Defender for Cloud adds external grounding and helps position CRIS-SME as an explainable overlay, not a disconnected scoring toy.</p>
+            </div>
+          </div>
+          <ul class="detail-list"><li><span class="detail-label">Framework:</span> Microsoft Defender for Cloud</li><li><span class="detail-label">Controls mapped:</span> 7</li><li><span class="detail-label">Native unhealthy recommendations:</span> 0</li><li><span class="detail-label">Agreement count:</span> 0</li><li><span class="detail-label">CRIS-only count:</span> 6</li><li><span class="detail-label">Native-only count:</span> 0</li><li><span class="detail-label">Coverage note:</span> Comparison is based on currently visible unhealthy Defender for Cloud assessments and mapped CRIS-SME controls. It supports calibration and divergence analysis, but it is not a claim that either system fully subsumes the other.</li><li><span class="detail-label">IAM-002 (clear):</span> 0 native recommendation(s)</li><li><span class="detail-label">NET-001 (cris_only):</span> 0 native recommendation(s)</li><li><span class="detail-label">NET-002 (cris_only):</span> 0 native recommendation(s)</li><li><span class="detail-label">CMP-001 (cris_only):</span> 0 native recommendation(s)</li><li><span class="detail-label">CMP-002 (cris_only):</span> 0 native recommendation(s)</li><li><span class="detail-label">CMP-003 (cris_only):</span> 0 native recommendation(s)</li><li><span class="detail-label">MON-003 (cris_only):</span> 0 native recommendation(s)</li></ul>
+        </section>
+
+        <section class="section-panel report-section">
+          <div class="section-heading">
+            <div>
+              <span class="section-kicker">Longitudinal Tracking</span>
+              <h2>Run Comparison</h2>
+              <p>Modern governance tools stand out when they show movement over time and across evidence classes. This section highlights posture drift, mode coverage, and progress rather than only a one-off scan.</p>
+            </div>
+          </div>
+          
+    <div class="metric-grid" style="margin-bottom: 16px;">
+      <div class="metric-card" style="grid-column: 1 / -1;">
+        <h3>Three-Mode Evaluation Summary</h3>
+        <p class="metric-meta">Synthetic, live Azure, and vulnerable-lab evidence are treated as equal first-class evaluation modes in the paper-facing output.</p>
+      </div>
+      
+            <div class="metric-card">
+              <h3>AzureGoat Vulnerable Lab</h3>
+              <p class="metric-value">38.79</p>
+              <p class="metric-meta">Intentionally vulnerable lab evidence</p>
+              <p class="metric-footnote">Findings 28 | Non-compliant 28 | Collector aws</p>
+            </div>
+            
+    </div>
+    
+          <ul class="detail-list"><li><span class="detail-label">History count:</span> 2</li><li><span class="detail-label">Current collector:</span> aws</li><li><span class="detail-label">Previous collector:</span> aws</li><li><span class="detail-label">Overall risk delta:</span> 0.0</li><li><span class="detail-label">Non-compliant findings delta:</span> 0</li><li><span class="detail-label">Latest run:</span> 2026-07-04T18:15:03.071496Z</li><li><span class="detail-label">Previous run:</span> 2026-07-04T18:13:19.019124Z</li><li><span class="detail-label">IAM delta:</span> 0.0</li><li><span class="detail-label">Network delta:</span> 0.0</li><li><span class="detail-label">Data delta:</span> 0.0</li><li><span class="detail-label">Monitoring/Logging delta:</span> 0.0</li><li><span class="detail-label">Compute/Workloads delta:</span> 0.0</li><li><span class="detail-label">Cost/Governance Hygiene delta:</span> 0.0</li><li><span class="detail-label">Healthcare IoT delta:</span> 0.0</li></ul>
+        </section>
+
+        <section class="section-panel report-section">
+          <div class="section-heading">
+            <div>
+              <span class="section-kicker">Context Graph</span>
+              <h2>Graph-Context Prioritization</h2>
+              <p>Context-aware risk interpretation highlights toxic combinations, blast-radius signals, and exposure chains without overclaiming full attack-path simulation.</p>
+            </div>
+          </div>
+          <ul class="detail-list"><li><span class="detail-label">Graph model:</span> cris_sme_lightweight_asset_context_v1</li><li><span class="detail-label">Assets:</span> 6</li><li><span class="detail-label">Relationships:</span> 10</li><li><span class="detail-label">Blast radius score:</span> 37.5</li><li><span class="detail-label">Blast radius band:</span> low</li><li><span class="detail-label">Coverage note:</span> This is a lightweight context graph to improve prioritization signals such as blast radius and toxic combinations. It is not a full attack-path simulator.</li><li><span class="detail-label">Public administrative exposure with privileged identity weakness (high):</span> Internet-reachable administrative surfaces combined with identity-control gaps can amplify unauthorized access and privilege abuse risk.</li><li><span class="detail-label">Exposed administrative path with weak detection/response readiness (high):</span> Exposure risk is harder to contain when monitoring retention or incident response runbooks are weak.</li></ul>
+        </section>
+
+        <section class="section-panel report-section">
+          <div class="section-heading">
+            <div>
+              <span class="section-kicker">Finding Lifecycle</span>
+              <h2>Lifecycle and Exceptions</h2>
+              <p>Findings are tracked with lifecycle states, first/last seen context, and bounded exception visibility for governance accountability.</p>
+            </div>
+          </div>
+          <ul class="detail-list"><li><span class="detail-label">New findings:</span> 0</li><li><span class="detail-label">Existing findings:</span> 28</li><li><span class="detail-label">Exceptions applied:</span> 0</li><li><span class="detail-label">Exception registry entries:</span> 0</li><li><span class="detail-label">open findings:</span> 28</li></ul>
+        </section>
+
+        <section class="section-panel report-section">
+          <div class="section-heading">
+            <div>
+              <span class="section-kicker">Budget-Aware Planning</span>
+              <h2>Budget-Aware Remediation</h2>
+              <p>SMEs need action sequences constrained by cost, not just a louder list of severe issues. The presentation now treats this as a core product capability.</p>
+            </div>
+          </div>
+          
+            <article class="org-card">
+              <h3>Free fixes this week</h3>
+              <p>Prioritize zero-cost configuration changes and governance fixes that can be started immediately.</p>
+              <ul class="detail-list">
+                <li><span class="detail-label">Budget cap:</span> GBP 0</li>
+                <li><span class="detail-label">Allowed tiers:</span> free</li>
+                <li><span class="detail-label">Recommended actions:</span> 5</li>
+                <li><span class="detail-label">Cumulative risk score:</span> 236.51</li>
+                <li><span class="detail-label">Average value score:</span> 47.3</li>
+                <li><span class="detail-label">IAM-001:</span> Privileged role assignments without MFA enforcement (67.97 risk, value 67.97)</li><li><span class="detail-label">DATA-001:</span> Public storage access increases data exposure risk (48.35 risk, value 48.35)</li><li><span class="detail-label">NET-002:</span> Network security group rules are broader than expected (44.71 risk, value 44.71)</li><li><span class="detail-label">IOT-002:</span> IoT shared access policies exceed least-privilege expectations (41.60 risk, value 41.60)</li><li><span class="detail-label">GOV-003:</span> Policy assignment coverage is below the baseline governance threshold (33.88 risk, value 33.88)</li>
+              </ul>
+            </article>
+            
+            <article class="org-card">
+              <h3>Under GBP200 per month</h3>
+              <p>Focus on the highest-value combination of free and low-cost remediations that fit a lean SME cloud budget.</p>
+              <ul class="detail-list">
+                <li><span class="detail-label">Budget cap:</span> GBP 200</li>
+                <li><span class="detail-label">Allowed tiers:</span> free, low</li>
+                <li><span class="detail-label">Recommended actions:</span> 7</li>
+                <li><span class="detail-label">Cumulative risk score:</span> 326.12</li>
+                <li><span class="detail-label">Average value score:</span> 43.27</li>
+                <li><span class="detail-label">IAM-001:</span> Privileged role assignments without MFA enforcement (67.97 risk, value 67.97)</li><li><span class="detail-label">DATA-001:</span> Public storage access increases data exposure risk (48.35 risk, value 48.35)</li><li><span class="detail-label">NET-002:</span> Network security group rules are broader than expected (44.71 risk, value 44.71)</li><li><span class="detail-label">IOT-002:</span> IoT shared access policies exceed least-privilege expectations (41.60 risk, value 41.60)</li><li><span class="detail-label">IOT-005:</span> IoT Hub public network access is not sufficiently constrained (47.25 risk, value 35.00)</li>
+              </ul>
+            </article>
+            
+            <article class="org-card">
+              <h3>Under GBP750 per month</h3>
+              <p>Broaden coverage to include medium-cost protections where they materially reduce SME cloud risk.</p>
+              <ul class="detail-list">
+                <li><span class="detail-label">Budget cap:</span> GBP 750</li>
+                <li><span class="detail-label">Allowed tiers:</span> free, low, medium</li>
+                <li><span class="detail-label">Recommended actions:</span> 10</li>
+                <li><span class="detail-label">Cumulative risk score:</span> 457.37</li>
+                <li><span class="detail-label">Average value score:</span> 39.17</li>
+                <li><span class="detail-label">IAM-001:</span> Privileged role assignments without MFA enforcement (67.97 risk, value 67.97)</li><li><span class="detail-label">DATA-001:</span> Public storage access increases data exposure risk (48.35 risk, value 48.35)</li><li><span class="detail-label">NET-002:</span> Network security group rules are broader than expected (44.71 risk, value 44.71)</li><li><span class="detail-label">IOT-002:</span> IoT shared access policies exceed least-privilege expectations (41.60 risk, value 41.60)</li><li><span class="detail-label">NET-001:</span> Administrative services are exposed to the public internet (72.12 risk, value 38.98)</li>
+              </ul>
+            </article>
+            
+        </section>
+
+        <section class="section-panel report-section">
+          <div class="section-heading">
+            <div>
+              <span class="section-kicker">Operational Delivery</span>
+              <h2>30-Day SME Action Plan</h2>
+              <p>The action plan is formatted as a practical execution layer so the report can move directly into operational follow-up.</p>
+            </div>
+          </div>
+          
+            <article class="org-card">
+              <h3>Fix this week</h3>
+              <p>Prioritize zero-cost or low-friction fixes that reduce immediate exposure.</p>
+              <ul class="detail-list">
+                <li><span class="detail-label">Time window:</span> Days 1-7</li>
+                <li><span class="detail-label">Total actions:</span> 5</li>
+                <li><span class="detail-label">Cumulative risk score:</span> 236.51</li>
+                <li><span class="detail-label">IAM-001:</span> Require MFA and admin-focused conditional access for privileged identities. (67.97 risk, free cost)</li><li><span class="detail-label">DATA-001:</span> Disable anonymous or public storage access and review data exposure paths. (48.35 risk, free cost)</li><li><span class="detail-label">NET-002:</span> Tighten overly permissive network rules to least-privilege source and port scopes. (44.71 risk, free cost)</li><li><span class="detail-label">IOT-002:</span> Reduce IoT shared access policies, remove overbroad permissions, and rotate keys through governed operations. (41.60 risk, free cost)</li><li><span class="detail-label">GOV-003:</span> Increase baseline policy assignment coverage for governance and compliance controls. (33.88 risk, free cost)</li>
+              </ul>
+            </article>
+            
+            <article class="org-card">
+              <h3>Complete this month</h3>
+              <p>Deliver the best remaining low-cost improvements within a lean SME operating window.</p>
+              <ul class="detail-list">
+                <li><span class="detail-label">Time window:</span> Days 8-30</li>
+                <li><span class="detail-label">Total actions:</span> 7</li>
+                <li><span class="detail-label">Cumulative risk score:</span> 187.72</li>
+                <li><span class="detail-label">IAM-003:</span> Rotate or remove stale service principal credentials and disable unused identities. (23.34 risk, free cost)</li><li><span class="detail-label">GOV-004:</span> Review and remove unused or orphaned resources to reduce cost and governance noise. (17.87 risk, free cost)</li><li><span class="detail-label">GOV-002:</span> Configure budget thresholds and spend alerts for cost oversight. (16.39 risk, free cost)</li><li><span class="detail-label">IOT-010:</span> Document clinical, operational, and supplier ownership boundaries for IoMT assets and validate device-level evidence manually. (4.72 risk, free cost)</li><li><span class="detail-label">IOT-005:</span> Restrict IoT Hub public access using IP filters, private endpoints, or documented clinical network boundaries. (47.25 risk, low cost)</li>
+              </ul>
+            </article>
+            
+            <article class="org-card">
+              <h3>Plan next</h3>
+              <p>Schedule higher-effort items that likely need architecture, tooling, or procurement support.</p>
+              <ul class="detail-list">
+                <li><span class="detail-label">Time window:</span> After day 30</li>
+                <li><span class="detail-label">Total actions:</span> 5</li>
+                <li><span class="detail-label">Cumulative risk score:</span> 89.55</li>
+                <li><span class="detail-label">IOT-008:</span> Store and rotate IoT credentials through governed key-management services with owner accountability. (21.98 risk, low cost)</li><li><span class="detail-label">IOT-003:</span> Enable IoT Hub diagnostic settings and route core diagnostic categories to a monitored destination. (21.77 risk, low cost)</li><li><span class="detail-label">IOT-007:</span> Route IoMT telemetry to governed storage and retain sufficient logs for investigation and clinical safety review. (20.93 risk, low cost)</li><li><span class="detail-label">IOT-009:</span> Create IoT-specific alert rules and route them to accountable clinical or operational responders. (20.30 risk, low cost)</li><li><span class="detail-label">IAM-005:</span> Broaden tenant-level identity evidence collection before treating IAM coverage as complete. (4.57 risk, low cost)</li>
+              </ul>
+            </article>
+            
+        </section>
+
+        <section class="section-panel report-section">
+          <div class="section-heading">
+            <div>
+              <span class="section-kicker">Insurance Readiness</span>
+              <h2>Cyber Insurance Evidence Pack</h2>
+              <p>Instead of looking like an engineer-only export, the report now carries a clearer insurer- and stakeholder-facing posture summary.</p>
+            </div>
+          </div>
+          <ul class="detail-list"><li><span class="detail-label">Jurisdiction:</span> United Kingdom</li><li><span class="detail-label">Readiness score:</span> 25.0</li><li><span class="detail-label">Questions assessed:</span> 6</li><li><span class="detail-label">Met:</span> 0</li><li><span class="detail-label">Partial:</span> 3</li><li><span class="detail-label">Not met:</span> 3</li><li><span class="detail-label">Unknown:</span> 0</li><li><span class="detail-label">INS-001 - Access security (not_met):</span> Do you enforce multi-factor authentication for privileged and administrative accounts? <br />CRIS-SME identified material evidence that this control area is not fully met. The strongest linked gap is IAM-001 at 67.97 risk (high priority).</li><li><span class="detail-label">INS-002 - Least privilege (partial):</span> Do you limit privileged access and review high-risk permissions regularly? <br />CRIS-SME identified partial evidence of control weakness or incomplete observability. The strongest linked gap is IAM-005 at 4.57 risk (monitor priority).</li><li><span class="detail-label">INS-003 - Perimeter exposure (not_met):</span> Are administrative services and internet-facing rules restricted to least-privilege network access? <br />CRIS-SME identified material evidence that this control area is not fully met. The strongest linked gap is NET-001 at 72.12 risk (high priority).</li><li><span class="detail-label">INS-004 - Patch and malware protection (partial):</span> Are critical workloads patched promptly and protected with endpoint or anti-malware controls? <br />CRIS-SME identified partial evidence of control weakness or incomplete observability. The strongest linked gap is CMP-001 at 42.69 risk (planned priority).</li><li><span class="detail-label">INS-005 - Backup and recovery (not_met):</span> Do you maintain resilient backups for critical workloads and business data? <br />CRIS-SME identified material evidence that this control area is not fully met. The strongest linked gap is DATA-003 at 37.58 risk (planned priority).</li><li><span class="detail-label">INS-006 - Monitoring and response (partial):</span> Do you retain logs, generate security alerts, and maintain incident response procedures? <br />CRIS-SME identified partial evidence of control weakness or incomplete observability. The strongest linked gap is MON-001 at 35.79 risk (planned priority).</li></ul><p>This evidence pack is an insurer-facing technical summary derived from the deterministic CRIS-SME assessment. It is not legal, regulatory, or insurance advice and should be reviewed alongside the organisation&#x27;s formal insurance application.</p>
+        </section>
+
+        <section class="section-panel report-section">
+          <div class="section-heading">
+            <div>
+              <span class="section-kicker">Benchmark Scaffold</span>
+              <h2>Benchmark Scaffold</h2>
+              <p>Even before the benchmark dataset matures, the report reserves visual space for peer comparison so the product category can evolve cleanly.</p>
+            </div>
+          </div>
+          <ul class="detail-list"><li><span class="detail-label">Dataset size:</span> 2</li><li><span class="detail-label">Peer count:</span> 0</li><li><span class="detail-label">Provider:</span> aws</li><li><span class="detail-label">Collector mode:</span> aws</li><li><span class="detail-label">Status:</span> insufficient_dataset</li><li><span class="detail-label">Note:</span> Benchmark comparison is scaffolded, but fewer than three comparable peer observations are currently available for a meaningful percentile ranking.</li></ul>
+        </section>
+
+        <section id="uk" class="section-panel report-section">
+          <div class="section-heading">
+            <div>
+              <span class="section-kicker">UK Obligations</span>
+              <h2>UK Regulatory Mapping</h2>
+              <p>This section keeps Cyber Essentials, UK GDPR, FCA SYSC, and related obligations visible in the same visual language as technical posture.</p>
+            </div>
+            <a class="section-anchor" href="#overview">Back to top</a>
+          </div>
+          <ul class="detail-list"><li><span class="detail-label">Profile:</span> UK SME regulatory profile</li><li><span class="detail-label">Mapped controls:</span> 9</li><li><span class="detail-label">Mapped non-compliant findings:</span> 9</li><li><span class="detail-label">Frameworks covered:</span> Cyber Essentials, DSPT, FCA SYSC, UK GDPR</li><li><span class="detail-label">Cyber Essentials mapped findings:</span> 5</li><li><span class="detail-label">DSPT mapped findings:</span> 3</li><li><span class="detail-label">FCA SYSC mapped findings:</span> 2</li><li><span class="detail-label">UK GDPR mapped findings:</span> 3</li></ul>
+        </section>
+
+        <section class="section-panel report-section">
+          <div class="section-heading">
+            <div>
+              <span class="section-kicker">Government-Facing Readiness</span>
+              <h2>Cyber Essentials Readiness</h2>
+              <p>Instead of burying Cyber Essentials in mapping notes, the report treats it as a primary readiness story for UK SMEs.</p>
+            </div>
+          </div>
+          <ul class="detail-list"><li><span class="detail-label">Profile:</span> Cyber Essentials readiness profile</li><li><span class="detail-label">Overall readiness score:</span> 33.33</li><li><span class="detail-label">Pillar count:</span> 5</li><li><span class="detail-label">Firewalls:</span> <span class="pill pill-status_gap">gap</span> (0.00)</li><li><span class="detail-label">Secure configuration:</span> <span class="pill pill-status_ready">ready</span> (100.00)</li><li><span class="detail-label">Access control:</span> <span class="pill pill-status_partial">partial</span> (66.67)</li><li><span class="detail-label">Malware protection:</span> <span class="pill pill-status_gap">gap</span> (0.00)</li><li><span class="detail-label">Security update management:</span> <span class="pill pill-status_gap">gap</span> (0.00)</li></ul>
+        </section>
+
+        <section class="section-panel report-section">
+          <div class="section-heading">
+            <div>
+              <span class="section-kicker">Board Output</span>
+              <h2>Executive Pack</h2>
+              <p>The executive layer is now visually closer to a board-ready briefing than a raw export, which helps with demos, case studies, and leadership conversations.</p>
+            </div>
+          </div>
+          <ul class="detail-list"><li><span class="detail-label">Pack:</span> CRIS-SME Executive Pack</li><li><span class="detail-label">Board message:</span> CRIS-SME highlights the highest-risk cloud governance issues, the most practical fixes for the next 30 days, and the organisation&#x27;s current UK-readiness signals.</li><li><span class="detail-label">Benchmark status:</span> insufficient_dataset</li><li><span class="detail-label">Benchmark note:</span> Benchmark comparison is scaffolded, but fewer than three comparable peer observations are currently available for a meaningful percentile ranking.</li><li><span class="detail-label">NET-001:</span> Administrative services are exposed to the public internet (High, 72.12)</li><li><span class="detail-label">IAM-001:</span> Privileged role assignments without MFA enforcement (High, 67.97)</li><li><span class="detail-label">DATA-001:</span> Public storage access increases data exposure risk (Planned, 48.35)</li><li><span class="detail-label">IOT-005:</span> IoT Hub public network access is not sufficiently constrained (Planned, 47.25)</li><li><span class="detail-label">NET-002:</span> Network security group rules are broader than expected (Planned, 44.71)</li></ul>
+        </section>
+
+        <section class="board-brief screen-only report-section">
+          
+    <span class="section-kicker" style="color: rgba(242, 248, 251, 0.72);">Board Brief</span>
+    <h2>Executive Briefing Snapshot</h2>
+    <p>CRIS-SME highlights the highest-risk cloud governance issues, the most practical fixes for the next 30 days, and the organisation&#x27;s current UK-readiness signals.</p>
+    <div class="board-brief-grid">
+      <div class="board-brief-card">
+        <h3>Overall risk</h3>
+        <strong>38.79</strong>
+        <p>Managed but material risk</p>
+      </div>
+      <div class="board-brief-card">
+        <h3>Cyber Essentials</h3>
+        <strong>33.33</strong>
+        <p>Current readiness score across the five technical themes.</p>
+      </div>
+      <div class="board-brief-card">
+        <h3>Insurance readiness</h3>
+        <strong>25.0</strong>
+        <p>Evidence-pack readiness score for insurer-style questions.</p>
+      </div>
+      <div class="board-brief-card">
+        <h3>Benchmark position</h3>
+        <strong style="font-size: 1.15rem; line-height: 1.2;">insufficient dataset</strong>
+        <p>Benchmark comparison is scaffolded, but fewer than three comparable peer observations are currently available for a meaningful percentile ranking.</p>
+      </div>
+    </div>
+    <div style="margin-top: 18px;">
+      <h3 style="margin: 0 0 12px; font-size: 1rem; color: rgba(242, 248, 251, 0.82);">Immediate actions</h3>
+      <ul class="action-list">
+            <li>
+              <strong>NET-001 | Administrative services are exposed to the public internet</strong>
+              <span>High priority, 72.12 risk score, medium remediation cost.</span>
+            </li>
+            
+            <li>
+              <strong>IAM-001 | Privileged role assignments without MFA enforcement</strong>
+              <span>High priority, 67.97 risk score, free remediation cost.</span>
+            </li>
+            
+            <li>
+              <strong>DATA-001 | Public storage access increases data exposure risk</strong>
+              <span>Planned priority, 48.35 risk score, free remediation cost.</span>
+            </li>
+            
+                        <li>
+                          <strong>Free this week</strong>
+                          <span>5 recommended free actions covering 236.51 cumulative risk score.</span>
+                        </li>
+                        </ul>
+    </div>
+    
+        </section>
+
+        <section class="section-panel report-section">
+          <div class="section-heading">
+            <div>
+              <span class="section-kicker">Narration Layer</span>
+              <h2>Plain-Language Narrator</h2>
+              <p>The optional narrator remains clearly secondary to the deterministic model, preserving trust and explainability.</p>
+            </div>
+          </div>
+          <p>The plain-language narrator is not enabled for this report.</p>
+        </section>
+
+        <section id="risks" class="report-section">
+          <div class="section-heading">
+            <div>
+              <span class="section-kicker">Risk Register</span>
+              <h2>Prioritized Risks</h2>
+              <p>This remains the evidence-rich core of the report, but it now sits under clearer context, triage, and action framing so the whole document scans more like a mature security product artifact.</p>
+            </div>
+            <a class="section-anchor" href="#overview">Back to top</a>
+          </div>
+          <div class="table-panel">
+            <table>
+              <thead>
+                <tr>
+                  <th>Control</th>
+                  <th>Category</th>
+                  <th>Severity</th>
+                  <th>Priority</th>
+                  <th>Score</th>
+                  <th>Organization</th>
+                  <th>Evidence</th>
+                  <th>Remediation</th>
+                  <th>Mappings</th>
+                </tr>
+              </thead>
+              <tbody>
+                
+    <tr>
+      <td><strong>NET-001</strong><br />Administrative services are exposed to the public internet</td>
+      <td>Network</td>
+      <td>Critical</td>
+      <td><span class="pill pill-high">High</span></td>
+      <td>72.12<details class="score-breakdown"><summary>Score breakdown</summary><ul><li><strong>Severity weight:</strong> 10.0</li><li><strong>Likelihood factor:</strong> 1.6</li><li><strong>Data factor:</strong> 1.28</li><li><strong>Confidence factor:</strong> 0.985</li><li><strong>Remediation factor:</strong> 1.0525</li><li><strong>Observed confidence:</strong> 0.94</li><li><strong>Calibrated confidence:</strong> 0.95</li><li><strong>Calibration status:</strong> validated</li><li><strong>Raw score:</strong> 21.2319</li><li><strong>Normalized score:</strong> 72.12</li></ul></details></td>
+      <td>SIGI Technologies</td>
+      <td><ul class="evidence"><li>1 asset(s) expose RDP to the public internet</li><li>1 asset(s) expose SSH to the public internet</li></ul></td>
+      <td>Restrict SSH and RDP exposure with private access paths, VPN, or just-in-time controls.<br /><span class="pill pill-monitor">medium</span><br />Value score: 38.98<br />Budget fits: under_750_month</td>
+      <td><ul class="mapping"><li>CIS Azure Foundations Benchmark 6.1</li><li>ISO 27001 A.8.20</li><li>Cyber Essentials Firewalls</li><li>FCA SYSC 3.2.6R</li></ul></td>
+    </tr>
+    
+    <tr>
+      <td><strong>IAM-001</strong><br />Privileged role assignments without MFA enforcement</td>
+      <td>IAM</td>
+      <td>Critical</td>
+      <td><span class="pill pill-high">High</span></td>
+      <td>67.97<details class="score-breakdown"><summary>Score breakdown</summary><ul><li><strong>Severity weight:</strong> 10.0</li><li><strong>Likelihood factor:</strong> 1.52</li><li><strong>Data factor:</strong> 1.28</li><li><strong>Confidence factor:</strong> 0.9772</li><li><strong>Remediation factor:</strong> 1.0525</li><li><strong>Observed confidence:</strong> 0.96</li><li><strong>Calibrated confidence:</strong> 0.924</li><li><strong>Calibration status:</strong> provisional</li><li><strong>Raw score:</strong> 20.0106</li><li><strong>Normalized score:</strong> 67.97</li></ul></details></td>
+      <td>SIGI Technologies</td>
+      <td><ul class="evidence"><li>1 privileged account(s) do not have MFA enabled</li><li>Conditional access for privileged administrators was not observable and is treated as unmet for deterministic scoring</li></ul></td>
+      <td>Require MFA and admin-focused conditional access for privileged identities.<br /><span class="pill pill-monitor">free</span><br />Value score: 67.97<br />Budget fits: free_this_week, under_200_month, under_750_month</td>
+      <td><ul class="mapping"><li>CIS Azure Foundations Benchmark 1.4</li><li>ISO 27001 A.5.17</li><li>NIST PR.AA-02</li><li>Cyber Essentials Access control</li><li>UK GDPR Article 32</li><li>FCA SYSC 3.2.6R</li></ul></td>
+    </tr>
+    
+    <tr>
+      <td><strong>DATA-001</strong><br />Public storage access increases data exposure risk</td>
+      <td>Data</td>
+      <td>High</td>
+      <td><span class="pill pill-planned">Planned</span></td>
+      <td>48.35<details class="score-breakdown"><summary>Score breakdown</summary><ul><li><strong>Severity weight:</strong> 7.0</li><li><strong>Likelihood factor:</strong> 1.56</li><li><strong>Data factor:</strong> 1.28</li><li><strong>Confidence factor:</strong> 0.9745</li><li><strong>Remediation factor:</strong> 1.045</li><li><strong>Observed confidence:</strong> 0.92</li><li><strong>Calibrated confidence:</strong> 0.915</li><li><strong>Calibration status:</strong> validated</li><li><strong>Raw score:</strong> 14.2341</li><li><strong>Normalized score:</strong> 48.35</li></ul></details></td>
+      <td>SIGI Technologies</td>
+      <td><ul class="evidence"><li>1 storage asset(s) allow public access</li></ul></td>
+      <td>Disable anonymous or public storage access and review data exposure paths.<br /><span class="pill pill-monitor">free</span><br />Value score: 48.35<br />Budget fits: free_this_week, under_200_month, under_750_month</td>
+      <td><ul class="mapping"><li>GDPR Article 32</li><li>ISO 27001 A.8.12</li><li>UK GDPR Article 32</li></ul></td>
+    </tr>
+    
+    <tr>
+      <td><strong>IOT-005</strong><br />IoT Hub public network access is not sufficiently constrained</td>
+      <td>Healthcare IoT</td>
+      <td>High</td>
+      <td><span class="pill pill-planned">Planned</span></td>
+      <td>47.25<details class="score-breakdown"><summary>Score breakdown</summary><ul><li><strong>Severity weight:</strong> 7.0</li><li><strong>Likelihood factor:</strong> 1.52</li><li><strong>Data factor:</strong> 1.28</li><li><strong>Confidence factor:</strong> 0.9568</li><li><strong>Remediation factor:</strong> 1.0675</li><li><strong>Observed confidence:</strong> 0.88</li><li><strong>Calibrated confidence:</strong> 0.856</li><li><strong>Calibration status:</strong> provisional</li><li><strong>Raw score:</strong> 13.9104</li><li><strong>Normalized score:</strong> 47.25</li></ul></details></td>
+      <td>SIGI Technologies</td>
+      <td><ul class="evidence"><li>IoT Hub public network access is enabled</li><li>No IP filter rules or private endpoints were observed for the hub scope</li></ul></td>
+      <td>Restrict IoT Hub public access using IP filters, private endpoints, or documented clinical network boundaries.<br /><span class="pill pill-monitor">low</span><br />Value score: 35.00<br />Budget fits: under_200_month, under_750_month</td>
+      <td><ul class="mapping"><li>NCSC CAF B4 System security</li><li>NHS DSPT Network security</li><li>Cyber Essentials Firewalls</li></ul></td>
+    </tr>
+    
+    <tr>
+      <td><strong>NET-002</strong><br />Network security group rules are broader than expected</td>
+      <td>Network</td>
+      <td>High</td>
+      <td><span class="pill pill-planned">Planned</span></td>
+      <td>44.71<details class="score-breakdown"><summary>Score breakdown</summary><ul><li><strong>Severity weight:</strong> 7.0</li><li><strong>Likelihood factor:</strong> 1.44</li><li><strong>Data factor:</strong> 1.28</li><li><strong>Confidence factor:</strong> 0.9625</li><li><strong>Remediation factor:</strong> 1.06</li><li><strong>Observed confidence:</strong> 0.86</li><li><strong>Calibrated confidence:</strong> 0.875</li><li><strong>Calibration status:</strong> validated</li><li><strong>Raw score:</strong> 13.1637</li><li><strong>Normalized score:</strong> 44.71</li></ul></details></td>
+      <td>SIGI Technologies</td>
+      <td><ul class="evidence"><li>2 permissive NSG rule(s) were identified</li></ul></td>
+      <td>Tighten overly permissive network rules to least-privilege source and port scopes.<br /><span class="pill pill-monitor">free</span><br />Value score: 44.71<br />Budget fits: free_this_week, under_200_month, under_750_month</td>
+      <td><ul class="mapping"><li>CIS Azure Foundations Benchmark 6.1</li><li>NIST PR.AC-05</li><li>Cyber Essentials Firewalls</li></ul></td>
+    </tr>
+    
+    <tr>
+      <td><strong>CMP-001</strong><br />Critical workloads remain unpatched beyond acceptable risk tolerance</td>
+      <td>Compute/Workloads</td>
+      <td>High</td>
+      <td><span class="pill pill-planned">Planned</span></td>
+      <td>42.69<details class="score-breakdown"><summary>Score breakdown</summary><ul><li><strong>Severity weight:</strong> 7.0</li><li><strong>Likelihood factor:</strong> 1.36</li><li><strong>Data factor:</strong> 1.28</li><li><strong>Confidence factor:</strong> 0.9661</li><li><strong>Remediation factor:</strong> 1.0675</li><li><strong>Observed confidence:</strong> 0.92</li><li><strong>Calibrated confidence:</strong> 0.887</li><li><strong>Calibration status:</strong> provisional</li><li><strong>Raw score:</strong> 12.5672</li><li><strong>Normalized score:</strong> 42.69</li></ul></details></td>
+      <td>SIGI Technologies</td>
+      <td><ul class="evidence"><li>1 critical VM(s) require urgent patching</li></ul></td>
+      <td>Patch critical workloads and enforce a stronger recurring patch policy.<br /><span class="pill pill-monitor">medium</span><br />Value score: 23.08<br />Budget fits: under_750_month</td>
+      <td><ul class="mapping"><li>Microsoft Cloud Security Benchmark PV-6</li><li>NIST PR.PS-03</li><li>Cyber Essentials Security update management</li><li>DSPT NDG Standard 6</li></ul></td>
+    </tr>
+    
+    <tr>
+      <td><strong>DATA-002</strong><br />Data stores lack expected encryption protections</td>
+      <td>Data</td>
+      <td>High</td>
+      <td><span class="pill pill-planned">Planned</span></td>
+      <td>42.36<details class="score-breakdown"><summary>Score breakdown</summary><ul><li><strong>Severity weight:</strong> 7.0</li><li><strong>Likelihood factor:</strong> 1.36</li><li><strong>Data factor:</strong> 1.28</li><li><strong>Confidence factor:</strong> 0.9655</li><li><strong>Remediation factor:</strong> 1.06</li><li><strong>Observed confidence:</strong> 0.9</li><li><strong>Calibrated confidence:</strong> 0.885</li><li><strong>Calibration status:</strong> validated</li><li><strong>Raw score:</strong> 12.4711</li><li><strong>Normalized score:</strong> 42.36</li></ul></details></td>
+      <td>SIGI Technologies</td>
+      <td><ul class="evidence"><li>1 data store(s) appear to be unencrypted at rest</li></ul></td>
+      <td>Enable encryption at rest for affected storage and database services.<br /><span class="pill pill-monitor">low</span><br />Value score: 31.38<br />Budget fits: under_200_month, under_750_month</td>
+      <td><ul class="mapping"><li>ISO 27001 A.8.24</li><li>NIST PR.DS-01</li><li>UK GDPR Article 32</li></ul></td>
+    </tr>
+    
+    <tr>
+      <td><strong>NET-004</strong><br />Private endpoint coverage is incomplete for sensitive services</td>
+      <td>Network</td>
+      <td>High</td>
+      <td><span class="pill pill-planned">Planned</span></td>
+      <td>41.93<details class="score-breakdown"><summary>Score breakdown</summary><ul><li><strong>Severity weight:</strong> 7.0</li><li><strong>Likelihood factor:</strong> 1.36</li><li><strong>Data factor:</strong> 1.28</li><li><strong>Confidence factor:</strong> 0.9424</li><li><strong>Remediation factor:</strong> 1.075</li><li><strong>Observed confidence:</strong> 0.82</li><li><strong>Calibrated confidence:</strong> 0.808</li><li><strong>Calibration status:</strong> provisional</li><li><strong>Raw score:</strong> 12.345</li><li><strong>Normalized score:</strong> 41.93</li></ul></details></td>
+      <td>SIGI Technologies</td>
+      <td><ul class="evidence"><li>5 required private endpoint(s) are not configured</li><li>0 of 5 expected private endpoint(s) are currently deployed</li></ul></td>
+      <td>Extend private endpoints to sensitive services that should not rely on public routing.<br /><span class="pill pill-monitor">medium</span><br />Value score: 22.66<br />Budget fits: under_750_month</td>
+      <td><ul class="mapping"><li>Microsoft Cloud Security Benchmark NS-2</li><li>NIST PR.AC-03</li></ul></td>
+    </tr>
+    
+    <tr>
+      <td><strong>IOT-002</strong><br />IoT shared access policies exceed least-privilege expectations</td>
+      <td>Healthcare IoT</td>
+      <td>High</td>
+      <td><span class="pill pill-planned">Planned</span></td>
+      <td>41.60<details class="score-breakdown"><summary>Score breakdown</summary><ul><li><strong>Severity weight:</strong> 7.0</li><li><strong>Likelihood factor:</strong> 1.36</li><li><strong>Data factor:</strong> 1.28</li><li><strong>Confidence factor:</strong> 0.9481</li><li><strong>Remediation factor:</strong> 1.06</li><li><strong>Observed confidence:</strong> 0.86</li><li><strong>Calibrated confidence:</strong> 0.827</li><li><strong>Calibration status:</strong> provisional</li><li><strong>Raw score:</strong> 12.2464</li><li><strong>Normalized score:</strong> 41.6</li></ul></details></td>
+      <td>SIGI Technologies</td>
+      <td><ul class="evidence"><li>1 IoT shared access policie(s) were observed</li><li>1 shared access policie(s) appear overbroad</li></ul></td>
+      <td>Reduce IoT shared access policies, remove overbroad permissions, and rotate keys through governed operations.<br /><span class="pill pill-monitor">free</span><br />Value score: 41.60<br />Budget fits: free_this_week, under_200_month, under_750_month</td>
+      <td><ul class="mapping"><li>NCSC CAF B2 Identity and access control</li><li>NHS DSPT Security management</li><li>IEC 62443 account management</li></ul></td>
+    </tr>
+    
+    <tr>
+      <td><strong>IOT-001</strong><br />Cloud device-identity registration posture is weak or unobservable</td>
+      <td>Healthcare IoT</td>
+      <td>High</td>
+      <td><span class="pill pill-planned">Planned</span></td>
+      <td>40.65<details class="score-breakdown"><summary>Score breakdown</summary><ul><li><strong>Severity weight:</strong> 7.0</li><li><strong>Likelihood factor:</strong> 1.32</li><li><strong>Data factor:</strong> 1.28</li><li><strong>Confidence factor:</strong> 0.9412</li><li><strong>Remediation factor:</strong> 1.075</li><li><strong>Observed confidence:</strong> 0.84</li><li><strong>Calibrated confidence:</strong> 0.804</li><li><strong>Calibration status:</strong> provisional</li><li><strong>Raw score:</strong> 11.9666</li><li><strong>Normalized score:</strong> 40.65</li></ul></details></td>
+      <td>SIGI Technologies</td>
+      <td><ul class="evidence"><li>Certificate-authority based device authentication was not observed</li></ul></td>
+      <td>Inventory cloud-registered IoMT device identities and prefer certificate-based authentication for clinical device connections while validating device-side credential storage separately.<br /><span class="pill pill-monitor">medium</span><br />Value score: 21.97<br />Budget fits: under_750_month</td>
+      <td><ul class="mapping"><li>NCSC CAF B2 Identity and access control</li><li>NHS DSPT Access control</li><li>IEC 80001-1 risk management</li></ul></td>
+    </tr>
+    
+    <tr>
+      <td><strong>CMP-002</strong><br />Endpoint protection coverage is below the expected workload baseline</td>
+      <td>Compute/Workloads</td>
+      <td>High</td>
+      <td><span class="pill pill-planned">Planned</span></td>
+      <td>39.53<details class="score-breakdown"><summary>Score breakdown</summary><ul><li><strong>Severity weight:</strong> 7.0</li><li><strong>Likelihood factor:</strong> 1.28</li><li><strong>Data factor:</strong> 1.28</li><li><strong>Confidence factor:</strong> 0.964</li><li><strong>Remediation factor:</strong> 1.0525</li><li><strong>Observed confidence:</strong> 0.88</li><li><strong>Calibrated confidence:</strong> 0.88</li><li><strong>Calibration status:</strong> validated</li><li><strong>Raw score:</strong> 11.6364</li><li><strong>Normalized score:</strong> 39.53</li></ul></details></td>
+      <td>SIGI Technologies</td>
+      <td><ul class="evidence"><li>Endpoint protection coverage is approximately 0%</li></ul></td>
+      <td>Deploy endpoint protection or security agents to uncovered workloads.<br /><span class="pill pill-monitor">medium</span><br />Value score: 21.37<br />Budget fits: under_750_month</td>
+      <td><ul class="mapping"><li>Microsoft Cloud Security Benchmark LT-4</li><li>NIST PR.PS-01</li><li>Cyber Essentials Malware protection</li></ul></td>
+    </tr>
+    
+    <tr>
+      <td><strong>CMP-003</strong><br />Workload hardening baseline coverage is incomplete</td>
+      <td>Compute/Workloads</td>
+      <td>High</td>
+      <td><span class="pill pill-planned">Planned</span></td>
+      <td>38.49<details class="score-breakdown"><summary>Score breakdown</summary><ul><li><strong>Severity weight:</strong> 7.0</li><li><strong>Likelihood factor:</strong> 1.24</li><li><strong>Data factor:</strong> 1.28</li><li><strong>Confidence factor:</strong> 0.9487</li><li><strong>Remediation factor:</strong> 1.075</li><li><strong>Observed confidence:</strong> 0.85</li><li><strong>Calibrated confidence:</strong> 0.829</li><li><strong>Calibration status:</strong> provisional</li><li><strong>Raw score:</strong> 11.331</li><li><strong>Normalized score:</strong> 38.49</li></ul></details></td>
+      <td>SIGI Technologies</td>
+      <td><ul class="evidence"><li>Hardened baseline coverage is approximately 0%</li></ul></td>
+      <td>Apply a hardened workload baseline across compute resources and administrative settings.<br /><span class="pill pill-monitor">medium</span><br />Value score: 20.81<br />Budget fits: under_750_month</td>
+      <td><ul class="mapping"><li>CIS Controls 4.1</li><li>NIST PR.IP-01</li></ul></td>
+    </tr>
+    
+    <tr>
+      <td><strong>DATA-003</strong><br />Backup and retention coverage fall below resilience expectations</td>
+      <td>Data</td>
+      <td>High</td>
+      <td><span class="pill pill-planned">Planned</span></td>
+      <td>37.58<details class="score-breakdown"><summary>Score breakdown</summary><ul><li><strong>Severity weight:</strong> 7.0</li><li><strong>Likelihood factor:</strong> 1.2</li><li><strong>Data factor:</strong> 1.28</li><li><strong>Confidence factor:</strong> 0.9505</li><li><strong>Remediation factor:</strong> 1.0825</li><li><strong>Observed confidence:</strong> 0.85</li><li><strong>Calibrated confidence:</strong> 0.835</li><li><strong>Calibration status:</strong> provisional</li><li><strong>Raw score:</strong> 11.0629</li><li><strong>Normalized score:</strong> 37.58</li></ul></details></td>
+      <td>SIGI Technologies</td>
+      <td><ul class="evidence"><li>Backup coverage is only 60%</li><li>Retention policy coverage is only 60%</li></ul></td>
+      <td>Increase backup and retention coverage for business-critical data stores.<br /><span class="pill pill-monitor">medium</span><br />Value score: 20.31<br />Budget fits: under_750_month</td>
+      <td><ul class="mapping"><li>ISO 27001 A.8.13</li><li>NIST PR.DS-04</li><li>DSPT NDG Standard 7</li></ul></td>
+    </tr>
+    
+    <tr>
+      <td><strong>MON-003</strong><br />Security monitoring coverage is below the expected baseline</td>
+      <td>Monitoring/Logging</td>
+      <td>High</td>
+      <td><span class="pill pill-planned">Planned</span></td>
+      <td>36.94<details class="score-breakdown"><summary>Score breakdown</summary><ul><li><strong>Severity weight:</strong> 7.0</li><li><strong>Likelihood factor:</strong> 1.2</li><li><strong>Data factor:</strong> 1.28</li><li><strong>Confidence factor:</strong> 0.9475</li><li><strong>Remediation factor:</strong> 1.0675</li><li><strong>Observed confidence:</strong> 0.84</li><li><strong>Calibrated confidence:</strong> 0.825</li><li><strong>Calibration status:</strong> provisional</li><li><strong>Raw score:</strong> 10.8752</li><li><strong>Normalized score:</strong> 36.94</li></ul></details></td>
+      <td>SIGI Technologies</td>
+      <td><ul class="evidence"><li>Security monitoring coverage is approximately 0%</li></ul></td>
+      <td>Expand security monitoring coverage across workloads and key cloud services.<br /><span class="pill pill-monitor">medium</span><br />Value score: 19.97<br />Budget fits: under_750_month</td>
+      <td><ul class="mapping"><li>Microsoft Cloud Security Benchmark LT-1</li><li>NIST DE.CM-02</li></ul></td>
+    </tr>
+    
+    <tr>
+      <td><strong>CMP-004</strong><br />Workload backup agent coverage is below resilience expectations</td>
+      <td>Compute/Workloads</td>
+      <td>High</td>
+      <td><span class="pill pill-planned">Planned</span></td>
+      <td>36.85<details class="score-breakdown"><summary>Score breakdown</summary><ul><li><strong>Severity weight:</strong> 7.0</li><li><strong>Likelihood factor:</strong> 1.2</li><li><strong>Data factor:</strong> 1.28</li><li><strong>Confidence factor:</strong> 0.952</li><li><strong>Remediation factor:</strong> 1.06</li><li><strong>Observed confidence:</strong> 0.83</li><li><strong>Calibrated confidence:</strong> 0.84</li><li><strong>Calibration status:</strong> validated</li><li><strong>Raw score:</strong> 10.8501</li><li><strong>Normalized score:</strong> 36.85</li></ul></details></td>
+      <td>SIGI Technologies</td>
+      <td><ul class="evidence"><li>Workload backup agent coverage is approximately 0%</li></ul></td>
+      <td>Enable workload backup protections for critical virtual machines and services.<br /><span class="pill pill-monitor">medium</span><br />Value score: 19.92<br />Budget fits: under_750_month</td>
+      <td><ul class="mapping"><li>ISO 27001 A.8.13</li><li>NIST PR.DS-04</li></ul></td>
+    </tr>
+    
+    <tr>
+      <td><strong>MON-001</strong><br />Activity log retention is below governance and investigation expectations</td>
+      <td>Monitoring/Logging</td>
+      <td>High</td>
+      <td><span class="pill pill-planned">Planned</span></td>
+      <td>35.79<details class="score-breakdown"><summary>Score breakdown</summary><ul><li><strong>Severity weight:</strong> 7.0</li><li><strong>Likelihood factor:</strong> 1.16</li><li><strong>Data factor:</strong> 1.28</li><li><strong>Confidence factor:</strong> 0.97</li><li><strong>Remediation factor:</strong> 1.045</li><li><strong>Observed confidence:</strong> 0.9</li><li><strong>Calibrated confidence:</strong> 0.9</li><li><strong>Calibration status:</strong> validated</li><li><strong>Raw score:</strong> 10.5355</li><li><strong>Normalized score:</strong> 35.79</li></ul></details></td>
+      <td>SIGI Technologies</td>
+      <td><ul class="evidence"><li>Activity logs are retained for only 0 day(s)</li></ul></td>
+      <td>Increase log retention to support investigation, governance review, and evidence preservation.<br /><span class="pill pill-monitor">low</span><br />Value score: 26.51<br />Budget fits: under_200_month, under_750_month</td>
+      <td><ul class="mapping"><li>CIS Azure Foundations Benchmark 5.2</li><li>NIST DE.CM-01</li><li>DSPT NDG Standard 6</li></ul></td>
+    </tr>
+    
+    <tr>
+      <td><strong>GOV-003</strong><br />Policy assignment coverage is below the baseline governance threshold</td>
+      <td>Cost/Governance Hygiene</td>
+      <td>High</td>
+      <td><span class="pill pill-planned">Planned</span></td>
+      <td>33.88<details class="score-breakdown"><summary>Score breakdown</summary><ul><li><strong>Severity weight:</strong> 7.0</li><li><strong>Likelihood factor:</strong> 1.08</li><li><strong>Data factor:</strong> 1.28</li><li><strong>Confidence factor:</strong> 0.9655</li><li><strong>Remediation factor:</strong> 1.0675</li><li><strong>Observed confidence:</strong> 0.87</li><li><strong>Calibrated confidence:</strong> 0.885</li><li><strong>Calibration status:</strong> validated</li><li><strong>Raw score:</strong> 9.9736</li><li><strong>Normalized score:</strong> 33.88</li></ul></details></td>
+      <td>SIGI Technologies</td>
+      <td><ul class="evidence"><li>Baseline policy assignment coverage is approximately 0%</li></ul></td>
+      <td>Increase baseline policy assignment coverage for governance and compliance controls.<br /><span class="pill pill-monitor">free</span><br />Value score: 33.88<br />Budget fits: free_this_week, under_200_month, under_750_month</td>
+      <td><ul class="mapping"><li>Azure Policy Baseline</li><li>NIST GV.PO-01</li></ul></td>
+    </tr>
+    
+    <tr>
+      <td><strong>IAM-003</strong><br />Stale service principals or credentials require review</td>
+      <td>IAM</td>
+      <td>Medium</td>
+      <td><span class="pill pill-monitor">Monitor</span></td>
+      <td>23.34<details class="score-breakdown"><summary>Score breakdown</summary><ul><li><strong>Severity weight:</strong> 4.0</li><li><strong>Likelihood factor:</strong> 1.32</li><li><strong>Data factor:</strong> 1.28</li><li><strong>Confidence factor:</strong> 0.9391</li><li><strong>Remediation factor:</strong> 1.0825</li><li><strong>Observed confidence:</strong> 0.8</li><li><strong>Calibrated confidence:</strong> 0.797</li><li><strong>Calibration status:</strong> provisional</li><li><strong>Raw score:</strong> 6.8704</li><li><strong>Normalized score:</strong> 23.34</li></ul></details></td>
+      <td>SIGI Technologies</td>
+      <td><ul class="evidence"><li>1 stale service principal(s) or credential set(s) were identified</li></ul></td>
+      <td>Rotate or remove stale service principal credentials and disable unused identities.<br /><span class="pill pill-monitor">free</span><br />Value score: 23.34<br />Budget fits: free_this_week, under_200_month, under_750_month</td>
+      <td><ul class="mapping"><li>Microsoft Cloud Security Benchmark IM-3</li><li>NIST PR.AA-01</li></ul></td>
+    </tr>
+    
+    <tr>
+      <td><strong>IOT-006</strong><br />Conditional private endpoint and network isolation posture is weak</td>
+      <td>Healthcare IoT</td>
+      <td>Medium</td>
+      <td><span class="pill pill-monitor">Monitor</span></td>
+      <td>23.33<details class="score-breakdown"><summary>Score breakdown</summary><ul><li><strong>Severity weight:</strong> 4.0</li><li><strong>Likelihood factor:</strong> 1.32</li><li><strong>Data factor:</strong> 1.28</li><li><strong>Confidence factor:</strong> 0.9388</li><li><strong>Remediation factor:</strong> 1.0825</li><li><strong>Observed confidence:</strong> 0.82</li><li><strong>Calibrated confidence:</strong> 0.796</li><li><strong>Calibration status:</strong> provisional</li><li><strong>Raw score:</strong> 6.8682</li><li><strong>Normalized score:</strong> 23.33</li></ul></details></td>
+      <td>SIGI Technologies</td>
+      <td><ul class="evidence"><li>IoT Hub public network access is enabled without IP filter evidence</li><li>Certificate-authority based device authentication was not observed</li><li>No private endpoint was observed for the IoT Hub scope</li></ul></td>
+      <td>Deploy private endpoints for sensitive IoMT telemetry services where public routing lacks documented and observable compensating controls.<br /><span class="pill pill-monitor">medium</span><br />Value score: 12.61<br />Budget fits: under_750_month</td>
+      <td><ul class="mapping"><li>NCSC CAF B4 System security</li><li>NHS DSPT Network security</li><li>UK GDPR Article 32</li></ul></td>
+    </tr>
+    
+    <tr>
+      <td><strong>IOT-008</strong><br />IoT credential governance is not linked to managed secret controls</td>
+      <td>Healthcare IoT</td>
+      <td>Medium</td>
+      <td><span class="pill pill-monitor">Monitor</span></td>
+      <td>21.98<details class="score-breakdown"><summary>Score breakdown</summary><ul><li><strong>Severity weight:</strong> 4.0</li><li><strong>Likelihood factor:</strong> 1.28</li><li><strong>Data factor:</strong> 1.28</li><li><strong>Confidence factor:</strong> 0.9184</li><li><strong>Remediation factor:</strong> 1.075</li><li><strong>Observed confidence:</strong> 0.74</li><li><strong>Calibrated confidence:</strong> 0.728</li><li><strong>Calibration status:</strong> provisional</li><li><strong>Raw score:</strong> 6.4702</li><li><strong>Normalized score:</strong> 21.98</li></ul></details></td>
+      <td>SIGI Technologies</td>
+      <td><ul class="evidence"><li>IoT credentials were not linked to a governed key vault path</li><li>IoT credential rotation evidence was not observable</li></ul></td>
+      <td>Store and rotate IoT credentials through governed key-management services with owner accountability.<br /><span class="pill pill-monitor">low</span><br />Value score: 16.28<br />Budget fits: under_200_month, under_750_month</td>
+      <td><ul class="mapping"><li>NCSC CAF B2 Identity and access control</li><li>NHS DSPT Access control</li><li>ISO 27001 A.8.24</li></ul></td>
+    </tr>
+    
+    <tr>
+      <td><strong>IOT-003</strong><br />IoT diagnostic logging is incomplete for clinical telemetry investigation</td>
+      <td>Healthcare IoT</td>
+      <td>Medium</td>
+      <td><span class="pill pill-monitor">Monitor</span></td>
+      <td>21.77<details class="score-breakdown"><summary>Score breakdown</summary><ul><li><strong>Severity weight:</strong> 4.0</li><li><strong>Likelihood factor:</strong> 1.24</li><li><strong>Data factor:</strong> 1.28</li><li><strong>Confidence factor:</strong> 0.9592</li><li><strong>Remediation factor:</strong> 1.0525</li><li><strong>Observed confidence:</strong> 0.9</li><li><strong>Calibrated confidence:</strong> 0.864</li><li><strong>Calibration status:</strong> provisional</li><li><strong>Raw score:</strong> 6.4095</li><li><strong>Normalized score:</strong> 21.77</li></ul></details></td>
+      <td>SIGI Technologies</td>
+      <td><ul class="evidence"><li>IoT Hub diagnostic settings were not enabled</li><li>No diagnostic destination was observed for IoT telemetry logs</li><li>IoT diagnostic category coverage is below the 80% baseline</li></ul></td>
+      <td>Enable IoT Hub diagnostic settings and route core diagnostic categories to a monitored destination.<br /><span class="pill pill-monitor">low</span><br />Value score: 16.13<br />Budget fits: under_200_month, under_750_month</td>
+      <td><ul class="mapping"><li>NCSC CAF C1 Security monitoring</li><li>NHS DSPT Logging and monitoring</li><li>ISO 27001 A.8.15</li></ul></td>
+    </tr>
+    
+    <tr>
+      <td><strong>IOT-004</strong><br />Defender for IoT or equivalent security monitoring is not evidenced</td>
+      <td>Healthcare IoT</td>
+      <td>Medium</td>
+      <td><span class="pill pill-monitor">Monitor</span></td>
+      <td>21.50<details class="score-breakdown"><summary>Score breakdown</summary><ul><li><strong>Severity weight:</strong> 4.0</li><li><strong>Likelihood factor:</strong> 1.24</li><li><strong>Data factor:</strong> 1.28</li><li><strong>Confidence factor:</strong> 0.9208</li><li><strong>Remediation factor:</strong> 1.0825</li><li><strong>Observed confidence:</strong> 0.76</li><li><strong>Calibrated confidence:</strong> 0.736</li><li><strong>Calibration status:</strong> provisional</li><li><strong>Raw score:</strong> 6.3283</li><li><strong>Normalized score:</strong> 21.5</li></ul></details></td>
+      <td>SIGI Technologies</td>
+      <td><ul class="evidence"><li>Defender for IoT coverage was not observed for the hub scope</li></ul></td>
+      <td>Enable Defender for IoT or document an equivalent monitoring path for clinical IoT assets.<br /><span class="pill pill-monitor">medium</span><br />Value score: 11.62<br />Budget fits: under_750_month</td>
+      <td><ul class="mapping"><li>NCSC CAF C1 Security monitoring</li><li>NHS DSPT Security operations</li><li>IEC 62443 security monitoring</li></ul></td>
+    </tr>
+    
+    <tr>
+      <td><strong>IOT-007</strong><br />IoMT telemetry routing and retention are below clinical evidence expectations</td>
+      <td>Healthcare IoT</td>
+      <td>Medium</td>
+      <td><span class="pill pill-monitor">Monitor</span></td>
+      <td>20.93<details class="score-breakdown"><summary>Score breakdown</summary><ul><li><strong>Severity weight:</strong> 4.0</li><li><strong>Likelihood factor:</strong> 1.2</li><li><strong>Data factor:</strong> 1.28</li><li><strong>Confidence factor:</strong> 0.9328</li><li><strong>Remediation factor:</strong> 1.075</li><li><strong>Observed confidence:</strong> 0.8</li><li><strong>Calibrated confidence:</strong> 0.776</li><li><strong>Calibration status:</strong> provisional</li><li><strong>Raw score:</strong> 6.161</li><li><strong>Normalized score:</strong> 20.93</li></ul></details></td>
+      <td>SIGI Technologies</td>
+      <td><ul class="evidence"><li>No IoT telemetry message route was observed</li><li>IoT telemetry retention is 0 day(s), below the 30-day baseline</li><li>Telemetry storage governance was not observed</li></ul></td>
+      <td>Route IoMT telemetry to governed storage and retain sufficient logs for investigation and clinical safety review.<br /><span class="pill pill-monitor">low</span><br />Value score: 15.50<br />Budget fits: under_200_month, under_750_month</td>
+      <td><ul class="mapping"><li>NCSC CAF C1 Security monitoring</li><li>NHS DSPT Records management</li><li>ISO 27001 A.8.15</li></ul></td>
+    </tr>
+    
+    <tr>
+      <td><strong>IOT-009</strong><br />Clinical IoT alert routing is not operationally evidenced</td>
+      <td>Healthcare IoT</td>
+      <td>Medium</td>
+      <td><span class="pill pill-monitor">Monitor</span></td>
+      <td>20.30<details class="score-breakdown"><summary>Score breakdown</summary><ul><li><strong>Severity weight:</strong> 4.0</li><li><strong>Likelihood factor:</strong> 1.16</li><li><strong>Data factor:</strong> 1.28</li><li><strong>Confidence factor:</strong> 0.9427</li><li><strong>Remediation factor:</strong> 1.0675</li><li><strong>Observed confidence:</strong> 0.83</li><li><strong>Calibrated confidence:</strong> 0.809</li><li><strong>Calibration status:</strong> provisional</li><li><strong>Raw score:</strong> 5.9768</li><li><strong>Normalized score:</strong> 20.3</li></ul></details></td>
+      <td>SIGI Technologies</td>
+      <td><ul class="evidence"><li>No IoT-specific clinical or operational alert rule was observed</li><li>No action group was observed for IoT alert routing</li></ul></td>
+      <td>Create IoT-specific alert rules and route them to accountable clinical or operational responders.<br /><span class="pill pill-monitor">low</span><br />Value score: 15.04<br />Budget fits: under_200_month, under_750_month</td>
+      <td><ul class="mapping"><li>NCSC CAF C2 Proactive security event discovery</li><li>NHS DSPT Incident management</li><li>IEC 80001-1 operational risk</li></ul></td>
+    </tr>
+    
+    <tr>
+      <td><strong>GOV-004</strong><br />Orphaned resources increase governance and cost hygiene risk</td>
+      <td>Cost/Governance Hygiene</td>
+      <td>Medium</td>
+      <td><span class="pill pill-monitor">Monitor</span></td>
+      <td>17.87<details class="score-breakdown"><summary>Score breakdown</summary><ul><li><strong>Severity weight:</strong> 4.0</li><li><strong>Likelihood factor:</strong> 1.04</li><li><strong>Data factor:</strong> 1.28</li><li><strong>Confidence factor:</strong> 0.9388</li><li><strong>Remediation factor:</strong> 1.0525</li><li><strong>Observed confidence:</strong> 0.82</li><li><strong>Calibrated confidence:</strong> 0.796</li><li><strong>Calibration status:</strong> provisional</li><li><strong>Raw score:</strong> 5.2614</li><li><strong>Normalized score:</strong> 17.87</li></ul></details></td>
+      <td>SIGI Technologies</td>
+      <td><ul class="evidence"><li>2 orphaned resource(s) were identified</li></ul></td>
+      <td>Review and remove unused or orphaned resources to reduce cost and governance noise.<br /><span class="pill pill-monitor">free</span><br />Value score: 17.87<br />Budget fits: free_this_week, under_200_month, under_750_month</td>
+      <td><ul class="mapping"><li>Azure CAF Governance Discipline</li><li>FinOps Asset Hygiene</li></ul></td>
+    </tr>
+    
+    <tr>
+      <td><strong>GOV-002</strong><br />Budget alerting is not enabled for cloud cost governance</td>
+      <td>Cost/Governance Hygiene</td>
+      <td>Medium</td>
+      <td><span class="pill pill-monitor">Monitor</span></td>
+      <td>16.39<details class="score-breakdown"><summary>Score breakdown</summary><ul><li><strong>Severity weight:</strong> 4.0</li><li><strong>Likelihood factor:</strong> 0.96</li><li><strong>Data factor:</strong> 1.28</li><li><strong>Confidence factor:</strong> 0.946</li><li><strong>Remediation factor:</strong> 1.0375</li><li><strong>Observed confidence:</strong> 0.8</li><li><strong>Calibrated confidence:</strong> 0.82</li><li><strong>Calibration status:</strong> validated</li><li><strong>Raw score:</strong> 4.8241</li><li><strong>Normalized score:</strong> 16.39</li></ul></details></td>
+      <td>SIGI Technologies</td>
+      <td><ul class="evidence"><li>Budget or spend alerting is not configured</li></ul></td>
+      <td>Configure budget thresholds and spend alerts for cost oversight.<br /><span class="pill pill-monitor">free</span><br />Value score: 16.39<br />Budget fits: free_this_week, under_200_month, under_750_month</td>
+      <td><ul class="mapping"><li>FinOps Cost Governance</li><li>ISO 27001 A.5.36</li></ul></td>
+    </tr>
+    
+    <tr>
+      <td><strong>IOT-010</strong><br />Clinical-operational ownership boundaries require human validation</td>
+      <td>Healthcare IoT</td>
+      <td>Low</td>
+      <td><span class="pill pill-monitor">Monitor</span></td>
+      <td>4.72<details class="score-breakdown"><summary>Score breakdown</summary><ul><li><strong>Severity weight:</strong> 1.0</li><li><strong>Likelihood factor:</strong> 1.08</li><li><strong>Data factor:</strong> 1.28</li><li><strong>Confidence factor:</strong> 0.9475</li><li><strong>Remediation factor:</strong> 1.06</li><li><strong>Observed confidence:</strong> 0.9</li><li><strong>Calibrated confidence:</strong> 0.825</li><li><strong>Calibration status:</strong> provisional</li><li><strong>Raw score:</strong> 1.3884</li><li><strong>Normalized score:</strong> 4.72</li></ul></details></td>
+      <td>SIGI Technologies</td>
+      <td><ul class="evidence"><li>Clinical and operational ownership boundary was not documented in collected evidence</li><li>1 operational evidence item(s) require human confirmation</li></ul></td>
+      <td>Document clinical, operational, and supplier ownership boundaries for IoMT assets and validate device-level evidence manually.<br /><span class="pill pill-monitor">free</span><br />Value score: 4.72<br />Budget fits: free_this_week, under_200_month, under_750_month</td>
+      <td><ul class="mapping"><li>NCSC CAF A1 Governance</li><li>NHS DSPT Leadership and governance</li><li>IEC 80001-1 responsibility agreements</li></ul></td>
+    </tr>
+    
+    <tr>
+      <td><strong>IAM-005</strong><br />Identity governance observability is partial for this assessment scope</td>
+      <td>IAM</td>
+      <td>Low</td>
+      <td><span class="pill pill-monitor">Monitor</span></td>
+      <td>4.57<details class="score-breakdown"><summary>Score breakdown</summary><ul><li><strong>Severity weight:</strong> 1.0</li><li><strong>Likelihood factor:</strong> 1.04</li><li><strong>Data factor:</strong> 1.28</li><li><strong>Confidence factor:</strong> 0.9805</li><li><strong>Remediation factor:</strong> 1.03</li><li><strong>Observed confidence:</strong> 0.92</li><li><strong>Calibrated confidence:</strong> 0.935</li><li><strong>Calibration status:</strong> validated</li><li><strong>Raw score:</strong> 1.3444</li><li><strong>Normalized score:</strong> 4.57</li></ul></details></td>
+      <td>SIGI Technologies</td>
+      <td><ul class="evidence"><li>Subscription-scoped evidence was collected for privileged role assignments</li><li>Tenant-wide Entra controls such as conditional access were not directly observable in this run</li><li>The signed-in assessment identity exposed 1 Entra directory role(s)</li><li>The tenant directory-role catalog was partially visible with 43 active role entry(ies)</li></ul></td>
+      <td>Broaden tenant-level identity evidence collection before treating IAM coverage as complete.<br /><span class="pill pill-monitor">low</span><br />Value score: 3.39<br />Budget fits: under_200_month, under_750_month</td>
+      <td><ul class="mapping"><li>ISO 27001 A.5.15</li><li>NIST GV.RM-01</li></ul></td>
+    </tr>
+    
+              </tbody>
+            </table>
+          </div>
+          <p class="footnote">
+            This report uses the deterministic CRIS-SME scoring model and preserves collection provenance
+            so reviewers can distinguish live cloud evidence from mock or synthetic posture inputs.
+          </p>
+        </section>
+      </main>
+    </div>
+  </body>
+</html>

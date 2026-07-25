@@ -1,0 +1,4460 @@
+{
+  "graph_schema_version": "1.0.0",
+  "graph_model": "cris_sme_decision_provenance_graph_v1",
+  "node_count": 164,
+  "edge_count": 220,
+  "path_count": 28,
+  "node_type_counts": {
+    "evidence_snapshot": 1,
+    "policy_pack": 1,
+    "assessment_assurance": 1,
+    "assessment_replay": 1,
+    "risk_bill_of_materials": 1,
+    "report_trust_badge": 1,
+    "control_drift_attribution": 1,
+    "control": 28,
+    "finding": 28,
+    "score": 28,
+    "evidence_sufficiency": 28,
+    "provider_evidence_contract": 28,
+    "decision_review_item": 17
+  },
+  "edge_type_counts": {
+    "evaluated_against": 1,
+    "supports_assurance": 1,
+    "replayed_by": 1,
+    "informs_assurance": 2,
+    "summarized_as": 1,
+    "compared_for_drift": 1,
+    "defines_control": 28,
+    "produces_finding": 28,
+    "evaluates_to": 28,
+    "sets_evidence_expectation": 28,
+    "has_evidence_sufficiency": 28,
+    "scored_as": 28,
+    "participates_in_drift": 28,
+    "requires_decision": 17
+  },
+  "nodes": [
+    {
+      "node_id": "snapshot:evs_38d7b6507aa3d94a",
+      "node_type": "evidence_snapshot",
+      "label": "Evidence Snapshot",
+      "summary": "Normalized evidence captured for deterministic replay.",
+      "metadata": {
+        "snapshot_id": "evs_38d7b6507aa3d94a",
+        "collector_mode": "aws",
+        "policy_pack_version": "2026.04.0",
+        "profile_sha256": "72fd0fff05f6e2c4a08db1d88c7ce923ee12f40ac3c9f304afa322e2901d34ae",
+        "finding_sha256": "46ecce455b44563c8770424b02d43d6b9a1c6f4f1b20b7b1509b12ec4efd6dd6"
+      }
+    },
+    {
+      "node_id": "policy_pack:2026.04.0",
+      "node_type": "policy_pack",
+      "label": "Policy Pack 2026.04.0",
+      "summary": "Control policy pack used for deterministic evaluation.",
+      "metadata": {
+        "policy_pack_version": "2026.04.0"
+      }
+    },
+    {
+      "node_id": "assurance:assessment",
+      "node_type": "assessment_assurance",
+      "label": "Assessment Assurance",
+      "summary": "Trustworthiness score for the assessment artifact.",
+      "metadata": {
+        "assurance_score": 61.25,
+        "assurance_level": "limited",
+        "risk_score_impact": "No impact. Assessment assurance grades artifact trustworthiness and never changes deterministic CRIS-SME risk scores."
+      }
+    },
+    {
+      "node_id": "replay:assessment",
+      "node_type": "assessment_replay",
+      "label": "Assessment Replay",
+      "summary": "Replay verification for deterministic decision reproduction.",
+      "metadata": {
+        "snapshot_id": "evs_38d7b6507aa3d94a",
+        "replayable": true,
+        "deterministic_match": false,
+        "overall_risk_delta": 0.0
+      }
+    },
+    {
+      "node_id": "rbom:assessment",
+      "node_type": "risk_bill_of_materials",
+      "label": "Risk Bill of Materials",
+      "summary": "Integrity manifest for report and downstream artifacts.",
+      "metadata": {
+        "run_id": "run_29ea23f0b2d8ece7",
+        "canonical_report_sha256": "d80b22e60a75ce58476c7f8ba6a476a061862cc15c278856e071777b7e30febd",
+        "integrity_algorithm": "sha256"
+      }
+    },
+    {
+      "node_id": "trust_badge:report",
+      "node_type": "report_trust_badge",
+      "label": "Report Trust Badge",
+      "summary": "Stakeholder-facing assurance label for the report.",
+      "metadata": {
+        "label": "CRIS-SME Limited Assurance",
+        "level": "limited",
+        "assurance_score": 61.25,
+        "risk_score_impact": "No impact. The trust badge summarizes report assurance signals and never changes deterministic CRIS-SME risk scores."
+      }
+    },
+    {
+      "node_id": "drift:control",
+      "node_type": "control_drift_attribution",
+      "label": "Control Drift Attribution",
+      "summary": "Explains control-level score movement between reports.",
+      "metadata": {
+        "comparable": true,
+        "primary_attribution": "unchanged",
+        "overall_risk_delta": 0.0
+      }
+    },
+    {
+      "node_id": "control:NET-001",
+      "node_type": "control",
+      "label": "NET-001",
+      "summary": "Administrative services are exposed to the public internet",
+      "metadata": {
+        "category": "Network",
+        "rule_version": "1.0.0"
+      }
+    },
+    {
+      "node_id": "finding:fdg_514b77f2a83791",
+      "node_type": "finding",
+      "label": "fdg_514b77f2a83791",
+      "summary": "Administrative services are exposed to the public internet",
+      "metadata": {
+        "finding_id": "fdg_514b77f2a83791",
+        "control_id": "NET-001",
+        "provider": "aws",
+        "priority": "High",
+        "resource_scope": "000832363767"
+      }
+    },
+    {
+      "node_id": "score:fdg_514b77f2a83791",
+      "node_type": "score",
+      "label": "Score 72.12",
+      "summary": "Deterministic finding score and priority.",
+      "metadata": {
+        "score": 72.12,
+        "priority": "High",
+        "score_breakdown": {
+          "observed_confidence": 0.94,
+          "calibrated_confidence": 0.95,
+          "calibration_status": "validated",
+          "base_severity": 10.0,
+          "likelihood_factor": 1.6,
+          "data_factor": 1.28,
+          "confidence_factor": 0.985,
+          "remediation_factor": 1.0525,
+          "raw_score": 21.2319,
+          "normalized_score": 72.12
+        }
+      }
+    },
+    {
+      "node_id": "evidence_sufficiency:fdg_514b77f2a83791",
+      "node_type": "evidence_sufficiency",
+      "label": "Evidence unsupported",
+      "summary": "Evidence sufficiency assessment for the finding decision.",
+      "metadata": {
+        "observation_class": "observed",
+        "sufficiency": "unsupported",
+        "direct_evidence_count": 2,
+        "inferred_evidence_count": 0,
+        "unavailable_evidence_count": 0,
+        "provider_support": "research_preview",
+        "missing_requirements": [
+          "inbound exposure inventory",
+          "administrative path restriction evidence"
+        ]
+      }
+    },
+    {
+      "node_id": "provider_contract:aws:NET-001",
+      "node_type": "provider_evidence_contract",
+      "label": "aws NET-001 Contract",
+      "summary": "Provider evidence contract for the control.",
+      "metadata": {
+        "contract_id": "pec_aws_net-001_1.0.0",
+        "support_status": "research_preview",
+        "freshness_hours": 24,
+        "activation_gate": "aws support is limited to research-preview evidence until lab validation, collector coverage, and expert review are complete."
+      }
+    },
+    {
+      "node_id": "decision_review:drv_4101b93513209e",
+      "node_type": "decision_review_item",
+      "label": "Approve remediation plan",
+      "summary": "Risk priority is high enough to require an explicit remediation decision.",
+      "metadata": {
+        "review_id": "drv_4101b93513209e",
+        "decision_type": "remediation_decision",
+        "priority": "high",
+        "owner_hint": "network"
+      }
+    },
+    {
+      "node_id": "control:IAM-001",
+      "node_type": "control",
+      "label": "IAM-001",
+      "summary": "Privileged role assignments without MFA enforcement",
+      "metadata": {
+        "category": "IAM",
+        "rule_version": "1.0.0"
+      }
+    },
+    {
+      "node_id": "finding:fdg_81612c096e8237",
+      "node_type": "finding",
+      "label": "fdg_81612c096e8237",
+      "summary": "Privileged role assignments without MFA enforcement",
+      "metadata": {
+        "finding_id": "fdg_81612c096e8237",
+        "control_id": "IAM-001",
+        "provider": "aws",
+        "priority": "High",
+        "resource_scope": "000832363767"
+      }
+    },
+    {
+      "node_id": "score:fdg_81612c096e8237",
+      "node_type": "score",
+      "label": "Score 67.97",
+      "summary": "Deterministic finding score and priority.",
+      "metadata": {
+        "score": 67.97,
+        "priority": "High",
+        "score_breakdown": {
+          "observed_confidence": 0.96,
+          "calibrated_confidence": 0.924,
+          "calibration_status": "provisional",
+          "base_severity": 10.0,
+          "likelihood_factor": 1.52,
+          "data_factor": 1.28,
+          "confidence_factor": 0.9772,
+          "remediation_factor": 1.0525,
+          "raw_score": 20.0106,
+          "normalized_score": 67.97
+        }
+      }
+    },
+    {
+      "node_id": "evidence_sufficiency:fdg_81612c096e8237",
+      "node_type": "evidence_sufficiency",
+      "label": "Evidence unsupported",
+      "summary": "Evidence sufficiency assessment for the finding decision.",
+      "metadata": {
+        "observation_class": "observed",
+        "sufficiency": "unsupported",
+        "direct_evidence_count": 2,
+        "inferred_evidence_count": 0,
+        "unavailable_evidence_count": 0,
+        "provider_support": "research_preview",
+        "missing_requirements": [
+          "privileged assignment inventory",
+          "identity governance visibility context"
+        ]
+      }
+    },
+    {
+      "node_id": "provider_contract:aws:IAM-001",
+      "node_type": "provider_evidence_contract",
+      "label": "aws IAM-001 Contract",
+      "summary": "Provider evidence contract for the control.",
+      "metadata": {
+        "contract_id": "pec_aws_iam-001_1.0.0",
+        "support_status": "research_preview",
+        "freshness_hours": 24,
+        "activation_gate": "aws support is limited to research-preview evidence until lab validation, collector coverage, and expert review are complete."
+      }
+    },
+    {
+      "node_id": "decision_review:drv_e7403d177a8470",
+      "node_type": "decision_review_item",
+      "label": "Approve remediation plan",
+      "summary": "Risk priority is high enough to require an explicit remediation decision.",
+      "metadata": {
+        "review_id": "drv_e7403d177a8470",
+        "decision_type": "remediation_decision",
+        "priority": "high",
+        "owner_hint": "identity"
+      }
+    },
+    {
+      "node_id": "control:DATA-001",
+      "node_type": "control",
+      "label": "DATA-001",
+      "summary": "Public storage access increases data exposure risk",
+      "metadata": {
+        "category": "Data",
+        "rule_version": "1.0.0"
+      }
+    },
+    {
+      "node_id": "finding:fdg_59af495a1834f7",
+      "node_type": "finding",
+      "label": "fdg_59af495a1834f7",
+      "summary": "Public storage access increases data exposure risk",
+      "metadata": {
+        "finding_id": "fdg_59af495a1834f7",
+        "control_id": "DATA-001",
+        "provider": "aws",
+        "priority": "Planned",
+        "resource_scope": "000832363767"
+      }
+    },
+    {
+      "node_id": "score:fdg_59af495a1834f7",
+      "node_type": "score",
+      "label": "Score 48.35",
+      "summary": "Deterministic finding score and priority.",
+      "metadata": {
+        "score": 48.35,
+        "priority": "Planned",
+        "score_breakdown": {
+          "observed_confidence": 0.92,
+          "calibrated_confidence": 0.915,
+          "calibration_status": "validated",
+          "base_severity": 7.0,
+          "likelihood_factor": 1.56,
+          "data_factor": 1.28,
+          "confidence_factor": 0.9745,
+          "remediation_factor": 1.045,
+          "raw_score": 14.2341,
+          "normalized_score": 48.35
+        }
+      }
+    },
+    {
+      "node_id": "evidence_sufficiency:fdg_59af495a1834f7",
+      "node_type": "evidence_sufficiency",
+      "label": "Evidence unsupported",
+      "summary": "Evidence sufficiency assessment for the finding decision.",
+      "metadata": {
+        "observation_class": "observed",
+        "sufficiency": "unsupported",
+        "direct_evidence_count": 1,
+        "inferred_evidence_count": 0,
+        "unavailable_evidence_count": 0,
+        "provider_support": "research_preview",
+        "missing_requirements": [
+          "public data-path and encryption evidence",
+          "backup/retention control-state evidence"
+        ]
+      }
+    },
+    {
+      "node_id": "provider_contract:aws:DATA-001",
+      "node_type": "provider_evidence_contract",
+      "label": "aws DATA-001 Contract",
+      "summary": "Provider evidence contract for the control.",
+      "metadata": {
+        "contract_id": "pec_aws_data-001_1.0.0",
+        "support_status": "research_preview",
+        "freshness_hours": 48,
+        "activation_gate": "aws support is limited to research-preview evidence until lab validation, collector coverage, and expert review are complete."
+      }
+    },
+    {
+      "node_id": "decision_review:drv_0fe7e2ead315c3",
+      "node_type": "decision_review_item",
+      "label": "Monitor in next assessment",
+      "summary": "Risk is present but below immediate governance-decision threshold.",
+      "metadata": {
+        "review_id": "drv_0fe7e2ead315c3",
+        "decision_type": "monitor",
+        "priority": "medium",
+        "owner_hint": "data"
+      }
+    },
+    {
+      "node_id": "control:IOT-005",
+      "node_type": "control",
+      "label": "IOT-005",
+      "summary": "IoT Hub public network access is not sufficiently constrained",
+      "metadata": {
+        "category": "Healthcare IoT",
+        "rule_version": "1.0.0"
+      }
+    },
+    {
+      "node_id": "finding:fdg_994c549d0b3d2e",
+      "node_type": "finding",
+      "label": "fdg_994c549d0b3d2e",
+      "summary": "IoT Hub public network access is not sufficiently constrained",
+      "metadata": {
+        "finding_id": "fdg_994c549d0b3d2e",
+        "control_id": "IOT-005",
+        "provider": "aws",
+        "priority": "Planned",
+        "resource_scope": "000832363767"
+      }
+    },
+    {
+      "node_id": "score:fdg_994c549d0b3d2e",
+      "node_type": "score",
+      "label": "Score 47.25",
+      "summary": "Deterministic finding score and priority.",
+      "metadata": {
+        "score": 47.25,
+        "priority": "Planned",
+        "score_breakdown": {
+          "observed_confidence": 0.88,
+          "calibrated_confidence": 0.856,
+          "calibration_status": "provisional",
+          "base_severity": 7.0,
+          "likelihood_factor": 1.52,
+          "data_factor": 1.28,
+          "confidence_factor": 0.9568,
+          "remediation_factor": 1.0675,
+          "raw_score": 13.9104,
+          "normalized_score": 47.25
+        }
+      }
+    },
+    {
+      "node_id": "evidence_sufficiency:fdg_994c549d0b3d2e",
+      "node_type": "evidence_sufficiency",
+      "label": "Evidence unsupported",
+      "summary": "Evidence sufficiency assessment for the finding decision.",
+      "metadata": {
+        "observation_class": "observed",
+        "sufficiency": "unsupported",
+        "direct_evidence_count": 2,
+        "inferred_evidence_count": 0,
+        "unavailable_evidence_count": 0,
+        "provider_support": "research_preview",
+        "missing_requirements": [
+          "IoT platform configuration evidence",
+          "device identity, telemetry, and clinical boundary evidence"
+        ]
+      }
+    },
+    {
+      "node_id": "provider_contract:aws:IOT-005",
+      "node_type": "provider_evidence_contract",
+      "label": "aws IOT-005 Contract",
+      "summary": "Provider evidence contract for the control.",
+      "metadata": {
+        "contract_id": "pec_aws_iot-005_1.0.0",
+        "support_status": "research_preview",
+        "freshness_hours": 168,
+        "activation_gate": "aws support is limited to research-preview evidence until lab validation, collector coverage, and expert review are complete."
+      }
+    },
+    {
+      "node_id": "decision_review:drv_e34602ec9ea91b",
+      "node_type": "decision_review_item",
+      "label": "Monitor in next assessment",
+      "summary": "Risk is present but below immediate governance-decision threshold.",
+      "metadata": {
+        "review_id": "drv_e34602ec9ea91b",
+        "decision_type": "monitor",
+        "priority": "medium",
+        "owner_hint": "governance"
+      }
+    },
+    {
+      "node_id": "control:NET-002",
+      "node_type": "control",
+      "label": "NET-002",
+      "summary": "Network security group rules are broader than expected",
+      "metadata": {
+        "category": "Network",
+        "rule_version": "1.0.0"
+      }
+    },
+    {
+      "node_id": "finding:fdg_e13f1fe2310b82",
+      "node_type": "finding",
+      "label": "fdg_e13f1fe2310b82",
+      "summary": "Network security group rules are broader than expected",
+      "metadata": {
+        "finding_id": "fdg_e13f1fe2310b82",
+        "control_id": "NET-002",
+        "provider": "aws",
+        "priority": "Planned",
+        "resource_scope": "000832363767"
+      }
+    },
+    {
+      "node_id": "score:fdg_e13f1fe2310b82",
+      "node_type": "score",
+      "label": "Score 44.71",
+      "summary": "Deterministic finding score and priority.",
+      "metadata": {
+        "score": 44.71,
+        "priority": "Planned",
+        "score_breakdown": {
+          "observed_confidence": 0.86,
+          "calibrated_confidence": 0.875,
+          "calibration_status": "validated",
+          "base_severity": 7.0,
+          "likelihood_factor": 1.44,
+          "data_factor": 1.28,
+          "confidence_factor": 0.9625,
+          "remediation_factor": 1.06,
+          "raw_score": 13.1637,
+          "normalized_score": 44.71
+        }
+      }
+    },
+    {
+      "node_id": "evidence_sufficiency:fdg_e13f1fe2310b82",
+      "node_type": "evidence_sufficiency",
+      "label": "Evidence unsupported",
+      "summary": "Evidence sufficiency assessment for the finding decision.",
+      "metadata": {
+        "observation_class": "observed",
+        "sufficiency": "unsupported",
+        "direct_evidence_count": 1,
+        "inferred_evidence_count": 0,
+        "unavailable_evidence_count": 0,
+        "provider_support": "research_preview",
+        "missing_requirements": [
+          "inbound exposure inventory",
+          "administrative path restriction evidence"
+        ]
+      }
+    },
+    {
+      "node_id": "provider_contract:aws:NET-002",
+      "node_type": "provider_evidence_contract",
+      "label": "aws NET-002 Contract",
+      "summary": "Provider evidence contract for the control.",
+      "metadata": {
+        "contract_id": "pec_aws_net-002_1.0.0",
+        "support_status": "research_preview",
+        "freshness_hours": 24,
+        "activation_gate": "aws support is limited to research-preview evidence until lab validation, collector coverage, and expert review are complete."
+      }
+    },
+    {
+      "node_id": "decision_review:drv_9a9a546b69bfe8",
+      "node_type": "decision_review_item",
+      "label": "Investigate or enrich evidence path",
+      "summary": "Add or enrich collector evidence for the missing requirement and keep the limitation visible until direct evidence is available.",
+      "metadata": {
+        "review_id": "drv_9a9a546b69bfe8",
+        "decision_type": "evidence_investigation",
+        "priority": "medium",
+        "owner_hint": "platform"
+      }
+    },
+    {
+      "node_id": "control:CMP-001",
+      "node_type": "control",
+      "label": "CMP-001",
+      "summary": "Critical workloads remain unpatched beyond acceptable risk tolerance",
+      "metadata": {
+        "category": "Compute/Workloads",
+        "rule_version": "1.1.0"
+      }
+    },
+    {
+      "node_id": "finding:fdg_dfbb1e782053b2",
+      "node_type": "finding",
+      "label": "fdg_dfbb1e782053b2",
+      "summary": "Critical workloads remain unpatched beyond acceptable risk tolerance",
+      "metadata": {
+        "finding_id": "fdg_dfbb1e782053b2",
+        "control_id": "CMP-001",
+        "provider": "aws",
+        "priority": "Planned",
+        "resource_scope": "000832363767"
+      }
+    },
+    {
+      "node_id": "score:fdg_dfbb1e782053b2",
+      "node_type": "score",
+      "label": "Score 42.69",
+      "summary": "Deterministic finding score and priority.",
+      "metadata": {
+        "score": 42.69,
+        "priority": "Planned",
+        "score_breakdown": {
+          "observed_confidence": 0.92,
+          "calibrated_confidence": 0.887,
+          "calibration_status": "provisional",
+          "base_severity": 7.0,
+          "likelihood_factor": 1.36,
+          "data_factor": 1.28,
+          "confidence_factor": 0.9661,
+          "remediation_factor": 1.0675,
+          "raw_score": 12.5672,
+          "normalized_score": 42.69
+        }
+      }
+    },
+    {
+      "node_id": "evidence_sufficiency:fdg_dfbb1e782053b2",
+      "node_type": "evidence_sufficiency",
+      "label": "Evidence unsupported",
+      "summary": "Evidence sufficiency assessment for the finding decision.",
+      "metadata": {
+        "observation_class": "observed",
+        "sufficiency": "unsupported",
+        "direct_evidence_count": 1,
+        "inferred_evidence_count": 0,
+        "unavailable_evidence_count": 0,
+        "provider_support": "research_preview",
+        "missing_requirements": [
+          "patch posture proxy evidence",
+          "workload hardening and endpoint coverage evidence"
+        ]
+      }
+    },
+    {
+      "node_id": "provider_contract:aws:CMP-001",
+      "node_type": "provider_evidence_contract",
+      "label": "aws CMP-001 Contract",
+      "summary": "Provider evidence contract for the control.",
+      "metadata": {
+        "contract_id": "pec_aws_cmp-001_1.1.0",
+        "support_status": "research_preview",
+        "freshness_hours": 72,
+        "activation_gate": "aws support is limited to research-preview evidence until lab validation, collector coverage, and expert review are complete."
+      }
+    },
+    {
+      "node_id": "decision_review:drv_71aed28f266bb5",
+      "node_type": "decision_review_item",
+      "label": "Monitor in next assessment",
+      "summary": "Risk is present but below immediate governance-decision threshold.",
+      "metadata": {
+        "review_id": "drv_71aed28f266bb5",
+        "decision_type": "monitor",
+        "priority": "medium",
+        "owner_hint": "platform"
+      }
+    },
+    {
+      "node_id": "control:DATA-002",
+      "node_type": "control",
+      "label": "DATA-002",
+      "summary": "Data stores lack expected encryption protections",
+      "metadata": {
+        "category": "Data",
+        "rule_version": "1.0.0"
+      }
+    },
+    {
+      "node_id": "finding:fdg_fd9b74860f2318",
+      "node_type": "finding",
+      "label": "fdg_fd9b74860f2318",
+      "summary": "Data stores lack expected encryption protections",
+      "metadata": {
+        "finding_id": "fdg_fd9b74860f2318",
+        "control_id": "DATA-002",
+        "provider": "aws",
+        "priority": "Planned",
+        "resource_scope": "000832363767"
+      }
+    },
+    {
+      "node_id": "score:fdg_fd9b74860f2318",
+      "node_type": "score",
+      "label": "Score 42.36",
+      "summary": "Deterministic finding score and priority.",
+      "metadata": {
+        "score": 42.36,
+        "priority": "Planned",
+        "score_breakdown": {
+          "observed_confidence": 0.9,
+          "calibrated_confidence": 0.885,
+          "calibration_status": "validated",
+          "base_severity": 7.0,
+          "likelihood_factor": 1.36,
+          "data_factor": 1.28,
+          "confidence_factor": 0.9655,
+          "remediation_factor": 1.06,
+          "raw_score": 12.4711,
+          "normalized_score": 42.36
+        }
+      }
+    },
+    {
+      "node_id": "evidence_sufficiency:fdg_fd9b74860f2318",
+      "node_type": "evidence_sufficiency",
+      "label": "Evidence unsupported",
+      "summary": "Evidence sufficiency assessment for the finding decision.",
+      "metadata": {
+        "observation_class": "observed",
+        "sufficiency": "unsupported",
+        "direct_evidence_count": 1,
+        "inferred_evidence_count": 0,
+        "unavailable_evidence_count": 0,
+        "provider_support": "research_preview",
+        "missing_requirements": [
+          "public data-path and encryption evidence",
+          "backup/retention control-state evidence"
+        ]
+      }
+    },
+    {
+      "node_id": "provider_contract:aws:DATA-002",
+      "node_type": "provider_evidence_contract",
+      "label": "aws DATA-002 Contract",
+      "summary": "Provider evidence contract for the control.",
+      "metadata": {
+        "contract_id": "pec_aws_data-002_1.0.0",
+        "support_status": "research_preview",
+        "freshness_hours": 48,
+        "activation_gate": "aws support is limited to research-preview evidence until lab validation, collector coverage, and expert review are complete."
+      }
+    },
+    {
+      "node_id": "decision_review:drv_265642e37d44ef",
+      "node_type": "decision_review_item",
+      "label": "Monitor in next assessment",
+      "summary": "Risk is present but below immediate governance-decision threshold.",
+      "metadata": {
+        "review_id": "drv_265642e37d44ef",
+        "decision_type": "monitor",
+        "priority": "medium",
+        "owner_hint": "data"
+      }
+    },
+    {
+      "node_id": "control:NET-004",
+      "node_type": "control",
+      "label": "NET-004",
+      "summary": "Private endpoint coverage is incomplete for sensitive services",
+      "metadata": {
+        "category": "Network",
+        "rule_version": "1.0.0"
+      }
+    },
+    {
+      "node_id": "finding:fdg_95befe3a0ef4d3",
+      "node_type": "finding",
+      "label": "fdg_95befe3a0ef4d3",
+      "summary": "Private endpoint coverage is incomplete for sensitive services",
+      "metadata": {
+        "finding_id": "fdg_95befe3a0ef4d3",
+        "control_id": "NET-004",
+        "provider": "aws",
+        "priority": "Planned",
+        "resource_scope": "000832363767"
+      }
+    },
+    {
+      "node_id": "score:fdg_95befe3a0ef4d3",
+      "node_type": "score",
+      "label": "Score 41.93",
+      "summary": "Deterministic finding score and priority.",
+      "metadata": {
+        "score": 41.93,
+        "priority": "Planned",
+        "score_breakdown": {
+          "observed_confidence": 0.82,
+          "calibrated_confidence": 0.808,
+          "calibration_status": "provisional",
+          "base_severity": 7.0,
+          "likelihood_factor": 1.36,
+          "data_factor": 1.28,
+          "confidence_factor": 0.9424,
+          "remediation_factor": 1.075,
+          "raw_score": 12.345,
+          "normalized_score": 41.93
+        }
+      }
+    },
+    {
+      "node_id": "evidence_sufficiency:fdg_95befe3a0ef4d3",
+      "node_type": "evidence_sufficiency",
+      "label": "Evidence unsupported",
+      "summary": "Evidence sufficiency assessment for the finding decision.",
+      "metadata": {
+        "observation_class": "observed",
+        "sufficiency": "unsupported",
+        "direct_evidence_count": 2,
+        "inferred_evidence_count": 0,
+        "unavailable_evidence_count": 0,
+        "provider_support": "research_preview",
+        "missing_requirements": [
+          "inbound exposure inventory",
+          "administrative path restriction evidence"
+        ]
+      }
+    },
+    {
+      "node_id": "provider_contract:aws:NET-004",
+      "node_type": "provider_evidence_contract",
+      "label": "aws NET-004 Contract",
+      "summary": "Provider evidence contract for the control.",
+      "metadata": {
+        "contract_id": "pec_aws_net-004_1.0.0",
+        "support_status": "research_preview",
+        "freshness_hours": 24,
+        "activation_gate": "aws support is limited to research-preview evidence until lab validation, collector coverage, and expert review are complete."
+      }
+    },
+    {
+      "node_id": "decision_review:drv_603cf37ee7a853",
+      "node_type": "decision_review_item",
+      "label": "Investigate or enrich evidence path",
+      "summary": "Add or enrich collector evidence for the missing requirement and keep the limitation visible until direct evidence is available.",
+      "metadata": {
+        "review_id": "drv_603cf37ee7a853",
+        "decision_type": "evidence_investigation",
+        "priority": "medium",
+        "owner_hint": "platform"
+      }
+    },
+    {
+      "node_id": "control:IOT-002",
+      "node_type": "control",
+      "label": "IOT-002",
+      "summary": "IoT shared access policies exceed least-privilege expectations",
+      "metadata": {
+        "category": "Healthcare IoT",
+        "rule_version": "1.0.0"
+      }
+    },
+    {
+      "node_id": "finding:fdg_47b2e528cc081f",
+      "node_type": "finding",
+      "label": "fdg_47b2e528cc081f",
+      "summary": "IoT shared access policies exceed least-privilege expectations",
+      "metadata": {
+        "finding_id": "fdg_47b2e528cc081f",
+        "control_id": "IOT-002",
+        "provider": "aws",
+        "priority": "Planned",
+        "resource_scope": "000832363767"
+      }
+    },
+    {
+      "node_id": "score:fdg_47b2e528cc081f",
+      "node_type": "score",
+      "label": "Score 41.6",
+      "summary": "Deterministic finding score and priority.",
+      "metadata": {
+        "score": 41.6,
+        "priority": "Planned",
+        "score_breakdown": {
+          "observed_confidence": 0.86,
+          "calibrated_confidence": 0.827,
+          "calibration_status": "provisional",
+          "base_severity": 7.0,
+          "likelihood_factor": 1.36,
+          "data_factor": 1.28,
+          "confidence_factor": 0.9481,
+          "remediation_factor": 1.06,
+          "raw_score": 12.2464,
+          "normalized_score": 41.6
+        }
+      }
+    },
+    {
+      "node_id": "evidence_sufficiency:fdg_47b2e528cc081f",
+      "node_type": "evidence_sufficiency",
+      "label": "Evidence unsupported",
+      "summary": "Evidence sufficiency assessment for the finding decision.",
+      "metadata": {
+        "observation_class": "observed",
+        "sufficiency": "unsupported",
+        "direct_evidence_count": 2,
+        "inferred_evidence_count": 0,
+        "unavailable_evidence_count": 0,
+        "provider_support": "research_preview",
+        "missing_requirements": [
+          "IoT platform configuration evidence",
+          "device identity, telemetry, and clinical boundary evidence"
+        ]
+      }
+    },
+    {
+      "node_id": "provider_contract:aws:IOT-002",
+      "node_type": "provider_evidence_contract",
+      "label": "aws IOT-002 Contract",
+      "summary": "Provider evidence contract for the control.",
+      "metadata": {
+        "contract_id": "pec_aws_iot-002_1.0.0",
+        "support_status": "research_preview",
+        "freshness_hours": 168,
+        "activation_gate": "aws support is limited to research-preview evidence until lab validation, collector coverage, and expert review are complete."
+      }
+    },
+    {
+      "node_id": "decision_review:drv_dd2b0b0a35d2cb",
+      "node_type": "decision_review_item",
+      "label": "Investigate or enrich evidence path",
+      "summary": "Add or enrich collector evidence for the missing requirement and keep the limitation visible until direct evidence is available.",
+      "metadata": {
+        "review_id": "drv_dd2b0b0a35d2cb",
+        "decision_type": "evidence_investigation",
+        "priority": "medium",
+        "owner_hint": "platform"
+      }
+    },
+    {
+      "node_id": "control:IOT-001",
+      "node_type": "control",
+      "label": "IOT-001",
+      "summary": "Cloud device-identity registration posture is weak or unobservable",
+      "metadata": {
+        "category": "Healthcare IoT",
+        "rule_version": "0.1.0"
+      }
+    },
+    {
+      "node_id": "finding:fdg_8de9e4b39be686",
+      "node_type": "finding",
+      "label": "fdg_8de9e4b39be686",
+      "summary": "Cloud device-identity registration posture is weak or unobservable",
+      "metadata": {
+        "finding_id": "fdg_8de9e4b39be686",
+        "control_id": "IOT-001",
+        "provider": "aws",
+        "priority": "Planned",
+        "resource_scope": "000832363767"
+      }
+    },
+    {
+      "node_id": "score:fdg_8de9e4b39be686",
+      "node_type": "score",
+      "label": "Score 40.65",
+      "summary": "Deterministic finding score and priority.",
+      "metadata": {
+        "score": 40.65,
+        "priority": "Planned",
+        "score_breakdown": {
+          "observed_confidence": 0.84,
+          "calibrated_confidence": 0.804,
+          "calibration_status": "provisional",
+          "base_severity": 7.0,
+          "likelihood_factor": 1.32,
+          "data_factor": 1.28,
+          "confidence_factor": 0.9412,
+          "remediation_factor": 1.075,
+          "raw_score": 11.9666,
+          "normalized_score": 40.65
+        }
+      }
+    },
+    {
+      "node_id": "evidence_sufficiency:fdg_8de9e4b39be686",
+      "node_type": "evidence_sufficiency",
+      "label": "Evidence unsupported",
+      "summary": "Evidence sufficiency assessment for the finding decision.",
+      "metadata": {
+        "observation_class": "observed",
+        "sufficiency": "unsupported",
+        "direct_evidence_count": 1,
+        "inferred_evidence_count": 0,
+        "unavailable_evidence_count": 0,
+        "provider_support": "research_preview",
+        "missing_requirements": [
+          "IoT platform configuration evidence",
+          "device identity, telemetry, and clinical boundary evidence"
+        ]
+      }
+    },
+    {
+      "node_id": "provider_contract:aws:IOT-001",
+      "node_type": "provider_evidence_contract",
+      "label": "aws IOT-001 Contract",
+      "summary": "Provider evidence contract for the control.",
+      "metadata": {
+        "contract_id": "pec_aws_iot-001_0.1.0",
+        "support_status": "research_preview",
+        "freshness_hours": 168,
+        "activation_gate": "aws support is limited to research-preview evidence until lab validation, collector coverage, and expert review are complete."
+      }
+    },
+    {
+      "node_id": "decision_review:drv_bc7df941ac92ac",
+      "node_type": "decision_review_item",
+      "label": "Investigate or enrich evidence path",
+      "summary": "Add or enrich collector evidence for the missing requirement and keep the limitation visible until direct evidence is available.",
+      "metadata": {
+        "review_id": "drv_bc7df941ac92ac",
+        "decision_type": "evidence_investigation",
+        "priority": "medium",
+        "owner_hint": "platform"
+      }
+    },
+    {
+      "node_id": "control:CMP-002",
+      "node_type": "control",
+      "label": "CMP-002",
+      "summary": "Endpoint protection coverage is below the expected workload baseline",
+      "metadata": {
+        "category": "Compute/Workloads",
+        "rule_version": "1.0.0"
+      }
+    },
+    {
+      "node_id": "finding:fdg_ba8563fa9c85b0",
+      "node_type": "finding",
+      "label": "fdg_ba8563fa9c85b0",
+      "summary": "Endpoint protection coverage is below the expected workload baseline",
+      "metadata": {
+        "finding_id": "fdg_ba8563fa9c85b0",
+        "control_id": "CMP-002",
+        "provider": "aws",
+        "priority": "Planned",
+        "resource_scope": "000832363767"
+      }
+    },
+    {
+      "node_id": "score:fdg_ba8563fa9c85b0",
+      "node_type": "score",
+      "label": "Score 39.53",
+      "summary": "Deterministic finding score and priority.",
+      "metadata": {
+        "score": 39.53,
+        "priority": "Planned",
+        "score_breakdown": {
+          "observed_confidence": 0.88,
+          "calibrated_confidence": 0.88,
+          "calibration_status": "validated",
+          "base_severity": 7.0,
+          "likelihood_factor": 1.28,
+          "data_factor": 1.28,
+          "confidence_factor": 0.964,
+          "remediation_factor": 1.0525,
+          "raw_score": 11.6364,
+          "normalized_score": 39.53
+        }
+      }
+    },
+    {
+      "node_id": "evidence_sufficiency:fdg_ba8563fa9c85b0",
+      "node_type": "evidence_sufficiency",
+      "label": "Evidence unsupported",
+      "summary": "Evidence sufficiency assessment for the finding decision.",
+      "metadata": {
+        "observation_class": "observed",
+        "sufficiency": "unsupported",
+        "direct_evidence_count": 1,
+        "inferred_evidence_count": 0,
+        "unavailable_evidence_count": 0,
+        "provider_support": "research_preview",
+        "missing_requirements": [
+          "patch posture proxy evidence",
+          "workload hardening and endpoint coverage evidence"
+        ]
+      }
+    },
+    {
+      "node_id": "provider_contract:aws:CMP-002",
+      "node_type": "provider_evidence_contract",
+      "label": "aws CMP-002 Contract",
+      "summary": "Provider evidence contract for the control.",
+      "metadata": {
+        "contract_id": "pec_aws_cmp-002_1.0.0",
+        "support_status": "research_preview",
+        "freshness_hours": 72,
+        "activation_gate": "aws support is limited to research-preview evidence until lab validation, collector coverage, and expert review are complete."
+      }
+    },
+    {
+      "node_id": "decision_review:drv_ad7aab39380163",
+      "node_type": "decision_review_item",
+      "label": "Investigate or enrich evidence path",
+      "summary": "Add or enrich collector evidence for the missing requirement and keep the limitation visible until direct evidence is available.",
+      "metadata": {
+        "review_id": "drv_ad7aab39380163",
+        "decision_type": "evidence_investigation",
+        "priority": "medium",
+        "owner_hint": "platform"
+      }
+    },
+    {
+      "node_id": "control:CMP-003",
+      "node_type": "control",
+      "label": "CMP-003",
+      "summary": "Workload hardening baseline coverage is incomplete",
+      "metadata": {
+        "category": "Compute/Workloads",
+        "rule_version": "1.0.0"
+      }
+    },
+    {
+      "node_id": "finding:fdg_1fcafc454b954f",
+      "node_type": "finding",
+      "label": "fdg_1fcafc454b954f",
+      "summary": "Workload hardening baseline coverage is incomplete",
+      "metadata": {
+        "finding_id": "fdg_1fcafc454b954f",
+        "control_id": "CMP-003",
+        "provider": "aws",
+        "priority": "Planned",
+        "resource_scope": "000832363767"
+      }
+    },
+    {
+      "node_id": "score:fdg_1fcafc454b954f",
+      "node_type": "score",
+      "label": "Score 38.49",
+      "summary": "Deterministic finding score and priority.",
+      "metadata": {
+        "score": 38.49,
+        "priority": "Planned",
+        "score_breakdown": {
+          "observed_confidence": 0.85,
+          "calibrated_confidence": 0.829,
+          "calibration_status": "provisional",
+          "base_severity": 7.0,
+          "likelihood_factor": 1.24,
+          "data_factor": 1.28,
+          "confidence_factor": 0.9487,
+          "remediation_factor": 1.075,
+          "raw_score": 11.331,
+          "normalized_score": 38.49
+        }
+      }
+    },
+    {
+      "node_id": "evidence_sufficiency:fdg_1fcafc454b954f",
+      "node_type": "evidence_sufficiency",
+      "label": "Evidence unsupported",
+      "summary": "Evidence sufficiency assessment for the finding decision.",
+      "metadata": {
+        "observation_class": "observed",
+        "sufficiency": "unsupported",
+        "direct_evidence_count": 1,
+        "inferred_evidence_count": 0,
+        "unavailable_evidence_count": 0,
+        "provider_support": "research_preview",
+        "missing_requirements": [
+          "patch posture proxy evidence",
+          "workload hardening and endpoint coverage evidence"
+        ]
+      }
+    },
+    {
+      "node_id": "provider_contract:aws:CMP-003",
+      "node_type": "provider_evidence_contract",
+      "label": "aws CMP-003 Contract",
+      "summary": "Provider evidence contract for the control.",
+      "metadata": {
+        "contract_id": "pec_aws_cmp-003_1.0.0",
+        "support_status": "research_preview",
+        "freshness_hours": 72,
+        "activation_gate": "aws support is limited to research-preview evidence until lab validation, collector coverage, and expert review are complete."
+      }
+    },
+    {
+      "node_id": "decision_review:drv_dc188eac435f5c",
+      "node_type": "decision_review_item",
+      "label": "Monitor in next assessment",
+      "summary": "Risk is present but below immediate governance-decision threshold.",
+      "metadata": {
+        "review_id": "drv_dc188eac435f5c",
+        "decision_type": "monitor",
+        "priority": "medium",
+        "owner_hint": "platform"
+      }
+    },
+    {
+      "node_id": "control:DATA-003",
+      "node_type": "control",
+      "label": "DATA-003",
+      "summary": "Backup and retention coverage fall below resilience expectations",
+      "metadata": {
+        "category": "Data",
+        "rule_version": "1.0.0"
+      }
+    },
+    {
+      "node_id": "finding:fdg_4fdee149a387bc",
+      "node_type": "finding",
+      "label": "fdg_4fdee149a387bc",
+      "summary": "Backup and retention coverage fall below resilience expectations",
+      "metadata": {
+        "finding_id": "fdg_4fdee149a387bc",
+        "control_id": "DATA-003",
+        "provider": "aws",
+        "priority": "Planned",
+        "resource_scope": "000832363767"
+      }
+    },
+    {
+      "node_id": "score:fdg_4fdee149a387bc",
+      "node_type": "score",
+      "label": "Score 37.58",
+      "summary": "Deterministic finding score and priority.",
+      "metadata": {
+        "score": 37.58,
+        "priority": "Planned",
+        "score_breakdown": {
+          "observed_confidence": 0.85,
+          "calibrated_confidence": 0.835,
+          "calibration_status": "provisional",
+          "base_severity": 7.0,
+          "likelihood_factor": 1.2,
+          "data_factor": 1.28,
+          "confidence_factor": 0.9505,
+          "remediation_factor": 1.0825,
+          "raw_score": 11.0629,
+          "normalized_score": 37.58
+        }
+      }
+    },
+    {
+      "node_id": "evidence_sufficiency:fdg_4fdee149a387bc",
+      "node_type": "evidence_sufficiency",
+      "label": "Evidence unsupported",
+      "summary": "Evidence sufficiency assessment for the finding decision.",
+      "metadata": {
+        "observation_class": "observed",
+        "sufficiency": "unsupported",
+        "direct_evidence_count": 2,
+        "inferred_evidence_count": 0,
+        "unavailable_evidence_count": 0,
+        "provider_support": "research_preview",
+        "missing_requirements": [
+          "public data-path and encryption evidence",
+          "backup/retention control-state evidence"
+        ]
+      }
+    },
+    {
+      "node_id": "provider_contract:aws:DATA-003",
+      "node_type": "provider_evidence_contract",
+      "label": "aws DATA-003 Contract",
+      "summary": "Provider evidence contract for the control.",
+      "metadata": {
+        "contract_id": "pec_aws_data-003_1.0.0",
+        "support_status": "research_preview",
+        "freshness_hours": 48,
+        "activation_gate": "aws support is limited to research-preview evidence until lab validation, collector coverage, and expert review are complete."
+      }
+    },
+    {
+      "node_id": "decision_review:drv_2b49de93132e57",
+      "node_type": "decision_review_item",
+      "label": "Monitor in next assessment",
+      "summary": "Risk is present but below immediate governance-decision threshold.",
+      "metadata": {
+        "review_id": "drv_2b49de93132e57",
+        "decision_type": "monitor",
+        "priority": "medium",
+        "owner_hint": "data"
+      }
+    },
+    {
+      "node_id": "control:MON-003",
+      "node_type": "control",
+      "label": "MON-003",
+      "summary": "Security monitoring coverage is below the expected baseline",
+      "metadata": {
+        "category": "Monitoring/Logging",
+        "rule_version": "1.0.0"
+      }
+    },
+    {
+      "node_id": "finding:fdg_0fc8904a5edd56",
+      "node_type": "finding",
+      "label": "fdg_0fc8904a5edd56",
+      "summary": "Security monitoring coverage is below the expected baseline",
+      "metadata": {
+        "finding_id": "fdg_0fc8904a5edd56",
+        "control_id": "MON-003",
+        "provider": "aws",
+        "priority": "Planned",
+        "resource_scope": "000832363767"
+      }
+    },
+    {
+      "node_id": "score:fdg_0fc8904a5edd56",
+      "node_type": "score",
+      "label": "Score 36.94",
+      "summary": "Deterministic finding score and priority.",
+      "metadata": {
+        "score": 36.94,
+        "priority": "Planned",
+        "score_breakdown": {
+          "observed_confidence": 0.84,
+          "calibrated_confidence": 0.825,
+          "calibration_status": "provisional",
+          "base_severity": 7.0,
+          "likelihood_factor": 1.2,
+          "data_factor": 1.28,
+          "confidence_factor": 0.9475,
+          "remediation_factor": 1.0675,
+          "raw_score": 10.8752,
+          "normalized_score": 36.94
+        }
+      }
+    },
+    {
+      "node_id": "evidence_sufficiency:fdg_0fc8904a5edd56",
+      "node_type": "evidence_sufficiency",
+      "label": "Evidence unsupported",
+      "summary": "Evidence sufficiency assessment for the finding decision.",
+      "metadata": {
+        "observation_class": "observed",
+        "sufficiency": "unsupported",
+        "direct_evidence_count": 1,
+        "inferred_evidence_count": 0,
+        "unavailable_evidence_count": 0,
+        "provider_support": "research_preview",
+        "missing_requirements": [
+          "log retention and alerting evidence",
+          "incident runbook or workflow evidence"
+        ]
+      }
+    },
+    {
+      "node_id": "provider_contract:aws:MON-003",
+      "node_type": "provider_evidence_contract",
+      "label": "aws MON-003 Contract",
+      "summary": "Provider evidence contract for the control.",
+      "metadata": {
+        "contract_id": "pec_aws_mon-003_1.0.0",
+        "support_status": "research_preview",
+        "freshness_hours": 24,
+        "activation_gate": "aws support is limited to research-preview evidence until lab validation, collector coverage, and expert review are complete."
+      }
+    },
+    {
+      "node_id": "decision_review:drv_b1d0fd66bf994c",
+      "node_type": "decision_review_item",
+      "label": "Monitor in next assessment",
+      "summary": "Risk is present but below immediate governance-decision threshold.",
+      "metadata": {
+        "review_id": "drv_b1d0fd66bf994c",
+        "decision_type": "monitor",
+        "priority": "medium",
+        "owner_hint": "security-operations"
+      }
+    },
+    {
+      "node_id": "control:CMP-004",
+      "node_type": "control",
+      "label": "CMP-004",
+      "summary": "Workload backup agent coverage is below resilience expectations",
+      "metadata": {
+        "category": "Compute/Workloads",
+        "rule_version": "1.0.0"
+      }
+    },
+    {
+      "node_id": "finding:fdg_32dfaf5364b4d6",
+      "node_type": "finding",
+      "label": "fdg_32dfaf5364b4d6",
+      "summary": "Workload backup agent coverage is below resilience expectations",
+      "metadata": {
+        "finding_id": "fdg_32dfaf5364b4d6",
+        "control_id": "CMP-004",
+        "provider": "aws",
+        "priority": "Planned",
+        "resource_scope": "000832363767"
+      }
+    },
+    {
+      "node_id": "score:fdg_32dfaf5364b4d6",
+      "node_type": "score",
+      "label": "Score 36.85",
+      "summary": "Deterministic finding score and priority.",
+      "metadata": {
+        "score": 36.85,
+        "priority": "Planned",
+        "score_breakdown": {
+          "observed_confidence": 0.83,
+          "calibrated_confidence": 0.84,
+          "calibration_status": "validated",
+          "base_severity": 7.0,
+          "likelihood_factor": 1.2,
+          "data_factor": 1.28,
+          "confidence_factor": 0.952,
+          "remediation_factor": 1.06,
+          "raw_score": 10.8501,
+          "normalized_score": 36.85
+        }
+      }
+    },
+    {
+      "node_id": "evidence_sufficiency:fdg_32dfaf5364b4d6",
+      "node_type": "evidence_sufficiency",
+      "label": "Evidence unsupported",
+      "summary": "Evidence sufficiency assessment for the finding decision.",
+      "metadata": {
+        "observation_class": "observed",
+        "sufficiency": "unsupported",
+        "direct_evidence_count": 1,
+        "inferred_evidence_count": 0,
+        "unavailable_evidence_count": 0,
+        "provider_support": "research_preview",
+        "missing_requirements": [
+          "patch posture proxy evidence",
+          "workload hardening and endpoint coverage evidence"
+        ]
+      }
+    },
+    {
+      "node_id": "provider_contract:aws:CMP-004",
+      "node_type": "provider_evidence_contract",
+      "label": "aws CMP-004 Contract",
+      "summary": "Provider evidence contract for the control.",
+      "metadata": {
+        "contract_id": "pec_aws_cmp-004_1.0.0",
+        "support_status": "research_preview",
+        "freshness_hours": 72,
+        "activation_gate": "aws support is limited to research-preview evidence until lab validation, collector coverage, and expert review are complete."
+      }
+    },
+    {
+      "node_id": "decision_review:drv_f924725c025c76",
+      "node_type": "decision_review_item",
+      "label": "Investigate or enrich evidence path",
+      "summary": "Add or enrich collector evidence for the missing requirement and keep the limitation visible until direct evidence is available.",
+      "metadata": {
+        "review_id": "drv_f924725c025c76",
+        "decision_type": "evidence_investigation",
+        "priority": "medium",
+        "owner_hint": "platform"
+      }
+    },
+    {
+      "node_id": "control:MON-001",
+      "node_type": "control",
+      "label": "MON-001",
+      "summary": "Activity log retention is below governance and investigation expectations",
+      "metadata": {
+        "category": "Monitoring/Logging",
+        "rule_version": "1.0.0"
+      }
+    },
+    {
+      "node_id": "finding:fdg_03484c44a1bea9",
+      "node_type": "finding",
+      "label": "fdg_03484c44a1bea9",
+      "summary": "Activity log retention is below governance and investigation expectations",
+      "metadata": {
+        "finding_id": "fdg_03484c44a1bea9",
+        "control_id": "MON-001",
+        "provider": "aws",
+        "priority": "Planned",
+        "resource_scope": "000832363767"
+      }
+    },
+    {
+      "node_id": "score:fdg_03484c44a1bea9",
+      "node_type": "score",
+      "label": "Score 35.79",
+      "summary": "Deterministic finding score and priority.",
+      "metadata": {
+        "score": 35.79,
+        "priority": "Planned",
+        "score_breakdown": {
+          "observed_confidence": 0.9,
+          "calibrated_confidence": 0.9,
+          "calibration_status": "validated",
+          "base_severity": 7.0,
+          "likelihood_factor": 1.16,
+          "data_factor": 1.28,
+          "confidence_factor": 0.97,
+          "remediation_factor": 1.045,
+          "raw_score": 10.5355,
+          "normalized_score": 35.79
+        }
+      }
+    },
+    {
+      "node_id": "evidence_sufficiency:fdg_03484c44a1bea9",
+      "node_type": "evidence_sufficiency",
+      "label": "Evidence unsupported",
+      "summary": "Evidence sufficiency assessment for the finding decision.",
+      "metadata": {
+        "observation_class": "observed",
+        "sufficiency": "unsupported",
+        "direct_evidence_count": 1,
+        "inferred_evidence_count": 0,
+        "unavailable_evidence_count": 0,
+        "provider_support": "research_preview",
+        "missing_requirements": [
+          "log retention and alerting evidence",
+          "incident runbook or workflow evidence"
+        ]
+      }
+    },
+    {
+      "node_id": "provider_contract:aws:MON-001",
+      "node_type": "provider_evidence_contract",
+      "label": "aws MON-001 Contract",
+      "summary": "Provider evidence contract for the control.",
+      "metadata": {
+        "contract_id": "pec_aws_mon-001_1.0.0",
+        "support_status": "research_preview",
+        "freshness_hours": 24,
+        "activation_gate": "aws support is limited to research-preview evidence until lab validation, collector coverage, and expert review are complete."
+      }
+    },
+    {
+      "node_id": "decision_review:drv_f6f198703fa349",
+      "node_type": "decision_review_item",
+      "label": "Monitor in next assessment",
+      "summary": "Risk is present but below immediate governance-decision threshold.",
+      "metadata": {
+        "review_id": "drv_f6f198703fa349",
+        "decision_type": "monitor",
+        "priority": "medium",
+        "owner_hint": "security-operations"
+      }
+    },
+    {
+      "node_id": "control:GOV-003",
+      "node_type": "control",
+      "label": "GOV-003",
+      "summary": "Policy assignment coverage is below the baseline governance threshold",
+      "metadata": {
+        "category": "Cost/Governance Hygiene",
+        "rule_version": "1.0.0"
+      }
+    },
+    {
+      "node_id": "finding:fdg_78fef0955deb69",
+      "node_type": "finding",
+      "label": "fdg_78fef0955deb69",
+      "summary": "Policy assignment coverage is below the baseline governance threshold",
+      "metadata": {
+        "finding_id": "fdg_78fef0955deb69",
+        "control_id": "GOV-003",
+        "provider": "aws",
+        "priority": "Planned",
+        "resource_scope": "000832363767"
+      }
+    },
+    {
+      "node_id": "score:fdg_78fef0955deb69",
+      "node_type": "score",
+      "label": "Score 33.88",
+      "summary": "Deterministic finding score and priority.",
+      "metadata": {
+        "score": 33.88,
+        "priority": "Planned",
+        "score_breakdown": {
+          "observed_confidence": 0.87,
+          "calibrated_confidence": 0.885,
+          "calibration_status": "validated",
+          "base_severity": 7.0,
+          "likelihood_factor": 1.08,
+          "data_factor": 1.28,
+          "confidence_factor": 0.9655,
+          "remediation_factor": 1.0675,
+          "raw_score": 9.9736,
+          "normalized_score": 33.88
+        }
+      }
+    },
+    {
+      "node_id": "evidence_sufficiency:fdg_78fef0955deb69",
+      "node_type": "evidence_sufficiency",
+      "label": "Evidence unsupported",
+      "summary": "Evidence sufficiency assessment for the finding decision.",
+      "metadata": {
+        "observation_class": "observed",
+        "sufficiency": "unsupported",
+        "direct_evidence_count": 1,
+        "inferred_evidence_count": 0,
+        "unavailable_evidence_count": 0,
+        "provider_support": "research_preview",
+        "missing_requirements": [
+          "resource inventory evidence",
+          "governance policy/budget/tagging control evidence"
+        ]
+      }
+    },
+    {
+      "node_id": "provider_contract:aws:GOV-003",
+      "node_type": "provider_evidence_contract",
+      "label": "aws GOV-003 Contract",
+      "summary": "Provider evidence contract for the control.",
+      "metadata": {
+        "contract_id": "pec_aws_gov-003_1.0.0",
+        "support_status": "research_preview",
+        "freshness_hours": 168,
+        "activation_gate": "aws support is limited to research-preview evidence until lab validation, collector coverage, and expert review are complete."
+      }
+    },
+    {
+      "node_id": "decision_review:drv_21094520d120b6",
+      "node_type": "decision_review_item",
+      "label": "Monitor in next assessment",
+      "summary": "Risk is present but below immediate governance-decision threshold.",
+      "metadata": {
+        "review_id": "drv_21094520d120b6",
+        "decision_type": "monitor",
+        "priority": "medium",
+        "owner_hint": "governance"
+      }
+    },
+    {
+      "node_id": "control:IAM-003",
+      "node_type": "control",
+      "label": "IAM-003",
+      "summary": "Stale service principals or credentials require review",
+      "metadata": {
+        "category": "IAM",
+        "rule_version": "1.0.0"
+      }
+    },
+    {
+      "node_id": "finding:fdg_c5f3db81b3965c",
+      "node_type": "finding",
+      "label": "fdg_c5f3db81b3965c",
+      "summary": "Stale service principals or credentials require review",
+      "metadata": {
+        "finding_id": "fdg_c5f3db81b3965c",
+        "control_id": "IAM-003",
+        "provider": "aws",
+        "priority": "Monitor",
+        "resource_scope": "000832363767"
+      }
+    },
+    {
+      "node_id": "score:fdg_c5f3db81b3965c",
+      "node_type": "score",
+      "label": "Score 23.34",
+      "summary": "Deterministic finding score and priority.",
+      "metadata": {
+        "score": 23.34,
+        "priority": "Monitor",
+        "score_breakdown": {
+          "observed_confidence": 0.8,
+          "calibrated_confidence": 0.797,
+          "calibration_status": "provisional",
+          "base_severity": 4.0,
+          "likelihood_factor": 1.32,
+          "data_factor": 1.28,
+          "confidence_factor": 0.9391,
+          "remediation_factor": 1.0825,
+          "raw_score": 6.8704,
+          "normalized_score": 23.34
+        }
+      }
+    },
+    {
+      "node_id": "evidence_sufficiency:fdg_c5f3db81b3965c",
+      "node_type": "evidence_sufficiency",
+      "label": "Evidence unsupported",
+      "summary": "Evidence sufficiency assessment for the finding decision.",
+      "metadata": {
+        "observation_class": "observed",
+        "sufficiency": "unsupported",
+        "direct_evidence_count": 1,
+        "inferred_evidence_count": 0,
+        "unavailable_evidence_count": 0,
+        "provider_support": "research_preview",
+        "missing_requirements": [
+          "privileged assignment inventory",
+          "identity governance visibility context"
+        ]
+      }
+    },
+    {
+      "node_id": "provider_contract:aws:IAM-003",
+      "node_type": "provider_evidence_contract",
+      "label": "aws IAM-003 Contract",
+      "summary": "Provider evidence contract for the control.",
+      "metadata": {
+        "contract_id": "pec_aws_iam-003_1.0.0",
+        "support_status": "research_preview",
+        "freshness_hours": 24,
+        "activation_gate": "aws support is limited to research-preview evidence until lab validation, collector coverage, and expert review are complete."
+      }
+    },
+    {
+      "node_id": "control:IOT-006",
+      "node_type": "control",
+      "label": "IOT-006",
+      "summary": "Conditional private endpoint and network isolation posture is weak",
+      "metadata": {
+        "category": "Healthcare IoT",
+        "rule_version": "1.0.0"
+      }
+    },
+    {
+      "node_id": "finding:fdg_22fa0573d52093",
+      "node_type": "finding",
+      "label": "fdg_22fa0573d52093",
+      "summary": "Conditional private endpoint and network isolation posture is weak",
+      "metadata": {
+        "finding_id": "fdg_22fa0573d52093",
+        "control_id": "IOT-006",
+        "provider": "aws",
+        "priority": "Monitor",
+        "resource_scope": "000832363767"
+      }
+    },
+    {
+      "node_id": "score:fdg_22fa0573d52093",
+      "node_type": "score",
+      "label": "Score 23.33",
+      "summary": "Deterministic finding score and priority.",
+      "metadata": {
+        "score": 23.33,
+        "priority": "Monitor",
+        "score_breakdown": {
+          "observed_confidence": 0.82,
+          "calibrated_confidence": 0.796,
+          "calibration_status": "provisional",
+          "base_severity": 4.0,
+          "likelihood_factor": 1.32,
+          "data_factor": 1.28,
+          "confidence_factor": 0.9388,
+          "remediation_factor": 1.0825,
+          "raw_score": 6.8682,
+          "normalized_score": 23.33
+        }
+      }
+    },
+    {
+      "node_id": "evidence_sufficiency:fdg_22fa0573d52093",
+      "node_type": "evidence_sufficiency",
+      "label": "Evidence unsupported",
+      "summary": "Evidence sufficiency assessment for the finding decision.",
+      "metadata": {
+        "observation_class": "observed",
+        "sufficiency": "unsupported",
+        "direct_evidence_count": 3,
+        "inferred_evidence_count": 0,
+        "unavailable_evidence_count": 0,
+        "provider_support": "research_preview",
+        "missing_requirements": [
+          "IoT platform configuration evidence",
+          "device identity, telemetry, and clinical boundary evidence"
+        ]
+      }
+    },
+    {
+      "node_id": "provider_contract:aws:IOT-006",
+      "node_type": "provider_evidence_contract",
+      "label": "aws IOT-006 Contract",
+      "summary": "Provider evidence contract for the control.",
+      "metadata": {
+        "contract_id": "pec_aws_iot-006_1.0.0",
+        "support_status": "research_preview",
+        "freshness_hours": 168,
+        "activation_gate": "aws support is limited to research-preview evidence until lab validation, collector coverage, and expert review are complete."
+      }
+    },
+    {
+      "node_id": "control:IOT-008",
+      "node_type": "control",
+      "label": "IOT-008",
+      "summary": "IoT credential governance is not linked to managed secret controls",
+      "metadata": {
+        "category": "Healthcare IoT",
+        "rule_version": "1.0.0"
+      }
+    },
+    {
+      "node_id": "finding:fdg_45fead59d5ed86",
+      "node_type": "finding",
+      "label": "fdg_45fead59d5ed86",
+      "summary": "IoT credential governance is not linked to managed secret controls",
+      "metadata": {
+        "finding_id": "fdg_45fead59d5ed86",
+        "control_id": "IOT-008",
+        "provider": "aws",
+        "priority": "Monitor",
+        "resource_scope": "000832363767"
+      }
+    },
+    {
+      "node_id": "score:fdg_45fead59d5ed86",
+      "node_type": "score",
+      "label": "Score 21.98",
+      "summary": "Deterministic finding score and priority.",
+      "metadata": {
+        "score": 21.98,
+        "priority": "Monitor",
+        "score_breakdown": {
+          "observed_confidence": 0.74,
+          "calibrated_confidence": 0.728,
+          "calibration_status": "provisional",
+          "base_severity": 4.0,
+          "likelihood_factor": 1.28,
+          "data_factor": 1.28,
+          "confidence_factor": 0.9184,
+          "remediation_factor": 1.075,
+          "raw_score": 6.4702,
+          "normalized_score": 21.98
+        }
+      }
+    },
+    {
+      "node_id": "evidence_sufficiency:fdg_45fead59d5ed86",
+      "node_type": "evidence_sufficiency",
+      "label": "Evidence unsupported",
+      "summary": "Evidence sufficiency assessment for the finding decision.",
+      "metadata": {
+        "observation_class": "observed",
+        "sufficiency": "unsupported",
+        "direct_evidence_count": 2,
+        "inferred_evidence_count": 0,
+        "unavailable_evidence_count": 0,
+        "provider_support": "research_preview",
+        "missing_requirements": [
+          "IoT platform configuration evidence",
+          "device identity, telemetry, and clinical boundary evidence"
+        ]
+      }
+    },
+    {
+      "node_id": "provider_contract:aws:IOT-008",
+      "node_type": "provider_evidence_contract",
+      "label": "aws IOT-008 Contract",
+      "summary": "Provider evidence contract for the control.",
+      "metadata": {
+        "contract_id": "pec_aws_iot-008_1.0.0",
+        "support_status": "research_preview",
+        "freshness_hours": 168,
+        "activation_gate": "aws support is limited to research-preview evidence until lab validation, collector coverage, and expert review are complete."
+      }
+    },
+    {
+      "node_id": "control:IOT-003",
+      "node_type": "control",
+      "label": "IOT-003",
+      "summary": "IoT diagnostic logging is incomplete for clinical telemetry investigation",
+      "metadata": {
+        "category": "Healthcare IoT",
+        "rule_version": "1.0.0"
+      }
+    },
+    {
+      "node_id": "finding:fdg_74c023949b5311",
+      "node_type": "finding",
+      "label": "fdg_74c023949b5311",
+      "summary": "IoT diagnostic logging is incomplete for clinical telemetry investigation",
+      "metadata": {
+        "finding_id": "fdg_74c023949b5311",
+        "control_id": "IOT-003",
+        "provider": "aws",
+        "priority": "Monitor",
+        "resource_scope": "000832363767"
+      }
+    },
+    {
+      "node_id": "score:fdg_74c023949b5311",
+      "node_type": "score",
+      "label": "Score 21.77",
+      "summary": "Deterministic finding score and priority.",
+      "metadata": {
+        "score": 21.77,
+        "priority": "Monitor",
+        "score_breakdown": {
+          "observed_confidence": 0.9,
+          "calibrated_confidence": 0.864,
+          "calibration_status": "provisional",
+          "base_severity": 4.0,
+          "likelihood_factor": 1.24,
+          "data_factor": 1.28,
+          "confidence_factor": 0.9592,
+          "remediation_factor": 1.0525,
+          "raw_score": 6.4095,
+          "normalized_score": 21.77
+        }
+      }
+    },
+    {
+      "node_id": "evidence_sufficiency:fdg_74c023949b5311",
+      "node_type": "evidence_sufficiency",
+      "label": "Evidence unsupported",
+      "summary": "Evidence sufficiency assessment for the finding decision.",
+      "metadata": {
+        "observation_class": "observed",
+        "sufficiency": "unsupported",
+        "direct_evidence_count": 3,
+        "inferred_evidence_count": 0,
+        "unavailable_evidence_count": 0,
+        "provider_support": "research_preview",
+        "missing_requirements": [
+          "IoT platform configuration evidence",
+          "device identity, telemetry, and clinical boundary evidence"
+        ]
+      }
+    },
+    {
+      "node_id": "provider_contract:aws:IOT-003",
+      "node_type": "provider_evidence_contract",
+      "label": "aws IOT-003 Contract",
+      "summary": "Provider evidence contract for the control.",
+      "metadata": {
+        "contract_id": "pec_aws_iot-003_1.0.0",
+        "support_status": "research_preview",
+        "freshness_hours": 168,
+        "activation_gate": "aws support is limited to research-preview evidence until lab validation, collector coverage, and expert review are complete."
+      }
+    },
+    {
+      "node_id": "control:IOT-004",
+      "node_type": "control",
+      "label": "IOT-004",
+      "summary": "Defender for IoT or equivalent security monitoring is not evidenced",
+      "metadata": {
+        "category": "Healthcare IoT",
+        "rule_version": "0.1.0"
+      }
+    },
+    {
+      "node_id": "finding:fdg_0487a7973756c3",
+      "node_type": "finding",
+      "label": "fdg_0487a7973756c3",
+      "summary": "Defender for IoT or equivalent security monitoring is not evidenced",
+      "metadata": {
+        "finding_id": "fdg_0487a7973756c3",
+        "control_id": "IOT-004",
+        "provider": "aws",
+        "priority": "Monitor",
+        "resource_scope": "000832363767"
+      }
+    },
+    {
+      "node_id": "score:fdg_0487a7973756c3",
+      "node_type": "score",
+      "label": "Score 21.5",
+      "summary": "Deterministic finding score and priority.",
+      "metadata": {
+        "score": 21.5,
+        "priority": "Monitor",
+        "score_breakdown": {
+          "observed_confidence": 0.76,
+          "calibrated_confidence": 0.736,
+          "calibration_status": "provisional",
+          "base_severity": 4.0,
+          "likelihood_factor": 1.24,
+          "data_factor": 1.28,
+          "confidence_factor": 0.9208,
+          "remediation_factor": 1.0825,
+          "raw_score": 6.3283,
+          "normalized_score": 21.5
+        }
+      }
+    },
+    {
+      "node_id": "evidence_sufficiency:fdg_0487a7973756c3",
+      "node_type": "evidence_sufficiency",
+      "label": "Evidence unsupported",
+      "summary": "Evidence sufficiency assessment for the finding decision.",
+      "metadata": {
+        "observation_class": "observed",
+        "sufficiency": "unsupported",
+        "direct_evidence_count": 1,
+        "inferred_evidence_count": 0,
+        "unavailable_evidence_count": 0,
+        "provider_support": "research_preview",
+        "missing_requirements": [
+          "IoT platform configuration evidence",
+          "device identity, telemetry, and clinical boundary evidence"
+        ]
+      }
+    },
+    {
+      "node_id": "provider_contract:aws:IOT-004",
+      "node_type": "provider_evidence_contract",
+      "label": "aws IOT-004 Contract",
+      "summary": "Provider evidence contract for the control.",
+      "metadata": {
+        "contract_id": "pec_aws_iot-004_0.1.0",
+        "support_status": "research_preview",
+        "freshness_hours": 168,
+        "activation_gate": "aws support is limited to research-preview evidence until lab validation, collector coverage, and expert review are complete."
+      }
+    },
+    {
+      "node_id": "control:IOT-007",
+      "node_type": "control",
+      "label": "IOT-007",
+      "summary": "IoMT telemetry routing and retention are below clinical evidence expectations",
+      "metadata": {
+        "category": "Healthcare IoT",
+        "rule_version": "1.0.0"
+      }
+    },
+    {
+      "node_id": "finding:fdg_212e49f1a69dad",
+      "node_type": "finding",
+      "label": "fdg_212e49f1a69dad",
+      "summary": "IoMT telemetry routing and retention are below clinical evidence expectations",
+      "metadata": {
+        "finding_id": "fdg_212e49f1a69dad",
+        "control_id": "IOT-007",
+        "provider": "aws",
+        "priority": "Monitor",
+        "resource_scope": "000832363767"
+      }
+    },
+    {
+      "node_id": "score:fdg_212e49f1a69dad",
+      "node_type": "score",
+      "label": "Score 20.93",
+      "summary": "Deterministic finding score and priority.",
+      "metadata": {
+        "score": 20.93,
+        "priority": "Monitor",
+        "score_breakdown": {
+          "observed_confidence": 0.8,
+          "calibrated_confidence": 0.776,
+          "calibration_status": "provisional",
+          "base_severity": 4.0,
+          "likelihood_factor": 1.2,
+          "data_factor": 1.28,
+          "confidence_factor": 0.9328,
+          "remediation_factor": 1.075,
+          "raw_score": 6.161,
+          "normalized_score": 20.93
+        }
+      }
+    },
+    {
+      "node_id": "evidence_sufficiency:fdg_212e49f1a69dad",
+      "node_type": "evidence_sufficiency",
+      "label": "Evidence unsupported",
+      "summary": "Evidence sufficiency assessment for the finding decision.",
+      "metadata": {
+        "observation_class": "observed",
+        "sufficiency": "unsupported",
+        "direct_evidence_count": 3,
+        "inferred_evidence_count": 0,
+        "unavailable_evidence_count": 0,
+        "provider_support": "research_preview",
+        "missing_requirements": [
+          "IoT platform configuration evidence",
+          "device identity, telemetry, and clinical boundary evidence"
+        ]
+      }
+    },
+    {
+      "node_id": "provider_contract:aws:IOT-007",
+      "node_type": "provider_evidence_contract",
+      "label": "aws IOT-007 Contract",
+      "summary": "Provider evidence contract for the control.",
+      "metadata": {
+        "contract_id": "pec_aws_iot-007_1.0.0",
+        "support_status": "research_preview",
+        "freshness_hours": 168,
+        "activation_gate": "aws support is limited to research-preview evidence until lab validation, collector coverage, and expert review are complete."
+      }
+    },
+    {
+      "node_id": "control:IOT-009",
+      "node_type": "control",
+      "label": "IOT-009",
+      "summary": "Clinical IoT alert routing is not operationally evidenced",
+      "metadata": {
+        "category": "Healthcare IoT",
+        "rule_version": "1.0.0"
+      }
+    },
+    {
+      "node_id": "finding:fdg_f2db05d7f43d6a",
+      "node_type": "finding",
+      "label": "fdg_f2db05d7f43d6a",
+      "summary": "Clinical IoT alert routing is not operationally evidenced",
+      "metadata": {
+        "finding_id": "fdg_f2db05d7f43d6a",
+        "control_id": "IOT-009",
+        "provider": "aws",
+        "priority": "Monitor",
+        "resource_scope": "000832363767"
+      }
+    },
+    {
+      "node_id": "score:fdg_f2db05d7f43d6a",
+      "node_type": "score",
+      "label": "Score 20.3",
+      "summary": "Deterministic finding score and priority.",
+      "metadata": {
+        "score": 20.3,
+        "priority": "Monitor",
+        "score_breakdown": {
+          "observed_confidence": 0.83,
+          "calibrated_confidence": 0.809,
+          "calibration_status": "provisional",
+          "base_severity": 4.0,
+          "likelihood_factor": 1.16,
+          "data_factor": 1.28,
+          "confidence_factor": 0.9427,
+          "remediation_factor": 1.0675,
+          "raw_score": 5.9768,
+          "normalized_score": 20.3
+        }
+      }
+    },
+    {
+      "node_id": "evidence_sufficiency:fdg_f2db05d7f43d6a",
+      "node_type": "evidence_sufficiency",
+      "label": "Evidence unsupported",
+      "summary": "Evidence sufficiency assessment for the finding decision.",
+      "metadata": {
+        "observation_class": "observed",
+        "sufficiency": "unsupported",
+        "direct_evidence_count": 2,
+        "inferred_evidence_count": 0,
+        "unavailable_evidence_count": 0,
+        "provider_support": "research_preview",
+        "missing_requirements": [
+          "IoT platform configuration evidence",
+          "device identity, telemetry, and clinical boundary evidence"
+        ]
+      }
+    },
+    {
+      "node_id": "provider_contract:aws:IOT-009",
+      "node_type": "provider_evidence_contract",
+      "label": "aws IOT-009 Contract",
+      "summary": "Provider evidence contract for the control.",
+      "metadata": {
+        "contract_id": "pec_aws_iot-009_1.0.0",
+        "support_status": "research_preview",
+        "freshness_hours": 168,
+        "activation_gate": "aws support is limited to research-preview evidence until lab validation, collector coverage, and expert review are complete."
+      }
+    },
+    {
+      "node_id": "control:GOV-004",
+      "node_type": "control",
+      "label": "GOV-004",
+      "summary": "Orphaned resources increase governance and cost hygiene risk",
+      "metadata": {
+        "category": "Cost/Governance Hygiene",
+        "rule_version": "1.0.0"
+      }
+    },
+    {
+      "node_id": "finding:fdg_6c25430ff366c3",
+      "node_type": "finding",
+      "label": "fdg_6c25430ff366c3",
+      "summary": "Orphaned resources increase governance and cost hygiene risk",
+      "metadata": {
+        "finding_id": "fdg_6c25430ff366c3",
+        "control_id": "GOV-004",
+        "provider": "aws",
+        "priority": "Monitor",
+        "resource_scope": "000832363767"
+      }
+    },
+    {
+      "node_id": "score:fdg_6c25430ff366c3",
+      "node_type": "score",
+      "label": "Score 17.87",
+      "summary": "Deterministic finding score and priority.",
+      "metadata": {
+        "score": 17.87,
+        "priority": "Monitor",
+        "score_breakdown": {
+          "observed_confidence": 0.82,
+          "calibrated_confidence": 0.796,
+          "calibration_status": "provisional",
+          "base_severity": 4.0,
+          "likelihood_factor": 1.04,
+          "data_factor": 1.28,
+          "confidence_factor": 0.9388,
+          "remediation_factor": 1.0525,
+          "raw_score": 5.2614,
+          "normalized_score": 17.87
+        }
+      }
+    },
+    {
+      "node_id": "evidence_sufficiency:fdg_6c25430ff366c3",
+      "node_type": "evidence_sufficiency",
+      "label": "Evidence unsupported",
+      "summary": "Evidence sufficiency assessment for the finding decision.",
+      "metadata": {
+        "observation_class": "observed",
+        "sufficiency": "unsupported",
+        "direct_evidence_count": 1,
+        "inferred_evidence_count": 0,
+        "unavailable_evidence_count": 0,
+        "provider_support": "research_preview",
+        "missing_requirements": [
+          "resource inventory evidence",
+          "governance policy/budget/tagging control evidence"
+        ]
+      }
+    },
+    {
+      "node_id": "provider_contract:aws:GOV-004",
+      "node_type": "provider_evidence_contract",
+      "label": "aws GOV-004 Contract",
+      "summary": "Provider evidence contract for the control.",
+      "metadata": {
+        "contract_id": "pec_aws_gov-004_1.0.0",
+        "support_status": "research_preview",
+        "freshness_hours": 168,
+        "activation_gate": "aws support is limited to research-preview evidence until lab validation, collector coverage, and expert review are complete."
+      }
+    },
+    {
+      "node_id": "control:GOV-002",
+      "node_type": "control",
+      "label": "GOV-002",
+      "summary": "Budget alerting is not enabled for cloud cost governance",
+      "metadata": {
+        "category": "Cost/Governance Hygiene",
+        "rule_version": "1.1.0"
+      }
+    },
+    {
+      "node_id": "finding:fdg_41e815a1b649a8",
+      "node_type": "finding",
+      "label": "fdg_41e815a1b649a8",
+      "summary": "Budget alerting is not enabled for cloud cost governance",
+      "metadata": {
+        "finding_id": "fdg_41e815a1b649a8",
+        "control_id": "GOV-002",
+        "provider": "aws",
+        "priority": "Monitor",
+        "resource_scope": "000832363767"
+      }
+    },
+    {
+      "node_id": "score:fdg_41e815a1b649a8",
+      "node_type": "score",
+      "label": "Score 16.39",
+      "summary": "Deterministic finding score and priority.",
+      "metadata": {
+        "score": 16.39,
+        "priority": "Monitor",
+        "score_breakdown": {
+          "observed_confidence": 0.8,
+          "calibrated_confidence": 0.82,
+          "calibration_status": "validated",
+          "base_severity": 4.0,
+          "likelihood_factor": 0.96,
+          "data_factor": 1.28,
+          "confidence_factor": 0.946,
+          "remediation_factor": 1.0375,
+          "raw_score": 4.8241,
+          "normalized_score": 16.39
+        }
+      }
+    },
+    {
+      "node_id": "evidence_sufficiency:fdg_41e815a1b649a8",
+      "node_type": "evidence_sufficiency",
+      "label": "Evidence unsupported",
+      "summary": "Evidence sufficiency assessment for the finding decision.",
+      "metadata": {
+        "observation_class": "observed",
+        "sufficiency": "unsupported",
+        "direct_evidence_count": 1,
+        "inferred_evidence_count": 0,
+        "unavailable_evidence_count": 0,
+        "provider_support": "research_preview",
+        "missing_requirements": [
+          "resource inventory evidence",
+          "governance policy/budget/tagging control evidence"
+        ]
+      }
+    },
+    {
+      "node_id": "provider_contract:aws:GOV-002",
+      "node_type": "provider_evidence_contract",
+      "label": "aws GOV-002 Contract",
+      "summary": "Provider evidence contract for the control.",
+      "metadata": {
+        "contract_id": "pec_aws_gov-002_1.1.0",
+        "support_status": "research_preview",
+        "freshness_hours": 168,
+        "activation_gate": "aws support is limited to research-preview evidence until lab validation, collector coverage, and expert review are complete."
+      }
+    },
+    {
+      "node_id": "control:IOT-010",
+      "node_type": "control",
+      "label": "IOT-010",
+      "summary": "Clinical-operational ownership boundaries require human validation",
+      "metadata": {
+        "category": "Healthcare IoT",
+        "rule_version": "0.1.0"
+      }
+    },
+    {
+      "node_id": "finding:fdg_bd7c18a97bdfc6",
+      "node_type": "finding",
+      "label": "fdg_bd7c18a97bdfc6",
+      "summary": "Clinical-operational ownership boundaries require human validation",
+      "metadata": {
+        "finding_id": "fdg_bd7c18a97bdfc6",
+        "control_id": "IOT-010",
+        "provider": "aws",
+        "priority": "Monitor",
+        "resource_scope": "000832363767"
+      }
+    },
+    {
+      "node_id": "score:fdg_bd7c18a97bdfc6",
+      "node_type": "score",
+      "label": "Score 4.72",
+      "summary": "Deterministic finding score and priority.",
+      "metadata": {
+        "score": 4.72,
+        "priority": "Monitor",
+        "score_breakdown": {
+          "observed_confidence": 0.9,
+          "calibrated_confidence": 0.825,
+          "calibration_status": "provisional",
+          "base_severity": 1.0,
+          "likelihood_factor": 1.08,
+          "data_factor": 1.28,
+          "confidence_factor": 0.9475,
+          "remediation_factor": 1.06,
+          "raw_score": 1.3884,
+          "normalized_score": 4.72
+        }
+      }
+    },
+    {
+      "node_id": "evidence_sufficiency:fdg_bd7c18a97bdfc6",
+      "node_type": "evidence_sufficiency",
+      "label": "Evidence unsupported",
+      "summary": "Evidence sufficiency assessment for the finding decision.",
+      "metadata": {
+        "observation_class": "observed",
+        "sufficiency": "unsupported",
+        "direct_evidence_count": 2,
+        "inferred_evidence_count": 0,
+        "unavailable_evidence_count": 0,
+        "provider_support": "research_preview",
+        "missing_requirements": [
+          "IoT platform configuration evidence",
+          "device identity, telemetry, and clinical boundary evidence"
+        ]
+      }
+    },
+    {
+      "node_id": "provider_contract:aws:IOT-010",
+      "node_type": "provider_evidence_contract",
+      "label": "aws IOT-010 Contract",
+      "summary": "Provider evidence contract for the control.",
+      "metadata": {
+        "contract_id": "pec_aws_iot-010_0.1.0",
+        "support_status": "research_preview",
+        "freshness_hours": 168,
+        "activation_gate": "aws support is limited to research-preview evidence until lab validation, collector coverage, and expert review are complete."
+      }
+    },
+    {
+      "node_id": "control:IAM-005",
+      "node_type": "control",
+      "label": "IAM-005",
+      "summary": "Identity governance observability is partial for this assessment scope",
+      "metadata": {
+        "category": "IAM",
+        "rule_version": "1.1.0"
+      }
+    },
+    {
+      "node_id": "finding:fdg_8ce865e5eb6019",
+      "node_type": "finding",
+      "label": "fdg_8ce865e5eb6019",
+      "summary": "Identity governance observability is partial for this assessment scope",
+      "metadata": {
+        "finding_id": "fdg_8ce865e5eb6019",
+        "control_id": "IAM-005",
+        "provider": "aws",
+        "priority": "Monitor",
+        "resource_scope": "000832363767"
+      }
+    },
+    {
+      "node_id": "score:fdg_8ce865e5eb6019",
+      "node_type": "score",
+      "label": "Score 4.57",
+      "summary": "Deterministic finding score and priority.",
+      "metadata": {
+        "score": 4.57,
+        "priority": "Monitor",
+        "score_breakdown": {
+          "observed_confidence": 0.92,
+          "calibrated_confidence": 0.935,
+          "calibration_status": "validated",
+          "base_severity": 1.0,
+          "likelihood_factor": 1.04,
+          "data_factor": 1.28,
+          "confidence_factor": 0.9805,
+          "remediation_factor": 1.03,
+          "raw_score": 1.3444,
+          "normalized_score": 4.57
+        }
+      }
+    },
+    {
+      "node_id": "evidence_sufficiency:fdg_8ce865e5eb6019",
+      "node_type": "evidence_sufficiency",
+      "label": "Evidence unsupported",
+      "summary": "Evidence sufficiency assessment for the finding decision.",
+      "metadata": {
+        "observation_class": "inferred",
+        "sufficiency": "unsupported",
+        "direct_evidence_count": 4,
+        "inferred_evidence_count": 0,
+        "unavailable_evidence_count": 1,
+        "provider_support": "research_preview",
+        "missing_requirements": [
+          "privileged assignment inventory",
+          "identity governance visibility context"
+        ]
+      }
+    },
+    {
+      "node_id": "provider_contract:aws:IAM-005",
+      "node_type": "provider_evidence_contract",
+      "label": "aws IAM-005 Contract",
+      "summary": "Provider evidence contract for the control.",
+      "metadata": {
+        "contract_id": "pec_aws_iam-005_1.1.0",
+        "support_status": "research_preview",
+        "freshness_hours": 24,
+        "activation_gate": "aws support is limited to research-preview evidence until lab validation, collector coverage, and expert review are complete."
+      }
+    }
+  ],
+  "edges": [
+    {
+      "edge_id": "60cb8345ec05f88f4a",
+      "source_node_id": "snapshot:evs_38d7b6507aa3d94a",
+      "target_node_id": "policy_pack:2026.04.0",
+      "relationship": "evaluated_against",
+      "explanation": "Evidence is evaluated against this policy pack."
+    },
+    {
+      "edge_id": "0e9a151f9d93363613",
+      "source_node_id": "snapshot:evs_38d7b6507aa3d94a",
+      "target_node_id": "assurance:assessment",
+      "relationship": "supports_assurance",
+      "explanation": "Evidence snapshot contributes to assessment assurance."
+    },
+    {
+      "edge_id": "e82295c3828149f588",
+      "source_node_id": "snapshot:evs_38d7b6507aa3d94a",
+      "target_node_id": "replay:assessment",
+      "relationship": "replayed_by",
+      "explanation": "Snapshot is replayed without recollecting cloud data."
+    },
+    {
+      "edge_id": "0f1d059e9d2b66423a",
+      "source_node_id": "replay:assessment",
+      "target_node_id": "assurance:assessment",
+      "relationship": "informs_assurance",
+      "explanation": "Replay result informs assessment assurance."
+    },
+    {
+      "edge_id": "cca6ac7045367a5b50",
+      "source_node_id": "rbom:assessment",
+      "target_node_id": "assurance:assessment",
+      "relationship": "informs_assurance",
+      "explanation": "RBOM integrity metadata informs assessment assurance."
+    },
+    {
+      "edge_id": "9308eab179aa556180",
+      "source_node_id": "assurance:assessment",
+      "target_node_id": "trust_badge:report",
+      "relationship": "summarized_as",
+      "explanation": "Assessment assurance is summarized as a report trust badge."
+    },
+    {
+      "edge_id": "861fd15af908561c53",
+      "source_node_id": "snapshot:evs_38d7b6507aa3d94a",
+      "target_node_id": "drift:control",
+      "relationship": "compared_for_drift",
+      "explanation": "Current evidence participates in control drift attribution."
+    },
+    {
+      "edge_id": "c27eefe37ae28f1f0d",
+      "source_node_id": "policy_pack:2026.04.0",
+      "target_node_id": "control:NET-001",
+      "relationship": "defines_control",
+      "explanation": "Policy pack defines this control."
+    },
+    {
+      "edge_id": "66f8e079d6bc1722ab",
+      "source_node_id": "snapshot:evs_38d7b6507aa3d94a",
+      "target_node_id": "finding:fdg_514b77f2a83791",
+      "relationship": "produces_finding",
+      "explanation": "Evidence snapshot produced this finding decision."
+    },
+    {
+      "edge_id": "a208e91d12d950b8c5",
+      "source_node_id": "control:NET-001",
+      "target_node_id": "finding:fdg_514b77f2a83791",
+      "relationship": "evaluates_to",
+      "explanation": "Control evaluation produced this finding."
+    },
+    {
+      "edge_id": "f970ffefdd38f1f313",
+      "source_node_id": "provider_contract:aws:NET-001",
+      "target_node_id": "evidence_sufficiency:fdg_514b77f2a83791",
+      "relationship": "sets_evidence_expectation",
+      "explanation": "Provider contract sets evidence expectations."
+    },
+    {
+      "edge_id": "775125614fda056937",
+      "source_node_id": "finding:fdg_514b77f2a83791",
+      "target_node_id": "evidence_sufficiency:fdg_514b77f2a83791",
+      "relationship": "has_evidence_sufficiency",
+      "explanation": "Finding includes evidence sufficiency classification."
+    },
+    {
+      "edge_id": "31ad56bad6f5ecfb23",
+      "source_node_id": "finding:fdg_514b77f2a83791",
+      "target_node_id": "score:fdg_514b77f2a83791",
+      "relationship": "scored_as",
+      "explanation": "Finding is scored by deterministic scoring."
+    },
+    {
+      "edge_id": "95bebd4f4ef4f26034",
+      "source_node_id": "score:fdg_514b77f2a83791",
+      "target_node_id": "drift:control",
+      "relationship": "participates_in_drift",
+      "explanation": "Finding score participates in drift attribution."
+    },
+    {
+      "edge_id": "be80f6e78415b5411d",
+      "source_node_id": "score:fdg_514b77f2a83791",
+      "target_node_id": "decision_review:drv_4101b93513209e",
+      "relationship": "requires_decision",
+      "explanation": "Scored finding requires governance review."
+    },
+    {
+      "edge_id": "6b0b89c2dfc1030012",
+      "source_node_id": "policy_pack:2026.04.0",
+      "target_node_id": "control:IAM-001",
+      "relationship": "defines_control",
+      "explanation": "Policy pack defines this control."
+    },
+    {
+      "edge_id": "138858c701ea6f765b",
+      "source_node_id": "snapshot:evs_38d7b6507aa3d94a",
+      "target_node_id": "finding:fdg_81612c096e8237",
+      "relationship": "produces_finding",
+      "explanation": "Evidence snapshot produced this finding decision."
+    },
+    {
+      "edge_id": "e0969bb94a29792975",
+      "source_node_id": "control:IAM-001",
+      "target_node_id": "finding:fdg_81612c096e8237",
+      "relationship": "evaluates_to",
+      "explanation": "Control evaluation produced this finding."
+    },
+    {
+      "edge_id": "6b56ac6f4509b2f791",
+      "source_node_id": "provider_contract:aws:IAM-001",
+      "target_node_id": "evidence_sufficiency:fdg_81612c096e8237",
+      "relationship": "sets_evidence_expectation",
+      "explanation": "Provider contract sets evidence expectations."
+    },
+    {
+      "edge_id": "0ae8b5e55c5c0681f4",
+      "source_node_id": "finding:fdg_81612c096e8237",
+      "target_node_id": "evidence_sufficiency:fdg_81612c096e8237",
+      "relationship": "has_evidence_sufficiency",
+      "explanation": "Finding includes evidence sufficiency classification."
+    },
+    {
+      "edge_id": "22c5b7e0d4e7b03b8a",
+      "source_node_id": "finding:fdg_81612c096e8237",
+      "target_node_id": "score:fdg_81612c096e8237",
+      "relationship": "scored_as",
+      "explanation": "Finding is scored by deterministic scoring."
+    },
+    {
+      "edge_id": "9b92698e817c61ac89",
+      "source_node_id": "score:fdg_81612c096e8237",
+      "target_node_id": "drift:control",
+      "relationship": "participates_in_drift",
+      "explanation": "Finding score participates in drift attribution."
+    },
+    {
+      "edge_id": "7fd20bbd622703e93a",
+      "source_node_id": "score:fdg_81612c096e8237",
+      "target_node_id": "decision_review:drv_e7403d177a8470",
+      "relationship": "requires_decision",
+      "explanation": "Scored finding requires governance review."
+    },
+    {
+      "edge_id": "94cb46975057bd7e62",
+      "source_node_id": "policy_pack:2026.04.0",
+      "target_node_id": "control:DATA-001",
+      "relationship": "defines_control",
+      "explanation": "Policy pack defines this control."
+    },
+    {
+      "edge_id": "92e60331e7c82cb5a8",
+      "source_node_id": "snapshot:evs_38d7b6507aa3d94a",
+      "target_node_id": "finding:fdg_59af495a1834f7",
+      "relationship": "produces_finding",
+      "explanation": "Evidence snapshot produced this finding decision."
+    },
+    {
+      "edge_id": "2b3cbf28bee280f18f",
+      "source_node_id": "control:DATA-001",
+      "target_node_id": "finding:fdg_59af495a1834f7",
+      "relationship": "evaluates_to",
+      "explanation": "Control evaluation produced this finding."
+    },
+    {
+      "edge_id": "ead474c61b15d2fc51",
+      "source_node_id": "provider_contract:aws:DATA-001",
+      "target_node_id": "evidence_sufficiency:fdg_59af495a1834f7",
+      "relationship": "sets_evidence_expectation",
+      "explanation": "Provider contract sets evidence expectations."
+    },
+    {
+      "edge_id": "7b539caf0feb887f3e",
+      "source_node_id": "finding:fdg_59af495a1834f7",
+      "target_node_id": "evidence_sufficiency:fdg_59af495a1834f7",
+      "relationship": "has_evidence_sufficiency",
+      "explanation": "Finding includes evidence sufficiency classification."
+    },
+    {
+      "edge_id": "1a3155db87b6f95a06",
+      "source_node_id": "finding:fdg_59af495a1834f7",
+      "target_node_id": "score:fdg_59af495a1834f7",
+      "relationship": "scored_as",
+      "explanation": "Finding is scored by deterministic scoring."
+    },
+    {
+      "edge_id": "7249ab6aa382dc97b7",
+      "source_node_id": "score:fdg_59af495a1834f7",
+      "target_node_id": "drift:control",
+      "relationship": "participates_in_drift",
+      "explanation": "Finding score participates in drift attribution."
+    },
+    {
+      "edge_id": "ce4d03b5c12a69cd4c",
+      "source_node_id": "score:fdg_59af495a1834f7",
+      "target_node_id": "decision_review:drv_0fe7e2ead315c3",
+      "relationship": "requires_decision",
+      "explanation": "Scored finding requires governance review."
+    },
+    {
+      "edge_id": "435ea5a52b6f37bca6",
+      "source_node_id": "policy_pack:2026.04.0",
+      "target_node_id": "control:IOT-005",
+      "relationship": "defines_control",
+      "explanation": "Policy pack defines this control."
+    },
+    {
+      "edge_id": "f1240e0d6f674d4dfb",
+      "source_node_id": "snapshot:evs_38d7b6507aa3d94a",
+      "target_node_id": "finding:fdg_994c549d0b3d2e",
+      "relationship": "produces_finding",
+      "explanation": "Evidence snapshot produced this finding decision."
+    },
+    {
+      "edge_id": "0f3cf6163f01bd18b9",
+      "source_node_id": "control:IOT-005",
+      "target_node_id": "finding:fdg_994c549d0b3d2e",
+      "relationship": "evaluates_to",
+      "explanation": "Control evaluation produced this finding."
+    },
+    {
+      "edge_id": "0f6139838f6c9adc9b",
+      "source_node_id": "provider_contract:aws:IOT-005",
+      "target_node_id": "evidence_sufficiency:fdg_994c549d0b3d2e",
+      "relationship": "sets_evidence_expectation",
+      "explanation": "Provider contract sets evidence expectations."
+    },
+    {
+      "edge_id": "eee12d09a7c9055c60",
+      "source_node_id": "finding:fdg_994c549d0b3d2e",
+      "target_node_id": "evidence_sufficiency:fdg_994c549d0b3d2e",
+      "relationship": "has_evidence_sufficiency",
+      "explanation": "Finding includes evidence sufficiency classification."
+    },
+    {
+      "edge_id": "fd3039b42dd0847da5",
+      "source_node_id": "finding:fdg_994c549d0b3d2e",
+      "target_node_id": "score:fdg_994c549d0b3d2e",
+      "relationship": "scored_as",
+      "explanation": "Finding is scored by deterministic scoring."
+    },
+    {
+      "edge_id": "b40e4f5fe9702a78c7",
+      "source_node_id": "score:fdg_994c549d0b3d2e",
+      "target_node_id": "drift:control",
+      "relationship": "participates_in_drift",
+      "explanation": "Finding score participates in drift attribution."
+    },
+    {
+      "edge_id": "1304d42c52158b673b",
+      "source_node_id": "score:fdg_994c549d0b3d2e",
+      "target_node_id": "decision_review:drv_e34602ec9ea91b",
+      "relationship": "requires_decision",
+      "explanation": "Scored finding requires governance review."
+    },
+    {
+      "edge_id": "7eade46ed6a9d65337",
+      "source_node_id": "policy_pack:2026.04.0",
+      "target_node_id": "control:NET-002",
+      "relationship": "defines_control",
+      "explanation": "Policy pack defines this control."
+    },
+    {
+      "edge_id": "2665fd5f728bff2fb2",
+      "source_node_id": "snapshot:evs_38d7b6507aa3d94a",
+      "target_node_id": "finding:fdg_e13f1fe2310b82",
+      "relationship": "produces_finding",
+      "explanation": "Evidence snapshot produced this finding decision."
+    },
+    {
+      "edge_id": "275eef91252872ecb8",
+      "source_node_id": "control:NET-002",
+      "target_node_id": "finding:fdg_e13f1fe2310b82",
+      "relationship": "evaluates_to",
+      "explanation": "Control evaluation produced this finding."
+    },
+    {
+      "edge_id": "198018927d7d21da7c",
+      "source_node_id": "provider_contract:aws:NET-002",
+      "target_node_id": "evidence_sufficiency:fdg_e13f1fe2310b82",
+      "relationship": "sets_evidence_expectation",
+      "explanation": "Provider contract sets evidence expectations."
+    },
+    {
+      "edge_id": "ad655fd41103815483",
+      "source_node_id": "finding:fdg_e13f1fe2310b82",
+      "target_node_id": "evidence_sufficiency:fdg_e13f1fe2310b82",
+      "relationship": "has_evidence_sufficiency",
+      "explanation": "Finding includes evidence sufficiency classification."
+    },
+    {
+      "edge_id": "54d5d27e0a4e251578",
+      "source_node_id": "finding:fdg_e13f1fe2310b82",
+      "target_node_id": "score:fdg_e13f1fe2310b82",
+      "relationship": "scored_as",
+      "explanation": "Finding is scored by deterministic scoring."
+    },
+    {
+      "edge_id": "fa36dd63ec995bde27",
+      "source_node_id": "score:fdg_e13f1fe2310b82",
+      "target_node_id": "drift:control",
+      "relationship": "participates_in_drift",
+      "explanation": "Finding score participates in drift attribution."
+    },
+    {
+      "edge_id": "092e3c08b5b8d7dbc4",
+      "source_node_id": "score:fdg_e13f1fe2310b82",
+      "target_node_id": "decision_review:drv_9a9a546b69bfe8",
+      "relationship": "requires_decision",
+      "explanation": "Scored finding requires governance review."
+    },
+    {
+      "edge_id": "fea4aa514f483a1188",
+      "source_node_id": "policy_pack:2026.04.0",
+      "target_node_id": "control:CMP-001",
+      "relationship": "defines_control",
+      "explanation": "Policy pack defines this control."
+    },
+    {
+      "edge_id": "a59913e24887b5da12",
+      "source_node_id": "snapshot:evs_38d7b6507aa3d94a",
+      "target_node_id": "finding:fdg_dfbb1e782053b2",
+      "relationship": "produces_finding",
+      "explanation": "Evidence snapshot produced this finding decision."
+    },
+    {
+      "edge_id": "5078efd584a8a0e4fd",
+      "source_node_id": "control:CMP-001",
+      "target_node_id": "finding:fdg_dfbb1e782053b2",
+      "relationship": "evaluates_to",
+      "explanation": "Control evaluation produced this finding."
+    },
+    {
+      "edge_id": "299cfaa55859be3a93",
+      "source_node_id": "provider_contract:aws:CMP-001",
+      "target_node_id": "evidence_sufficiency:fdg_dfbb1e782053b2",
+      "relationship": "sets_evidence_expectation",
+      "explanation": "Provider contract sets evidence expectations."
+    },
+    {
+      "edge_id": "fa82c9ef6293dc11f3",
+      "source_node_id": "finding:fdg_dfbb1e782053b2",
+      "target_node_id": "evidence_sufficiency:fdg_dfbb1e782053b2",
+      "relationship": "has_evidence_sufficiency",
+      "explanation": "Finding includes evidence sufficiency classification."
+    },
+    {
+      "edge_id": "91d59bf40d0552ed2a",
+      "source_node_id": "finding:fdg_dfbb1e782053b2",
+      "target_node_id": "score:fdg_dfbb1e782053b2",
+      "relationship": "scored_as",
+      "explanation": "Finding is scored by deterministic scoring."
+    },
+    {
+      "edge_id": "f0cf2e51503a3c4390",
+      "source_node_id": "score:fdg_dfbb1e782053b2",
+      "target_node_id": "drift:control",
+      "relationship": "participates_in_drift",
+      "explanation": "Finding score participates in drift attribution."
+    },
+    {
+      "edge_id": "9e05caf61e9fb9f63d",
+      "source_node_id": "score:fdg_dfbb1e782053b2",
+      "target_node_id": "decision_review:drv_71aed28f266bb5",
+      "relationship": "requires_decision",
+      "explanation": "Scored finding requires governance review."
+    },
+    {
+      "edge_id": "3ee36612f7aa7dcb5d",
+      "source_node_id": "policy_pack:2026.04.0",
+      "target_node_id": "control:DATA-002",
+      "relationship": "defines_control",
+      "explanation": "Policy pack defines this control."
+    },
+    {
+      "edge_id": "ff172ac806d41ca174",
+      "source_node_id": "snapshot:evs_38d7b6507aa3d94a",
+      "target_node_id": "finding:fdg_fd9b74860f2318",
+      "relationship": "produces_finding",
+      "explanation": "Evidence snapshot produced this finding decision."
+    },
+    {
+      "edge_id": "6b0007160406fe6652",
+      "source_node_id": "control:DATA-002",
+      "target_node_id": "finding:fdg_fd9b74860f2318",
+      "relationship": "evaluates_to",
+      "explanation": "Control evaluation produced this finding."
+    },
+    {
+      "edge_id": "d0a15e0fb48bd98507",
+      "source_node_id": "provider_contract:aws:DATA-002",
+      "target_node_id": "evidence_sufficiency:fdg_fd9b74860f2318",
+      "relationship": "sets_evidence_expectation",
+      "explanation": "Provider contract sets evidence expectations."
+    },
+    {
+      "edge_id": "d7262d93c74a29f59b",
+      "source_node_id": "finding:fdg_fd9b74860f2318",
+      "target_node_id": "evidence_sufficiency:fdg_fd9b74860f2318",
+      "relationship": "has_evidence_sufficiency",
+      "explanation": "Finding includes evidence sufficiency classification."
+    },
+    {
+      "edge_id": "7a6d74156fec0ec655",
+      "source_node_id": "finding:fdg_fd9b74860f2318",
+      "target_node_id": "score:fdg_fd9b74860f2318",
+      "relationship": "scored_as",
+      "explanation": "Finding is scored by deterministic scoring."
+    },
+    {
+      "edge_id": "c78fed0b6ccffe59c4",
+      "source_node_id": "score:fdg_fd9b74860f2318",
+      "target_node_id": "drift:control",
+      "relationship": "participates_in_drift",
+      "explanation": "Finding score participates in drift attribution."
+    },
+    {
+      "edge_id": "c50aef0ce958fe4e42",
+      "source_node_id": "score:fdg_fd9b74860f2318",
+      "target_node_id": "decision_review:drv_265642e37d44ef",
+      "relationship": "requires_decision",
+      "explanation": "Scored finding requires governance review."
+    },
+    {
+      "edge_id": "d707f4ec6f135f1b70",
+      "source_node_id": "policy_pack:2026.04.0",
+      "target_node_id": "control:NET-004",
+      "relationship": "defines_control",
+      "explanation": "Policy pack defines this control."
+    },
+    {
+      "edge_id": "03e87a25153427388f",
+      "source_node_id": "snapshot:evs_38d7b6507aa3d94a",
+      "target_node_id": "finding:fdg_95befe3a0ef4d3",
+      "relationship": "produces_finding",
+      "explanation": "Evidence snapshot produced this finding decision."
+    },
+    {
+      "edge_id": "e226c892dff865bceb",
+      "source_node_id": "control:NET-004",
+      "target_node_id": "finding:fdg_95befe3a0ef4d3",
+      "relationship": "evaluates_to",
+      "explanation": "Control evaluation produced this finding."
+    },
+    {
+      "edge_id": "7f7a5dc287f246d8e5",
+      "source_node_id": "provider_contract:aws:NET-004",
+      "target_node_id": "evidence_sufficiency:fdg_95befe3a0ef4d3",
+      "relationship": "sets_evidence_expectation",
+      "explanation": "Provider contract sets evidence expectations."
+    },
+    {
+      "edge_id": "86e3210cf6452e48d9",
+      "source_node_id": "finding:fdg_95befe3a0ef4d3",
+      "target_node_id": "evidence_sufficiency:fdg_95befe3a0ef4d3",
+      "relationship": "has_evidence_sufficiency",
+      "explanation": "Finding includes evidence sufficiency classification."
+    },
+    {
+      "edge_id": "ddeb62299c25ed2c53",
+      "source_node_id": "finding:fdg_95befe3a0ef4d3",
+      "target_node_id": "score:fdg_95befe3a0ef4d3",
+      "relationship": "scored_as",
+      "explanation": "Finding is scored by deterministic scoring."
+    },
+    {
+      "edge_id": "fa4760c1325697366a",
+      "source_node_id": "score:fdg_95befe3a0ef4d3",
+      "target_node_id": "drift:control",
+      "relationship": "participates_in_drift",
+      "explanation": "Finding score participates in drift attribution."
+    },
+    {
+      "edge_id": "c33b43750f37de3138",
+      "source_node_id": "score:fdg_95befe3a0ef4d3",
+      "target_node_id": "decision_review:drv_603cf37ee7a853",
+      "relationship": "requires_decision",
+      "explanation": "Scored finding requires governance review."
+    },
+    {
+      "edge_id": "cc93c769f6aa84c31c",
+      "source_node_id": "policy_pack:2026.04.0",
+      "target_node_id": "control:IOT-002",
+      "relationship": "defines_control",
+      "explanation": "Policy pack defines this control."
+    },
+    {
+      "edge_id": "1e29817192149b537c",
+      "source_node_id": "snapshot:evs_38d7b6507aa3d94a",
+      "target_node_id": "finding:fdg_47b2e528cc081f",
+      "relationship": "produces_finding",
+      "explanation": "Evidence snapshot produced this finding decision."
+    },
+    {
+      "edge_id": "baff491d1e3ed96621",
+      "source_node_id": "control:IOT-002",
+      "target_node_id": "finding:fdg_47b2e528cc081f",
+      "relationship": "evaluates_to",
+      "explanation": "Control evaluation produced this finding."
+    },
+    {
+      "edge_id": "fd7ba6a47470037739",
+      "source_node_id": "provider_contract:aws:IOT-002",
+      "target_node_id": "evidence_sufficiency:fdg_47b2e528cc081f",
+      "relationship": "sets_evidence_expectation",
+      "explanation": "Provider contract sets evidence expectations."
+    },
+    {
+      "edge_id": "e4360f8ef5d489e7d0",
+      "source_node_id": "finding:fdg_47b2e528cc081f",
+      "target_node_id": "evidence_sufficiency:fdg_47b2e528cc081f",
+      "relationship": "has_evidence_sufficiency",
+      "explanation": "Finding includes evidence sufficiency classification."
+    },
+    {
+      "edge_id": "e29ff6f6217f491b53",
+      "source_node_id": "finding:fdg_47b2e528cc081f",
+      "target_node_id": "score:fdg_47b2e528cc081f",
+      "relationship": "scored_as",
+      "explanation": "Finding is scored by deterministic scoring."
+    },
+    {
+      "edge_id": "0dd1107042c85618fe",
+      "source_node_id": "score:fdg_47b2e528cc081f",
+      "target_node_id": "drift:control",
+      "relationship": "participates_in_drift",
+      "explanation": "Finding score participates in drift attribution."
+    },
+    {
+      "edge_id": "8e45ff9e1d07014c78",
+      "source_node_id": "score:fdg_47b2e528cc081f",
+      "target_node_id": "decision_review:drv_dd2b0b0a35d2cb",
+      "relationship": "requires_decision",
+      "explanation": "Scored finding requires governance review."
+    },
+    {
+      "edge_id": "eec65175a548d78dd3",
+      "source_node_id": "policy_pack:2026.04.0",
+      "target_node_id": "control:IOT-001",
+      "relationship": "defines_control",
+      "explanation": "Policy pack defines this control."
+    },
+    {
+      "edge_id": "83124c40d9b562444a",
+      "source_node_id": "snapshot:evs_38d7b6507aa3d94a",
+      "target_node_id": "finding:fdg_8de9e4b39be686",
+      "relationship": "produces_finding",
+      "explanation": "Evidence snapshot produced this finding decision."
+    },
+    {
+      "edge_id": "1235bb45c6a9b79119",
+      "source_node_id": "control:IOT-001",
+      "target_node_id": "finding:fdg_8de9e4b39be686",
+      "relationship": "evaluates_to",
+      "explanation": "Control evaluation produced this finding."
+    },
+    {
+      "edge_id": "6882fc9439a71b4be2",
+      "source_node_id": "provider_contract:aws:IOT-001",
+      "target_node_id": "evidence_sufficiency:fdg_8de9e4b39be686",
+      "relationship": "sets_evidence_expectation",
+      "explanation": "Provider contract sets evidence expectations."
+    },
+    {
+      "edge_id": "7555fff9b50a6ed5f9",
+      "source_node_id": "finding:fdg_8de9e4b39be686",
+      "target_node_id": "evidence_sufficiency:fdg_8de9e4b39be686",
+      "relationship": "has_evidence_sufficiency",
+      "explanation": "Finding includes evidence sufficiency classification."
+    },
+    {
+      "edge_id": "d03a6c955b6c7f5010",
+      "source_node_id": "finding:fdg_8de9e4b39be686",
+      "target_node_id": "score:fdg_8de9e4b39be686",
+      "relationship": "scored_as",
+      "explanation": "Finding is scored by deterministic scoring."
+    },
+    {
+      "edge_id": "1add3805f295007322",
+      "source_node_id": "score:fdg_8de9e4b39be686",
+      "target_node_id": "drift:control",
+      "relationship": "participates_in_drift",
+      "explanation": "Finding score participates in drift attribution."
+    },
+    {
+      "edge_id": "2bc1326583f836c07c",
+      "source_node_id": "score:fdg_8de9e4b39be686",
+      "target_node_id": "decision_review:drv_bc7df941ac92ac",
+      "relationship": "requires_decision",
+      "explanation": "Scored finding requires governance review."
+    },
+    {
+      "edge_id": "de24515a1daa692f31",
+      "source_node_id": "policy_pack:2026.04.0",
+      "target_node_id": "control:CMP-002",
+      "relationship": "defines_control",
+      "explanation": "Policy pack defines this control."
+    },
+    {
+      "edge_id": "9ca297d12080e55fc5",
+      "source_node_id": "snapshot:evs_38d7b6507aa3d94a",
+      "target_node_id": "finding:fdg_ba8563fa9c85b0",
+      "relationship": "produces_finding",
+      "explanation": "Evidence snapshot produced this finding decision."
+    },
+    {
+      "edge_id": "9a9bf1061d5424a5a0",
+      "source_node_id": "control:CMP-002",
+      "target_node_id": "finding:fdg_ba8563fa9c85b0",
+      "relationship": "evaluates_to",
+      "explanation": "Control evaluation produced this finding."
+    },
+    {
+      "edge_id": "67f4ec382be42d1b3f",
+      "source_node_id": "provider_contract:aws:CMP-002",
+      "target_node_id": "evidence_sufficiency:fdg_ba8563fa9c85b0",
+      "relationship": "sets_evidence_expectation",
+      "explanation": "Provider contract sets evidence expectations."
+    },
+    {
+      "edge_id": "89cffd6fddebceaa17",
+      "source_node_id": "finding:fdg_ba8563fa9c85b0",
+      "target_node_id": "evidence_sufficiency:fdg_ba8563fa9c85b0",
+      "relationship": "has_evidence_sufficiency",
+      "explanation": "Finding includes evidence sufficiency classification."
+    },
+    {
+      "edge_id": "085af8ea46bb07bcb4",
+      "source_node_id": "finding:fdg_ba8563fa9c85b0",
+      "target_node_id": "score:fdg_ba8563fa9c85b0",
+      "relationship": "scored_as",
+      "explanation": "Finding is scored by deterministic scoring."
+    },
+    {
+      "edge_id": "86016817c53607cbae",
+      "source_node_id": "score:fdg_ba8563fa9c85b0",
+      "target_node_id": "drift:control",
+      "relationship": "participates_in_drift",
+      "explanation": "Finding score participates in drift attribution."
+    },
+    {
+      "edge_id": "830a6851d4a2e71e72",
+      "source_node_id": "score:fdg_ba8563fa9c85b0",
+      "target_node_id": "decision_review:drv_ad7aab39380163",
+      "relationship": "requires_decision",
+      "explanation": "Scored finding requires governance review."
+    },
+    {
+      "edge_id": "bf4f441090467537d6",
+      "source_node_id": "policy_pack:2026.04.0",
+      "target_node_id": "control:CMP-003",
+      "relationship": "defines_control",
+      "explanation": "Policy pack defines this control."
+    },
+    {
+      "edge_id": "b68b5dbd700b158fb5",
+      "source_node_id": "snapshot:evs_38d7b6507aa3d94a",
+      "target_node_id": "finding:fdg_1fcafc454b954f",
+      "relationship": "produces_finding",
+      "explanation": "Evidence snapshot produced this finding decision."
+    },
+    {
+      "edge_id": "6aedade3eaf71d1af5",
+      "source_node_id": "control:CMP-003",
+      "target_node_id": "finding:fdg_1fcafc454b954f",
+      "relationship": "evaluates_to",
+      "explanation": "Control evaluation produced this finding."
+    },
+    {
+      "edge_id": "7f99db5d85620a8203",
+      "source_node_id": "provider_contract:aws:CMP-003",
+      "target_node_id": "evidence_sufficiency:fdg_1fcafc454b954f",
+      "relationship": "sets_evidence_expectation",
+      "explanation": "Provider contract sets evidence expectations."
+    },
+    {
+      "edge_id": "3b0f21c0bd2842e2c9",
+      "source_node_id": "finding:fdg_1fcafc454b954f",
+      "target_node_id": "evidence_sufficiency:fdg_1fcafc454b954f",
+      "relationship": "has_evidence_sufficiency",
+      "explanation": "Finding includes evidence sufficiency classification."
+    },
+    {
+      "edge_id": "aac2334bc7d4e0c1f3",
+      "source_node_id": "finding:fdg_1fcafc454b954f",
+      "target_node_id": "score:fdg_1fcafc454b954f",
+      "relationship": "scored_as",
+      "explanation": "Finding is scored by deterministic scoring."
+    },
+    {
+      "edge_id": "154b0300886035c089",
+      "source_node_id": "score:fdg_1fcafc454b954f",
+      "target_node_id": "drift:control",
+      "relationship": "participates_in_drift",
+      "explanation": "Finding score participates in drift attribution."
+    },
+    {
+      "edge_id": "2169a4236bd0e98a31",
+      "source_node_id": "score:fdg_1fcafc454b954f",
+      "target_node_id": "decision_review:drv_dc188eac435f5c",
+      "relationship": "requires_decision",
+      "explanation": "Scored finding requires governance review."
+    },
+    {
+      "edge_id": "e949cc630deb8d3ae0",
+      "source_node_id": "policy_pack:2026.04.0",
+      "target_node_id": "control:DATA-003",
+      "relationship": "defines_control",
+      "explanation": "Policy pack defines this control."
+    },
+    {
+      "edge_id": "71ec160231f25879ba",
+      "source_node_id": "snapshot:evs_38d7b6507aa3d94a",
+      "target_node_id": "finding:fdg_4fdee149a387bc",
+      "relationship": "produces_finding",
+      "explanation": "Evidence snapshot produced this finding decision."
+    },
+    {
+      "edge_id": "7e2c3c87a066db3cbe",
+      "source_node_id": "control:DATA-003",
+      "target_node_id": "finding:fdg_4fdee149a387bc",
+      "relationship": "evaluates_to",
+      "explanation": "Control evaluation produced this finding."
+    },
+    {
+      "edge_id": "c75e79d46ecdb5b7ee",
+      "source_node_id": "provider_contract:aws:DATA-003",
+      "target_node_id": "evidence_sufficiency:fdg_4fdee149a387bc",
+      "relationship": "sets_evidence_expectation",
+      "explanation": "Provider contract sets evidence expectations."
+    },
+    {
+      "edge_id": "bb5c322a235bac9fd7",
+      "source_node_id": "finding:fdg_4fdee149a387bc",
+      "target_node_id": "evidence_sufficiency:fdg_4fdee149a387bc",
+      "relationship": "has_evidence_sufficiency",
+      "explanation": "Finding includes evidence sufficiency classification."
+    },
+    {
+      "edge_id": "f160a4779f85d0043b",
+      "source_node_id": "finding:fdg_4fdee149a387bc",
+      "target_node_id": "score:fdg_4fdee149a387bc",
+      "relationship": "scored_as",
+      "explanation": "Finding is scored by deterministic scoring."
+    },
+    {
+      "edge_id": "c46a4070b6561f7bd9",
+      "source_node_id": "score:fdg_4fdee149a387bc",
+      "target_node_id": "drift:control",
+      "relationship": "participates_in_drift",
+      "explanation": "Finding score participates in drift attribution."
+    },
+    {
+      "edge_id": "89f5c9237f08771eb4",
+      "source_node_id": "score:fdg_4fdee149a387bc",
+      "target_node_id": "decision_review:drv_2b49de93132e57",
+      "relationship": "requires_decision",
+      "explanation": "Scored finding requires governance review."
+    },
+    {
+      "edge_id": "b3e74678d2be664b38",
+      "source_node_id": "policy_pack:2026.04.0",
+      "target_node_id": "control:MON-003",
+      "relationship": "defines_control",
+      "explanation": "Policy pack defines this control."
+    },
+    {
+      "edge_id": "25441b9760af9ff45f",
+      "source_node_id": "snapshot:evs_38d7b6507aa3d94a",
+      "target_node_id": "finding:fdg_0fc8904a5edd56",
+      "relationship": "produces_finding",
+      "explanation": "Evidence snapshot produced this finding decision."
+    },
+    {
+      "edge_id": "8be32e980c1951afd5",
+      "source_node_id": "control:MON-003",
+      "target_node_id": "finding:fdg_0fc8904a5edd56",
+      "relationship": "evaluates_to",
+      "explanation": "Control evaluation produced this finding."
+    },
+    {
+      "edge_id": "b2019d87b8afedba31",
+      "source_node_id": "provider_contract:aws:MON-003",
+      "target_node_id": "evidence_sufficiency:fdg_0fc8904a5edd56",
+      "relationship": "sets_evidence_expectation",
+      "explanation": "Provider contract sets evidence expectations."
+    },
+    {
+      "edge_id": "9a10eb8bf40ed31934",
+      "source_node_id": "finding:fdg_0fc8904a5edd56",
+      "target_node_id": "evidence_sufficiency:fdg_0fc8904a5edd56",
+      "relationship": "has_evidence_sufficiency",
+      "explanation": "Finding includes evidence sufficiency classification."
+    },
+    {
+      "edge_id": "1c237afc422ec70d8a",
+      "source_node_id": "finding:fdg_0fc8904a5edd56",
+      "target_node_id": "score:fdg_0fc8904a5edd56",
+      "relationship": "scored_as",
+      "explanation": "Finding is scored by deterministic scoring."
+    },
+    {
+      "edge_id": "b63839e573122bfb93",
+      "source_node_id": "score:fdg_0fc8904a5edd56",
+      "target_node_id": "drift:control",
+      "relationship": "participates_in_drift",
+      "explanation": "Finding score participates in drift attribution."
+    },
+    {
+      "edge_id": "c396be24cc0c1f92cd",
+      "source_node_id": "score:fdg_0fc8904a5edd56",
+      "target_node_id": "decision_review:drv_b1d0fd66bf994c",
+      "relationship": "requires_decision",
+      "explanation": "Scored finding requires governance review."
+    },
+    {
+      "edge_id": "e8c45cf2d5a4b79286",
+      "source_node_id": "policy_pack:2026.04.0",
+      "target_node_id": "control:CMP-004",
+      "relationship": "defines_control",
+      "explanation": "Policy pack defines this control."
+    },
+    {
+      "edge_id": "c65e32bfd8fc374cab",
+      "source_node_id": "snapshot:evs_38d7b6507aa3d94a",
+      "target_node_id": "finding:fdg_32dfaf5364b4d6",
+      "relationship": "produces_finding",
+      "explanation": "Evidence snapshot produced this finding decision."
+    },
+    {
+      "edge_id": "9a6f458c99ffe0f41b",
+      "source_node_id": "control:CMP-004",
+      "target_node_id": "finding:fdg_32dfaf5364b4d6",
+      "relationship": "evaluates_to",
+      "explanation": "Control evaluation produced this finding."
+    },
+    {
+      "edge_id": "3ce8d15543e094f321",
+      "source_node_id": "provider_contract:aws:CMP-004",
+      "target_node_id": "evidence_sufficiency:fdg_32dfaf5364b4d6",
+      "relationship": "sets_evidence_expectation",
+      "explanation": "Provider contract sets evidence expectations."
+    },
+    {
+      "edge_id": "2b90bc1986c517db2f",
+      "source_node_id": "finding:fdg_32dfaf5364b4d6",
+      "target_node_id": "evidence_sufficiency:fdg_32dfaf5364b4d6",
+      "relationship": "has_evidence_sufficiency",
+      "explanation": "Finding includes evidence sufficiency classification."
+    },
+    {
+      "edge_id": "11cc78551a3be5af27",
+      "source_node_id": "finding:fdg_32dfaf5364b4d6",
+      "target_node_id": "score:fdg_32dfaf5364b4d6",
+      "relationship": "scored_as",
+      "explanation": "Finding is scored by deterministic scoring."
+    },
+    {
+      "edge_id": "8c24638cb7b3424834",
+      "source_node_id": "score:fdg_32dfaf5364b4d6",
+      "target_node_id": "drift:control",
+      "relationship": "participates_in_drift",
+      "explanation": "Finding score participates in drift attribution."
+    },
+    {
+      "edge_id": "eb0275145a04f1e770",
+      "source_node_id": "score:fdg_32dfaf5364b4d6",
+      "target_node_id": "decision_review:drv_f924725c025c76",
+      "relationship": "requires_decision",
+      "explanation": "Scored finding requires governance review."
+    },
+    {
+      "edge_id": "c523ceed9f0925135b",
+      "source_node_id": "policy_pack:2026.04.0",
+      "target_node_id": "control:MON-001",
+      "relationship": "defines_control",
+      "explanation": "Policy pack defines this control."
+    },
+    {
+      "edge_id": "208b5a97ba5b2024ad",
+      "source_node_id": "snapshot:evs_38d7b6507aa3d94a",
+      "target_node_id": "finding:fdg_03484c44a1bea9",
+      "relationship": "produces_finding",
+      "explanation": "Evidence snapshot produced this finding decision."
+    },
+    {
+      "edge_id": "c9325f52809f4b7bb3",
+      "source_node_id": "control:MON-001",
+      "target_node_id": "finding:fdg_03484c44a1bea9",
+      "relationship": "evaluates_to",
+      "explanation": "Control evaluation produced this finding."
+    },
+    {
+      "edge_id": "69d1a5c475c56c0901",
+      "source_node_id": "provider_contract:aws:MON-001",
+      "target_node_id": "evidence_sufficiency:fdg_03484c44a1bea9",
+      "relationship": "sets_evidence_expectation",
+      "explanation": "Provider contract sets evidence expectations."
+    },
+    {
+      "edge_id": "38ae62db4648eae117",
+      "source_node_id": "finding:fdg_03484c44a1bea9",
+      "target_node_id": "evidence_sufficiency:fdg_03484c44a1bea9",
+      "relationship": "has_evidence_sufficiency",
+      "explanation": "Finding includes evidence sufficiency classification."
+    },
+    {
+      "edge_id": "129e4448d0b421a9e0",
+      "source_node_id": "finding:fdg_03484c44a1bea9",
+      "target_node_id": "score:fdg_03484c44a1bea9",
+      "relationship": "scored_as",
+      "explanation": "Finding is scored by deterministic scoring."
+    },
+    {
+      "edge_id": "1e272a28548f294c19",
+      "source_node_id": "score:fdg_03484c44a1bea9",
+      "target_node_id": "drift:control",
+      "relationship": "participates_in_drift",
+      "explanation": "Finding score participates in drift attribution."
+    },
+    {
+      "edge_id": "7e95c67cfc270c6fbb",
+      "source_node_id": "score:fdg_03484c44a1bea9",
+      "target_node_id": "decision_review:drv_f6f198703fa349",
+      "relationship": "requires_decision",
+      "explanation": "Scored finding requires governance review."
+    },
+    {
+      "edge_id": "81a9185c09a2624951",
+      "source_node_id": "policy_pack:2026.04.0",
+      "target_node_id": "control:GOV-003",
+      "relationship": "defines_control",
+      "explanation": "Policy pack defines this control."
+    },
+    {
+      "edge_id": "e339e83a65a022faee",
+      "source_node_id": "snapshot:evs_38d7b6507aa3d94a",
+      "target_node_id": "finding:fdg_78fef0955deb69",
+      "relationship": "produces_finding",
+      "explanation": "Evidence snapshot produced this finding decision."
+    },
+    {
+      "edge_id": "3e2ec6b29cf9549982",
+      "source_node_id": "control:GOV-003",
+      "target_node_id": "finding:fdg_78fef0955deb69",
+      "relationship": "evaluates_to",
+      "explanation": "Control evaluation produced this finding."
+    },
+    {
+      "edge_id": "840e6575103666d9c0",
+      "source_node_id": "provider_contract:aws:GOV-003",
+      "target_node_id": "evidence_sufficiency:fdg_78fef0955deb69",
+      "relationship": "sets_evidence_expectation",
+      "explanation": "Provider contract sets evidence expectations."
+    },
+    {
+      "edge_id": "d7a9703aa98df8690f",
+      "source_node_id": "finding:fdg_78fef0955deb69",
+      "target_node_id": "evidence_sufficiency:fdg_78fef0955deb69",
+      "relationship": "has_evidence_sufficiency",
+      "explanation": "Finding includes evidence sufficiency classification."
+    },
+    {
+      "edge_id": "589919294677c62c15",
+      "source_node_id": "finding:fdg_78fef0955deb69",
+      "target_node_id": "score:fdg_78fef0955deb69",
+      "relationship": "scored_as",
+      "explanation": "Finding is scored by deterministic scoring."
+    },
+    {
+      "edge_id": "8a9baa2b3f4d2cf178",
+      "source_node_id": "score:fdg_78fef0955deb69",
+      "target_node_id": "drift:control",
+      "relationship": "participates_in_drift",
+      "explanation": "Finding score participates in drift attribution."
+    },
+    {
+      "edge_id": "8f543ddb8833ca418f",
+      "source_node_id": "score:fdg_78fef0955deb69",
+      "target_node_id": "decision_review:drv_21094520d120b6",
+      "relationship": "requires_decision",
+      "explanation": "Scored finding requires governance review."
+    },
+    {
+      "edge_id": "f462a524dfa83e6b76",
+      "source_node_id": "policy_pack:2026.04.0",
+      "target_node_id": "control:IAM-003",
+      "relationship": "defines_control",
+      "explanation": "Policy pack defines this control."
+    },
+    {
+      "edge_id": "0f2fc2343def463ec6",
+      "source_node_id": "snapshot:evs_38d7b6507aa3d94a",
+      "target_node_id": "finding:fdg_c5f3db81b3965c",
+      "relationship": "produces_finding",
+      "explanation": "Evidence snapshot produced this finding decision."
+    },
+    {
+      "edge_id": "cbc9509f680f354da5",
+      "source_node_id": "control:IAM-003",
+      "target_node_id": "finding:fdg_c5f3db81b3965c",
+      "relationship": "evaluates_to",
+      "explanation": "Control evaluation produced this finding."
+    },
+    {
+      "edge_id": "f723c16cde70d3ff50",
+      "source_node_id": "provider_contract:aws:IAM-003",
+      "target_node_id": "evidence_sufficiency:fdg_c5f3db81b3965c",
+      "relationship": "sets_evidence_expectation",
+      "explanation": "Provider contract sets evidence expectations."
+    },
+    {
+      "edge_id": "98a12981a8840ec55d",
+      "source_node_id": "finding:fdg_c5f3db81b3965c",
+      "target_node_id": "evidence_sufficiency:fdg_c5f3db81b3965c",
+      "relationship": "has_evidence_sufficiency",
+      "explanation": "Finding includes evidence sufficiency classification."
+    },
+    {
+      "edge_id": "b2f5a3cf9e2d5c311e",
+      "source_node_id": "finding:fdg_c5f3db81b3965c",
+      "target_node_id": "score:fdg_c5f3db81b3965c",
+      "relationship": "scored_as",
+      "explanation": "Finding is scored by deterministic scoring."
+    },
+    {
+      "edge_id": "7bdfba15dc25030a6b",
+      "source_node_id": "score:fdg_c5f3db81b3965c",
+      "target_node_id": "drift:control",
+      "relationship": "participates_in_drift",
+      "explanation": "Finding score participates in drift attribution."
+    },
+    {
+      "edge_id": "40af72211acf1e7040",
+      "source_node_id": "policy_pack:2026.04.0",
+      "target_node_id": "control:IOT-006",
+      "relationship": "defines_control",
+      "explanation": "Policy pack defines this control."
+    },
+    {
+      "edge_id": "c1a0233090d043a31e",
+      "source_node_id": "snapshot:evs_38d7b6507aa3d94a",
+      "target_node_id": "finding:fdg_22fa0573d52093",
+      "relationship": "produces_finding",
+      "explanation": "Evidence snapshot produced this finding decision."
+    },
+    {
+      "edge_id": "6048690d027d64b0b6",
+      "source_node_id": "control:IOT-006",
+      "target_node_id": "finding:fdg_22fa0573d52093",
+      "relationship": "evaluates_to",
+      "explanation": "Control evaluation produced this finding."
+    },
+    {
+      "edge_id": "692a8eb72ce26e9af4",
+      "source_node_id": "provider_contract:aws:IOT-006",
+      "target_node_id": "evidence_sufficiency:fdg_22fa0573d52093",
+      "relationship": "sets_evidence_expectation",
+      "explanation": "Provider contract sets evidence expectations."
+    },
+    {
+      "edge_id": "036d18cefd5313e5d1",
+      "source_node_id": "finding:fdg_22fa0573d52093",
+      "target_node_id": "evidence_sufficiency:fdg_22fa0573d52093",
+      "relationship": "has_evidence_sufficiency",
+      "explanation": "Finding includes evidence sufficiency classification."
+    },
+    {
+      "edge_id": "be380d0a652ffa9554",
+      "source_node_id": "finding:fdg_22fa0573d52093",
+      "target_node_id": "score:fdg_22fa0573d52093",
+      "relationship": "scored_as",
+      "explanation": "Finding is scored by deterministic scoring."
+    },
+    {
+      "edge_id": "d98794eca87f5ab533",
+      "source_node_id": "score:fdg_22fa0573d52093",
+      "target_node_id": "drift:control",
+      "relationship": "participates_in_drift",
+      "explanation": "Finding score participates in drift attribution."
+    },
+    {
+      "edge_id": "9020b4d52ade90eeb2",
+      "source_node_id": "policy_pack:2026.04.0",
+      "target_node_id": "control:IOT-008",
+      "relationship": "defines_control",
+      "explanation": "Policy pack defines this control."
+    },
+    {
+      "edge_id": "b07433f08da1788478",
+      "source_node_id": "snapshot:evs_38d7b6507aa3d94a",
+      "target_node_id": "finding:fdg_45fead59d5ed86",
+      "relationship": "produces_finding",
+      "explanation": "Evidence snapshot produced this finding decision."
+    },
+    {
+      "edge_id": "f0b1026c8f2ce83436",
+      "source_node_id": "control:IOT-008",
+      "target_node_id": "finding:fdg_45fead59d5ed86",
+      "relationship": "evaluates_to",
+      "explanation": "Control evaluation produced this finding."
+    },
+    {
+      "edge_id": "b959cb7cae4043b03b",
+      "source_node_id": "provider_contract:aws:IOT-008",
+      "target_node_id": "evidence_sufficiency:fdg_45fead59d5ed86",
+      "relationship": "sets_evidence_expectation",
+      "explanation": "Provider contract sets evidence expectations."
+    },
+    {
+      "edge_id": "d3a80bcb5de2097702",
+      "source_node_id": "finding:fdg_45fead59d5ed86",
+      "target_node_id": "evidence_sufficiency:fdg_45fead59d5ed86",
+      "relationship": "has_evidence_sufficiency",
+      "explanation": "Finding includes evidence sufficiency classification."
+    },
+    {
+      "edge_id": "e6ae6aca731ed134f4",
+      "source_node_id": "finding:fdg_45fead59d5ed86",
+      "target_node_id": "score:fdg_45fead59d5ed86",
+      "relationship": "scored_as",
+      "explanation": "Finding is scored by deterministic scoring."
+    },
+    {
+      "edge_id": "7262c8011ea77e51e0",
+      "source_node_id": "score:fdg_45fead59d5ed86",
+      "target_node_id": "drift:control",
+      "relationship": "participates_in_drift",
+      "explanation": "Finding score participates in drift attribution."
+    },
+    {
+      "edge_id": "51e9114b6e25cac58b",
+      "source_node_id": "policy_pack:2026.04.0",
+      "target_node_id": "control:IOT-003",
+      "relationship": "defines_control",
+      "explanation": "Policy pack defines this control."
+    },
+    {
+      "edge_id": "ab959230a03735d20c",
+      "source_node_id": "snapshot:evs_38d7b6507aa3d94a",
+      "target_node_id": "finding:fdg_74c023949b5311",
+      "relationship": "produces_finding",
+      "explanation": "Evidence snapshot produced this finding decision."
+    },
+    {
+      "edge_id": "22b98365484355b817",
+      "source_node_id": "control:IOT-003",
+      "target_node_id": "finding:fdg_74c023949b5311",
+      "relationship": "evaluates_to",
+      "explanation": "Control evaluation produced this finding."
+    },
+    {
+      "edge_id": "bd9e643fa009d12256",
+      "source_node_id": "provider_contract:aws:IOT-003",
+      "target_node_id": "evidence_sufficiency:fdg_74c023949b5311",
+      "relationship": "sets_evidence_expectation",
+      "explanation": "Provider contract sets evidence expectations."
+    },
+    {
+      "edge_id": "0d7f6b55f285facd4b",
+      "source_node_id": "finding:fdg_74c023949b5311",
+      "target_node_id": "evidence_sufficiency:fdg_74c023949b5311",
+      "relationship": "has_evidence_sufficiency",
+      "explanation": "Finding includes evidence sufficiency classification."
+    },
+    {
+      "edge_id": "39caaea404c10d674e",
+      "source_node_id": "finding:fdg_74c023949b5311",
+      "target_node_id": "score:fdg_74c023949b5311",
+      "relationship": "scored_as",
+      "explanation": "Finding is scored by deterministic scoring."
+    },
+    {
+      "edge_id": "1691e6fa71a3a8a863",
+      "source_node_id": "score:fdg_74c023949b5311",
+      "target_node_id": "drift:control",
+      "relationship": "participates_in_drift",
+      "explanation": "Finding score participates in drift attribution."
+    },
+    {
+      "edge_id": "7d0c1b6181b1769da2",
+      "source_node_id": "policy_pack:2026.04.0",
+      "target_node_id": "control:IOT-004",
+      "relationship": "defines_control",
+      "explanation": "Policy pack defines this control."
+    },
+    {
+      "edge_id": "49fa8abf98283a1491",
+      "source_node_id": "snapshot:evs_38d7b6507aa3d94a",
+      "target_node_id": "finding:fdg_0487a7973756c3",
+      "relationship": "produces_finding",
+      "explanation": "Evidence snapshot produced this finding decision."
+    },
+    {
+      "edge_id": "b3efedfe0ce73a39e0",
+      "source_node_id": "control:IOT-004",
+      "target_node_id": "finding:fdg_0487a7973756c3",
+      "relationship": "evaluates_to",
+      "explanation": "Control evaluation produced this finding."
+    },
+    {
+      "edge_id": "405d62b804271825a4",
+      "source_node_id": "provider_contract:aws:IOT-004",
+      "target_node_id": "evidence_sufficiency:fdg_0487a7973756c3",
+      "relationship": "sets_evidence_expectation",
+      "explanation": "Provider contract sets evidence expectations."
+    },
+    {
+      "edge_id": "2002a77755463c23e5",
+      "source_node_id": "finding:fdg_0487a7973756c3",
+      "target_node_id": "evidence_sufficiency:fdg_0487a7973756c3",
+      "relationship": "has_evidence_sufficiency",
+      "explanation": "Finding includes evidence sufficiency classification."
+    },
+    {
+      "edge_id": "881a6e2824a259ff38",
+      "source_node_id": "finding:fdg_0487a7973756c3",
+      "target_node_id": "score:fdg_0487a7973756c3",
+      "relationship": "scored_as",
+      "explanation": "Finding is scored by deterministic scoring."
+    },
+    {
+      "edge_id": "166d34313796f5975d",
+      "source_node_id": "score:fdg_0487a7973756c3",
+      "target_node_id": "drift:control",
+      "relationship": "participates_in_drift",
+      "explanation": "Finding score participates in drift attribution."
+    },
+    {
+      "edge_id": "0bb970aa1499a8a67e",
+      "source_node_id": "policy_pack:2026.04.0",
+      "target_node_id": "control:IOT-007",
+      "relationship": "defines_control",
+      "explanation": "Policy pack defines this control."
+    },
+    {
+      "edge_id": "1f20b203b53f652474",
+      "source_node_id": "snapshot:evs_38d7b6507aa3d94a",
+      "target_node_id": "finding:fdg_212e49f1a69dad",
+      "relationship": "produces_finding",
+      "explanation": "Evidence snapshot produced this finding decision."
+    },
+    {
+      "edge_id": "c2a9eac0c18d57940e",
+      "source_node_id": "control:IOT-007",
+      "target_node_id": "finding:fdg_212e49f1a69dad",
+      "relationship": "evaluates_to",
+      "explanation": "Control evaluation produced this finding."
+    },
+    {
+      "edge_id": "6ec9d8bff366b09e18",
+      "source_node_id": "provider_contract:aws:IOT-007",
+      "target_node_id": "evidence_sufficiency:fdg_212e49f1a69dad",
+      "relationship": "sets_evidence_expectation",
+      "explanation": "Provider contract sets evidence expectations."
+    },
+    {
+      "edge_id": "b356e6d0924babb626",
+      "source_node_id": "finding:fdg_212e49f1a69dad",
+      "target_node_id": "evidence_sufficiency:fdg_212e49f1a69dad",
+      "relationship": "has_evidence_sufficiency",
+      "explanation": "Finding includes evidence sufficiency classification."
+    },
+    {
+      "edge_id": "712b9066b3788e90f7",
+      "source_node_id": "finding:fdg_212e49f1a69dad",
+      "target_node_id": "score:fdg_212e49f1a69dad",
+      "relationship": "scored_as",
+      "explanation": "Finding is scored by deterministic scoring."
+    },
+    {
+      "edge_id": "afb86d8f49c79602b8",
+      "source_node_id": "score:fdg_212e49f1a69dad",
+      "target_node_id": "drift:control",
+      "relationship": "participates_in_drift",
+      "explanation": "Finding score participates in drift attribution."
+    },
+    {
+      "edge_id": "f78a397e33600813ac",
+      "source_node_id": "policy_pack:2026.04.0",
+      "target_node_id": "control:IOT-009",
+      "relationship": "defines_control",
+      "explanation": "Policy pack defines this control."
+    },
+    {
+      "edge_id": "1ffa7664fdbfa2a941",
+      "source_node_id": "snapshot:evs_38d7b6507aa3d94a",
+      "target_node_id": "finding:fdg_f2db05d7f43d6a",
+      "relationship": "produces_finding",
+      "explanation": "Evidence snapshot produced this finding decision."
+    },
+    {
+      "edge_id": "24b7fada459d1dec08",
+      "source_node_id": "control:IOT-009",
+      "target_node_id": "finding:fdg_f2db05d7f43d6a",
+      "relationship": "evaluates_to",
+      "explanation": "Control evaluation produced this finding."
+    },
+    {
+      "edge_id": "4204eb83727bb0a4cf",
+      "source_node_id": "provider_contract:aws:IOT-009",
+      "target_node_id": "evidence_sufficiency:fdg_f2db05d7f43d6a",
+      "relationship": "sets_evidence_expectation",
+      "explanation": "Provider contract sets evidence expectations."
+    },
+    {
+      "edge_id": "0b0f8f08147784f309",
+      "source_node_id": "finding:fdg_f2db05d7f43d6a",
+      "target_node_id": "evidence_sufficiency:fdg_f2db05d7f43d6a",
+      "relationship": "has_evidence_sufficiency",
+      "explanation": "Finding includes evidence sufficiency classification."
+    },
+    {
+      "edge_id": "c50209f8cf160e57ca",
+      "source_node_id": "finding:fdg_f2db05d7f43d6a",
+      "target_node_id": "score:fdg_f2db05d7f43d6a",
+      "relationship": "scored_as",
+      "explanation": "Finding is scored by deterministic scoring."
+    },
+    {
+      "edge_id": "24b8518d1d51a46904",
+      "source_node_id": "score:fdg_f2db05d7f43d6a",
+      "target_node_id": "drift:control",
+      "relationship": "participates_in_drift",
+      "explanation": "Finding score participates in drift attribution."
+    },
+    {
+      "edge_id": "1df62895f6a83785b3",
+      "source_node_id": "policy_pack:2026.04.0",
+      "target_node_id": "control:GOV-004",
+      "relationship": "defines_control",
+      "explanation": "Policy pack defines this control."
+    },
+    {
+      "edge_id": "aa6db618c257eba6ec",
+      "source_node_id": "snapshot:evs_38d7b6507aa3d94a",
+      "target_node_id": "finding:fdg_6c25430ff366c3",
+      "relationship": "produces_finding",
+      "explanation": "Evidence snapshot produced this finding decision."
+    },
+    {
+      "edge_id": "f98b2922bf21c0d416",
+      "source_node_id": "control:GOV-004",
+      "target_node_id": "finding:fdg_6c25430ff366c3",
+      "relationship": "evaluates_to",
+      "explanation": "Control evaluation produced this finding."
+    },
+    {
+      "edge_id": "d574b0c73db7975c8e",
+      "source_node_id": "provider_contract:aws:GOV-004",
+      "target_node_id": "evidence_sufficiency:fdg_6c25430ff366c3",
+      "relationship": "sets_evidence_expectation",
+      "explanation": "Provider contract sets evidence expectations."
+    },
+    {
+      "edge_id": "c91c2e7a82c03c548b",
+      "source_node_id": "finding:fdg_6c25430ff366c3",
+      "target_node_id": "evidence_sufficiency:fdg_6c25430ff366c3",
+      "relationship": "has_evidence_sufficiency",
+      "explanation": "Finding includes evidence sufficiency classification."
+    },
+    {
+      "edge_id": "68a2906618b5f4f2d2",
+      "source_node_id": "finding:fdg_6c25430ff366c3",
+      "target_node_id": "score:fdg_6c25430ff366c3",
+      "relationship": "scored_as",
+      "explanation": "Finding is scored by deterministic scoring."
+    },
+    {
+      "edge_id": "34669cf134927eea87",
+      "source_node_id": "score:fdg_6c25430ff366c3",
+      "target_node_id": "drift:control",
+      "relationship": "participates_in_drift",
+      "explanation": "Finding score participates in drift attribution."
+    },
+    {
+      "edge_id": "9f571f33c00a289b02",
+      "source_node_id": "policy_pack:2026.04.0",
+      "target_node_id": "control:GOV-002",
+      "relationship": "defines_control",
+      "explanation": "Policy pack defines this control."
+    },
+    {
+      "edge_id": "7154e9262b520a238c",
+      "source_node_id": "snapshot:evs_38d7b6507aa3d94a",
+      "target_node_id": "finding:fdg_41e815a1b649a8",
+      "relationship": "produces_finding",
+      "explanation": "Evidence snapshot produced this finding decision."
+    },
+    {
+      "edge_id": "517b2e36a3e45940d6",
+      "source_node_id": "control:GOV-002",
+      "target_node_id": "finding:fdg_41e815a1b649a8",
+      "relationship": "evaluates_to",
+      "explanation": "Control evaluation produced this finding."
+    },
+    {
+      "edge_id": "55607453d38bd26c35",
+      "source_node_id": "provider_contract:aws:GOV-002",
+      "target_node_id": "evidence_sufficiency:fdg_41e815a1b649a8",
+      "relationship": "sets_evidence_expectation",
+      "explanation": "Provider contract sets evidence expectations."
+    },
+    {
+      "edge_id": "e664dfbe92b66fc469",
+      "source_node_id": "finding:fdg_41e815a1b649a8",
+      "target_node_id": "evidence_sufficiency:fdg_41e815a1b649a8",
+      "relationship": "has_evidence_sufficiency",
+      "explanation": "Finding includes evidence sufficiency classification."
+    },
+    {
+      "edge_id": "16c49ebacd39f69f8d",
+      "source_node_id": "finding:fdg_41e815a1b649a8",
+      "target_node_id": "score:fdg_41e815a1b649a8",
+      "relationship": "scored_as",
+      "explanation": "Finding is scored by deterministic scoring."
+    },
+    {
+      "edge_id": "0d7e0a19e9222c8d12",
+      "source_node_id": "score:fdg_41e815a1b649a8",
+      "target_node_id": "drift:control",
+      "relationship": "participates_in_drift",
+      "explanation": "Finding score participates in drift attribution."
+    },
+    {
+      "edge_id": "6ee9097d9fa68c0604",
+      "source_node_id": "policy_pack:2026.04.0",
+      "target_node_id": "control:IOT-010",
+      "relationship": "defines_control",
+      "explanation": "Policy pack defines this control."
+    },
+    {
+      "edge_id": "4cb10e87d7568381bb",
+      "source_node_id": "snapshot:evs_38d7b6507aa3d94a",
+      "target_node_id": "finding:fdg_bd7c18a97bdfc6",
+      "relationship": "produces_finding",
+      "explanation": "Evidence snapshot produced this finding decision."
+    },
+    {
+      "edge_id": "365fde97005a1745eb",
+      "source_node_id": "control:IOT-010",
+      "target_node_id": "finding:fdg_bd7c18a97bdfc6",
+      "relationship": "evaluates_to",
+      "explanation": "Control evaluation produced this finding."
+    },
+    {
+      "edge_id": "401f8703995af16ddf",
+      "source_node_id": "provider_contract:aws:IOT-010",
+      "target_node_id": "evidence_sufficiency:fdg_bd7c18a97bdfc6",
+      "relationship": "sets_evidence_expectation",
+      "explanation": "Provider contract sets evidence expectations."
+    },
+    {
+      "edge_id": "f4c438c3a868d3a1e1",
+      "source_node_id": "finding:fdg_bd7c18a97bdfc6",
+      "target_node_id": "evidence_sufficiency:fdg_bd7c18a97bdfc6",
+      "relationship": "has_evidence_sufficiency",
+      "explanation": "Finding includes evidence sufficiency classification."
+    },
+    {
+      "edge_id": "6b84eb006a9f2231ae",
+      "source_node_id": "finding:fdg_bd7c18a97bdfc6",
+      "target_node_id": "score:fdg_bd7c18a97bdfc6",
+      "relationship": "scored_as",
+      "explanation": "Finding is scored by deterministic scoring."
+    },
+    {
+      "edge_id": "f13989cf01f918f7ad",
+      "source_node_id": "score:fdg_bd7c18a97bdfc6",
+      "target_node_id": "drift:control",
+      "relationship": "participates_in_drift",
+      "explanation": "Finding score participates in drift attribution."
+    },
+    {
+      "edge_id": "217047b61cfda7b264",
+      "source_node_id": "policy_pack:2026.04.0",
+      "target_node_id": "control:IAM-005",
+      "relationship": "defines_control",
+      "explanation": "Policy pack defines this control."
+    },
+    {
+      "edge_id": "a645a94ee51d7b1c5c",
+      "source_node_id": "snapshot:evs_38d7b6507aa3d94a",
+      "target_node_id": "finding:fdg_8ce865e5eb6019",
+      "relationship": "produces_finding",
+      "explanation": "Evidence snapshot produced this finding decision."
+    },
+    {
+      "edge_id": "bdb4c3bf9ac3103c70",
+      "source_node_id": "control:IAM-005",
+      "target_node_id": "finding:fdg_8ce865e5eb6019",
+      "relationship": "evaluates_to",
+      "explanation": "Control evaluation produced this finding."
+    },
+    {
+      "edge_id": "27ebab626457157698",
+      "source_node_id": "provider_contract:aws:IAM-005",
+      "target_node_id": "evidence_sufficiency:fdg_8ce865e5eb6019",
+      "relationship": "sets_evidence_expectation",
+      "explanation": "Provider contract sets evidence expectations."
+    },
+    {
+      "edge_id": "0bafc1e2d45374cdcb",
+      "source_node_id": "finding:fdg_8ce865e5eb6019",
+      "target_node_id": "evidence_sufficiency:fdg_8ce865e5eb6019",
+      "relationship": "has_evidence_sufficiency",
+      "explanation": "Finding includes evidence sufficiency classification."
+    },
+    {
+      "edge_id": "a1db7d9b4fa7e4a319",
+      "source_node_id": "finding:fdg_8ce865e5eb6019",
+      "target_node_id": "score:fdg_8ce865e5eb6019",
+      "relationship": "scored_as",
+      "explanation": "Finding is scored by deterministic scoring."
+    },
+    {
+      "edge_id": "a788ebc270bcea8b85",
+      "source_node_id": "score:fdg_8ce865e5eb6019",
+      "target_node_id": "drift:control",
+      "relationship": "participates_in_drift",
+      "explanation": "Finding score participates in drift attribution."
+    }
+  ],
+  "top_decision_paths": [
+    {
+      "path_id": "0d53c72118345c4432",
+      "finding_id": "fdg_514b77f2a83791",
+      "control_id": "NET-001",
+      "node_ids": [
+        "snapshot:evs_38d7b6507aa3d94a",
+        "policy_pack:2026.04.0",
+        "control:NET-001",
+        "provider_contract:aws:NET-001",
+        "finding:fdg_514b77f2a83791",
+        "evidence_sufficiency:fdg_514b77f2a83791",
+        "score:fdg_514b77f2a83791",
+        "decision_review:drv_4101b93513209e",
+        "assurance:assessment",
+        "trust_badge:report"
+      ],
+      "summary": "NET-001 decision path links evidence, policy, finding, score, assurance, and review state."
+    },
+    {
+      "path_id": "7f6e4e5c1f857ffd1d",
+      "finding_id": "fdg_81612c096e8237",
+      "control_id": "IAM-001",
+      "node_ids": [
+        "snapshot:evs_38d7b6507aa3d94a",
+        "policy_pack:2026.04.0",
+        "control:IAM-001",
+        "provider_contract:aws:IAM-001",
+        "finding:fdg_81612c096e8237",
+        "evidence_sufficiency:fdg_81612c096e8237",
+        "score:fdg_81612c096e8237",
+        "decision_review:drv_e7403d177a8470",
+        "assurance:assessment",
+        "trust_badge:report"
+      ],
+      "summary": "IAM-001 decision path links evidence, policy, finding, score, assurance, and review state."
+    },
+    {
+      "path_id": "680798d306150bba0b",
+      "finding_id": "fdg_59af495a1834f7",
+      "control_id": "DATA-001",
+      "node_ids": [
+        "snapshot:evs_38d7b6507aa3d94a",
+        "policy_pack:2026.04.0",
+        "control:DATA-001",
+        "provider_contract:aws:DATA-001",
+        "finding:fdg_59af495a1834f7",
+        "evidence_sufficiency:fdg_59af495a1834f7",
+        "score:fdg_59af495a1834f7",
+        "decision_review:drv_0fe7e2ead315c3",
+        "assurance:assessment",
+        "trust_badge:report"
+      ],
+      "summary": "DATA-001 decision path links evidence, policy, finding, score, assurance, and review state."
+    },
+    {
+      "path_id": "5e534437786e74e30c",
+      "finding_id": "fdg_994c549d0b3d2e",
+      "control_id": "IOT-005",
+      "node_ids": [
+        "snapshot:evs_38d7b6507aa3d94a",
+        "policy_pack:2026.04.0",
+        "control:IOT-005",
+        "provider_contract:aws:IOT-005",
+        "finding:fdg_994c549d0b3d2e",
+        "evidence_sufficiency:fdg_994c549d0b3d2e",
+        "score:fdg_994c549d0b3d2e",
+        "decision_review:drv_e34602ec9ea91b",
+        "assurance:assessment",
+        "trust_badge:report"
+      ],
+      "summary": "IOT-005 decision path links evidence, policy, finding, score, assurance, and review state."
+    },
+    {
+      "path_id": "41d78801ab3c2c586c",
+      "finding_id": "fdg_e13f1fe2310b82",
+      "control_id": "NET-002",
+      "node_ids": [
+        "snapshot:evs_38d7b6507aa3d94a",
+        "policy_pack:2026.04.0",
+        "control:NET-002",
+        "provider_contract:aws:NET-002",
+        "finding:fdg_e13f1fe2310b82",
+        "evidence_sufficiency:fdg_e13f1fe2310b82",
+        "score:fdg_e13f1fe2310b82",
+        "decision_review:drv_9a9a546b69bfe8",
+        "assurance:assessment",
+        "trust_badge:report"
+      ],
+      "summary": "NET-002 decision path links evidence, policy, finding, score, assurance, and review state."
+    },
+    {
+      "path_id": "02d9d7cff8f5ee906b",
+      "finding_id": "fdg_dfbb1e782053b2",
+      "control_id": "CMP-001",
+      "node_ids": [
+        "snapshot:evs_38d7b6507aa3d94a",
+        "policy_pack:2026.04.0",
+        "control:CMP-001",
+        "provider_contract:aws:CMP-001",
+        "finding:fdg_dfbb1e782053b2",
+        "evidence_sufficiency:fdg_dfbb1e782053b2",
+        "score:fdg_dfbb1e782053b2",
+        "decision_review:drv_71aed28f266bb5",
+        "assurance:assessment",
+        "trust_badge:report"
+      ],
+      "summary": "CMP-001 decision path links evidence, policy, finding, score, assurance, and review state."
+    },
+    {
+      "path_id": "ebc482566af908d4eb",
+      "finding_id": "fdg_fd9b74860f2318",
+      "control_id": "DATA-002",
+      "node_ids": [
+        "snapshot:evs_38d7b6507aa3d94a",
+        "policy_pack:2026.04.0",
+        "control:DATA-002",
+        "provider_contract:aws:DATA-002",
+        "finding:fdg_fd9b74860f2318",
+        "evidence_sufficiency:fdg_fd9b74860f2318",
+        "score:fdg_fd9b74860f2318",
+        "decision_review:drv_265642e37d44ef",
+        "assurance:assessment",
+        "trust_badge:report"
+      ],
+      "summary": "DATA-002 decision path links evidence, policy, finding, score, assurance, and review state."
+    },
+    {
+      "path_id": "cf1240ab45a4a13f9d",
+      "finding_id": "fdg_95befe3a0ef4d3",
+      "control_id": "NET-004",
+      "node_ids": [
+        "snapshot:evs_38d7b6507aa3d94a",
+        "policy_pack:2026.04.0",
+        "control:NET-004",
+        "provider_contract:aws:NET-004",
+        "finding:fdg_95befe3a0ef4d3",
+        "evidence_sufficiency:fdg_95befe3a0ef4d3",
+        "score:fdg_95befe3a0ef4d3",
+        "decision_review:drv_603cf37ee7a853",
+        "assurance:assessment",
+        "trust_badge:report"
+      ],
+      "summary": "NET-004 decision path links evidence, policy, finding, score, assurance, and review state."
+    },
+    {
+      "path_id": "fa761a29df2916c6c9",
+      "finding_id": "fdg_47b2e528cc081f",
+      "control_id": "IOT-002",
+      "node_ids": [
+        "snapshot:evs_38d7b6507aa3d94a",
+        "policy_pack:2026.04.0",
+        "control:IOT-002",
+        "provider_contract:aws:IOT-002",
+        "finding:fdg_47b2e528cc081f",
+        "evidence_sufficiency:fdg_47b2e528cc081f",
+        "score:fdg_47b2e528cc081f",
+        "decision_review:drv_dd2b0b0a35d2cb",
+        "assurance:assessment",
+        "trust_badge:report"
+      ],
+      "summary": "IOT-002 decision path links evidence, policy, finding, score, assurance, and review state."
+    },
+    {
+      "path_id": "0ca5ea30105f379ec1",
+      "finding_id": "fdg_8de9e4b39be686",
+      "control_id": "IOT-001",
+      "node_ids": [
+        "snapshot:evs_38d7b6507aa3d94a",
+        "policy_pack:2026.04.0",
+        "control:IOT-001",
+        "provider_contract:aws:IOT-001",
+        "finding:fdg_8de9e4b39be686",
+        "evidence_sufficiency:fdg_8de9e4b39be686",
+        "score:fdg_8de9e4b39be686",
+        "decision_review:drv_bc7df941ac92ac",
+        "assurance:assessment",
+        "trust_badge:report"
+      ],
+      "summary": "IOT-001 decision path links evidence, policy, finding, score, assurance, and review state."
+    },
+    {
+      "path_id": "b86382451e5c44df8e",
+      "finding_id": "fdg_ba8563fa9c85b0",
+      "control_id": "CMP-002",
+      "node_ids": [
+        "snapshot:evs_38d7b6507aa3d94a",
+        "policy_pack:2026.04.0",
+        "control:CMP-002",
+        "provider_contract:aws:CMP-002",
+        "finding:fdg_ba8563fa9c85b0",
+        "evidence_sufficiency:fdg_ba8563fa9c85b0",
+        "score:fdg_ba8563fa9c85b0",
+        "decision_review:drv_ad7aab39380163",
+        "assurance:assessment",
+        "trust_badge:report"
+      ],
+      "summary": "CMP-002 decision path links evidence, policy, finding, score, assurance, and review state."
+    },
+    {
+      "path_id": "358d1313c75bf46e81",
+      "finding_id": "fdg_1fcafc454b954f",
+      "control_id": "CMP-003",
+      "node_ids": [
+        "snapshot:evs_38d7b6507aa3d94a",
+        "policy_pack:2026.04.0",
+        "control:CMP-003",
+        "provider_contract:aws:CMP-003",
+        "finding:fdg_1fcafc454b954f",
+        "evidence_sufficiency:fdg_1fcafc454b954f",
+        "score:fdg_1fcafc454b954f",
+        "decision_review:drv_dc188eac435f5c",
+        "assurance:assessment",
+        "trust_badge:report"
+      ],
+      "summary": "CMP-003 decision path links evidence, policy, finding, score, assurance, and review state."
+    },
+    {
+      "path_id": "3c5ee8a397bb26604d",
+      "finding_id": "fdg_4fdee149a387bc",
+      "control_id": "DATA-003",
+      "node_ids": [
+        "snapshot:evs_38d7b6507aa3d94a",
+        "policy_pack:2026.04.0",
+        "control:DATA-003",
+        "provider_contract:aws:DATA-003",
+        "finding:fdg_4fdee149a387bc",
+        "evidence_sufficiency:fdg_4fdee149a387bc",
+        "score:fdg_4fdee149a387bc",
+        "decision_review:drv_2b49de93132e57",
+        "assurance:assessment",
+        "trust_badge:report"
+      ],
+      "summary": "DATA-003 decision path links evidence, policy, finding, score, assurance, and review state."
+    },
+    {
+      "path_id": "03b61fe3d63351344c",
+      "finding_id": "fdg_0fc8904a5edd56",
+      "control_id": "MON-003",
+      "node_ids": [
+        "snapshot:evs_38d7b6507aa3d94a",
+        "policy_pack:2026.04.0",
+        "control:MON-003",
+        "provider_contract:aws:MON-003",
+        "finding:fdg_0fc8904a5edd56",
+        "evidence_sufficiency:fdg_0fc8904a5edd56",
+        "score:fdg_0fc8904a5edd56",
+        "decision_review:drv_b1d0fd66bf994c",
+        "assurance:assessment",
+        "trust_badge:report"
+      ],
+      "summary": "MON-003 decision path links evidence, policy, finding, score, assurance, and review state."
+    },
+    {
+      "path_id": "1e51d9ac8f4ac854d9",
+      "finding_id": "fdg_32dfaf5364b4d6",
+      "control_id": "CMP-004",
+      "node_ids": [
+        "snapshot:evs_38d7b6507aa3d94a",
+        "policy_pack:2026.04.0",
+        "control:CMP-004",
+        "provider_contract:aws:CMP-004",
+        "finding:fdg_32dfaf5364b4d6",
+        "evidence_sufficiency:fdg_32dfaf5364b4d6",
+        "score:fdg_32dfaf5364b4d6",
+        "decision_review:drv_f924725c025c76",
+        "assurance:assessment",
+        "trust_badge:report"
+      ],
+      "summary": "CMP-004 decision path links evidence, policy, finding, score, assurance, and review state."
+    },
+    {
+      "path_id": "a9128e874233d1f0f1",
+      "finding_id": "fdg_03484c44a1bea9",
+      "control_id": "MON-001",
+      "node_ids": [
+        "snapshot:evs_38d7b6507aa3d94a",
+        "policy_pack:2026.04.0",
+        "control:MON-001",
+        "provider_contract:aws:MON-001",
+        "finding:fdg_03484c44a1bea9",
+        "evidence_sufficiency:fdg_03484c44a1bea9",
+        "score:fdg_03484c44a1bea9",
+        "decision_review:drv_f6f198703fa349",
+        "assurance:assessment",
+        "trust_badge:report"
+      ],
+      "summary": "MON-001 decision path links evidence, policy, finding, score, assurance, and review state."
+    },
+    {
+      "path_id": "dd24aa7c5e3afaf29b",
+      "finding_id": "fdg_78fef0955deb69",
+      "control_id": "GOV-003",
+      "node_ids": [
+        "snapshot:evs_38d7b6507aa3d94a",
+        "policy_pack:2026.04.0",
+        "control:GOV-003",
+        "provider_contract:aws:GOV-003",
+        "finding:fdg_78fef0955deb69",
+        "evidence_sufficiency:fdg_78fef0955deb69",
+        "score:fdg_78fef0955deb69",
+        "decision_review:drv_21094520d120b6",
+        "assurance:assessment",
+        "trust_badge:report"
+      ],
+      "summary": "GOV-003 decision path links evidence, policy, finding, score, assurance, and review state."
+    },
+    {
+      "path_id": "3b93873cab9aa44bad",
+      "finding_id": "fdg_c5f3db81b3965c",
+      "control_id": "IAM-003",
+      "node_ids": [
+        "snapshot:evs_38d7b6507aa3d94a",
+        "policy_pack:2026.04.0",
+        "control:IAM-003",
+        "provider_contract:aws:IAM-003",
+        "finding:fdg_c5f3db81b3965c",
+        "evidence_sufficiency:fdg_c5f3db81b3965c",
+        "score:fdg_c5f3db81b3965c",
+        "assurance:assessment",
+        "trust_badge:report"
+      ],
+      "summary": "IAM-003 decision path links evidence, policy, finding, score, assurance, and review state."
+    },
+    {
+      "path_id": "ddd4eab96d46f16255",
+      "finding_id": "fdg_22fa0573d52093",
+      "control_id": "IOT-006",
+      "node_ids": [
+        "snapshot:evs_38d7b6507aa3d94a",
+        "policy_pack:2026.04.0",
+        "control:IOT-006",
+        "provider_contract:aws:IOT-006",
+        "finding:fdg_22fa0573d52093",
+        "evidence_sufficiency:fdg_22fa0573d52093",
+        "score:fdg_22fa0573d52093",
+        "assurance:assessment",
+        "trust_badge:report"
+      ],
+      "summary": "IOT-006 decision path links evidence, policy, finding, score, assurance, and review state."
+    },
+    {
+      "path_id": "f62c6820c70270f939",
+      "finding_id": "fdg_45fead59d5ed86",
+      "control_id": "IOT-008",
+      "node_ids": [
+        "snapshot:evs_38d7b6507aa3d94a",
+        "policy_pack:2026.04.0",
+        "control:IOT-008",
+        "provider_contract:aws:IOT-008",
+        "finding:fdg_45fead59d5ed86",
+        "evidence_sufficiency:fdg_45fead59d5ed86",
+        "score:fdg_45fead59d5ed86",
+        "assurance:assessment",
+        "trust_badge:report"
+      ],
+      "summary": "IOT-008 decision path links evidence, policy, finding, score, assurance, and review state."
+    },
+    {
+      "path_id": "b8e24a1862ff9b9b9f",
+      "finding_id": "fdg_74c023949b5311",
+      "control_id": "IOT-003",
+      "node_ids": [
+        "snapshot:evs_38d7b6507aa3d94a",
+        "policy_pack:2026.04.0",
+        "control:IOT-003",
+        "provider_contract:aws:IOT-003",
+        "finding:fdg_74c023949b5311",
+        "evidence_sufficiency:fdg_74c023949b5311",
+        "score:fdg_74c023949b5311",
+        "assurance:assessment",
+        "trust_badge:report"
+      ],
+      "summary": "IOT-003 decision path links evidence, policy, finding, score, assurance, and review state."
+    },
+    {
+      "path_id": "b91dfc99124c1d8563",
+      "finding_id": "fdg_0487a7973756c3",
+      "control_id": "IOT-004",
+      "node_ids": [
+        "snapshot:evs_38d7b6507aa3d94a",
+        "policy_pack:2026.04.0",
+        "control:IOT-004",
+        "provider_contract:aws:IOT-004",
+        "finding:fdg_0487a7973756c3",
+        "evidence_sufficiency:fdg_0487a7973756c3",
+        "score:fdg_0487a7973756c3",
+        "assurance:assessment",
+        "trust_badge:report"
+      ],
+      "summary": "IOT-004 decision path links evidence, policy, finding, score, assurance, and review state."
+    },
+    {
+      "path_id": "b65348b73dd186399b",
+      "finding_id": "fdg_212e49f1a69dad",
+      "control_id": "IOT-007",
+      "node_ids": [
+        "snapshot:evs_38d7b6507aa3d94a",
+        "policy_pack:2026.04.0",
+        "control:IOT-007",
+        "provider_contract:aws:IOT-007",
+        "finding:fdg_212e49f1a69dad",
+        "evidence_sufficiency:fdg_212e49f1a69dad",
+        "score:fdg_212e49f1a69dad",
+        "assurance:assessment",
+        "trust_badge:report"
+      ],
+      "summary": "IOT-007 decision path links evidence, policy, finding, score, assurance, and review state."
+    },
+    {
+      "path_id": "675341b142d6507ab0",
+      "finding_id": "fdg_f2db05d7f43d6a",
+      "control_id": "IOT-009",
+      "node_ids": [
+        "snapshot:evs_38d7b6507aa3d94a",
+        "policy_pack:2026.04.0",
+        "control:IOT-009",
+        "provider_contract:aws:IOT-009",
+        "finding:fdg_f2db05d7f43d6a",
+        "evidence_sufficiency:fdg_f2db05d7f43d6a",
+        "score:fdg_f2db05d7f43d6a",
+        "assurance:assessment",
+        "trust_badge:report"
+      ],
+      "summary": "IOT-009 decision path links evidence, policy, finding, score, assurance, and review state."
+    },
+    {
+      "path_id": "a63ec591f6abc962fd",
+      "finding_id": "fdg_6c25430ff366c3",
+      "control_id": "GOV-004",
+      "node_ids": [
+        "snapshot:evs_38d7b6507aa3d94a",
+        "policy_pack:2026.04.0",
+        "control:GOV-004",
+        "provider_contract:aws:GOV-004",
+        "finding:fdg_6c25430ff366c3",
+        "evidence_sufficiency:fdg_6c25430ff366c3",
+        "score:fdg_6c25430ff366c3",
+        "assurance:assessment",
+        "trust_badge:report"
+      ],
+      "summary": "GOV-004 decision path links evidence, policy, finding, score, assurance, and review state."
+    },
+    {
+      "path_id": "ca45877aed2ea5fb31",
+      "finding_id": "fdg_41e815a1b649a8",
+      "control_id": "GOV-002",
+      "node_ids": [
+        "snapshot:evs_38d7b6507aa3d94a",
+        "policy_pack:2026.04.0",
+        "control:GOV-002",
+        "provider_contract:aws:GOV-002",
+        "finding:fdg_41e815a1b649a8",
+        "evidence_sufficiency:fdg_41e815a1b649a8",
+        "score:fdg_41e815a1b649a8",
+        "assurance:assessment",
+        "trust_badge:report"
+      ],
+      "summary": "GOV-002 decision path links evidence, policy, finding, score, assurance, and review state."
+    },
+    {
+      "path_id": "e373de7b49e1ada54c",
+      "finding_id": "fdg_bd7c18a97bdfc6",
+      "control_id": "IOT-010",
+      "node_ids": [
+        "snapshot:evs_38d7b6507aa3d94a",
+        "policy_pack:2026.04.0",
+        "control:IOT-010",
+        "provider_contract:aws:IOT-010",
+        "finding:fdg_bd7c18a97bdfc6",
+        "evidence_sufficiency:fdg_bd7c18a97bdfc6",
+        "score:fdg_bd7c18a97bdfc6",
+        "assurance:assessment",
+        "trust_badge:report"
+      ],
+      "summary": "IOT-010 decision path links evidence, policy, finding, score, assurance, and review state."
+    },
+    {
+      "path_id": "f71bbbee2aedf72cf2",
+      "finding_id": "fdg_8ce865e5eb6019",
+      "control_id": "IAM-005",
+      "node_ids": [
+        "snapshot:evs_38d7b6507aa3d94a",
+        "policy_pack:2026.04.0",
+        "control:IAM-005",
+        "provider_contract:aws:IAM-005",
+        "finding:fdg_8ce865e5eb6019",
+        "evidence_sufficiency:fdg_8ce865e5eb6019",
+        "score:fdg_8ce865e5eb6019",
+        "assurance:assessment",
+        "trust_badge:report"
+      ],
+      "summary": "IAM-005 decision path links evidence, policy, finding, score, assurance, and review state."
+    }
+  ]
+}

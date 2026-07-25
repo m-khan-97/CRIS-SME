@@ -1,0 +1,1944 @@
+{
+  "snapshot_schema_version": "1.0.0",
+  "snapshot_id": "evs_38d7b6507aa3d94a",
+  "generated_at": "2026-07-04T18:15:03.071496Z",
+  "collector_mode": "aws",
+  "policy_pack_version": "2026.04.0",
+  "profile_count": 1,
+  "finding_count": 28,
+  "non_compliant_finding_count": 28,
+  "providers_in_scope": [
+    "aws"
+  ],
+  "control_ids": [
+    "CMP-001",
+    "CMP-002",
+    "CMP-003",
+    "CMP-004",
+    "DATA-001",
+    "DATA-002",
+    "DATA-003",
+    "GOV-002",
+    "GOV-003",
+    "GOV-004",
+    "IAM-001",
+    "IAM-003",
+    "IAM-005",
+    "IOT-001",
+    "IOT-002",
+    "IOT-003",
+    "IOT-004",
+    "IOT-005",
+    "IOT-006",
+    "IOT-007",
+    "IOT-008",
+    "IOT-009",
+    "IOT-010",
+    "MON-001",
+    "MON-003",
+    "NET-001",
+    "NET-002",
+    "NET-004"
+  ],
+  "profile_sha256": "72fd0fff05f6e2c4a08db1d88c7ce923ee12f40ac3c9f304afa322e2901d34ae",
+  "finding_sha256": "46ecce455b44563c8770424b02d43d6b9a1c6f4f1b20b7b1509b12ec4efd6dd6",
+  "snapshot_sha256": "38d7b6507aa3d94adb344413c85ba6746a41eb8101c0f54211f1931fbd7526d0",
+  "profiles": [
+    {
+      "organization_id": "aws-000832363767",
+      "organization_name": "SIGI Technologies",
+      "provider": "aws",
+      "sector": "Technology Services",
+      "tenant_scope": "000832363767",
+      "iam": {
+        "privileged_accounts": 2,
+        "privileged_accounts_without_mfa": 1,
+        "overprivileged_accounts": 0,
+        "stale_service_principals": 1,
+        "rbac_review_age_days": 0,
+        "conditional_access_enforced_for_admins": false,
+        "privileged_user_assignments": 1,
+        "privileged_service_principal_assignments": 1,
+        "disabled_service_principals": 0,
+        "signed_in_user_directory_roles": 1,
+        "signed_in_user_is_directory_admin": false,
+        "visible_directory_role_catalog_entries": 43,
+        "directory_role_catalog_visible": true,
+        "identity_observability": "partial",
+        "rbac_review_api_accessible": false,
+        "rbac_review_definition_count": 0,
+        "rbac_review_privileged_scope_count": 0,
+        "rbac_review_scope": "unavailable"
+      },
+      "network": {
+        "internet_exposed_rdp_assets": 1,
+        "internet_exposed_ssh_assets": 1,
+        "permissive_nsg_rules": 2,
+        "public_storage_endpoints": 0,
+        "private_endpoints_required": 5,
+        "private_endpoints_configured": 0,
+        "private_endpoint_exemptions": 0,
+        "private_endpoint_requirement_basis": "s3_and_rds_inventory"
+      },
+      "data": {
+        "public_storage_assets": 1,
+        "unencrypted_data_stores": 1,
+        "backup_coverage_ratio": 0.6,
+        "retention_policy_coverage_ratio": 0.6,
+        "key_vault_mfa_enabled": true,
+        "key_vault_purge_protection_enabled": true,
+        "key_vault_count": 1,
+        "key_vault_purge_protected_count": 1,
+        "key_vault_posture_state": "observed"
+      },
+      "monitoring": {
+        "activity_log_retention_days": 0,
+        "critical_alert_coverage_ratio": 1.0,
+        "defender_coverage_ratio": 0.0,
+        "centralized_logging_enabled": true,
+        "incident_response_runbooks_enabled": true
+      },
+      "compute": {
+        "unpatched_critical_vms": 1,
+        "endpoint_protection_coverage_ratio": 0.0,
+        "hardened_baseline_coverage_ratio": 0.0,
+        "workload_backup_agent_coverage_ratio": 0.0,
+        "linux_password_auth_enabled_vms": 0
+      },
+      "governance": {
+        "tagging_coverage_ratio": 1.0,
+        "budget_alerts_enabled": false,
+        "budget_api_accessible": true,
+        "budget_alert_count": 0,
+        "budget_evidence_state": "observed_empty",
+        "policy_assignment_coverage_ratio": 0.0,
+        "orphaned_resource_count": 2
+      },
+      "iot": {
+        "iot_hub_count": 1,
+        "device_identity_count": 3,
+        "device_identity_observable": true,
+        "certificate_authority_configured": false,
+        "shared_access_policy_count": 1,
+        "overbroad_shared_access_policy_count": 1,
+        "diagnostic_settings_enabled": false,
+        "diagnostic_destination_count": 0,
+        "diagnostic_category_coverage_ratio": 0.0,
+        "defender_iot_enabled": false,
+        "iot_security_monitoring_observable": true,
+        "public_network_access_enabled": true,
+        "allowed_ip_rule_count": 0,
+        "private_endpoint_count": 0,
+        "private_endpoint_required": true,
+        "message_route_count": 0,
+        "telemetry_retention_days": 0,
+        "telemetry_storage_governed": false,
+        "iot_key_vault_linked": false,
+        "iot_secret_rotation_observable": false,
+        "alert_rule_count": 0,
+        "action_group_count": 0,
+        "clinical_operational_boundary_documented": false,
+        "device_evidence_required_count": 0,
+        "clinical_operational_evidence_required_count": 1,
+        "evidence_state": "observed"
+      },
+      "metadata": {
+        "collection_mode": "aws_boto3_account_inventory",
+        "collector_stage": "aws_live_enriched",
+        "profile_source": "aws_live",
+        "dataset_source_type": "vulnerable_lab",
+        "authorization_basis": "owned_controlled_lab",
+        "dataset_use": "full_spectrum_control_stress_test",
+        "account_id": "000832363767",
+        "regions_scanned": [
+          "eu-west-2"
+        ],
+        "iam_collection_mode": "aws_iam_user_role_inventory",
+        "identity_observability": "partial",
+        "conditional_access_accessible": false,
+        "conditional_access_policy_count": 0,
+        "network_collection_mode": "aws_ec2_security_group_inventory",
+        "security_group_count": 3,
+        "load_balancer_count": 0,
+        "internet_facing_load_balancer_count": 0,
+        "http_only_internet_facing_load_balancer_count": 0,
+        "data_collection_mode": "aws_s3_and_rds_inventory",
+        "storage_account_count": 4,
+        "public_storage_asset_count": 1,
+        "intentional_public_service_count": 0,
+        "unencrypted_data_store_count": 1,
+        "buckets_without_public_access_block_count": 1,
+        "key_vault_count": 1,
+        "key_vault_purge_protected_count": 1,
+        "key_vault_posture_state": "observed",
+        "sql_server_count": 1,
+        "sql_database_count": 1,
+        "public_sql_server_count": 1,
+        "unencrypted_sql_database_count": 1,
+        "private_endpoint_requirement_basis": "s3_and_rds_inventory",
+        "private_endpoint_exemption_count": 0,
+        "monitoring_collection_mode": "aws_cloudtrail_and_cloudwatch_inventory",
+        "activity_log_alert_count": 3,
+        "guardduty_enabled": false,
+        "securityhub_enabled": false,
+        "guardduty_active_finding_count": 0,
+        "guardduty_high_severity_finding_count": 0,
+        "securityhub_active_finding_count": 0,
+        "securityhub_critical_finding_count": 0,
+        "compute_collection_mode": "aws_ec2_inventory",
+        "virtual_machine_count": 1,
+        "vm_extension_covered_count": 0,
+        "vm_hardening_covered_count": 0,
+        "vm_backup_protected_count": 0,
+        "vm_patch_compliant_count": 0,
+        "linux_password_auth_enabled_vm_count": 0,
+        "lambda_function_count": 0,
+        "lambda_functions_with_public_url_count": 0,
+        "lambda_functions_with_public_policy_count": 0,
+        "ecs_cluster_count": 1,
+        "ecs_active_service_count": 0,
+        "eks_cluster_count": 0,
+        "eks_clusters_with_public_endpoint_count": 0,
+        "eks_clusters_with_unrestricted_public_endpoint_count": 0,
+        "governance_collection_mode": "aws_resource_tagging_inventory",
+        "governance_resource_count": 26,
+        "policy_assignment_count": 0,
+        "orphaned_resource_count": 2,
+        "budget_api_accessible": true,
+        "budget_alert_count": 0,
+        "budget_evidence_state": "observed_empty",
+        "config_recorder_enabled": false,
+        "config_compliant_rule_count": 0,
+        "config_noncompliant_rule_count": 0,
+        "iot_collection_mode": "aws_iot_core_inventory",
+        "iot_hub_count": 1,
+        "iot_device_identity_count": 3,
+        "iot_device_identity_observable": true,
+        "iot_shared_access_policy_count": 1,
+        "iot_overbroad_shared_access_policy_count": 1,
+        "iot_diagnostic_destination_count": 0,
+        "iot_defender_enabled": false,
+        "iot_public_network_hub_count": 1,
+        "iot_private_endpoint_count": 0,
+        "iot_alert_rule_count": 0,
+        "note": "This profile was created from live AWS account context via boto3. IAM, network, data, monitoring, compute, and governance posture include live AWS evidence where available. Several fields are best-effort analogs of Azure concepts with no exact AWS equivalent (e.g. Key Vault posture is approximated from KMS/Secrets Manager, IoT Hub posture from AWS IoT Core); this collector is a research preview and has not yet been verified against a live AWS account."
+      }
+    }
+  ],
+  "findings": [
+    {
+      "control_id": "IAM-001",
+      "title": "Privileged role assignments without MFA enforcement",
+      "category": "IAM",
+      "severity": "Critical",
+      "evidence": [
+        "1 privileged account(s) do not have MFA enabled",
+        "Conditional access for privileged administrators was not observable and is treated as unmet for deterministic scoring"
+      ],
+      "resource_scope": "000832363767",
+      "is_compliant": false,
+      "confidence": 0.96,
+      "exposure": 0.9,
+      "data_sensitivity": 0.6,
+      "remediation_effort": 0.35,
+      "remediation_summary": "Require MFA and admin-focused conditional access for privileged identities.",
+      "remediation_cost_tier": "free",
+      "mapping": [
+        "CIS Azure Foundations Benchmark 1.4",
+        "ISO 27001 A.5.17",
+        "NIST PR.AA-02",
+        "Cyber Essentials Access control",
+        "UK GDPR Article 32",
+        "FCA SYSC 3.2.6R"
+      ],
+      "asset_ids": [
+        "identity:aws:aws-000832363767"
+      ],
+      "evidence_ids": [
+        "evd_fdg_81612c096e8237_01",
+        "evd_fdg_81612c096e8237_02"
+      ],
+      "metadata": {
+        "organization_id": "aws-000832363767",
+        "organization_name": "SIGI Technologies",
+        "provider": "aws",
+        "sector": "Technology Services",
+        "profile_source": "aws_live",
+        "generated_by": "iam_controls",
+        "control_category": "IAM",
+        "rule_version": "1.0.0",
+        "control_intent": "Privileged role assignments without MFA enforcement",
+        "control_applicability": "azure_first_provider_neutral_core",
+        "control_known_limitations": [
+          "tenant-wide identity controls can be partially observable depending on Entra permissions"
+        ],
+        "evidence_requirements": [
+          "privileged assignment inventory",
+          "identity governance visibility context"
+        ],
+        "provider_support": {
+          "azure": "active",
+          "aws": "research_preview",
+          "gcp": "planned"
+        },
+        "conditional_access_accessible": false,
+        "conditional_access_policy_count": 0,
+        "conditional_access_enforced_for_admins": false,
+        "asset_ids": [
+          "identity:aws:aws-000832363767"
+        ],
+        "evidence_ids": [
+          "evd_fdg_81612c096e8237_01",
+          "evd_fdg_81612c096e8237_02"
+        ]
+      }
+    },
+    {
+      "control_id": "IAM-003",
+      "title": "Stale service principals or credentials require review",
+      "category": "IAM",
+      "severity": "Medium",
+      "evidence": [
+        "1 stale service principal(s) or credential set(s) were identified"
+      ],
+      "resource_scope": "000832363767",
+      "is_compliant": false,
+      "confidence": 0.8,
+      "exposure": 0.65,
+      "data_sensitivity": 0.6,
+      "remediation_effort": 0.55,
+      "remediation_summary": "Rotate or remove stale service principal credentials and disable unused identities.",
+      "remediation_cost_tier": "free",
+      "mapping": [
+        "Microsoft Cloud Security Benchmark IM-3",
+        "NIST PR.AA-01"
+      ],
+      "asset_ids": [
+        "identity:aws:aws-000832363767"
+      ],
+      "evidence_ids": [
+        "evd_fdg_c5f3db81b3965c_01"
+      ],
+      "metadata": {
+        "organization_id": "aws-000832363767",
+        "organization_name": "SIGI Technologies",
+        "provider": "aws",
+        "sector": "Technology Services",
+        "profile_source": "aws_live",
+        "generated_by": "iam_controls",
+        "control_category": "IAM",
+        "rule_version": "1.0.0",
+        "control_intent": "Stale service principals or credentials require review",
+        "control_applicability": "azure_first_provider_neutral_core",
+        "control_known_limitations": [
+          "tenant-wide identity controls can be partially observable depending on Entra permissions"
+        ],
+        "evidence_requirements": [
+          "privileged assignment inventory",
+          "identity governance visibility context"
+        ],
+        "provider_support": {
+          "azure": "active",
+          "aws": "research_preview",
+          "gcp": "planned"
+        },
+        "asset_ids": [
+          "identity:aws:aws-000832363767"
+        ],
+        "evidence_ids": [
+          "evd_fdg_c5f3db81b3965c_01"
+        ]
+      }
+    },
+    {
+      "control_id": "IAM-005",
+      "title": "Identity governance observability is partial for this assessment scope",
+      "category": "IAM",
+      "severity": "Low",
+      "evidence": [
+        "Subscription-scoped evidence was collected for privileged role assignments",
+        "Tenant-wide Entra controls such as conditional access were not directly observable in this run",
+        "The signed-in assessment identity exposed 1 Entra directory role(s)",
+        "The tenant directory-role catalog was partially visible with 43 active role entry(ies)"
+      ],
+      "resource_scope": "000832363767",
+      "is_compliant": false,
+      "confidence": 0.92,
+      "exposure": 0.3,
+      "data_sensitivity": 0.6,
+      "remediation_effort": 0.2,
+      "remediation_summary": "Broaden tenant-level identity evidence collection before treating IAM coverage as complete.",
+      "remediation_cost_tier": "low",
+      "mapping": [
+        "ISO 27001 A.5.15",
+        "NIST GV.RM-01"
+      ],
+      "asset_ids": [
+        "identity:aws:aws-000832363767"
+      ],
+      "evidence_ids": [
+        "evd_fdg_8ce865e5eb6019_01",
+        "evd_fdg_8ce865e5eb6019_02",
+        "evd_fdg_8ce865e5eb6019_03",
+        "evd_fdg_8ce865e5eb6019_04"
+      ],
+      "metadata": {
+        "organization_id": "aws-000832363767",
+        "organization_name": "SIGI Technologies",
+        "provider": "aws",
+        "sector": "Technology Services",
+        "profile_source": "aws_live",
+        "generated_by": "iam_controls",
+        "control_category": "IAM",
+        "rule_version": "1.1.0",
+        "control_intent": "Make identity observability boundaries explicit so decision-makers do not over-trust partial IAM visibility.",
+        "control_applicability": "azure_first_provider_neutral_core",
+        "control_known_limitations": [
+          "tenant-wide Conditional Access evidence remains partially observable in the current Azure collector path"
+        ],
+        "evidence_requirements": [
+          "privileged assignment inventory",
+          "identity governance visibility context"
+        ],
+        "provider_support": {
+          "azure": "active",
+          "aws": "research_preview",
+          "gcp": "planned"
+        },
+        "asset_ids": [
+          "identity:aws:aws-000832363767"
+        ],
+        "evidence_ids": [
+          "evd_fdg_8ce865e5eb6019_01",
+          "evd_fdg_8ce865e5eb6019_02",
+          "evd_fdg_8ce865e5eb6019_03",
+          "evd_fdg_8ce865e5eb6019_04"
+        ]
+      }
+    },
+    {
+      "control_id": "NET-001",
+      "title": "Administrative services are exposed to the public internet",
+      "category": "Network",
+      "severity": "Critical",
+      "evidence": [
+        "1 asset(s) expose RDP to the public internet",
+        "1 asset(s) expose SSH to the public internet"
+      ],
+      "resource_scope": "000832363767",
+      "is_compliant": false,
+      "confidence": 0.94,
+      "exposure": 1.0,
+      "data_sensitivity": 0.6,
+      "remediation_effort": 0.35,
+      "remediation_summary": "Restrict SSH and RDP exposure with private access paths, VPN, or just-in-time controls.",
+      "remediation_cost_tier": "medium",
+      "mapping": [
+        "CIS Azure Foundations Benchmark 6.1",
+        "ISO 27001 A.8.20",
+        "Cyber Essentials Firewalls",
+        "FCA SYSC 3.2.6R"
+      ],
+      "asset_ids": [
+        "network:aws:aws-000832363767"
+      ],
+      "evidence_ids": [
+        "evd_fdg_514b77f2a83791_01",
+        "evd_fdg_514b77f2a83791_02"
+      ],
+      "metadata": {
+        "organization_id": "aws-000832363767",
+        "organization_name": "SIGI Technologies",
+        "provider": "aws",
+        "sector": "Technology Services",
+        "profile_source": "aws_live",
+        "generated_by": "network_controls",
+        "control_category": "Network",
+        "rule_version": "1.0.0",
+        "control_intent": "Administrative services are exposed to the public internet",
+        "control_applicability": "azure_first_provider_neutral_core",
+        "control_known_limitations": [
+          "network exposure is assessed at visible scope and does not claim full attack-path simulation"
+        ],
+        "evidence_requirements": [
+          "inbound exposure inventory",
+          "administrative path restriction evidence"
+        ],
+        "provider_support": {
+          "azure": "active",
+          "aws": "research_preview",
+          "gcp": "planned"
+        },
+        "asset_ids": [
+          "network:aws:aws-000832363767"
+        ],
+        "evidence_ids": [
+          "evd_fdg_514b77f2a83791_01",
+          "evd_fdg_514b77f2a83791_02"
+        ]
+      }
+    },
+    {
+      "control_id": "NET-002",
+      "title": "Network security group rules are broader than expected",
+      "category": "Network",
+      "severity": "High",
+      "evidence": [
+        "2 permissive NSG rule(s) were identified"
+      ],
+      "resource_scope": "000832363767",
+      "is_compliant": false,
+      "confidence": 0.86,
+      "exposure": 0.8,
+      "data_sensitivity": 0.6,
+      "remediation_effort": 0.4,
+      "remediation_summary": "Tighten overly permissive network rules to least-privilege source and port scopes.",
+      "remediation_cost_tier": "free",
+      "mapping": [
+        "CIS Azure Foundations Benchmark 6.1",
+        "NIST PR.AC-05",
+        "Cyber Essentials Firewalls"
+      ],
+      "asset_ids": [
+        "network:aws:aws-000832363767"
+      ],
+      "evidence_ids": [
+        "evd_fdg_e13f1fe2310b82_01"
+      ],
+      "metadata": {
+        "organization_id": "aws-000832363767",
+        "organization_name": "SIGI Technologies",
+        "provider": "aws",
+        "sector": "Technology Services",
+        "profile_source": "aws_live",
+        "generated_by": "network_controls",
+        "control_category": "Network",
+        "rule_version": "1.0.0",
+        "control_intent": "Network security group rules are broader than expected",
+        "control_applicability": "azure_first_provider_neutral_core",
+        "control_known_limitations": [
+          "network exposure is assessed at visible scope and does not claim full attack-path simulation"
+        ],
+        "evidence_requirements": [
+          "inbound exposure inventory",
+          "administrative path restriction evidence"
+        ],
+        "provider_support": {
+          "azure": "active",
+          "aws": "research_preview",
+          "gcp": "planned"
+        },
+        "asset_ids": [
+          "network:aws:aws-000832363767"
+        ],
+        "evidence_ids": [
+          "evd_fdg_e13f1fe2310b82_01"
+        ]
+      }
+    },
+    {
+      "control_id": "NET-004",
+      "title": "Private endpoint coverage is incomplete for sensitive services",
+      "category": "Network",
+      "severity": "High",
+      "evidence": [
+        "5 required private endpoint(s) are not configured",
+        "0 of 5 expected private endpoint(s) are currently deployed"
+      ],
+      "resource_scope": "000832363767",
+      "is_compliant": false,
+      "confidence": 0.82,
+      "exposure": 0.7,
+      "data_sensitivity": 0.6,
+      "remediation_effort": 0.5,
+      "remediation_summary": "Extend private endpoints to sensitive services that should not rely on public routing.",
+      "remediation_cost_tier": "medium",
+      "mapping": [
+        "Microsoft Cloud Security Benchmark NS-2",
+        "NIST PR.AC-03"
+      ],
+      "asset_ids": [
+        "network:aws:aws-000832363767"
+      ],
+      "evidence_ids": [
+        "evd_fdg_95befe3a0ef4d3_01",
+        "evd_fdg_95befe3a0ef4d3_02"
+      ],
+      "metadata": {
+        "organization_id": "aws-000832363767",
+        "organization_name": "SIGI Technologies",
+        "provider": "aws",
+        "sector": "Technology Services",
+        "profile_source": "aws_live",
+        "generated_by": "network_controls",
+        "control_category": "Network",
+        "rule_version": "1.0.0",
+        "control_intent": "Private endpoint coverage is incomplete for sensitive services",
+        "control_applicability": "azure_first_provider_neutral_core",
+        "control_known_limitations": [
+          "network exposure is assessed at visible scope and does not claim full attack-path simulation"
+        ],
+        "evidence_requirements": [
+          "inbound exposure inventory",
+          "administrative path restriction evidence"
+        ],
+        "provider_support": {
+          "azure": "active",
+          "aws": "research_preview",
+          "gcp": "planned"
+        },
+        "private_endpoint_requirement_basis": "s3_and_rds_inventory",
+        "private_endpoint_exemptions": 0,
+        "asset_ids": [
+          "network:aws:aws-000832363767"
+        ],
+        "evidence_ids": [
+          "evd_fdg_95befe3a0ef4d3_01",
+          "evd_fdg_95befe3a0ef4d3_02"
+        ]
+      }
+    },
+    {
+      "control_id": "DATA-001",
+      "title": "Public storage access increases data exposure risk",
+      "category": "Data",
+      "severity": "High",
+      "evidence": [
+        "1 storage asset(s) allow public access"
+      ],
+      "resource_scope": "000832363767",
+      "is_compliant": false,
+      "confidence": 0.92,
+      "exposure": 0.95,
+      "data_sensitivity": 0.6,
+      "remediation_effort": 0.3,
+      "remediation_summary": "Disable anonymous or public storage access and review data exposure paths.",
+      "remediation_cost_tier": "free",
+      "mapping": [
+        "GDPR Article 32",
+        "ISO 27001 A.8.12",
+        "UK GDPR Article 32"
+      ],
+      "asset_ids": [
+        "data:aws:aws-000832363767"
+      ],
+      "evidence_ids": [
+        "evd_fdg_59af495a1834f7_01"
+      ],
+      "metadata": {
+        "organization_id": "aws-000832363767",
+        "organization_name": "SIGI Technologies",
+        "provider": "aws",
+        "sector": "Technology Services",
+        "profile_source": "aws_live",
+        "generated_by": "data_controls",
+        "control_category": "Data",
+        "rule_version": "1.0.0",
+        "control_intent": "Public storage access increases data exposure risk",
+        "control_applicability": "azure_first_provider_neutral_core",
+        "control_known_limitations": [],
+        "evidence_requirements": [
+          "public data-path and encryption evidence",
+          "backup/retention control-state evidence"
+        ],
+        "provider_support": {
+          "azure": "active",
+          "aws": "research_preview",
+          "gcp": "planned"
+        },
+        "asset_ids": [
+          "data:aws:aws-000832363767"
+        ],
+        "evidence_ids": [
+          "evd_fdg_59af495a1834f7_01"
+        ]
+      }
+    },
+    {
+      "control_id": "DATA-002",
+      "title": "Data stores lack expected encryption protections",
+      "category": "Data",
+      "severity": "High",
+      "evidence": [
+        "1 data store(s) appear to be unencrypted at rest"
+      ],
+      "resource_scope": "000832363767",
+      "is_compliant": false,
+      "confidence": 0.9,
+      "exposure": 0.7,
+      "data_sensitivity": 0.6,
+      "remediation_effort": 0.4,
+      "remediation_summary": "Enable encryption at rest for affected storage and database services.",
+      "remediation_cost_tier": "low",
+      "mapping": [
+        "ISO 27001 A.8.24",
+        "NIST PR.DS-01",
+        "UK GDPR Article 32"
+      ],
+      "asset_ids": [
+        "data:aws:aws-000832363767"
+      ],
+      "evidence_ids": [
+        "evd_fdg_fd9b74860f2318_01"
+      ],
+      "metadata": {
+        "organization_id": "aws-000832363767",
+        "organization_name": "SIGI Technologies",
+        "provider": "aws",
+        "sector": "Technology Services",
+        "profile_source": "aws_live",
+        "generated_by": "data_controls",
+        "control_category": "Data",
+        "rule_version": "1.0.0",
+        "control_intent": "Data stores lack expected encryption protections",
+        "control_applicability": "azure_first_provider_neutral_core",
+        "control_known_limitations": [],
+        "evidence_requirements": [
+          "public data-path and encryption evidence",
+          "backup/retention control-state evidence"
+        ],
+        "provider_support": {
+          "azure": "active",
+          "aws": "research_preview",
+          "gcp": "planned"
+        },
+        "asset_ids": [
+          "data:aws:aws-000832363767"
+        ],
+        "evidence_ids": [
+          "evd_fdg_fd9b74860f2318_01"
+        ]
+      }
+    },
+    {
+      "control_id": "DATA-003",
+      "title": "Backup and retention coverage fall below resilience expectations",
+      "category": "Data",
+      "severity": "High",
+      "evidence": [
+        "Backup coverage is only 60%",
+        "Retention policy coverage is only 60%"
+      ],
+      "resource_scope": "000832363767",
+      "is_compliant": false,
+      "confidence": 0.85,
+      "exposure": 0.5,
+      "data_sensitivity": 0.6,
+      "remediation_effort": 0.55,
+      "remediation_summary": "Increase backup and retention coverage for business-critical data stores.",
+      "remediation_cost_tier": "medium",
+      "mapping": [
+        "ISO 27001 A.8.13",
+        "NIST PR.DS-04",
+        "DSPT NDG Standard 7"
+      ],
+      "asset_ids": [
+        "data:aws:aws-000832363767"
+      ],
+      "evidence_ids": [
+        "evd_fdg_4fdee149a387bc_01",
+        "evd_fdg_4fdee149a387bc_02"
+      ],
+      "metadata": {
+        "organization_id": "aws-000832363767",
+        "organization_name": "SIGI Technologies",
+        "provider": "aws",
+        "sector": "Technology Services",
+        "profile_source": "aws_live",
+        "generated_by": "data_controls",
+        "control_category": "Data",
+        "rule_version": "1.0.0",
+        "control_intent": "Backup and retention coverage fall below resilience expectations",
+        "control_applicability": "azure_first_provider_neutral_core",
+        "control_known_limitations": [],
+        "evidence_requirements": [
+          "public data-path and encryption evidence",
+          "backup/retention control-state evidence"
+        ],
+        "provider_support": {
+          "azure": "active",
+          "aws": "research_preview",
+          "gcp": "planned"
+        },
+        "asset_ids": [
+          "data:aws:aws-000832363767"
+        ],
+        "evidence_ids": [
+          "evd_fdg_4fdee149a387bc_01",
+          "evd_fdg_4fdee149a387bc_02"
+        ]
+      }
+    },
+    {
+      "control_id": "MON-001",
+      "title": "Activity log retention is below governance and investigation expectations",
+      "category": "Monitoring/Logging",
+      "severity": "High",
+      "evidence": [
+        "Activity logs are retained for only 0 day(s)"
+      ],
+      "resource_scope": "000832363767",
+      "is_compliant": false,
+      "confidence": 0.9,
+      "exposure": 0.45,
+      "data_sensitivity": 0.6,
+      "remediation_effort": 0.3,
+      "remediation_summary": "Increase log retention to support investigation, governance review, and evidence preservation.",
+      "remediation_cost_tier": "low",
+      "mapping": [
+        "CIS Azure Foundations Benchmark 5.2",
+        "NIST DE.CM-01",
+        "DSPT NDG Standard 6"
+      ],
+      "asset_ids": [
+        "monitoring:aws:aws-000832363767"
+      ],
+      "evidence_ids": [
+        "evd_fdg_03484c44a1bea9_01"
+      ],
+      "metadata": {
+        "organization_id": "aws-000832363767",
+        "organization_name": "SIGI Technologies",
+        "provider": "aws",
+        "sector": "Technology Services",
+        "profile_source": "aws_live",
+        "generated_by": "monitoring_controls",
+        "control_category": "Monitoring/Logging",
+        "rule_version": "1.0.0",
+        "control_intent": "Activity log retention is below governance and investigation expectations",
+        "control_applicability": "azure_first_provider_neutral_core",
+        "control_known_limitations": [],
+        "evidence_requirements": [
+          "log retention and alerting evidence",
+          "incident runbook or workflow evidence"
+        ],
+        "provider_support": {
+          "azure": "active",
+          "aws": "research_preview",
+          "gcp": "planned"
+        },
+        "asset_ids": [
+          "monitoring:aws:aws-000832363767"
+        ],
+        "evidence_ids": [
+          "evd_fdg_03484c44a1bea9_01"
+        ]
+      }
+    },
+    {
+      "control_id": "MON-003",
+      "title": "Security monitoring coverage is below the expected baseline",
+      "category": "Monitoring/Logging",
+      "severity": "High",
+      "evidence": [
+        "Security monitoring coverage is approximately 0%"
+      ],
+      "resource_scope": "000832363767",
+      "is_compliant": false,
+      "confidence": 0.84,
+      "exposure": 0.5,
+      "data_sensitivity": 0.6,
+      "remediation_effort": 0.45,
+      "remediation_summary": "Expand security monitoring coverage across workloads and key cloud services.",
+      "remediation_cost_tier": "medium",
+      "mapping": [
+        "Microsoft Cloud Security Benchmark LT-1",
+        "NIST DE.CM-02"
+      ],
+      "asset_ids": [
+        "monitoring:aws:aws-000832363767"
+      ],
+      "evidence_ids": [
+        "evd_fdg_0fc8904a5edd56_01"
+      ],
+      "metadata": {
+        "organization_id": "aws-000832363767",
+        "organization_name": "SIGI Technologies",
+        "provider": "aws",
+        "sector": "Technology Services",
+        "profile_source": "aws_live",
+        "generated_by": "monitoring_controls",
+        "control_category": "Monitoring/Logging",
+        "rule_version": "1.0.0",
+        "control_intent": "Security monitoring coverage is below the expected baseline",
+        "control_applicability": "azure_first_provider_neutral_core",
+        "control_known_limitations": [],
+        "evidence_requirements": [
+          "log retention and alerting evidence",
+          "incident runbook or workflow evidence"
+        ],
+        "provider_support": {
+          "azure": "active",
+          "aws": "research_preview",
+          "gcp": "planned"
+        },
+        "asset_ids": [
+          "monitoring:aws:aws-000832363767"
+        ],
+        "evidence_ids": [
+          "evd_fdg_0fc8904a5edd56_01"
+        ]
+      }
+    },
+    {
+      "control_id": "CMP-001",
+      "title": "Critical workloads remain unpatched beyond acceptable risk tolerance",
+      "category": "Compute/Workloads",
+      "severity": "High",
+      "evidence": [
+        "1 critical VM(s) require urgent patching"
+      ],
+      "resource_scope": "000832363767",
+      "is_compliant": false,
+      "confidence": 0.92,
+      "exposure": 0.7,
+      "data_sensitivity": 0.6,
+      "remediation_effort": 0.45,
+      "remediation_summary": "Patch critical workloads and enforce a stronger recurring patch policy.",
+      "remediation_cost_tier": "medium",
+      "mapping": [
+        "Microsoft Cloud Security Benchmark PV-6",
+        "NIST PR.PS-03",
+        "Cyber Essentials Security update management",
+        "DSPT NDG Standard 6"
+      ],
+      "asset_ids": [
+        "compute:aws:aws-000832363767"
+      ],
+      "evidence_ids": [
+        "evd_fdg_dfbb1e782053b2_01"
+      ],
+      "metadata": {
+        "organization_id": "aws-000832363767",
+        "organization_name": "SIGI Technologies",
+        "provider": "aws",
+        "sector": "Technology Services",
+        "profile_source": "aws_live",
+        "generated_by": "compute_controls",
+        "control_category": "Compute/Workloads",
+        "rule_version": "1.1.0",
+        "control_intent": "Critical workloads remain unpatched beyond acceptable risk tolerance",
+        "control_applicability": "azure_first_provider_neutral_core",
+        "control_known_limitations": [
+          "patch posture uses a conservative VM configuration proxy and does not claim full patch-state verification"
+        ],
+        "evidence_requirements": [
+          "patch posture proxy evidence",
+          "workload hardening and endpoint coverage evidence"
+        ],
+        "provider_support": {
+          "azure": "active",
+          "aws": "research_preview",
+          "gcp": "planned"
+        },
+        "asset_ids": [
+          "compute:aws:aws-000832363767"
+        ],
+        "evidence_ids": [
+          "evd_fdg_dfbb1e782053b2_01"
+        ]
+      }
+    },
+    {
+      "control_id": "CMP-002",
+      "title": "Endpoint protection coverage is below the expected workload baseline",
+      "category": "Compute/Workloads",
+      "severity": "High",
+      "evidence": [
+        "Endpoint protection coverage is approximately 0%"
+      ],
+      "resource_scope": "000832363767",
+      "is_compliant": false,
+      "confidence": 0.88,
+      "exposure": 0.6,
+      "data_sensitivity": 0.6,
+      "remediation_effort": 0.35,
+      "remediation_summary": "Deploy endpoint protection or security agents to uncovered workloads.",
+      "remediation_cost_tier": "medium",
+      "mapping": [
+        "Microsoft Cloud Security Benchmark LT-4",
+        "NIST PR.PS-01",
+        "Cyber Essentials Malware protection"
+      ],
+      "asset_ids": [
+        "compute:aws:aws-000832363767"
+      ],
+      "evidence_ids": [
+        "evd_fdg_ba8563fa9c85b0_01"
+      ],
+      "metadata": {
+        "organization_id": "aws-000832363767",
+        "organization_name": "SIGI Technologies",
+        "provider": "aws",
+        "sector": "Technology Services",
+        "profile_source": "aws_live",
+        "generated_by": "compute_controls",
+        "control_category": "Compute/Workloads",
+        "rule_version": "1.0.0",
+        "control_intent": "Endpoint protection coverage is below the expected workload baseline",
+        "control_applicability": "azure_first_provider_neutral_core",
+        "control_known_limitations": [],
+        "evidence_requirements": [
+          "patch posture proxy evidence",
+          "workload hardening and endpoint coverage evidence"
+        ],
+        "provider_support": {
+          "azure": "active",
+          "aws": "research_preview",
+          "gcp": "planned"
+        },
+        "asset_ids": [
+          "compute:aws:aws-000832363767"
+        ],
+        "evidence_ids": [
+          "evd_fdg_ba8563fa9c85b0_01"
+        ]
+      }
+    },
+    {
+      "control_id": "CMP-003",
+      "title": "Workload hardening baseline coverage is incomplete",
+      "category": "Compute/Workloads",
+      "severity": "High",
+      "evidence": [
+        "Hardened baseline coverage is approximately 0%"
+      ],
+      "resource_scope": "000832363767",
+      "is_compliant": false,
+      "confidence": 0.85,
+      "exposure": 0.55,
+      "data_sensitivity": 0.6,
+      "remediation_effort": 0.5,
+      "remediation_summary": "Apply a hardened workload baseline across compute resources and administrative settings.",
+      "remediation_cost_tier": "medium",
+      "mapping": [
+        "CIS Controls 4.1",
+        "NIST PR.IP-01"
+      ],
+      "asset_ids": [
+        "compute:aws:aws-000832363767"
+      ],
+      "evidence_ids": [
+        "evd_fdg_1fcafc454b954f_01"
+      ],
+      "metadata": {
+        "organization_id": "aws-000832363767",
+        "organization_name": "SIGI Technologies",
+        "provider": "aws",
+        "sector": "Technology Services",
+        "profile_source": "aws_live",
+        "generated_by": "compute_controls",
+        "control_category": "Compute/Workloads",
+        "rule_version": "1.0.0",
+        "control_intent": "Workload hardening baseline coverage is incomplete",
+        "control_applicability": "azure_first_provider_neutral_core",
+        "control_known_limitations": [
+          "this control currently relies on conservative proxy or heuristic evidence paths"
+        ],
+        "evidence_requirements": [
+          "patch posture proxy evidence",
+          "workload hardening and endpoint coverage evidence"
+        ],
+        "provider_support": {
+          "azure": "active",
+          "aws": "research_preview",
+          "gcp": "planned"
+        },
+        "asset_ids": [
+          "compute:aws:aws-000832363767"
+        ],
+        "evidence_ids": [
+          "evd_fdg_1fcafc454b954f_01"
+        ]
+      }
+    },
+    {
+      "control_id": "CMP-004",
+      "title": "Workload backup agent coverage is below resilience expectations",
+      "category": "Compute/Workloads",
+      "severity": "High",
+      "evidence": [
+        "Workload backup agent coverage is approximately 0%"
+      ],
+      "resource_scope": "000832363767",
+      "is_compliant": false,
+      "confidence": 0.83,
+      "exposure": 0.5,
+      "data_sensitivity": 0.6,
+      "remediation_effort": 0.4,
+      "remediation_summary": "Enable workload backup protections for critical virtual machines and services.",
+      "remediation_cost_tier": "medium",
+      "mapping": [
+        "ISO 27001 A.8.13",
+        "NIST PR.DS-04"
+      ],
+      "asset_ids": [
+        "compute:aws:aws-000832363767"
+      ],
+      "evidence_ids": [
+        "evd_fdg_32dfaf5364b4d6_01"
+      ],
+      "metadata": {
+        "organization_id": "aws-000832363767",
+        "organization_name": "SIGI Technologies",
+        "provider": "aws",
+        "sector": "Technology Services",
+        "profile_source": "aws_live",
+        "generated_by": "compute_controls",
+        "control_category": "Compute/Workloads",
+        "rule_version": "1.0.0",
+        "control_intent": "Workload backup agent coverage is below resilience expectations",
+        "control_applicability": "azure_first_provider_neutral_core",
+        "control_known_limitations": [],
+        "evidence_requirements": [
+          "patch posture proxy evidence",
+          "workload hardening and endpoint coverage evidence"
+        ],
+        "provider_support": {
+          "azure": "active",
+          "aws": "research_preview",
+          "gcp": "planned"
+        },
+        "asset_ids": [
+          "compute:aws:aws-000832363767"
+        ],
+        "evidence_ids": [
+          "evd_fdg_32dfaf5364b4d6_01"
+        ]
+      }
+    },
+    {
+      "control_id": "GOV-002",
+      "title": "Budget alerting is not enabled for cloud cost governance",
+      "category": "Cost/Governance Hygiene",
+      "severity": "Medium",
+      "evidence": [
+        "Budget or spend alerting is not configured"
+      ],
+      "resource_scope": "000832363767",
+      "is_compliant": false,
+      "confidence": 0.8,
+      "exposure": 0.2,
+      "data_sensitivity": 0.6,
+      "remediation_effort": 0.25,
+      "remediation_summary": "Configure budget thresholds and spend alerts for cost oversight.",
+      "remediation_cost_tier": "free",
+      "mapping": [
+        "FinOps Cost Governance",
+        "ISO 27001 A.5.36"
+      ],
+      "asset_ids": [
+        "tenant:aws:aws-000832363767"
+      ],
+      "evidence_ids": [
+        "evd_fdg_41e815a1b649a8_01"
+      ],
+      "metadata": {
+        "organization_id": "aws-000832363767",
+        "organization_name": "SIGI Technologies",
+        "provider": "aws",
+        "sector": "Technology Services",
+        "profile_source": "aws_live",
+        "generated_by": "governance_controls",
+        "control_category": "Cost/Governance Hygiene",
+        "rule_version": "1.1.0",
+        "control_intent": "Budget alerting is not enabled for cloud cost governance",
+        "control_applicability": "azure_first_provider_neutral_core",
+        "control_known_limitations": [
+          "live budget-alert evidence is currently conservative in some collection contexts"
+        ],
+        "evidence_requirements": [
+          "resource inventory evidence",
+          "governance policy/budget/tagging control evidence"
+        ],
+        "provider_support": {
+          "azure": "active",
+          "aws": "research_preview",
+          "gcp": "planned"
+        },
+        "budget_api_accessible": true,
+        "budget_alert_count": 0,
+        "budget_evidence_state": "observed_empty",
+        "asset_ids": [
+          "tenant:aws:aws-000832363767"
+        ],
+        "evidence_ids": [
+          "evd_fdg_41e815a1b649a8_01"
+        ]
+      }
+    },
+    {
+      "control_id": "GOV-003",
+      "title": "Policy assignment coverage is below the baseline governance threshold",
+      "category": "Cost/Governance Hygiene",
+      "severity": "High",
+      "evidence": [
+        "Baseline policy assignment coverage is approximately 0%"
+      ],
+      "resource_scope": "000832363767",
+      "is_compliant": false,
+      "confidence": 0.87,
+      "exposure": 0.35,
+      "data_sensitivity": 0.6,
+      "remediation_effort": 0.45,
+      "remediation_summary": "Increase baseline policy assignment coverage for governance and compliance controls.",
+      "remediation_cost_tier": "free",
+      "mapping": [
+        "Azure Policy Baseline",
+        "NIST GV.PO-01"
+      ],
+      "asset_ids": [
+        "tenant:aws:aws-000832363767"
+      ],
+      "evidence_ids": [
+        "evd_fdg_78fef0955deb69_01"
+      ],
+      "metadata": {
+        "organization_id": "aws-000832363767",
+        "organization_name": "SIGI Technologies",
+        "provider": "aws",
+        "sector": "Technology Services",
+        "profile_source": "aws_live",
+        "generated_by": "governance_controls",
+        "control_category": "Cost/Governance Hygiene",
+        "rule_version": "1.0.0",
+        "control_intent": "Policy assignment coverage is below the baseline governance threshold",
+        "control_applicability": "azure_first_provider_neutral_core",
+        "control_known_limitations": [],
+        "evidence_requirements": [
+          "resource inventory evidence",
+          "governance policy/budget/tagging control evidence"
+        ],
+        "provider_support": {
+          "azure": "active",
+          "aws": "research_preview",
+          "gcp": "planned"
+        },
+        "asset_ids": [
+          "tenant:aws:aws-000832363767"
+        ],
+        "evidence_ids": [
+          "evd_fdg_78fef0955deb69_01"
+        ]
+      }
+    },
+    {
+      "control_id": "GOV-004",
+      "title": "Orphaned resources increase governance and cost hygiene risk",
+      "category": "Cost/Governance Hygiene",
+      "severity": "Medium",
+      "evidence": [
+        "2 orphaned resource(s) were identified"
+      ],
+      "resource_scope": "000832363767",
+      "is_compliant": false,
+      "confidence": 0.82,
+      "exposure": 0.3,
+      "data_sensitivity": 0.6,
+      "remediation_effort": 0.35,
+      "remediation_summary": "Review and remove unused or orphaned resources to reduce cost and governance noise.",
+      "remediation_cost_tier": "free",
+      "mapping": [
+        "Azure CAF Governance Discipline",
+        "FinOps Asset Hygiene"
+      ],
+      "asset_ids": [
+        "tenant:aws:aws-000832363767"
+      ],
+      "evidence_ids": [
+        "evd_fdg_6c25430ff366c3_01"
+      ],
+      "metadata": {
+        "organization_id": "aws-000832363767",
+        "organization_name": "SIGI Technologies",
+        "provider": "aws",
+        "sector": "Technology Services",
+        "profile_source": "aws_live",
+        "generated_by": "governance_controls",
+        "control_category": "Cost/Governance Hygiene",
+        "rule_version": "1.0.0",
+        "control_intent": "Orphaned resources increase governance and cost hygiene risk",
+        "control_applicability": "azure_first_provider_neutral_core",
+        "control_known_limitations": [
+          "this control currently relies on conservative proxy or heuristic evidence paths"
+        ],
+        "evidence_requirements": [
+          "resource inventory evidence",
+          "governance policy/budget/tagging control evidence"
+        ],
+        "provider_support": {
+          "azure": "active",
+          "aws": "research_preview",
+          "gcp": "planned"
+        },
+        "asset_ids": [
+          "tenant:aws:aws-000832363767"
+        ],
+        "evidence_ids": [
+          "evd_fdg_6c25430ff366c3_01"
+        ]
+      }
+    },
+    {
+      "control_id": "IOT-001",
+      "title": "Cloud device-identity registration posture is weak or unobservable",
+      "category": "Healthcare IoT",
+      "severity": "High",
+      "evidence": [
+        "Certificate-authority based device authentication was not observed"
+      ],
+      "resource_scope": "000832363767",
+      "is_compliant": false,
+      "confidence": 0.84,
+      "exposure": 0.65,
+      "data_sensitivity": 0.6,
+      "remediation_effort": 0.5,
+      "remediation_summary": "Inventory cloud-registered IoMT device identities and prefer certificate-based authentication for clinical device connections while validating device-side credential storage separately.",
+      "remediation_cost_tier": "medium",
+      "mapping": [
+        "NCSC CAF B2 Identity and access control",
+        "NHS DSPT Access control",
+        "IEC 80001-1 risk management"
+      ],
+      "asset_ids": [
+        "data:aws:aws-000832363767"
+      ],
+      "evidence_ids": [
+        "evd_fdg_8de9e4b39be686_01"
+      ],
+      "metadata": {
+        "organization_id": "aws-000832363767",
+        "organization_name": "SIGI Technologies",
+        "provider": "aws",
+        "sector": "Technology Services",
+        "profile_source": "aws_live",
+        "generated_by": "iot_controls",
+        "control_category": "Healthcare IoT",
+        "rule_version": "0.1.0",
+        "control_intent": "Cloud device-identity registration posture is weak or unobservable",
+        "control_applicability": "healthcare_iot_research_preview",
+        "control_known_limitations": [
+          "device-level certificate posture may require IoT Hub registry permissions or device-management integration"
+        ],
+        "evidence_requirements": [
+          "IoT platform configuration evidence",
+          "device identity, telemetry, and clinical boundary evidence"
+        ],
+        "provider_support": {
+          "azure": "research_preview",
+          "aws": "research_preview",
+          "gcp": "planned"
+        },
+        "iomt_evidence_state": "observed",
+        "iot_hub_count": 1,
+        "device_identity_count": 3,
+        "device_identity_observable": true,
+        "certificate_authority_configured": false,
+        "asset_ids": [
+          "data:aws:aws-000832363767"
+        ],
+        "evidence_ids": [
+          "evd_fdg_8de9e4b39be686_01"
+        ]
+      }
+    },
+    {
+      "control_id": "IOT-002",
+      "title": "IoT shared access policies exceed least-privilege expectations",
+      "category": "Healthcare IoT",
+      "severity": "High",
+      "evidence": [
+        "1 IoT shared access policie(s) were observed",
+        "1 shared access policie(s) appear overbroad"
+      ],
+      "resource_scope": "000832363767",
+      "is_compliant": false,
+      "confidence": 0.86,
+      "exposure": 0.7,
+      "data_sensitivity": 0.6,
+      "remediation_effort": 0.4,
+      "remediation_summary": "Reduce IoT shared access policies, remove overbroad permissions, and rotate keys through governed operations.",
+      "remediation_cost_tier": "free",
+      "mapping": [
+        "NCSC CAF B2 Identity and access control",
+        "NHS DSPT Security management",
+        "IEC 62443 account management"
+      ],
+      "asset_ids": [
+        "data:aws:aws-000832363767"
+      ],
+      "evidence_ids": [
+        "evd_fdg_47b2e528cc081f_01",
+        "evd_fdg_47b2e528cc081f_02"
+      ],
+      "metadata": {
+        "organization_id": "aws-000832363767",
+        "organization_name": "SIGI Technologies",
+        "provider": "aws",
+        "sector": "Technology Services",
+        "profile_source": "aws_live",
+        "generated_by": "iot_controls",
+        "control_category": "Healthcare IoT",
+        "rule_version": "1.0.0",
+        "control_intent": "IoT shared access policies exceed least-privilege expectations",
+        "control_applicability": "azure_first_provider_neutral_core",
+        "control_known_limitations": [],
+        "evidence_requirements": [
+          "IoT platform configuration evidence",
+          "device identity, telemetry, and clinical boundary evidence"
+        ],
+        "provider_support": {
+          "azure": "research_preview",
+          "aws": "research_preview",
+          "gcp": "planned"
+        },
+        "iomt_evidence_state": "observed",
+        "iot_hub_count": 1,
+        "device_identity_count": 3,
+        "shared_access_policy_count": 1,
+        "overbroad_shared_access_policy_count": 1,
+        "asset_ids": [
+          "data:aws:aws-000832363767"
+        ],
+        "evidence_ids": [
+          "evd_fdg_47b2e528cc081f_01",
+          "evd_fdg_47b2e528cc081f_02"
+        ]
+      }
+    },
+    {
+      "control_id": "IOT-003",
+      "title": "IoT diagnostic logging is incomplete for clinical telemetry investigation",
+      "category": "Healthcare IoT",
+      "severity": "Medium",
+      "evidence": [
+        "IoT Hub diagnostic settings were not enabled",
+        "No diagnostic destination was observed for IoT telemetry logs",
+        "IoT diagnostic category coverage is below the 80% baseline"
+      ],
+      "resource_scope": "000832363767",
+      "is_compliant": false,
+      "confidence": 0.9,
+      "exposure": 0.55,
+      "data_sensitivity": 0.6,
+      "remediation_effort": 0.35,
+      "remediation_summary": "Enable IoT Hub diagnostic settings and route core diagnostic categories to a monitored destination.",
+      "remediation_cost_tier": "low",
+      "mapping": [
+        "NCSC CAF C1 Security monitoring",
+        "NHS DSPT Logging and monitoring",
+        "ISO 27001 A.8.15"
+      ],
+      "asset_ids": [
+        "data:aws:aws-000832363767"
+      ],
+      "evidence_ids": [
+        "evd_fdg_74c023949b5311_01",
+        "evd_fdg_74c023949b5311_02",
+        "evd_fdg_74c023949b5311_03"
+      ],
+      "metadata": {
+        "organization_id": "aws-000832363767",
+        "organization_name": "SIGI Technologies",
+        "provider": "aws",
+        "sector": "Technology Services",
+        "profile_source": "aws_live",
+        "generated_by": "iot_controls",
+        "control_category": "Healthcare IoT",
+        "rule_version": "1.0.0",
+        "control_intent": "IoT diagnostic logging is incomplete for clinical telemetry investigation",
+        "control_applicability": "azure_first_provider_neutral_core",
+        "control_known_limitations": [],
+        "evidence_requirements": [
+          "IoT platform configuration evidence",
+          "device identity, telemetry, and clinical boundary evidence"
+        ],
+        "provider_support": {
+          "azure": "research_preview",
+          "aws": "research_preview",
+          "gcp": "planned"
+        },
+        "iomt_evidence_state": "observed",
+        "iot_hub_count": 1,
+        "device_identity_count": 3,
+        "diagnostic_settings_enabled": false,
+        "diagnostic_destination_count": 0,
+        "diagnostic_category_coverage_ratio": 0.0,
+        "asset_ids": [
+          "data:aws:aws-000832363767"
+        ],
+        "evidence_ids": [
+          "evd_fdg_74c023949b5311_01",
+          "evd_fdg_74c023949b5311_02",
+          "evd_fdg_74c023949b5311_03"
+        ]
+      }
+    },
+    {
+      "control_id": "IOT-004",
+      "title": "Defender for IoT or equivalent security monitoring is not evidenced",
+      "category": "Healthcare IoT",
+      "severity": "Medium",
+      "evidence": [
+        "Defender for IoT coverage was not observed for the hub scope"
+      ],
+      "resource_scope": "000832363767",
+      "is_compliant": false,
+      "confidence": 0.76,
+      "exposure": 0.55,
+      "data_sensitivity": 0.6,
+      "remediation_effort": 0.55,
+      "remediation_summary": "Enable Defender for IoT or document an equivalent monitoring path for clinical IoT assets.",
+      "remediation_cost_tier": "medium",
+      "mapping": [
+        "NCSC CAF C1 Security monitoring",
+        "NHS DSPT Security operations",
+        "IEC 62443 security monitoring"
+      ],
+      "asset_ids": [
+        "data:aws:aws-000832363767"
+      ],
+      "evidence_ids": [
+        "evd_fdg_0487a7973756c3_01"
+      ],
+      "metadata": {
+        "organization_id": "aws-000832363767",
+        "organization_name": "SIGI Technologies",
+        "provider": "aws",
+        "sector": "Technology Services",
+        "profile_source": "aws_live",
+        "generated_by": "iot_controls",
+        "control_category": "Healthcare IoT",
+        "rule_version": "0.1.0",
+        "control_intent": "Defender for IoT or equivalent security monitoring is not evidenced",
+        "control_applicability": "healthcare_iot_research_preview",
+        "control_known_limitations": [
+          "Defender for IoT state is a control-plane signal and does not prove complete medical-device sensor coverage"
+        ],
+        "evidence_requirements": [
+          "IoT platform configuration evidence",
+          "device identity, telemetry, and clinical boundary evidence"
+        ],
+        "provider_support": {
+          "azure": "research_preview",
+          "aws": "research_preview",
+          "gcp": "planned"
+        },
+        "iomt_evidence_state": "observed",
+        "iot_hub_count": 1,
+        "device_identity_count": 3,
+        "defender_iot_enabled": false,
+        "iot_security_monitoring_observable": true,
+        "asset_ids": [
+          "data:aws:aws-000832363767"
+        ],
+        "evidence_ids": [
+          "evd_fdg_0487a7973756c3_01"
+        ]
+      }
+    },
+    {
+      "control_id": "IOT-005",
+      "title": "IoT Hub public network access is not sufficiently constrained",
+      "category": "Healthcare IoT",
+      "severity": "High",
+      "evidence": [
+        "IoT Hub public network access is enabled",
+        "No IP filter rules or private endpoints were observed for the hub scope"
+      ],
+      "resource_scope": "000832363767",
+      "is_compliant": false,
+      "confidence": 0.88,
+      "exposure": 0.9,
+      "data_sensitivity": 0.6,
+      "remediation_effort": 0.45,
+      "remediation_summary": "Restrict IoT Hub public access using IP filters, private endpoints, or documented clinical network boundaries.",
+      "remediation_cost_tier": "low",
+      "mapping": [
+        "NCSC CAF B4 System security",
+        "NHS DSPT Network security",
+        "Cyber Essentials Firewalls"
+      ],
+      "asset_ids": [
+        "data:aws:aws-000832363767"
+      ],
+      "evidence_ids": [
+        "evd_fdg_994c549d0b3d2e_01",
+        "evd_fdg_994c549d0b3d2e_02"
+      ],
+      "metadata": {
+        "organization_id": "aws-000832363767",
+        "organization_name": "SIGI Technologies",
+        "provider": "aws",
+        "sector": "Technology Services",
+        "profile_source": "aws_live",
+        "generated_by": "iot_controls",
+        "control_category": "Healthcare IoT",
+        "rule_version": "1.0.0",
+        "control_intent": "IoT Hub public network access is not sufficiently constrained",
+        "control_applicability": "azure_first_provider_neutral_core",
+        "control_known_limitations": [],
+        "evidence_requirements": [
+          "IoT platform configuration evidence",
+          "device identity, telemetry, and clinical boundary evidence"
+        ],
+        "provider_support": {
+          "azure": "research_preview",
+          "aws": "research_preview",
+          "gcp": "planned"
+        },
+        "iomt_evidence_state": "observed",
+        "iot_hub_count": 1,
+        "device_identity_count": 3,
+        "public_network_access_enabled": true,
+        "allowed_ip_rule_count": 0,
+        "private_endpoint_count": 0,
+        "asset_ids": [
+          "data:aws:aws-000832363767"
+        ],
+        "evidence_ids": [
+          "evd_fdg_994c549d0b3d2e_01",
+          "evd_fdg_994c549d0b3d2e_02"
+        ]
+      }
+    },
+    {
+      "control_id": "IOT-006",
+      "title": "Conditional private endpoint and network isolation posture is weak",
+      "category": "Healthcare IoT",
+      "severity": "Medium",
+      "evidence": [
+        "IoT Hub public network access is enabled without IP filter evidence",
+        "Certificate-authority based device authentication was not observed",
+        "No private endpoint was observed for the IoT Hub scope"
+      ],
+      "resource_scope": "000832363767",
+      "is_compliant": false,
+      "confidence": 0.82,
+      "exposure": 0.65,
+      "data_sensitivity": 0.6,
+      "remediation_effort": 0.55,
+      "remediation_summary": "Deploy private endpoints for sensitive IoMT telemetry services where public routing lacks documented and observable compensating controls.",
+      "remediation_cost_tier": "medium",
+      "mapping": [
+        "NCSC CAF B4 System security",
+        "NHS DSPT Network security",
+        "UK GDPR Article 32"
+      ],
+      "asset_ids": [
+        "data:aws:aws-000832363767"
+      ],
+      "evidence_ids": [
+        "evd_fdg_22fa0573d52093_01",
+        "evd_fdg_22fa0573d52093_02",
+        "evd_fdg_22fa0573d52093_03"
+      ],
+      "metadata": {
+        "organization_id": "aws-000832363767",
+        "organization_name": "SIGI Technologies",
+        "provider": "aws",
+        "sector": "Technology Services",
+        "profile_source": "aws_live",
+        "generated_by": "iot_controls",
+        "control_category": "Healthcare IoT",
+        "rule_version": "1.0.0",
+        "control_intent": "Conditional private endpoint and network isolation posture is weak",
+        "control_applicability": "azure_first_provider_neutral_core",
+        "control_known_limitations": [],
+        "evidence_requirements": [
+          "IoT platform configuration evidence",
+          "device identity, telemetry, and clinical boundary evidence"
+        ],
+        "provider_support": {
+          "azure": "research_preview",
+          "aws": "research_preview",
+          "gcp": "planned"
+        },
+        "iomt_evidence_state": "observed",
+        "iot_hub_count": 1,
+        "device_identity_count": 3,
+        "private_endpoint_required": true,
+        "private_endpoint_count": 0,
+        "public_network_access_enabled": true,
+        "allowed_ip_rule_count": 0,
+        "certificate_authority_configured": false,
+        "decision_basis": "conditional_private_endpoint_gap_requires_public_exposure_without_ip_filter_or_certificate_evidence",
+        "asset_ids": [
+          "data:aws:aws-000832363767"
+        ],
+        "evidence_ids": [
+          "evd_fdg_22fa0573d52093_01",
+          "evd_fdg_22fa0573d52093_02",
+          "evd_fdg_22fa0573d52093_03"
+        ]
+      }
+    },
+    {
+      "control_id": "IOT-007",
+      "title": "IoMT telemetry routing and retention are below clinical evidence expectations",
+      "category": "Healthcare IoT",
+      "severity": "Medium",
+      "evidence": [
+        "No IoT telemetry message route was observed",
+        "IoT telemetry retention is 0 day(s), below the 30-day baseline",
+        "Telemetry storage governance was not observed"
+      ],
+      "resource_scope": "000832363767",
+      "is_compliant": false,
+      "confidence": 0.8,
+      "exposure": 0.5,
+      "data_sensitivity": 0.6,
+      "remediation_effort": 0.5,
+      "remediation_summary": "Route IoMT telemetry to governed storage and retain sufficient logs for investigation and clinical safety review.",
+      "remediation_cost_tier": "low",
+      "mapping": [
+        "NCSC CAF C1 Security monitoring",
+        "NHS DSPT Records management",
+        "ISO 27001 A.8.15"
+      ],
+      "asset_ids": [
+        "data:aws:aws-000832363767"
+      ],
+      "evidence_ids": [
+        "evd_fdg_212e49f1a69dad_01",
+        "evd_fdg_212e49f1a69dad_02",
+        "evd_fdg_212e49f1a69dad_03"
+      ],
+      "metadata": {
+        "organization_id": "aws-000832363767",
+        "organization_name": "SIGI Technologies",
+        "provider": "aws",
+        "sector": "Technology Services",
+        "profile_source": "aws_live",
+        "generated_by": "iot_controls",
+        "control_category": "Healthcare IoT",
+        "rule_version": "1.0.0",
+        "control_intent": "IoMT telemetry routing and retention are below clinical evidence expectations",
+        "control_applicability": "azure_first_provider_neutral_core",
+        "control_known_limitations": [],
+        "evidence_requirements": [
+          "IoT platform configuration evidence",
+          "device identity, telemetry, and clinical boundary evidence"
+        ],
+        "provider_support": {
+          "azure": "research_preview",
+          "aws": "research_preview",
+          "gcp": "planned"
+        },
+        "iomt_evidence_state": "observed",
+        "iot_hub_count": 1,
+        "device_identity_count": 3,
+        "message_route_count": 0,
+        "telemetry_retention_days": 0,
+        "telemetry_storage_governed": false,
+        "asset_ids": [
+          "data:aws:aws-000832363767"
+        ],
+        "evidence_ids": [
+          "evd_fdg_212e49f1a69dad_01",
+          "evd_fdg_212e49f1a69dad_02",
+          "evd_fdg_212e49f1a69dad_03"
+        ]
+      }
+    },
+    {
+      "control_id": "IOT-008",
+      "title": "IoT credential governance is not linked to managed secret controls",
+      "category": "Healthcare IoT",
+      "severity": "Medium",
+      "evidence": [
+        "IoT credentials were not linked to a governed key vault path",
+        "IoT credential rotation evidence was not observable"
+      ],
+      "resource_scope": "000832363767",
+      "is_compliant": false,
+      "confidence": 0.74,
+      "exposure": 0.6,
+      "data_sensitivity": 0.6,
+      "remediation_effort": 0.5,
+      "remediation_summary": "Store and rotate IoT credentials through governed key-management services with owner accountability.",
+      "remediation_cost_tier": "low",
+      "mapping": [
+        "NCSC CAF B2 Identity and access control",
+        "NHS DSPT Access control",
+        "ISO 27001 A.8.24"
+      ],
+      "asset_ids": [
+        "data:aws:aws-000832363767"
+      ],
+      "evidence_ids": [
+        "evd_fdg_45fead59d5ed86_01",
+        "evd_fdg_45fead59d5ed86_02"
+      ],
+      "metadata": {
+        "organization_id": "aws-000832363767",
+        "organization_name": "SIGI Technologies",
+        "provider": "aws",
+        "sector": "Technology Services",
+        "profile_source": "aws_live",
+        "generated_by": "iot_controls",
+        "control_category": "Healthcare IoT",
+        "rule_version": "1.0.0",
+        "control_intent": "IoT credential governance is not linked to managed secret controls",
+        "control_applicability": "azure_first_provider_neutral_core",
+        "control_known_limitations": [],
+        "evidence_requirements": [
+          "IoT platform configuration evidence",
+          "device identity, telemetry, and clinical boundary evidence"
+        ],
+        "provider_support": {
+          "azure": "research_preview",
+          "aws": "research_preview",
+          "gcp": "planned"
+        },
+        "iomt_evidence_state": "observed",
+        "iot_hub_count": 1,
+        "device_identity_count": 3,
+        "iot_key_vault_linked": false,
+        "iot_secret_rotation_observable": false,
+        "asset_ids": [
+          "data:aws:aws-000832363767"
+        ],
+        "evidence_ids": [
+          "evd_fdg_45fead59d5ed86_01",
+          "evd_fdg_45fead59d5ed86_02"
+        ]
+      }
+    },
+    {
+      "control_id": "IOT-009",
+      "title": "Clinical IoT alert routing is not operationally evidenced",
+      "category": "Healthcare IoT",
+      "severity": "Medium",
+      "evidence": [
+        "No IoT-specific clinical or operational alert rule was observed",
+        "No action group was observed for IoT alert routing"
+      ],
+      "resource_scope": "000832363767",
+      "is_compliant": false,
+      "confidence": 0.83,
+      "exposure": 0.45,
+      "data_sensitivity": 0.6,
+      "remediation_effort": 0.45,
+      "remediation_summary": "Create IoT-specific alert rules and route them to accountable clinical or operational responders.",
+      "remediation_cost_tier": "low",
+      "mapping": [
+        "NCSC CAF C2 Proactive security event discovery",
+        "NHS DSPT Incident management",
+        "IEC 80001-1 operational risk"
+      ],
+      "asset_ids": [
+        "data:aws:aws-000832363767"
+      ],
+      "evidence_ids": [
+        "evd_fdg_f2db05d7f43d6a_01",
+        "evd_fdg_f2db05d7f43d6a_02"
+      ],
+      "metadata": {
+        "organization_id": "aws-000832363767",
+        "organization_name": "SIGI Technologies",
+        "provider": "aws",
+        "sector": "Technology Services",
+        "profile_source": "aws_live",
+        "generated_by": "iot_controls",
+        "control_category": "Healthcare IoT",
+        "rule_version": "1.0.0",
+        "control_intent": "Clinical IoT alert routing is not operationally evidenced",
+        "control_applicability": "azure_first_provider_neutral_core",
+        "control_known_limitations": [],
+        "evidence_requirements": [
+          "IoT platform configuration evidence",
+          "device identity, telemetry, and clinical boundary evidence"
+        ],
+        "provider_support": {
+          "azure": "research_preview",
+          "aws": "research_preview",
+          "gcp": "planned"
+        },
+        "iomt_evidence_state": "observed",
+        "iot_hub_count": 1,
+        "device_identity_count": 3,
+        "alert_rule_count": 0,
+        "action_group_count": 0,
+        "asset_ids": [
+          "data:aws:aws-000832363767"
+        ],
+        "evidence_ids": [
+          "evd_fdg_f2db05d7f43d6a_01",
+          "evd_fdg_f2db05d7f43d6a_02"
+        ]
+      }
+    },
+    {
+      "control_id": "IOT-010",
+      "title": "Clinical-operational ownership boundaries require human validation",
+      "category": "Healthcare IoT",
+      "severity": "Low",
+      "evidence": [
+        "Clinical and operational ownership boundary was not documented in collected evidence",
+        "1 operational evidence item(s) require human confirmation"
+      ],
+      "resource_scope": "000832363767",
+      "is_compliant": false,
+      "confidence": 0.9,
+      "exposure": 0.35,
+      "data_sensitivity": 0.6,
+      "remediation_effort": 0.4,
+      "remediation_summary": "Document clinical, operational, and supplier ownership boundaries for IoMT assets and validate device-level evidence manually.",
+      "remediation_cost_tier": "free",
+      "mapping": [
+        "NCSC CAF A1 Governance",
+        "NHS DSPT Leadership and governance",
+        "IEC 80001-1 responsibility agreements"
+      ],
+      "asset_ids": [
+        "data:aws:aws-000832363767"
+      ],
+      "evidence_ids": [
+        "evd_fdg_bd7c18a97bdfc6_01",
+        "evd_fdg_bd7c18a97bdfc6_02"
+      ],
+      "metadata": {
+        "organization_id": "aws-000832363767",
+        "organization_name": "SIGI Technologies",
+        "provider": "aws",
+        "sector": "Technology Services",
+        "profile_source": "aws_live",
+        "generated_by": "iot_controls",
+        "control_category": "Healthcare IoT",
+        "rule_version": "0.1.0",
+        "control_intent": "Make clinical-operational ownership assumptions explicit rather than treating cloud control-plane evidence as complete medical-device assurance.",
+        "control_applicability": "healthcare_iot_human_verification_boundary",
+        "control_known_limitations": [
+          "clinical ownership, supplier accountability, and patient-safety workflow evidence require human validation"
+        ],
+        "evidence_requirements": [
+          "IoT platform configuration evidence",
+          "device identity, telemetry, and clinical boundary evidence"
+        ],
+        "provider_support": {
+          "azure": "research_preview",
+          "aws": "research_preview",
+          "gcp": "planned"
+        },
+        "iomt_evidence_state": "observed",
+        "iot_hub_count": 1,
+        "device_identity_count": 3,
+        "clinical_operational_boundary_documented": false,
+        "device_evidence_required_count": 0,
+        "clinical_operational_evidence_required_count": 1,
+        "asset_ids": [
+          "data:aws:aws-000832363767"
+        ],
+        "evidence_ids": [
+          "evd_fdg_bd7c18a97bdfc6_01",
+          "evd_fdg_bd7c18a97bdfc6_02"
+        ]
+      }
+    }
+  ],
+  "notes": [
+    "Snapshot stores normalized profile evidence and deterministic finding inputs.",
+    "Replay does not recollect cloud evidence."
+  ]
+}

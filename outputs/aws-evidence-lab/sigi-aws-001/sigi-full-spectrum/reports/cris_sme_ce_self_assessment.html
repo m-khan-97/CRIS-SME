@@ -1,0 +1,2713 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>CRIS-SME Cyber Essentials Pre-Assessment Pack</title>
+    <style>
+      :root {
+        --bg: #f7f9fb;
+        --ink: #172033;
+        --muted: #617083;
+        --panel: #ffffff;
+        --line: #d8e2ec;
+        --accent: #0f766e;
+        --warn: #a16207;
+        --risk: #b42318;
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        background: var(--bg);
+        color: var(--ink);
+        font-family: "IBM Plex Sans", "Segoe UI", sans-serif;
+      }
+      main { max-width: 1220px; margin: 0 auto; padding: 28px 18px 56px; }
+      header { border-bottom: 1px solid var(--line); padding-bottom: 18px; margin-bottom: 18px; }
+      h1 { margin: 0; font-size: clamp(1.7rem, 4vw, 2.5rem); }
+      h2 { margin: 0 0 12px; font-size: 1.25rem; }
+      h3 { margin: 0 0 6px; font-size: 1rem; }
+      p { line-height: 1.55; overflow-wrap: anywhere; }
+      .muted { color: var(--muted); }
+      .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 190px), 1fr)); gap: 12px; }
+      .panel {
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        padding: 14px;
+        margin-bottom: 14px;
+        overflow: hidden;
+      }
+      .metric { font-size: 1.55rem; font-weight: 800; margin: 2px 0; overflow-wrap: anywhere; }
+      .tabs { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
+      .tabs a {
+        background: #ccfbf1;
+        color: #042f2e;
+        border: 1px solid #99f6e4;
+        border-radius: 999px;
+        padding: 7px 11px;
+        text-decoration: none;
+        font-weight: 700;
+      }
+      .answer {
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: #fbfdff;
+        padding: 12px;
+        margin-bottom: 10px;
+      }
+      .meta { display: flex; flex-wrap: wrap; gap: 7px; margin: 8px 0; }
+      .pill {
+        display: inline-flex;
+        border-radius: 999px;
+        padding: 4px 8px;
+        font-size: 0.78rem;
+        font-weight: 800;
+        background: #e2e8f0;
+        color: #263548;
+      }
+      .status-supported_risk_found { background: #fee2e2; color: var(--risk); }
+      .status-supported_no_issue { background: #dcfce7; color: #166534; }
+      .status-endpoint_required,
+      .status-policy_required,
+      .status-manual_required,
+      .status-insufficient_evidence { background: #fef3c7; color: var(--warn); }
+      ul { margin: 8px 0 0; padding-left: 18px; }
+      li { margin-bottom: 5px; overflow-wrap: anywhere; }
+      footer { color: var(--muted); margin-top: 20px; font-size: 0.9rem; }
+    </style>
+  </head>
+  <body>
+    <main>
+      <header>
+        <h1>Cyber Essentials Pre-Assessment Pack</h1>
+        <p class="muted">This artifact does not certify Cyber Essentials compliance. It pre-populates candidate answer statuses from available evidence for human review.</p>
+        <div class="tabs"><a href="#your_company">Your Company</a><a href="#certificates">Certificates</a><a href="#scope_of_assessment">Scope Of Assessment</a><a href="#insurance">Insurance</a><a href="#firewalls">Firewalls</a><a href="#secure_configuration">Secure Configuration</a><a href="#security_update_management">Security Update Management</a><a href="#user_access_control">User Access Control</a><a href="#malware_protection">Malware Protection</a></div>
+      </header>
+
+      <section class="panel">
+        <h2>Question Set</h2>
+        <div class="grid">
+          <div class="panel"><div class="metric">Danzell</div><div><strong>Set</strong></div><div class="muted">version 16.2</div></div>
+          <div class="panel"><div class="metric">3.3</div><div><strong>Requirements</strong></div><div class="muted">NCSC version</div></div>
+          <div class="panel"><div class="metric">106</div><div><strong>Questions</strong></div><div class="muted">mapped entries</div></div>
+          <div class="panel"><div class="metric">62</div><div><strong>Technical</strong></div><div class="muted">technical-control entries</div></div>
+        </div>
+      </section>
+
+      <section class="panel">
+        <h2>Coverage</h2>
+        <div class="grid">
+          <div class="panel"><div class="metric">5</div><div><strong>Direct Cloud</strong></div><div class="muted">entries</div></div><div class="panel"><div class="metric">24</div><div><strong>Endpoint Required</strong></div><div class="muted">entries</div></div><div class="panel"><div class="metric">23</div><div><strong>Inferred Cloud</strong></div><div class="muted">entries</div></div><div class="panel"><div class="metric">35</div><div><strong>Manual Required</strong></div><div class="muted">entries</div></div><div class="panel"><div class="metric">19</div><div><strong>Policy Required</strong></div><div class="muted">entries</div></div>
+        </div>
+      </section>
+
+      <section class="panel">
+        <h2>Proposed Status</h2>
+        <div class="grid">
+          <div class="panel"><div class="metric">24</div><div><strong>Endpoint Required</strong></div><div class="muted">entries</div></div><div class="panel"><div class="metric">35</div><div><strong>Manual Required</strong></div><div class="muted">entries</div></div><div class="panel"><div class="metric">19</div><div><strong>Policy Required</strong></div><div class="muted">entries</div></div><div class="panel"><div class="metric">4</div><div><strong>Supported No Issue</strong></div><div class="muted">entries</div></div><div class="panel"><div class="metric">24</div><div><strong>Supported Risk Found</strong></div><div class="muted">entries</div></div>
+        </div>
+      </section>
+
+      <section class="panel">
+        <h2>Proposed Answer</h2>
+        <div class="grid">
+          <div class="panel"><div class="metric">78</div><div><strong>Cannot Determine</strong></div><div class="muted">entries</div></div><div class="panel"><div class="metric">24</div><div><strong>No</strong></div><div class="muted">entries</div></div><div class="panel"><div class="metric">4</div><div><strong>Yes</strong></div><div class="muted">entries</div></div>
+        </div>
+      </section>
+
+      
+      <section class="panel" id="your_company">
+        <h2>Your Company</h2>
+        
+        <article class="answer">
+          <h3>A1.1: State the legal organisation name for the assessment certificate.</h3>
+          <div class="meta">
+            <span class="pill">manual_required</span>
+            <span class="pill status-manual_required">manual_required</span>
+            <span class="pill">answer: Cannot determine</span>
+            <span class="pill">controls: none</span>
+          </div>
+          <p><strong>Answer basis:</strong> No CE Yes/No answer is proposed because human context is required.</p>
+          <p class="muted">This entry requires human scoping, administrative context, or final applicant attestation.</p>
+          <details>
+            <summary>Linked findings</summary>
+            <ul><li>No linked CRIS-SME risk finding.</li></ul>
+          </details>
+          <details>
+            <summary>Evidence snippets</summary>
+            <ul><li>No evidence snippet attached.</li></ul>
+          </details>
+          <details>
+            <summary>Evidence still needed</summary>
+            <ul><li>company registration lookup</li></ul>
+          </details>
+        </article>
+    
+        <article class="answer">
+          <h3>A1.2: Identify the organisation type or legal form.</h3>
+          <div class="meta">
+            <span class="pill">manual_required</span>
+            <span class="pill status-manual_required">manual_required</span>
+            <span class="pill">answer: Cannot determine</span>
+            <span class="pill">controls: none</span>
+          </div>
+          <p><strong>Answer basis:</strong> No CE Yes/No answer is proposed because human context is required.</p>
+          <p class="muted">This entry requires human scoping, administrative context, or final applicant attestation.</p>
+          <details>
+            <summary>Linked findings</summary>
+            <ul><li>No linked CRIS-SME risk finding.</li></ul>
+          </details>
+          <details>
+            <summary>Evidence snippets</summary>
+            <ul><li>No evidence snippet attached.</li></ul>
+          </details>
+          <details>
+            <summary>Evidence still needed</summary>
+            <ul><li>company registration lookup</li></ul>
+          </details>
+        </article>
+    
+        <article class="answer">
+          <h3>A1.3: Declare the workforce size, including relevant workers with access to organisational data.</h3>
+          <div class="meta">
+            <span class="pill">manual_required</span>
+            <span class="pill status-manual_required">manual_required</span>
+            <span class="pill">answer: Cannot determine</span>
+            <span class="pill">controls: none</span>
+          </div>
+          <p><strong>Answer basis:</strong> No CE Yes/No answer is proposed because human context is required.</p>
+          <p class="muted">This entry requires human scoping, administrative context, or final applicant attestation.</p>
+          <details>
+            <summary>Linked findings</summary>
+            <ul><li>No linked CRIS-SME risk finding.</li></ul>
+          </details>
+          <details>
+            <summary>Evidence snippets</summary>
+            <ul><li>No evidence snippet attached.</li></ul>
+          </details>
+          <details>
+            <summary>Evidence still needed</summary>
+            <ul><li>HR or identity directory count with caveats</li></ul>
+          </details>
+        </article>
+    
+        <article class="answer">
+          <h3>A1.4: Provide the primary legal entity registration identifier.</h3>
+          <div class="meta">
+            <span class="pill">manual_required</span>
+            <span class="pill status-manual_required">manual_required</span>
+            <span class="pill">answer: Cannot determine</span>
+            <span class="pill">controls: none</span>
+          </div>
+          <p><strong>Answer basis:</strong> No CE Yes/No answer is proposed because human context is required.</p>
+          <p class="muted">This entry requires human scoping, administrative context, or final applicant attestation.</p>
+          <details>
+            <summary>Linked findings</summary>
+            <ul><li>No linked CRIS-SME risk finding.</li></ul>
+          </details>
+          <details>
+            <summary>Evidence snippets</summary>
+            <ul><li>No evidence snippet attached.</li></ul>
+          </details>
+          <details>
+            <summary>Evidence still needed</summary>
+            <ul><li>company registration lookup</li></ul>
+          </details>
+        </article>
+    
+        <article class="answer">
+          <h3>A1.5: Record the registered address for the legal organisation.</h3>
+          <div class="meta">
+            <span class="pill">manual_required</span>
+            <span class="pill status-manual_required">manual_required</span>
+            <span class="pill">answer: Cannot determine</span>
+            <span class="pill">controls: none</span>
+          </div>
+          <p><strong>Answer basis:</strong> No CE Yes/No answer is proposed because human context is required.</p>
+          <p class="muted">This entry requires human scoping, administrative context, or final applicant attestation.</p>
+          <details>
+            <summary>Linked findings</summary>
+            <ul><li>No linked CRIS-SME risk finding.</li></ul>
+          </details>
+          <details>
+            <summary>Evidence snippets</summary>
+            <ul><li>No evidence snippet attached.</li></ul>
+          </details>
+          <details>
+            <summary>Evidence still needed</summary>
+            <ul><li>company registration lookup</li></ul>
+          </details>
+        </article>
+    
+        <article class="answer">
+          <h3>A1.5.1: Record operational locations that differ from the registered address.</h3>
+          <div class="meta">
+            <span class="pill">manual_required</span>
+            <span class="pill status-manual_required">manual_required</span>
+            <span class="pill">answer: Cannot determine</span>
+            <span class="pill">controls: none</span>
+          </div>
+          <p><strong>Answer basis:</strong> No CE Yes/No answer is proposed because human context is required.</p>
+          <p class="muted">This entry requires human scoping, administrative context, or final applicant attestation.</p>
+          <details>
+            <summary>Linked findings</summary>
+            <ul><li>No linked CRIS-SME risk finding.</li></ul>
+          </details>
+          <details>
+            <summary>Evidence snippets</summary>
+            <ul><li>No evidence snippet attached.</li></ul>
+          </details>
+          <details>
+            <summary>Evidence still needed</summary>
+            <ul><li>asset inventory location metadata</li></ul>
+          </details>
+        </article>
+    
+        <article class="answer">
+          <h3>A1.7: Select the organisation&#x27;s main business sector.</h3>
+          <div class="meta">
+            <span class="pill">manual_required</span>
+            <span class="pill status-manual_required">manual_required</span>
+            <span class="pill">answer: Cannot determine</span>
+            <span class="pill">controls: none</span>
+          </div>
+          <p><strong>Answer basis:</strong> No CE Yes/No answer is proposed because human context is required.</p>
+          <p class="muted">This entry requires human scoping, administrative context, or final applicant attestation.</p>
+          <details>
+            <summary>Linked findings</summary>
+            <ul><li>No linked CRIS-SME risk finding.</li></ul>
+          </details>
+          <details>
+            <summary>Evidence snippets</summary>
+            <ul><li>No evidence snippet attached.</li></ul>
+          </details>
+          <details>
+            <summary>Evidence still needed</summary>
+            <ul><li>SIC or company profile lookup</li></ul>
+          </details>
+        </article>
+    
+        <article class="answer">
+          <h3>A1.8: Provide the organisation&#x27;s public web presence if one exists.</h3>
+          <div class="meta">
+            <span class="pill">manual_required</span>
+            <span class="pill status-manual_required">manual_required</span>
+            <span class="pill">answer: Cannot determine</span>
+            <span class="pill">controls: none</span>
+          </div>
+          <p><strong>Answer basis:</strong> No CE Yes/No answer is proposed because human context is required.</p>
+          <p class="muted">This entry requires human scoping, administrative context, or final applicant attestation.</p>
+          <details>
+            <summary>Linked findings</summary>
+            <ul><li>No linked CRIS-SME risk finding.</li></ul>
+          </details>
+          <details>
+            <summary>Evidence snippets</summary>
+            <ul><li>No evidence snippet attached.</li></ul>
+          </details>
+          <details>
+            <summary>Evidence still needed</summary>
+            <ul><li>domain inventory</li></ul>
+          </details>
+        </article>
+    
+        <article class="answer">
+          <h3>A1.9: State whether this is a first application or a renewal.</h3>
+          <div class="meta">
+            <span class="pill">manual_required</span>
+            <span class="pill status-manual_required">manual_required</span>
+            <span class="pill">answer: Cannot determine</span>
+            <span class="pill">controls: none</span>
+          </div>
+          <p><strong>Answer basis:</strong> No CE Yes/No answer is proposed because human context is required.</p>
+          <p class="muted">This entry requires human scoping, administrative context, or final applicant attestation.</p>
+          <details>
+            <summary>Linked findings</summary>
+            <ul><li>No linked CRIS-SME risk finding.</li></ul>
+          </details>
+          <details>
+            <summary>Evidence snippets</summary>
+            <ul><li>No evidence snippet attached.</li></ul>
+          </details>
+          <details>
+            <summary>Evidence still needed</summary>
+            <ul><li>previous certification metadata</li></ul>
+          </details>
+        </article>
+    
+        <article class="answer">
+          <h3>A1.10: Record the main reasons for seeking certification.</h3>
+          <div class="meta">
+            <span class="pill">manual_required</span>
+            <span class="pill status-manual_required">manual_required</span>
+            <span class="pill">answer: Cannot determine</span>
+            <span class="pill">controls: none</span>
+          </div>
+          <p><strong>Answer basis:</strong> No CE Yes/No answer is proposed because human context is required.</p>
+          <p class="muted">This entry requires human scoping, administrative context, or final applicant attestation.</p>
+          <details>
+            <summary>Linked findings</summary>
+            <ul><li>No linked CRIS-SME risk finding.</li></ul>
+          </details>
+          <details>
+            <summary>Evidence snippets</summary>
+            <ul><li>No evidence snippet attached.</li></ul>
+          </details>
+          <details>
+            <summary>Evidence still needed</summary>
+            <ul><li>commercial context</li></ul>
+          </details>
+        </article>
+    
+        <article class="answer">
+          <h3>A1.10.1: Identify a commercial contracting organisation where relevant.</h3>
+          <div class="meta">
+            <span class="pill">manual_required</span>
+            <span class="pill status-manual_required">manual_required</span>
+            <span class="pill">answer: Cannot determine</span>
+            <span class="pill">controls: none</span>
+          </div>
+          <p><strong>Answer basis:</strong> No CE Yes/No answer is proposed because human context is required.</p>
+          <p class="muted">This entry requires human scoping, administrative context, or final applicant attestation.</p>
+          <details>
+            <summary>Linked findings</summary>
+            <ul><li>No linked CRIS-SME risk finding.</li></ul>
+          </details>
+          <details>
+            <summary>Evidence snippets</summary>
+            <ul><li>No evidence snippet attached.</li></ul>
+          </details>
+          <details>
+            <summary>Evidence still needed</summary>
+            <ul><li>contract metadata</li></ul>
+          </details>
+        </article>
+    
+        <article class="answer">
+          <h3>A1.10.2: Identify government contract context where relevant.</h3>
+          <div class="meta">
+            <span class="pill">manual_required</span>
+            <span class="pill status-manual_required">manual_required</span>
+            <span class="pill">answer: Cannot determine</span>
+            <span class="pill">controls: none</span>
+          </div>
+          <p><strong>Answer basis:</strong> No CE Yes/No answer is proposed because human context is required.</p>
+          <p class="muted">This entry requires human scoping, administrative context, or final applicant attestation.</p>
+          <details>
+            <summary>Linked findings</summary>
+            <ul><li>No linked CRIS-SME risk finding.</li></ul>
+          </details>
+          <details>
+            <summary>Evidence snippets</summary>
+            <ul><li>No evidence snippet attached.</li></ul>
+          </details>
+          <details>
+            <summary>Evidence still needed</summary>
+            <ul><li>contract metadata</li></ul>
+          </details>
+        </article>
+    
+        <article class="answer">
+          <h3>A1.10.3: Identify grant authority context where relevant.</h3>
+          <div class="meta">
+            <span class="pill">manual_required</span>
+            <span class="pill status-manual_required">manual_required</span>
+            <span class="pill">answer: Cannot determine</span>
+            <span class="pill">controls: none</span>
+          </div>
+          <p><strong>Answer basis:</strong> No CE Yes/No answer is proposed because human context is required.</p>
+          <p class="muted">This entry requires human scoping, administrative context, or final applicant attestation.</p>
+          <details>
+            <summary>Linked findings</summary>
+            <ul><li>No linked CRIS-SME risk finding.</li></ul>
+          </details>
+          <details>
+            <summary>Evidence snippets</summary>
+            <ul><li>No evidence snippet attached.</li></ul>
+          </details>
+          <details>
+            <summary>Evidence still needed</summary>
+            <ul><li>grant metadata</li></ul>
+          </details>
+        </article>
+    
+        <article class="answer">
+          <h3>A1.10.4: Identify regulator context where relevant.</h3>
+          <div class="meta">
+            <span class="pill">manual_required</span>
+            <span class="pill status-manual_required">manual_required</span>
+            <span class="pill">answer: Cannot determine</span>
+            <span class="pill">controls: none</span>
+          </div>
+          <p><strong>Answer basis:</strong> No CE Yes/No answer is proposed because human context is required.</p>
+          <p class="muted">This entry requires human scoping, administrative context, or final applicant attestation.</p>
+          <details>
+            <summary>Linked findings</summary>
+            <ul><li>No linked CRIS-SME risk finding.</li></ul>
+          </details>
+          <details>
+            <summary>Evidence snippets</summary>
+            <ul><li>No evidence snippet attached.</li></ul>
+          </details>
+          <details>
+            <summary>Evidence still needed</summary>
+            <ul><li>regulatory context</li></ul>
+          </details>
+        </article>
+    
+        <article class="answer">
+          <h3>A1.10.5: Explain any other certification motivation.</h3>
+          <div class="meta">
+            <span class="pill">manual_required</span>
+            <span class="pill status-manual_required">manual_required</span>
+            <span class="pill">answer: Cannot determine</span>
+            <span class="pill">controls: none</span>
+          </div>
+          <p><strong>Answer basis:</strong> No CE Yes/No answer is proposed because human context is required.</p>
+          <p class="muted">This entry requires human scoping, administrative context, or final applicant attestation.</p>
+          <details>
+            <summary>Linked findings</summary>
+            <ul><li>No linked CRIS-SME risk finding.</li></ul>
+          </details>
+          <details>
+            <summary>Evidence snippets</summary>
+            <ul><li>No evidence snippet attached.</li></ul>
+          </details>
+          <details>
+            <summary>Evidence still needed</summary>
+            <ul><li>commercial context</li></ul>
+          </details>
+        </article>
+    
+        <article class="answer">
+          <h3>A1.11: Confirm the requirements document has been read.</h3>
+          <div class="meta">
+            <span class="pill">manual_required</span>
+            <span class="pill status-manual_required">manual_required</span>
+            <span class="pill">answer: Cannot determine</span>
+            <span class="pill">controls: none</span>
+          </div>
+          <p><strong>Answer basis:</strong> No CE Yes/No answer is proposed because human context is required.</p>
+          <p class="muted">This entry requires human scoping, administrative context, or final applicant attestation.</p>
+          <details>
+            <summary>Linked findings</summary>
+            <ul><li>No linked CRIS-SME risk finding.</li></ul>
+          </details>
+          <details>
+            <summary>Evidence snippets</summary>
+            <ul><li>No evidence snippet attached.</li></ul>
+          </details>
+          <details>
+            <summary>Evidence still needed</summary>
+            <ul><li>attestation workflow</li></ul>
+          </details>
+        </article>
+    
+        <article class="answer">
+          <h3>A1.12: Record whether advice was received from an assured Cyber Advisor.</h3>
+          <div class="meta">
+            <span class="pill">manual_required</span>
+            <span class="pill status-manual_required">manual_required</span>
+            <span class="pill">answer: Cannot determine</span>
+            <span class="pill">controls: none</span>
+          </div>
+          <p><strong>Answer basis:</strong> No CE Yes/No answer is proposed because human context is required.</p>
+          <p class="muted">This entry requires human scoping, administrative context, or final applicant attestation.</p>
+          <details>
+            <summary>Linked findings</summary>
+            <ul><li>No linked CRIS-SME risk finding.</li></ul>
+          </details>
+          <details>
+            <summary>Evidence snippets</summary>
+            <ul><li>No evidence snippet attached.</li></ul>
+          </details>
+          <details>
+            <summary>Evidence still needed</summary>
+            <ul><li>advisor engagement record</li></ul>
+          </details>
+        </article>
+    
+        <article class="answer">
+          <h3>A1.13: Record breach follow-up consent preference.</h3>
+          <div class="meta">
+            <span class="pill">manual_required</span>
+            <span class="pill status-manual_required">manual_required</span>
+            <span class="pill">answer: Cannot determine</span>
+            <span class="pill">controls: none</span>
+          </div>
+          <p><strong>Answer basis:</strong> No CE Yes/No answer is proposed because human context is required.</p>
+          <p class="muted">This entry requires human scoping, administrative context, or final applicant attestation.</p>
+          <details>
+            <summary>Linked findings</summary>
+            <ul><li>No linked CRIS-SME risk finding.</li></ul>
+          </details>
+          <details>
+            <summary>Evidence snippets</summary>
+            <ul><li>No evidence snippet attached.</li></ul>
+          </details>
+          <details>
+            <summary>Evidence still needed</summary>
+            <ul><li>attestation workflow</li></ul>
+          </details>
+        </article>
+    
+        <article class="answer">
+          <h3>A1.14: Record how the organisation heard about Cyber Essentials.</h3>
+          <div class="meta">
+            <span class="pill">manual_required</span>
+            <span class="pill status-manual_required">manual_required</span>
+            <span class="pill">answer: Cannot determine</span>
+            <span class="pill">controls: none</span>
+          </div>
+          <p><strong>Answer basis:</strong> No CE Yes/No answer is proposed because human context is required.</p>
+          <p class="muted">This entry requires human scoping, administrative context, or final applicant attestation.</p>
+          <details>
+            <summary>Linked findings</summary>
+            <ul><li>No linked CRIS-SME risk finding.</li></ul>
+          </details>
+          <details>
+            <summary>Evidence snippets</summary>
+            <ul><li>No evidence snippet attached.</li></ul>
+          </details>
+          <details>
+            <summary>Evidence still needed</summary>
+            <ul><li>application metadata</li></ul>
+          </details>
+        </article>
+    
+        <article class="answer">
+          <h3>A1.15: Record consent to be contacted for research.</h3>
+          <div class="meta">
+            <span class="pill">manual_required</span>
+            <span class="pill status-manual_required">manual_required</span>
+            <span class="pill">answer: Cannot determine</span>
+            <span class="pill">controls: none</span>
+          </div>
+          <p><strong>Answer basis:</strong> No CE Yes/No answer is proposed because human context is required.</p>
+          <p class="muted">This entry requires human scoping, administrative context, or final applicant attestation.</p>
+          <details>
+            <summary>Linked findings</summary>
+            <ul><li>No linked CRIS-SME risk finding.</li></ul>
+          </details>
+          <details>
+            <summary>Evidence snippets</summary>
+            <ul><li>No evidence snippet attached.</li></ul>
+          </details>
+          <details>
+            <summary>Evidence still needed</summary>
+            <ul><li>attestation workflow</li></ul>
+          </details>
+        </article>
+    
+        <article class="answer">
+          <h3>A1.16: Record whether the organisation uses the NCSC Early Warning service.</h3>
+          <div class="meta">
+            <span class="pill">policy_required</span>
+            <span class="pill status-policy_required">policy_required</span>
+            <span class="pill">answer: Cannot determine</span>
+            <span class="pill">controls: MON-004</span>
+          </div>
+          <p><strong>Answer basis:</strong> No CE Yes/No answer is proposed because policy or process evidence is required.</p>
+          <p class="muted">This entry requires policy, process, approval, contractual, or business-need evidence that cannot be proven from cloud telemetry alone.</p>
+          <details>
+            <summary>Linked findings</summary>
+            <ul><li>No linked CRIS-SME risk finding.</li></ul>
+          </details>
+          <details>
+            <summary>Evidence snippets</summary>
+            <ul><li>No evidence snippet attached.</li></ul>
+          </details>
+          <details>
+            <summary>Evidence still needed</summary>
+            <ul><li>external service enrolment evidence</li></ul>
+          </details>
+        </article>
+    
+      </section>
+    
+      <section class="panel" id="certificates">
+        <h2>Certificates</h2>
+        
+        <article class="answer">
+          <h3>A1.6: State whether multiple legal entities are included in the certification scope.</h3>
+          <div class="meta">
+            <span class="pill">manual_required</span>
+            <span class="pill status-manual_required">manual_required</span>
+            <span class="pill">answer: Cannot determine</span>
+            <span class="pill">controls: none</span>
+          </div>
+          <p><strong>Answer basis:</strong> No CE Yes/No answer is proposed because human context is required.</p>
+          <p class="muted">This entry requires human scoping, administrative context, or final applicant attestation.</p>
+          <details>
+            <summary>Linked findings</summary>
+            <ul><li>No linked CRIS-SME risk finding.</li></ul>
+          </details>
+          <details>
+            <summary>Evidence snippets</summary>
+            <ul><li>No evidence snippet attached.</li></ul>
+          </details>
+          <details>
+            <summary>Evidence still needed</summary>
+            <ul><li>company structure evidence</li></ul>
+          </details>
+        </article>
+    
+        <article class="answer">
+          <h3>A1.6.1: List additional legal entities included in the assessment scope.</h3>
+          <div class="meta">
+            <span class="pill">manual_required</span>
+            <span class="pill status-manual_required">manual_required</span>
+            <span class="pill">answer: Cannot determine</span>
+            <span class="pill">controls: none</span>
+          </div>
+          <p><strong>Answer basis:</strong> No CE Yes/No answer is proposed because human context is required.</p>
+          <p class="muted">This entry requires human scoping, administrative context, or final applicant attestation.</p>
+          <details>
+            <summary>Linked findings</summary>
+            <ul><li>No linked CRIS-SME risk finding.</li></ul>
+          </details>
+          <details>
+            <summary>Evidence snippets</summary>
+            <ul><li>No evidence snippet attached.</li></ul>
+          </details>
+          <details>
+            <summary>Evidence still needed</summary>
+            <ul><li>company structure evidence</li></ul>
+          </details>
+        </article>
+    
+      </section>
+    
+      <section class="panel" id="scope_of_assessment">
+        <h2>Scope Of Assessment</h2>
+        
+        <article class="answer">
+          <h3>A2.1: State whether the scope is the whole organisation or a defined subset.</h3>
+          <div class="meta">
+            <span class="pill">manual_required</span>
+            <span class="pill status-manual_required">manual_required</span>
+            <span class="pill">answer: Cannot determine</span>
+            <span class="pill">controls: none</span>
+          </div>
+          <p><strong>Answer basis:</strong> No CE Yes/No answer is proposed because human context is required.</p>
+          <p class="muted">This entry requires human scoping, administrative context, or final applicant attestation.</p>
+          <details>
+            <summary>Linked findings</summary>
+            <ul><li>No linked CRIS-SME risk finding.</li></ul>
+          </details>
+          <details>
+            <summary>Evidence snippets</summary>
+            <ul><li>No evidence snippet attached.</li></ul>
+          </details>
+          <details>
+            <summary>Evidence still needed</summary>
+            <ul><li>scope declaration workflow</li></ul>
+          </details>
+        </article>
+    
+        <article class="answer">
+          <h3>A2.2: Describe the assessment scope where only part of the organisation is included.</h3>
+          <div class="meta">
+            <span class="pill">manual_required</span>
+            <span class="pill status-manual_required">manual_required</span>
+            <span class="pill">answer: Cannot determine</span>
+            <span class="pill">controls: none</span>
+          </div>
+          <p><strong>Answer basis:</strong> No CE Yes/No answer is proposed because human context is required.</p>
+          <p class="muted">This entry requires human scoping, administrative context, or final applicant attestation.</p>
+          <details>
+            <summary>Linked findings</summary>
+            <ul><li>No linked CRIS-SME risk finding.</li></ul>
+          </details>
+          <details>
+            <summary>Evidence snippets</summary>
+            <ul><li>No evidence snippet attached.</li></ul>
+          </details>
+          <details>
+            <summary>Evidence still needed</summary>
+            <ul><li>scope declaration workflow</li></ul>
+          </details>
+        </article>
+    
+        <article class="answer">
+          <h3>A2.2.1: Describe excluded networks created as subsets.</h3>
+          <div class="meta">
+            <span class="pill">manual_required</span>
+            <span class="pill status-manual_required">manual_required</span>
+            <span class="pill">answer: Cannot determine</span>
+            <span class="pill">controls: NET-002</span>
+          </div>
+          <p><strong>Answer basis:</strong> No CE Yes/No answer is proposed because human context is required.</p>
+          <p class="muted">This entry requires human scoping, administrative context, or final applicant attestation.</p>
+          <details>
+            <summary>Linked findings</summary>
+            <ul><li>NET-002 Planned 44.71: Network security group rules are broader than expected</li></ul>
+          </details>
+          <details>
+            <summary>Evidence snippets</summary>
+            <ul><li>2 permissive NSG rule(s) were identified</li></ul>
+          </details>
+          <details>
+            <summary>Evidence still needed</summary>
+            <ul><li>network segmentation inventory</li></ul>
+          </details>
+        </article>
+    
+        <article class="answer">
+          <h3>A2.2.2: Explain the mechanism used to create any subset boundary.</h3>
+          <div class="meta">
+            <span class="pill">inferred_cloud</span>
+            <span class="pill status-supported_risk_found">supported_risk_found</span>
+            <span class="pill">answer: No</span>
+            <span class="pill">controls: NET-002</span>
+          </div>
+          <p><strong>Answer basis:</strong> A mapped CRIS-SME risk finding is present, so the candidate CE answer is No pending human verification.</p>
+          <p class="muted">CRIS-SME found related cloud evidence that may affect this answer. A responsible person must verify the final Cyber Essentials response.</p>
+          <details>
+            <summary>Linked findings</summary>
+            <ul><li>NET-002 Planned 44.71: Network security group rules are broader than expected</li></ul>
+          </details>
+          <details>
+            <summary>Evidence snippets</summary>
+            <ul><li>2 permissive NSG rule(s) were identified</li></ul>
+          </details>
+          <details>
+            <summary>Evidence still needed</summary>
+            <ul><li>firewall or VLAN segmentation evidence</li></ul>
+          </details>
+        </article>
+    
+        <article class="answer">
+          <h3>A2.3: Confirm whether in-scope networks operate at the declared locations.</h3>
+          <div class="meta">
+            <span class="pill">manual_required</span>
+            <span class="pill status-manual_required">manual_required</span>
+            <span class="pill">answer: Cannot determine</span>
+            <span class="pill">controls: none</span>
+          </div>
+          <p><strong>Answer basis:</strong> No CE Yes/No answer is proposed because human context is required.</p>
+          <p class="muted">This entry requires human scoping, administrative context, or final applicant attestation.</p>
+          <details>
+            <summary>Linked findings</summary>
+            <ul><li>No linked CRIS-SME risk finding.</li></ul>
+          </details>
+          <details>
+            <summary>Evidence snippets</summary>
+            <ul><li>No evidence snippet attached.</li></ul>
+          </details>
+          <details>
+            <summary>Evidence still needed</summary>
+            <ul><li>asset location inventory</li></ul>
+          </details>
+        </article>
+    
+        <article class="answer">
+          <h3>A2.3.1: Record whether each organisation site has internet connectivity.</h3>
+          <div class="meta">
+            <span class="pill">manual_required</span>
+            <span class="pill status-manual_required">manual_required</span>
+            <span class="pill">answer: Cannot determine</span>
+            <span class="pill">controls: none</span>
+          </div>
+          <p><strong>Answer basis:</strong> No CE Yes/No answer is proposed because human context is required.</p>
+          <p class="muted">This entry requires human scoping, administrative context, or final applicant attestation.</p>
+          <details>
+            <summary>Linked findings</summary>
+            <ul><li>No linked CRIS-SME risk finding.</li></ul>
+          </details>
+          <details>
+            <summary>Evidence snippets</summary>
+            <ul><li>No evidence snippet attached.</li></ul>
+          </details>
+          <details>
+            <summary>Evidence still needed</summary>
+            <ul><li>network inventory</li></ul>
+          </details>
+        </article>
+    
+        <article class="answer">
+          <h3>A2.3.2: Describe site-to-site connectivity where direct site internet is absent.</h3>
+          <div class="meta">
+            <span class="pill">manual_required</span>
+            <span class="pill status-manual_required">manual_required</span>
+            <span class="pill">answer: Cannot determine</span>
+            <span class="pill">controls: NET-002</span>
+          </div>
+          <p><strong>Answer basis:</strong> No CE Yes/No answer is proposed because human context is required.</p>
+          <p class="muted">This entry requires human scoping, administrative context, or final applicant attestation.</p>
+          <details>
+            <summary>Linked findings</summary>
+            <ul><li>NET-002 Planned 44.71: Network security group rules are broader than expected</li></ul>
+          </details>
+          <details>
+            <summary>Evidence snippets</summary>
+            <ul><li>2 permissive NSG rule(s) were identified</li></ul>
+          </details>
+          <details>
+            <summary>Evidence still needed</summary>
+            <ul><li>VPN or WAN topology inventory</li></ul>
+          </details>
+        </article>
+    
+        <article class="answer">
+          <h3>A2.4: List networks included in the assessment scope.</h3>
+          <div class="meta">
+            <span class="pill">inferred_cloud</span>
+            <span class="pill status-supported_risk_found">supported_risk_found</span>
+            <span class="pill">answer: No</span>
+            <span class="pill">controls: NET-002</span>
+          </div>
+          <p><strong>Answer basis:</strong> A mapped CRIS-SME risk finding is present, so the candidate CE answer is No pending human verification.</p>
+          <p class="muted">CRIS-SME found related cloud evidence that may affect this answer. A responsible person must verify the final Cyber Essentials response.</p>
+          <details>
+            <summary>Linked findings</summary>
+            <ul><li>NET-002 Planned 44.71: Network security group rules are broader than expected</li></ul>
+          </details>
+          <details>
+            <summary>Evidence snippets</summary>
+            <ul><li>2 permissive NSG rule(s) were identified</li></ul>
+          </details>
+          <details>
+            <summary>Evidence still needed</summary>
+            <ul><li>network asset inventory</li></ul>
+          </details>
+        </article>
+    
+        <article class="answer">
+          <h3>A2.4.1: Record the number of home or remote workers.</h3>
+          <div class="meta">
+            <span class="pill">manual_required</span>
+            <span class="pill status-manual_required">manual_required</span>
+            <span class="pill">answer: Cannot determine</span>
+            <span class="pill">controls: none</span>
+          </div>
+          <p><strong>Answer basis:</strong> No CE Yes/No answer is proposed because human context is required.</p>
+          <p class="muted">This entry requires human scoping, administrative context, or final applicant attestation.</p>
+          <details>
+            <summary>Linked findings</summary>
+            <ul><li>No linked CRIS-SME risk finding.</li></ul>
+          </details>
+          <details>
+            <summary>Evidence snippets</summary>
+            <ul><li>No evidence snippet attached.</li></ul>
+          </details>
+          <details>
+            <summary>Evidence still needed</summary>
+            <ul><li>HR or device management inventory</li></ul>
+          </details>
+        </article>
+    
+        <article class="answer">
+          <h3>A2.4.2: Describe how remote workers access organisational data and services.</h3>
+          <div class="meta">
+            <span class="pill">manual_required</span>
+            <span class="pill status-manual_required">manual_required</span>
+            <span class="pill">answer: Cannot determine</span>
+            <span class="pill">controls: NET-001, IAM-001</span>
+          </div>
+          <p><strong>Answer basis:</strong> No CE Yes/No answer is proposed because human context is required.</p>
+          <p class="muted">This entry requires human scoping, administrative context, or final applicant attestation.</p>
+          <details>
+            <summary>Linked findings</summary>
+            <ul><li>NET-001 High 72.12: Administrative services are exposed to the public internet</li><li>IAM-001 High 67.97: Privileged role assignments without MFA enforcement</li></ul>
+          </details>
+          <details>
+            <summary>Evidence snippets</summary>
+            <ul><li>1 asset(s) expose RDP to the public internet</li><li>1 asset(s) expose SSH to the public internet</li><li>1 privileged account(s) do not have MFA enabled</li><li>Conditional access for privileged administrators was not observable and is treated as unmet for deterministic scoring</li></ul>
+          </details>
+          <details>
+            <summary>Evidence still needed</summary>
+            <ul><li>VPN, ZTNA, or SaaS access inventory</li></ul>
+          </details>
+        </article>
+    
+        <article class="answer">
+          <h3>A2.5: List in-scope routers, firewalls, or equivalent network-boundary equipment.</h3>
+          <div class="meta">
+            <span class="pill">inferred_cloud</span>
+            <span class="pill status-supported_risk_found">supported_risk_found</span>
+            <span class="pill">answer: No</span>
+            <span class="pill">controls: NET-002</span>
+          </div>
+          <p><strong>Answer basis:</strong> A mapped CRIS-SME risk finding is present, so the candidate CE answer is No pending human verification.</p>
+          <p class="muted">CRIS-SME found related cloud evidence that may affect this answer. A responsible person must verify the final Cyber Essentials response.</p>
+          <details>
+            <summary>Linked findings</summary>
+            <ul><li>NET-002 Planned 44.71: Network security group rules are broader than expected</li></ul>
+          </details>
+          <details>
+            <summary>Evidence snippets</summary>
+            <ul><li>2 permissive NSG rule(s) were identified</li></ul>
+          </details>
+          <details>
+            <summary>Evidence still needed</summary>
+            <ul><li>firewall, router, and cloud firewall inventory</li></ul>
+          </details>
+        </article>
+    
+        <article class="answer">
+          <h3>A2.5.1: List equipment used to define any partial-scope subset.</h3>
+          <div class="meta">
+            <span class="pill">inferred_cloud</span>
+            <span class="pill status-supported_risk_found">supported_risk_found</span>
+            <span class="pill">answer: No</span>
+            <span class="pill">controls: NET-002</span>
+          </div>
+          <p><strong>Answer basis:</strong> A mapped CRIS-SME risk finding is present, so the candidate CE answer is No pending human verification.</p>
+          <p class="muted">CRIS-SME found related cloud evidence that may affect this answer. A responsible person must verify the final Cyber Essentials response.</p>
+          <details>
+            <summary>Linked findings</summary>
+            <ul><li>NET-002 Planned 44.71: Network security group rules are broader than expected</li></ul>
+          </details>
+          <details>
+            <summary>Evidence snippets</summary>
+            <ul><li>2 permissive NSG rule(s) were identified</li></ul>
+          </details>
+          <details>
+            <summary>Evidence still needed</summary>
+            <ul><li>segmentation inventory</li></ul>
+          </details>
+        </article>
+    
+        <article class="answer">
+          <h3>A2.6: Summarise laptops, desktops, and virtual desktops in scope.</h3>
+          <div class="meta">
+            <span class="pill">endpoint_required</span>
+            <span class="pill status-endpoint_required">endpoint_required</span>
+            <span class="pill">answer: Cannot determine</span>
+            <span class="pill">controls: CMP-003</span>
+          </div>
+          <p><strong>Answer basis:</strong> No CE Yes/No answer is proposed because endpoint evidence is required.</p>
+          <p class="muted">This entry requires endpoint, MDM, EDR, patch, local firewall, or device inventory evidence outside the current cloud-control-plane scope.</p>
+          <details>
+            <summary>Linked findings</summary>
+            <ul><li>CMP-003 Planned 38.49: Workload hardening baseline coverage is incomplete</li></ul>
+          </details>
+          <details>
+            <summary>Evidence snippets</summary>
+            <ul><li>Hardened baseline coverage is approximately 0%</li></ul>
+          </details>
+          <details>
+            <summary>Evidence still needed</summary>
+            <ul><li>Intune, MDM, Defender for Endpoint, device inventory</li></ul>
+          </details>
+        </article>
+    
+        <article class="answer">
+          <h3>A2.6.1: Summarise thin clients in scope.</h3>
+          <div class="meta">
+            <span class="pill">endpoint_required</span>
+            <span class="pill status-endpoint_required">endpoint_required</span>
+            <span class="pill">answer: Cannot determine</span>
+            <span class="pill">controls: CMP-003</span>
+          </div>
+          <p><strong>Answer basis:</strong> No CE Yes/No answer is proposed because endpoint evidence is required.</p>
+          <p class="muted">This entry requires endpoint, MDM, EDR, patch, local firewall, or device inventory evidence outside the current cloud-control-plane scope.</p>
+          <details>
+            <summary>Linked findings</summary>
+            <ul><li>CMP-003 Planned 38.49: Workload hardening baseline coverage is incomplete</li></ul>
+          </details>
+          <details>
+            <summary>Evidence snippets</summary>
+            <ul><li>Hardened baseline coverage is approximately 0%</li></ul>
+          </details>
+          <details>
+            <summary>Evidence still needed</summary>
+            <ul><li>device inventory</li></ul>
+          </details>
+        </article>
+    
+        <article class="answer">
+          <h3>A2.7: Summarise servers, hypervisors, and virtual desktop infrastructure in scope.</h3>
+          <div class="meta">
+            <span class="pill">inferred_cloud</span>
+            <span class="pill status-supported_risk_found">supported_risk_found</span>
+            <span class="pill">answer: No</span>
+            <span class="pill">controls: CMP-001, CMP-003</span>
+          </div>
+          <p><strong>Answer basis:</strong> A mapped CRIS-SME risk finding is present, so the candidate CE answer is No pending human verification.</p>
+          <p class="muted">CRIS-SME found related cloud evidence that may affect this answer. A responsible person must verify the final Cyber Essentials response.</p>
+          <details>
+            <summary>Linked findings</summary>
+            <ul><li>CMP-001 Planned 42.69: Critical workloads remain unpatched beyond acceptable risk tolerance</li><li>CMP-003 Planned 38.49: Workload hardening baseline coverage is incomplete</li></ul>
+          </details>
+          <details>
+            <summary>Evidence snippets</summary>
+            <ul><li>1 critical VM(s) require urgent patching</li><li>Hardened baseline coverage is approximately 0%</li></ul>
+          </details>
+          <details>
+            <summary>Evidence still needed</summary>
+            <ul><li>VM inventory, hypervisor inventory</li></ul>
+          </details>
+        </article>
+    
+        <article class="answer">
+          <h3>A2.8: Summarise tablets and mobile devices in scope.</h3>
+          <div class="meta">
+            <span class="pill">endpoint_required</span>
+            <span class="pill status-endpoint_required">endpoint_required</span>
+            <span class="pill">answer: Cannot determine</span>
+            <span class="pill">controls: CMP-003</span>
+          </div>
+          <p><strong>Answer basis:</strong> No CE Yes/No answer is proposed because endpoint evidence is required.</p>
+          <p class="muted">This entry requires endpoint, MDM, EDR, patch, local firewall, or device inventory evidence outside the current cloud-control-plane scope.</p>
+          <details>
+            <summary>Linked findings</summary>
+            <ul><li>CMP-003 Planned 38.49: Workload hardening baseline coverage is incomplete</li></ul>
+          </details>
+          <details>
+            <summary>Evidence snippets</summary>
+            <ul><li>Hardened baseline coverage is approximately 0%</li></ul>
+          </details>
+          <details>
+            <summary>Evidence still needed</summary>
+            <ul><li>Intune, MDM, mobile device inventory</li></ul>
+          </details>
+        </article>
+    
+        <article class="answer">
+          <h3>A2.9: List third-party cloud services used for organisational data or services.</h3>
+          <div class="meta">
+            <span class="pill">inferred_cloud</span>
+            <span class="pill status-supported_risk_found">supported_risk_found</span>
+            <span class="pill">answer: No</span>
+            <span class="pill">controls: DATA-001, IAM-001, GOV-003</span>
+          </div>
+          <p><strong>Answer basis:</strong> A mapped CRIS-SME risk finding is present, so the candidate CE answer is No pending human verification.</p>
+          <p class="muted">CRIS-SME found related cloud evidence that may affect this answer. A responsible person must verify the final Cyber Essentials response.</p>
+          <details>
+            <summary>Linked findings</summary>
+            <ul><li>DATA-001 Planned 48.35: Public storage access increases data exposure risk</li><li>IAM-001 High 67.97: Privileged role assignments without MFA enforcement</li><li>GOV-003 Planned 33.88: Policy assignment coverage is below the baseline governance threshold</li></ul>
+          </details>
+          <details>
+            <summary>Evidence snippets</summary>
+            <ul><li>1 storage asset(s) allow public access</li><li>1 privileged account(s) do not have MFA enabled</li><li>Conditional access for privileged administrators was not observable and is treated as unmet for deterministic scoring</li><li>Baseline policy assignment coverage is approximately 0%</li></ul>
+          </details>
+          <details>
+            <summary>Evidence still needed</summary>
+            <ul><li>SaaS inventory, cloud app discovery</li></ul>
+          </details>
+        </article>
+    
+        <article class="answer">
+          <h3>A2.10: Identify the internal person responsible for in-scope IT systems.</h3>
+          <div class="meta">
+            <span class="pill">manual_required</span>
+            <span class="pill status-manual_required">manual_required</span>
+            <span class="pill">answer: Cannot determine</span>
+            <span class="pill">controls: none</span>
+          </div>
+          <p><strong>Answer basis:</strong> No CE Yes/No answer is proposed because human context is required.</p>
+          <p class="muted">This entry requires human scoping, administrative context, or final applicant attestation.</p>
+          <details>
+            <summary>Linked findings</summary>
+            <ul><li>No linked CRIS-SME risk finding.</li></ul>
+          </details>
+          <details>
+            <summary>Evidence snippets</summary>
+            <ul><li>No evidence snippet attached.</li></ul>
+          </details>
+          <details>
+            <summary>Evidence still needed</summary>
+            <ul><li>ownership metadata</li></ul>
+          </details>
+        </article>
+    
+      </section>
+    
+      <section class="panel" id="insurance">
+        <h2>Insurance</h2>
+        
+        <article class="answer">
+          <h3>A3.1: Confirm eligibility conditions for included cyber insurance.</h3>
+          <div class="meta">
+            <span class="pill">manual_required</span>
+            <span class="pill status-manual_required">manual_required</span>
+            <span class="pill">answer: Cannot determine</span>
+            <span class="pill">controls: none</span>
+          </div>
+          <p><strong>Answer basis:</strong> No CE Yes/No answer is proposed because human context is required.</p>
+          <p class="muted">This entry requires human scoping, administrative context, or final applicant attestation.</p>
+          <details>
+            <summary>Linked findings</summary>
+            <ul><li>No linked CRIS-SME risk finding.</li></ul>
+          </details>
+          <details>
+            <summary>Evidence snippets</summary>
+            <ul><li>No evidence snippet attached.</li></ul>
+          </details>
+          <details>
+            <summary>Evidence still needed</summary>
+            <ul><li>company and finance context</li></ul>
+          </details>
+        </article>
+    
+        <article class="answer">
+          <h3>A3.2: Record whether the organisation opts into included insurance.</h3>
+          <div class="meta">
+            <span class="pill">manual_required</span>
+            <span class="pill status-manual_required">manual_required</span>
+            <span class="pill">answer: Cannot determine</span>
+            <span class="pill">controls: none</span>
+          </div>
+          <p><strong>Answer basis:</strong> No CE Yes/No answer is proposed because human context is required.</p>
+          <p class="muted">This entry requires human scoping, administrative context, or final applicant attestation.</p>
+          <details>
+            <summary>Linked findings</summary>
+            <ul><li>No linked CRIS-SME risk finding.</li></ul>
+          </details>
+          <details>
+            <summary>Evidence snippets</summary>
+            <ul><li>No evidence snippet attached.</li></ul>
+          </details>
+          <details>
+            <summary>Evidence still needed</summary>
+            <ul><li>insurance evidence workflow</li></ul>
+          </details>
+        </article>
+    
+        <article class="answer">
+          <h3>A3.3: Provide contact details for insurance documents if opting in.</h3>
+          <div class="meta">
+            <span class="pill">manual_required</span>
+            <span class="pill status-manual_required">manual_required</span>
+            <span class="pill">answer: Cannot determine</span>
+            <span class="pill">controls: none</span>
+          </div>
+          <p><strong>Answer basis:</strong> No CE Yes/No answer is proposed because human context is required.</p>
+          <p class="muted">This entry requires human scoping, administrative context, or final applicant attestation.</p>
+          <details>
+            <summary>Linked findings</summary>
+            <ul><li>No linked CRIS-SME risk finding.</li></ul>
+          </details>
+          <details>
+            <summary>Evidence snippets</summary>
+            <ul><li>No evidence snippet attached.</li></ul>
+          </details>
+          <details>
+            <summary>Evidence still needed</summary>
+            <ul><li>insurance evidence workflow</li></ul>
+          </details>
+        </article>
+    
+      </section>
+    
+      <section class="panel" id="firewalls">
+        <h2>Firewalls</h2>
+        
+        <article class="answer">
+          <h3>A4.1: Confirm firewall protection exists between in-scope systems and the internet.</h3>
+          <div class="meta">
+            <span class="pill">inferred_cloud</span>
+            <span class="pill status-supported_risk_found">supported_risk_found</span>
+            <span class="pill">answer: No</span>
+            <span class="pill">controls: NET-001, NET-002</span>
+          </div>
+          <p><strong>Answer basis:</strong> A mapped CRIS-SME risk finding is present, so the candidate CE answer is No pending human verification.</p>
+          <p class="muted">CRIS-SME found related cloud evidence that may affect this answer. A responsible person must verify the final Cyber Essentials response.</p>
+          <details>
+            <summary>Linked findings</summary>
+            <ul><li>NET-001 High 72.12: Administrative services are exposed to the public internet</li><li>NET-002 Planned 44.71: Network security group rules are broader than expected</li></ul>
+          </details>
+          <details>
+            <summary>Evidence snippets</summary>
+            <ul><li>1 asset(s) expose RDP to the public internet</li><li>1 asset(s) expose SSH to the public internet</li><li>2 permissive NSG rule(s) were identified</li></ul>
+          </details>
+          <details>
+            <summary>Evidence still needed</summary>
+            <ul><li>NSG, firewall, router, endpoint firewall inventory</li></ul>
+          </details>
+        </article>
+    
+        <article class="answer">
+          <h3>A4.1.1: Confirm software firewalls are enabled on end-user and server devices.</h3>
+          <div class="meta">
+            <span class="pill">endpoint_required</span>
+            <span class="pill status-endpoint_required">endpoint_required</span>
+            <span class="pill">answer: Cannot determine</span>
+            <span class="pill">controls: CMP-003</span>
+          </div>
+          <p><strong>Answer basis:</strong> No CE Yes/No answer is proposed because endpoint evidence is required.</p>
+          <p class="muted">This entry requires endpoint, MDM, EDR, patch, local firewall, or device inventory evidence outside the current cloud-control-plane scope.</p>
+          <details>
+            <summary>Linked findings</summary>
+            <ul><li>CMP-003 Planned 38.49: Workload hardening baseline coverage is incomplete</li></ul>
+          </details>
+          <details>
+            <summary>Evidence snippets</summary>
+            <ul><li>Hardened baseline coverage is approximately 0%</li></ul>
+          </details>
+          <details>
+            <summary>Evidence still needed</summary>
+            <ul><li>Intune, MDM, Defender for Endpoint, local firewall inventory</li></ul>
+          </details>
+        </article>
+    
+        <article class="answer">
+          <h3>A4.1.2: Explain any operating systems where software firewalls are unavailable.</h3>
+          <div class="meta">
+            <span class="pill">endpoint_required</span>
+            <span class="pill status-endpoint_required">endpoint_required</span>
+            <span class="pill">answer: Cannot determine</span>
+            <span class="pill">controls: CMP-003</span>
+          </div>
+          <p><strong>Answer basis:</strong> No CE Yes/No answer is proposed because endpoint evidence is required.</p>
+          <p class="muted">This entry requires endpoint, MDM, EDR, patch, local firewall, or device inventory evidence outside the current cloud-control-plane scope.</p>
+          <details>
+            <summary>Linked findings</summary>
+            <ul><li>CMP-003 Planned 38.49: Workload hardening baseline coverage is incomplete</li></ul>
+          </details>
+          <details>
+            <summary>Evidence snippets</summary>
+            <ul><li>Hardened baseline coverage is approximately 0%</li></ul>
+          </details>
+          <details>
+            <summary>Evidence still needed</summary>
+            <ul><li>device OS inventory</li></ul>
+          </details>
+        </article>
+    
+        <article class="answer">
+          <h3>A4.2: Confirm default firewall or router administrative passwords have been changed.</h3>
+          <div class="meta">
+            <span class="pill">policy_required</span>
+            <span class="pill status-policy_required">policy_required</span>
+            <span class="pill">answer: Cannot determine</span>
+            <span class="pill">controls: NET-002, IAM-001</span>
+          </div>
+          <p><strong>Answer basis:</strong> No CE Yes/No answer is proposed because policy or process evidence is required.</p>
+          <p class="muted">This entry requires policy, process, approval, contractual, or business-need evidence that cannot be proven from cloud telemetry alone.</p>
+          <details>
+            <summary>Linked findings</summary>
+            <ul><li>NET-002 Planned 44.71: Network security group rules are broader than expected</li><li>IAM-001 High 67.97: Privileged role assignments without MFA enforcement</li></ul>
+          </details>
+          <details>
+            <summary>Evidence snippets</summary>
+            <ul><li>2 permissive NSG rule(s) were identified</li><li>1 privileged account(s) do not have MFA enabled</li><li>Conditional access for privileged administrators was not observable and is treated as unmet for deterministic scoring</li></ul>
+          </details>
+          <details>
+            <summary>Evidence still needed</summary>
+            <ul><li>firewall configuration audit</li></ul>
+          </details>
+        </article>
+    
+        <article class="answer">
+          <h3>A4.2.1: Describe how firewall administrative passwords are changed.</h3>
+          <div class="meta">
+            <span class="pill">policy_required</span>
+            <span class="pill status-policy_required">policy_required</span>
+            <span class="pill">answer: Cannot determine</span>
+            <span class="pill">controls: IAM-001</span>
+          </div>
+          <p><strong>Answer basis:</strong> No CE Yes/No answer is proposed because policy or process evidence is required.</p>
+          <p class="muted">This entry requires policy, process, approval, contractual, or business-need evidence that cannot be proven from cloud telemetry alone.</p>
+          <details>
+            <summary>Linked findings</summary>
+            <ul><li>IAM-001 High 67.97: Privileged role assignments without MFA enforcement</li></ul>
+          </details>
+          <details>
+            <summary>Evidence snippets</summary>
+            <ul><li>1 privileged account(s) do not have MFA enabled</li><li>Conditional access for privileged administrators was not observable and is treated as unmet for deterministic scoring</li></ul>
+          </details>
+          <details>
+            <summary>Evidence still needed</summary>
+            <ul><li>procedure evidence</li></ul>
+          </details>
+        </article>
+    
+        <article class="answer">
+          <h3>A4.3: Identify the password or passwordless protection model for firewall administration.</h3>
+          <div class="meta">
+            <span class="pill">policy_required</span>
+            <span class="pill status-policy_required">policy_required</span>
+            <span class="pill">answer: Cannot determine</span>
+            <span class="pill">controls: IAM-001</span>
+          </div>
+          <p><strong>Answer basis:</strong> No CE Yes/No answer is proposed because policy or process evidence is required.</p>
+          <p class="muted">This entry requires policy, process, approval, contractual, or business-need evidence that cannot be proven from cloud telemetry alone.</p>
+          <details>
+            <summary>Linked findings</summary>
+            <ul><li>IAM-001 High 67.97: Privileged role assignments without MFA enforcement</li></ul>
+          </details>
+          <details>
+            <summary>Evidence snippets</summary>
+            <ul><li>1 privileged account(s) do not have MFA enabled</li><li>Conditional access for privileged administrators was not observable and is treated as unmet for deterministic scoring</li></ul>
+          </details>
+          <details>
+            <summary>Evidence still needed</summary>
+            <ul><li>firewall identity configuration</li></ul>
+          </details>
+        </article>
+    
+        <article class="answer">
+          <h3>A4.4: Confirm firewall passwords are changed after suspected compromise.</h3>
+          <div class="meta">
+            <span class="pill">policy_required</span>
+            <span class="pill status-policy_required">policy_required</span>
+            <span class="pill">answer: Cannot determine</span>
+            <span class="pill">controls: IAM-001</span>
+          </div>
+          <p><strong>Answer basis:</strong> No CE Yes/No answer is proposed because policy or process evidence is required.</p>
+          <p class="muted">This entry requires policy, process, approval, contractual, or business-need evidence that cannot be proven from cloud telemetry alone.</p>
+          <details>
+            <summary>Linked findings</summary>
+            <ul><li>IAM-001 High 67.97: Privileged role assignments without MFA enforcement</li></ul>
+          </details>
+          <details>
+            <summary>Evidence snippets</summary>
+            <ul><li>1 privileged account(s) do not have MFA enabled</li><li>Conditional access for privileged administrators was not observable and is treated as unmet for deterministic scoring</li></ul>
+          </details>
+          <details>
+            <summary>Evidence still needed</summary>
+            <ul><li>incident response procedure evidence</li></ul>
+          </details>
+        </article>
+    
+        <article class="answer">
+          <h3>A4.5: Confirm a process exists for managing firewall rule changes.</h3>
+          <div class="meta">
+            <span class="pill">policy_required</span>
+            <span class="pill status-policy_required">policy_required</span>
+            <span class="pill">answer: Cannot determine</span>
+            <span class="pill">controls: NET-002, GOV-003</span>
+          </div>
+          <p><strong>Answer basis:</strong> No CE Yes/No answer is proposed because policy or process evidence is required.</p>
+          <p class="muted">This entry requires policy, process, approval, contractual, or business-need evidence that cannot be proven from cloud telemetry alone.</p>
+          <details>
+            <summary>Linked findings</summary>
+            <ul><li>NET-002 Planned 44.71: Network security group rules are broader than expected</li><li>GOV-003 Planned 33.88: Policy assignment coverage is below the baseline governance threshold</li></ul>
+          </details>
+          <details>
+            <summary>Evidence snippets</summary>
+            <ul><li>2 permissive NSG rule(s) were identified</li><li>Baseline policy assignment coverage is approximately 0%</li></ul>
+          </details>
+          <details>
+            <summary>Evidence still needed</summary>
+            <ul><li>change management records</li></ul>
+          </details>
+        </article>
+    
+        <article class="answer">
+          <h3>A4.6: Confirm firewall rules have been reviewed within the expected period.</h3>
+          <div class="meta">
+            <span class="pill">policy_required</span>
+            <span class="pill status-policy_required">policy_required</span>
+            <span class="pill">answer: Cannot determine</span>
+            <span class="pill">controls: NET-002</span>
+          </div>
+          <p><strong>Answer basis:</strong> No CE Yes/No answer is proposed because policy or process evidence is required.</p>
+          <p class="muted">This entry requires policy, process, approval, contractual, or business-need evidence that cannot be proven from cloud telemetry alone.</p>
+          <details>
+            <summary>Linked findings</summary>
+            <ul><li>NET-002 Planned 44.71: Network security group rules are broader than expected</li></ul>
+          </details>
+          <details>
+            <summary>Evidence snippets</summary>
+            <ul><li>2 permissive NSG rule(s) were identified</li></ul>
+          </details>
+          <details>
+            <summary>Evidence still needed</summary>
+            <ul><li>rule review history, change tickets</li></ul>
+          </details>
+        </article>
+    
+        <article class="answer">
+          <h3>A4.7: Confirm unauthenticated inbound connections are blocked by default.</h3>
+          <div class="meta">
+            <span class="pill">direct_cloud</span>
+            <span class="pill status-supported_risk_found">supported_risk_found</span>
+            <span class="pill">answer: No</span>
+            <span class="pill">controls: NET-001, NET-002</span>
+          </div>
+          <p><strong>Answer basis:</strong> A mapped CRIS-SME risk finding is present, so the candidate CE answer is No pending human verification.</p>
+          <p class="muted">CRIS-SME found related cloud evidence that may affect this answer. A responsible person must verify the final Cyber Essentials response.</p>
+          <details>
+            <summary>Linked findings</summary>
+            <ul><li>NET-001 High 72.12: Administrative services are exposed to the public internet</li><li>NET-002 Planned 44.71: Network security group rules are broader than expected</li></ul>
+          </details>
+          <details>
+            <summary>Evidence snippets</summary>
+            <ul><li>1 asset(s) expose RDP to the public internet</li><li>1 asset(s) expose SSH to the public internet</li><li>2 permissive NSG rule(s) were identified</li></ul>
+          </details>
+          <details>
+            <summary>Evidence still needed</summary>
+            <ul><li>cloud firewall default action, NSG effective rules</li></ul>
+          </details>
+        </article>
+    
+        <article class="answer">
+          <h3>A4.8: Describe approval and documentation for allowed inbound connections.</h3>
+          <div class="meta">
+            <span class="pill">policy_required</span>
+            <span class="pill status-policy_required">policy_required</span>
+            <span class="pill">answer: Cannot determine</span>
+            <span class="pill">controls: NET-002, GOV-003</span>
+          </div>
+          <p><strong>Answer basis:</strong> No CE Yes/No answer is proposed because policy or process evidence is required.</p>
+          <p class="muted">This entry requires policy, process, approval, contractual, or business-need evidence that cannot be proven from cloud telemetry alone.</p>
+          <details>
+            <summary>Linked findings</summary>
+            <ul><li>NET-002 Planned 44.71: Network security group rules are broader than expected</li><li>GOV-003 Planned 33.88: Policy assignment coverage is below the baseline governance threshold</li></ul>
+          </details>
+          <details>
+            <summary>Evidence snippets</summary>
+            <ul><li>2 permissive NSG rule(s) were identified</li><li>Baseline policy assignment coverage is approximately 0%</li></ul>
+          </details>
+          <details>
+            <summary>Evidence still needed</summary>
+            <ul><li>rule tags, descriptions, approval records</li></ul>
+          </details>
+        </article>
+    
+        <article class="answer">
+          <h3>A4.9: Confirm whether firewall configuration interfaces are internet-accessible.</h3>
+          <div class="meta">
+            <span class="pill">direct_cloud</span>
+            <span class="pill status-supported_risk_found">supported_risk_found</span>
+            <span class="pill">answer: No</span>
+            <span class="pill">controls: NET-001</span>
+          </div>
+          <p><strong>Answer basis:</strong> A mapped CRIS-SME risk finding is present, so the candidate CE answer is No pending human verification.</p>
+          <p class="muted">CRIS-SME found related cloud evidence that may affect this answer. A responsible person must verify the final Cyber Essentials response.</p>
+          <details>
+            <summary>Linked findings</summary>
+            <ul><li>NET-001 High 72.12: Administrative services are exposed to the public internet</li></ul>
+          </details>
+          <details>
+            <summary>Evidence snippets</summary>
+            <ul><li>1 asset(s) expose RDP to the public internet</li><li>1 asset(s) expose SSH to the public internet</li></ul>
+          </details>
+          <details>
+            <summary>Evidence still needed</summary>
+            <ul><li>management-plane exposure inventory</li></ul>
+          </details>
+        </article>
+    
+        <article class="answer">
+          <h3>A4.10: Confirm documented business need for any internet-accessible firewall administration.</h3>
+          <div class="meta">
+            <span class="pill">policy_required</span>
+            <span class="pill status-policy_required">policy_required</span>
+            <span class="pill">answer: Cannot determine</span>
+            <span class="pill">controls: NET-001, GOV-003</span>
+          </div>
+          <p><strong>Answer basis:</strong> No CE Yes/No answer is proposed because policy or process evidence is required.</p>
+          <p class="muted">This entry requires policy, process, approval, contractual, or business-need evidence that cannot be proven from cloud telemetry alone.</p>
+          <details>
+            <summary>Linked findings</summary>
+            <ul><li>NET-001 High 72.12: Administrative services are exposed to the public internet</li><li>GOV-003 Planned 33.88: Policy assignment coverage is below the baseline governance threshold</li></ul>
+          </details>
+          <details>
+            <summary>Evidence snippets</summary>
+            <ul><li>1 asset(s) expose RDP to the public internet</li><li>1 asset(s) expose SSH to the public internet</li><li>Baseline policy assignment coverage is approximately 0%</li></ul>
+          </details>
+          <details>
+            <summary>Evidence still needed</summary>
+            <ul><li>business justification records</li></ul>
+          </details>
+        </article>
+    
+        <article class="answer">
+          <h3>A4.11: Confirm remote firewall administration is protected by MFA or trusted-source restrictions.</h3>
+          <div class="meta">
+            <span class="pill">inferred_cloud</span>
+            <span class="pill status-supported_risk_found">supported_risk_found</span>
+            <span class="pill">answer: No</span>
+            <span class="pill">controls: NET-001, IAM-001</span>
+          </div>
+          <p><strong>Answer basis:</strong> A mapped CRIS-SME risk finding is present, so the candidate CE answer is No pending human verification.</p>
+          <p class="muted">CRIS-SME found related cloud evidence that may affect this answer. A responsible person must verify the final Cyber Essentials response.</p>
+          <details>
+            <summary>Linked findings</summary>
+            <ul><li>NET-001 High 72.12: Administrative services are exposed to the public internet</li><li>IAM-001 High 67.97: Privileged role assignments without MFA enforcement</li></ul>
+          </details>
+          <details>
+            <summary>Evidence snippets</summary>
+            <ul><li>1 asset(s) expose RDP to the public internet</li><li>1 asset(s) expose SSH to the public internet</li><li>1 privileged account(s) do not have MFA enabled</li><li>Conditional access for privileged administrators was not observable and is treated as unmet for deterministic scoring</li></ul>
+          </details>
+          <details>
+            <summary>Evidence still needed</summary>
+            <ul><li>firewall admin source allow-list and identity controls</li></ul>
+          </details>
+        </article>
+    
+      </section>
+    
+      <section class="panel" id="secure_configuration">
+        <h2>Secure Configuration</h2>
+        
+        <article class="answer">
+          <h3>A5.1: Confirm unused software and services are removed or disabled across devices and cloud services.</h3>
+          <div class="meta">
+            <span class="pill">endpoint_required</span>
+            <span class="pill status-endpoint_required">endpoint_required</span>
+            <span class="pill">answer: Cannot determine</span>
+            <span class="pill">controls: CMP-003</span>
+          </div>
+          <p><strong>Answer basis:</strong> No CE Yes/No answer is proposed because endpoint evidence is required.</p>
+          <p class="muted">This entry requires endpoint, MDM, EDR, patch, local firewall, or device inventory evidence outside the current cloud-control-plane scope.</p>
+          <details>
+            <summary>Linked findings</summary>
+            <ul><li>CMP-003 Planned 38.49: Workload hardening baseline coverage is incomplete</li></ul>
+          </details>
+          <details>
+            <summary>Evidence snippets</summary>
+            <ul><li>Hardened baseline coverage is approximately 0%</li></ul>
+          </details>
+          <details>
+            <summary>Evidence still needed</summary>
+            <ul><li>Defender for Endpoint, Intune, software inventory, cloud service inventory</li></ul>
+          </details>
+        </article>
+    
+        <article class="answer">
+          <h3>A5.2: Confirm only necessary and active user accounts exist across devices and cloud services.</h3>
+          <div class="meta">
+            <span class="pill">inferred_cloud</span>
+            <span class="pill status-supported_risk_found">supported_risk_found</span>
+            <span class="pill">answer: No</span>
+            <span class="pill">controls: IAM-002, IAM-003</span>
+          </div>
+          <p><strong>Answer basis:</strong> A mapped CRIS-SME risk finding is present, so the candidate CE answer is No pending human verification.</p>
+          <p class="muted">CRIS-SME found related cloud evidence that may affect this answer. A responsible person must verify the final Cyber Essentials response.</p>
+          <details>
+            <summary>Linked findings</summary>
+            <ul><li>IAM-003 Monitor 23.34: Stale service principals or credentials require review</li></ul>
+          </details>
+          <details>
+            <summary>Evidence snippets</summary>
+            <ul><li>1 stale service principal(s) or credential set(s) were identified</li></ul>
+          </details>
+          <details>
+            <summary>Evidence still needed</summary>
+            <ul><li>Entra users, SaaS users, local device accounts</li></ul>
+          </details>
+        </article>
+    
+        <article class="answer">
+          <h3>A5.3: Confirm default passwords have been changed on user and administrator accounts for devices.</h3>
+          <div class="meta">
+            <span class="pill">endpoint_required</span>
+            <span class="pill status-endpoint_required">endpoint_required</span>
+            <span class="pill">answer: Cannot determine</span>
+            <span class="pill">controls: IAM-001</span>
+          </div>
+          <p><strong>Answer basis:</strong> No CE Yes/No answer is proposed because endpoint evidence is required.</p>
+          <p class="muted">This entry requires endpoint, MDM, EDR, patch, local firewall, or device inventory evidence outside the current cloud-control-plane scope.</p>
+          <details>
+            <summary>Linked findings</summary>
+            <ul><li>IAM-001 High 67.97: Privileged role assignments without MFA enforcement</li></ul>
+          </details>
+          <details>
+            <summary>Evidence snippets</summary>
+            <ul><li>1 privileged account(s) do not have MFA enabled</li><li>Conditional access for privileged administrators was not observable and is treated as unmet for deterministic scoring</li></ul>
+          </details>
+          <details>
+            <summary>Evidence still needed</summary>
+            <ul><li>device configuration policy, local account audit</li></ul>
+          </details>
+        </article>
+    
+        <article class="answer">
+          <h3>A5.4: Identify externally reachable services that provide access to non-public data.</h3>
+          <div class="meta">
+            <span class="pill">direct_cloud</span>
+            <span class="pill status-supported_risk_found">supported_risk_found</span>
+            <span class="pill">answer: No</span>
+            <span class="pill">controls: NET-001, DATA-001</span>
+          </div>
+          <p><strong>Answer basis:</strong> A mapped CRIS-SME risk finding is present, so the candidate CE answer is No pending human verification.</p>
+          <p class="muted">CRIS-SME found related cloud evidence that may affect this answer. A responsible person must verify the final Cyber Essentials response.</p>
+          <details>
+            <summary>Linked findings</summary>
+            <ul><li>NET-001 High 72.12: Administrative services are exposed to the public internet</li><li>DATA-001 Planned 48.35: Public storage access increases data exposure risk</li></ul>
+          </details>
+          <details>
+            <summary>Evidence snippets</summary>
+            <ul><li>1 asset(s) expose RDP to the public internet</li><li>1 asset(s) expose SSH to the public internet</li><li>1 storage asset(s) allow public access</li></ul>
+          </details>
+          <details>
+            <summary>Evidence still needed</summary>
+            <ul><li>public endpoint inventory, app gateway, app service access restrictions</li></ul>
+          </details>
+        </article>
+    
+        <article class="answer">
+          <h3>A5.5: Identify the authentication protection used for externally reachable non-public services.</h3>
+          <div class="meta">
+            <span class="pill">inferred_cloud</span>
+            <span class="pill status-supported_risk_found">supported_risk_found</span>
+            <span class="pill">answer: No</span>
+            <span class="pill">controls: IAM-001</span>
+          </div>
+          <p><strong>Answer basis:</strong> A mapped CRIS-SME risk finding is present, so the candidate CE answer is No pending human verification.</p>
+          <p class="muted">CRIS-SME found related cloud evidence that may affect this answer. A responsible person must verify the final Cyber Essentials response.</p>
+          <details>
+            <summary>Linked findings</summary>
+            <ul><li>IAM-001 High 67.97: Privileged role assignments without MFA enforcement</li></ul>
+          </details>
+          <details>
+            <summary>Evidence snippets</summary>
+            <ul><li>1 privileged account(s) do not have MFA enabled</li><li>Conditional access for privileged administrators was not observable and is treated as unmet for deterministic scoring</li></ul>
+          </details>
+          <details>
+            <summary>Evidence still needed</summary>
+            <ul><li>Entra app authentication, WAF or app auth configuration</li></ul>
+          </details>
+        </article>
+    
+        <article class="answer">
+          <h3>A5.6: Describe password-change process for externally reachable services after compromise.</h3>
+          <div class="meta">
+            <span class="pill">policy_required</span>
+            <span class="pill status-policy_required">policy_required</span>
+            <span class="pill">answer: Cannot determine</span>
+            <span class="pill">controls: IAM-001, MON-004</span>
+          </div>
+          <p><strong>Answer basis:</strong> No CE Yes/No answer is proposed because policy or process evidence is required.</p>
+          <p class="muted">This entry requires policy, process, approval, contractual, or business-need evidence that cannot be proven from cloud telemetry alone.</p>
+          <details>
+            <summary>Linked findings</summary>
+            <ul><li>IAM-001 High 67.97: Privileged role assignments without MFA enforcement</li></ul>
+          </details>
+          <details>
+            <summary>Evidence snippets</summary>
+            <ul><li>1 privileged account(s) do not have MFA enabled</li><li>Conditional access for privileged administrators was not observable and is treated as unmet for deterministic scoring</li></ul>
+          </details>
+          <details>
+            <summary>Evidence still needed</summary>
+            <ul><li>incident response procedure evidence</li></ul>
+          </details>
+        </article>
+    
+        <article class="answer">
+          <h3>A5.7: Identify brute-force protection used when MFA is not used for external services.</h3>
+          <div class="meta">
+            <span class="pill">inferred_cloud</span>
+            <span class="pill status-supported_risk_found">supported_risk_found</span>
+            <span class="pill">answer: No</span>
+            <span class="pill">controls: IAM-001</span>
+          </div>
+          <p><strong>Answer basis:</strong> A mapped CRIS-SME risk finding is present, so the candidate CE answer is No pending human verification.</p>
+          <p class="muted">CRIS-SME found related cloud evidence that may affect this answer. A responsible person must verify the final Cyber Essentials response.</p>
+          <details>
+            <summary>Linked findings</summary>
+            <ul><li>IAM-001 High 67.97: Privileged role assignments without MFA enforcement</li></ul>
+          </details>
+          <details>
+            <summary>Evidence snippets</summary>
+            <ul><li>1 privileged account(s) do not have MFA enabled</li><li>Conditional access for privileged administrators was not observable and is treated as unmet for deterministic scoring</li></ul>
+          </details>
+          <details>
+            <summary>Evidence still needed</summary>
+            <ul><li>account lockout policy, WAF throttling, Entra smart lockout</li></ul>
+          </details>
+        </article>
+    
+        <article class="answer">
+          <h3>A5.8: Confirm automatic execution of imported or downloaded files is disabled.</h3>
+          <div class="meta">
+            <span class="pill">endpoint_required</span>
+            <span class="pill status-endpoint_required">endpoint_required</span>
+            <span class="pill">answer: Cannot determine</span>
+            <span class="pill">controls: CMP-003</span>
+          </div>
+          <p><strong>Answer basis:</strong> No CE Yes/No answer is proposed because endpoint evidence is required.</p>
+          <p class="muted">This entry requires endpoint, MDM, EDR, patch, local firewall, or device inventory evidence outside the current cloud-control-plane scope.</p>
+          <details>
+            <summary>Linked findings</summary>
+            <ul><li>CMP-003 Planned 38.49: Workload hardening baseline coverage is incomplete</li></ul>
+          </details>
+          <details>
+            <summary>Evidence snippets</summary>
+            <ul><li>Hardened baseline coverage is approximately 0%</li></ul>
+          </details>
+          <details>
+            <summary>Evidence still needed</summary>
+            <ul><li>Intune, MDM, local policy inventory</li></ul>
+          </details>
+        </article>
+    
+        <article class="answer">
+          <h3>A5.9: Confirm user-present devices require a locking mechanism.</h3>
+          <div class="meta">
+            <span class="pill">endpoint_required</span>
+            <span class="pill status-endpoint_required">endpoint_required</span>
+            <span class="pill">answer: Cannot determine</span>
+            <span class="pill">controls: CMP-003</span>
+          </div>
+          <p><strong>Answer basis:</strong> No CE Yes/No answer is proposed because endpoint evidence is required.</p>
+          <p class="muted">This entry requires endpoint, MDM, EDR, patch, local firewall, or device inventory evidence outside the current cloud-control-plane scope.</p>
+          <details>
+            <summary>Linked findings</summary>
+            <ul><li>CMP-003 Planned 38.49: Workload hardening baseline coverage is incomplete</li></ul>
+          </details>
+          <details>
+            <summary>Evidence snippets</summary>
+            <ul><li>Hardened baseline coverage is approximately 0%</li></ul>
+          </details>
+          <details>
+            <summary>Evidence still needed</summary>
+            <ul><li>Intune, MDM, device compliance policy</li></ul>
+          </details>
+        </article>
+    
+        <article class="answer">
+          <h3>A5.10: Identify the device unlock method and brute-force protection.</h3>
+          <div class="meta">
+            <span class="pill">endpoint_required</span>
+            <span class="pill status-endpoint_required">endpoint_required</span>
+            <span class="pill">answer: Cannot determine</span>
+            <span class="pill">controls: CMP-003</span>
+          </div>
+          <p><strong>Answer basis:</strong> No CE Yes/No answer is proposed because endpoint evidence is required.</p>
+          <p class="muted">This entry requires endpoint, MDM, EDR, patch, local firewall, or device inventory evidence outside the current cloud-control-plane scope.</p>
+          <details>
+            <summary>Linked findings</summary>
+            <ul><li>CMP-003 Planned 38.49: Workload hardening baseline coverage is incomplete</li></ul>
+          </details>
+          <details>
+            <summary>Evidence snippets</summary>
+            <ul><li>Hardened baseline coverage is approximately 0%</li></ul>
+          </details>
+          <details>
+            <summary>Evidence still needed</summary>
+            <ul><li>Intune, MDM, local lock policy</li></ul>
+          </details>
+        </article>
+    
+      </section>
+    
+      <section class="panel" id="security_update_management">
+        <h2>Security Update Management</h2>
+        
+        <article class="answer">
+          <h3>A6.1: Confirm operating systems and firmware are supported and receive security fixes.</h3>
+          <div class="meta">
+            <span class="pill">inferred_cloud</span>
+            <span class="pill status-supported_risk_found">supported_risk_found</span>
+            <span class="pill">answer: No</span>
+            <span class="pill">controls: CMP-001</span>
+          </div>
+          <p><strong>Answer basis:</strong> A mapped CRIS-SME risk finding is present, so the candidate CE answer is No pending human verification.</p>
+          <p class="muted">CRIS-SME found related cloud evidence that may affect this answer. A responsible person must verify the final Cyber Essentials response.</p>
+          <details>
+            <summary>Linked findings</summary>
+            <ul><li>CMP-001 Planned 42.69: Critical workloads remain unpatched beyond acceptable risk tolerance</li></ul>
+          </details>
+          <details>
+            <summary>Evidence snippets</summary>
+            <ul><li>1 critical VM(s) require urgent patching</li></ul>
+          </details>
+          <details>
+            <summary>Evidence still needed</summary>
+            <ul><li>VM image metadata, Defender recommendations, endpoint inventory</li></ul>
+          </details>
+        </article>
+    
+        <article class="answer">
+          <h3>A6.2: Confirm application software is supported and receives vulnerability fixes.</h3>
+          <div class="meta">
+            <span class="pill">endpoint_required</span>
+            <span class="pill status-endpoint_required">endpoint_required</span>
+            <span class="pill">answer: Cannot determine</span>
+            <span class="pill">controls: CMP-001</span>
+          </div>
+          <p><strong>Answer basis:</strong> No CE Yes/No answer is proposed because endpoint evidence is required.</p>
+          <p class="muted">This entry requires endpoint, MDM, EDR, patch, local firewall, or device inventory evidence outside the current cloud-control-plane scope.</p>
+          <details>
+            <summary>Linked findings</summary>
+            <ul><li>CMP-001 Planned 42.69: Critical workloads remain unpatched beyond acceptable risk tolerance</li></ul>
+          </details>
+          <details>
+            <summary>Evidence snippets</summary>
+            <ul><li>1 critical VM(s) require urgent patching</li></ul>
+          </details>
+          <details>
+            <summary>Evidence still needed</summary>
+            <ul><li>software inventory, Defender for Endpoint, SaaS inventory</li></ul>
+          </details>
+        </article>
+    
+        <article class="answer">
+          <h3>A6.2.1: List browsers and versions in use.</h3>
+          <div class="meta">
+            <span class="pill">endpoint_required</span>
+            <span class="pill status-endpoint_required">endpoint_required</span>
+            <span class="pill">answer: Cannot determine</span>
+            <span class="pill">controls: CMP-001</span>
+          </div>
+          <p><strong>Answer basis:</strong> No CE Yes/No answer is proposed because endpoint evidence is required.</p>
+          <p class="muted">This entry requires endpoint, MDM, EDR, patch, local firewall, or device inventory evidence outside the current cloud-control-plane scope.</p>
+          <details>
+            <summary>Linked findings</summary>
+            <ul><li>CMP-001 Planned 42.69: Critical workloads remain unpatched beyond acceptable risk tolerance</li></ul>
+          </details>
+          <details>
+            <summary>Evidence snippets</summary>
+            <ul><li>1 critical VM(s) require urgent patching</li></ul>
+          </details>
+          <details>
+            <summary>Evidence still needed</summary>
+            <ul><li>software inventory, browser inventory</li></ul>
+          </details>
+        </article>
+    
+        <article class="answer">
+          <h3>A6.2.2: List malware protection products and versions in use.</h3>
+          <div class="meta">
+            <span class="pill">endpoint_required</span>
+            <span class="pill status-endpoint_required">endpoint_required</span>
+            <span class="pill">answer: Cannot determine</span>
+            <span class="pill">controls: CMP-002</span>
+          </div>
+          <p><strong>Answer basis:</strong> No CE Yes/No answer is proposed because endpoint evidence is required.</p>
+          <p class="muted">This entry requires endpoint, MDM, EDR, patch, local firewall, or device inventory evidence outside the current cloud-control-plane scope.</p>
+          <details>
+            <summary>Linked findings</summary>
+            <ul><li>CMP-002 Planned 39.53: Endpoint protection coverage is below the expected workload baseline</li></ul>
+          </details>
+          <details>
+            <summary>Evidence snippets</summary>
+            <ul><li>Endpoint protection coverage is approximately 0%</li></ul>
+          </details>
+          <details>
+            <summary>Evidence still needed</summary>
+            <ul><li>Defender for Endpoint, AV inventory</li></ul>
+          </details>
+        </article>
+    
+        <article class="answer">
+          <h3>A6.2.3: List email applications installed on devices and servers.</h3>
+          <div class="meta">
+            <span class="pill">endpoint_required</span>
+            <span class="pill status-endpoint_required">endpoint_required</span>
+            <span class="pill">answer: Cannot determine</span>
+            <span class="pill">controls: CMP-001</span>
+          </div>
+          <p><strong>Answer basis:</strong> No CE Yes/No answer is proposed because endpoint evidence is required.</p>
+          <p class="muted">This entry requires endpoint, MDM, EDR, patch, local firewall, or device inventory evidence outside the current cloud-control-plane scope.</p>
+          <details>
+            <summary>Linked findings</summary>
+            <ul><li>CMP-001 Planned 42.69: Critical workloads remain unpatched beyond acceptable risk tolerance</li></ul>
+          </details>
+          <details>
+            <summary>Evidence snippets</summary>
+            <ul><li>1 critical VM(s) require urgent patching</li></ul>
+          </details>
+          <details>
+            <summary>Evidence still needed</summary>
+            <ul><li>software inventory, server inventory</li></ul>
+          </details>
+        </article>
+    
+        <article class="answer">
+          <h3>A6.2.4: List office or productivity applications used to create organisational data.</h3>
+          <div class="meta">
+            <span class="pill">endpoint_required</span>
+            <span class="pill status-endpoint_required">endpoint_required</span>
+            <span class="pill">answer: Cannot determine</span>
+            <span class="pill">controls: CMP-001, DATA-001</span>
+          </div>
+          <p><strong>Answer basis:</strong> No CE Yes/No answer is proposed because endpoint evidence is required.</p>
+          <p class="muted">This entry requires endpoint, MDM, EDR, patch, local firewall, or device inventory evidence outside the current cloud-control-plane scope.</p>
+          <details>
+            <summary>Linked findings</summary>
+            <ul><li>CMP-001 Planned 42.69: Critical workloads remain unpatched beyond acceptable risk tolerance</li><li>DATA-001 Planned 48.35: Public storage access increases data exposure risk</li></ul>
+          </details>
+          <details>
+            <summary>Evidence snippets</summary>
+            <ul><li>1 critical VM(s) require urgent patching</li><li>1 storage asset(s) allow public access</li></ul>
+          </details>
+          <details>
+            <summary>Evidence still needed</summary>
+            <ul><li>software inventory, SaaS inventory</li></ul>
+          </details>
+        </article>
+    
+        <article class="answer">
+          <h3>A6.3: Confirm whether any in-scope software or cloud services are unsupported or unlicensed.</h3>
+          <div class="meta">
+            <span class="pill">inferred_cloud</span>
+            <span class="pill status-supported_risk_found">supported_risk_found</span>
+            <span class="pill">answer: No</span>
+            <span class="pill">controls: CMP-001, GOV-004</span>
+          </div>
+          <p><strong>Answer basis:</strong> A mapped CRIS-SME risk finding is present, so the candidate CE answer is No pending human verification.</p>
+          <p class="muted">CRIS-SME found related cloud evidence that may affect this answer. A responsible person must verify the final Cyber Essentials response.</p>
+          <details>
+            <summary>Linked findings</summary>
+            <ul><li>CMP-001 Planned 42.69: Critical workloads remain unpatched beyond acceptable risk tolerance</li><li>GOV-004 Monitor 17.87: Orphaned resources increase governance and cost hygiene risk</li></ul>
+          </details>
+          <details>
+            <summary>Evidence snippets</summary>
+            <ul><li>1 critical VM(s) require urgent patching</li><li>2 orphaned resource(s) were identified</li></ul>
+          </details>
+          <details>
+            <summary>Evidence still needed</summary>
+            <ul><li>software licence inventory, SaaS licence inventory</li></ul>
+          </details>
+        </article>
+    
+        <article class="answer">
+          <h3>A6.3.1: List unsupported or unlicensed software or cloud services where present.</h3>
+          <div class="meta">
+            <span class="pill">endpoint_required</span>
+            <span class="pill status-endpoint_required">endpoint_required</span>
+            <span class="pill">answer: Cannot determine</span>
+            <span class="pill">controls: CMP-001, GOV-004</span>
+          </div>
+          <p><strong>Answer basis:</strong> No CE Yes/No answer is proposed because endpoint evidence is required.</p>
+          <p class="muted">This entry requires endpoint, MDM, EDR, patch, local firewall, or device inventory evidence outside the current cloud-control-plane scope.</p>
+          <details>
+            <summary>Linked findings</summary>
+            <ul><li>CMP-001 Planned 42.69: Critical workloads remain unpatched beyond acceptable risk tolerance</li><li>GOV-004 Monitor 17.87: Orphaned resources increase governance and cost hygiene risk</li></ul>
+          </details>
+          <details>
+            <summary>Evidence snippets</summary>
+            <ul><li>1 critical VM(s) require urgent patching</li><li>2 orphaned resource(s) were identified</li></ul>
+          </details>
+          <details>
+            <summary>Evidence still needed</summary>
+            <ul><li>software inventory, SaaS inventory</li></ul>
+          </details>
+        </article>
+    
+        <article class="answer">
+          <h3>A6.4: Confirm high-risk operating system and firmware fixes are applied within the required time window.</h3>
+          <div class="meta">
+            <span class="pill">inferred_cloud</span>
+            <span class="pill status-supported_risk_found">supported_risk_found</span>
+            <span class="pill">answer: No</span>
+            <span class="pill">controls: CMP-001</span>
+          </div>
+          <p><strong>Answer basis:</strong> A mapped CRIS-SME risk finding is present, so the candidate CE answer is No pending human verification.</p>
+          <p class="muted">CRIS-SME found related cloud evidence that may affect this answer. A responsible person must verify the final Cyber Essentials response.</p>
+          <details>
+            <summary>Linked findings</summary>
+            <ul><li>CMP-001 Planned 42.69: Critical workloads remain unpatched beyond acceptable risk tolerance</li></ul>
+          </details>
+          <details>
+            <summary>Evidence snippets</summary>
+            <ul><li>1 critical VM(s) require urgent patching</li></ul>
+          </details>
+          <details>
+            <summary>Evidence still needed</summary>
+            <ul><li>Azure Update Manager, Defender vulnerability assessment, endpoint patch telemetry</li></ul>
+          </details>
+        </article>
+    
+        <article class="answer">
+          <h3>A6.4.1: Confirm operating system automatic updates are enabled where possible.</h3>
+          <div class="meta">
+            <span class="pill">endpoint_required</span>
+            <span class="pill status-endpoint_required">endpoint_required</span>
+            <span class="pill">answer: Cannot determine</span>
+            <span class="pill">controls: CMP-001</span>
+          </div>
+          <p><strong>Answer basis:</strong> No CE Yes/No answer is proposed because endpoint evidence is required.</p>
+          <p class="muted">This entry requires endpoint, MDM, EDR, patch, local firewall, or device inventory evidence outside the current cloud-control-plane scope.</p>
+          <details>
+            <summary>Linked findings</summary>
+            <ul><li>CMP-001 Planned 42.69: Critical workloads remain unpatched beyond acceptable risk tolerance</li></ul>
+          </details>
+          <details>
+            <summary>Evidence snippets</summary>
+            <ul><li>1 critical VM(s) require urgent patching</li></ul>
+          </details>
+          <details>
+            <summary>Evidence still needed</summary>
+            <ul><li>Intune, Azure Update Manager, MDM update policy</li></ul>
+          </details>
+        </article>
+    
+        <article class="answer">
+          <h3>A6.4.2: Describe update process where automatic operating system updates are not used.</h3>
+          <div class="meta">
+            <span class="pill">policy_required</span>
+            <span class="pill status-policy_required">policy_required</span>
+            <span class="pill">answer: Cannot determine</span>
+            <span class="pill">controls: CMP-001</span>
+          </div>
+          <p><strong>Answer basis:</strong> No CE Yes/No answer is proposed because policy or process evidence is required.</p>
+          <p class="muted">This entry requires policy, process, approval, contractual, or business-need evidence that cannot be proven from cloud telemetry alone.</p>
+          <details>
+            <summary>Linked findings</summary>
+            <ul><li>CMP-001 Planned 42.69: Critical workloads remain unpatched beyond acceptable risk tolerance</li></ul>
+          </details>
+          <details>
+            <summary>Evidence snippets</summary>
+            <ul><li>1 critical VM(s) require urgent patching</li></ul>
+          </details>
+          <details>
+            <summary>Evidence still needed</summary>
+            <ul><li>patch management process evidence</li></ul>
+          </details>
+        </article>
+    
+        <article class="answer">
+          <h3>A6.5: Confirm high-risk application fixes are applied within the required time window.</h3>
+          <div class="meta">
+            <span class="pill">endpoint_required</span>
+            <span class="pill status-endpoint_required">endpoint_required</span>
+            <span class="pill">answer: Cannot determine</span>
+            <span class="pill">controls: CMP-001</span>
+          </div>
+          <p><strong>Answer basis:</strong> No CE Yes/No answer is proposed because endpoint evidence is required.</p>
+          <p class="muted">This entry requires endpoint, MDM, EDR, patch, local firewall, or device inventory evidence outside the current cloud-control-plane scope.</p>
+          <details>
+            <summary>Linked findings</summary>
+            <ul><li>CMP-001 Planned 42.69: Critical workloads remain unpatched beyond acceptable risk tolerance</li></ul>
+          </details>
+          <details>
+            <summary>Evidence snippets</summary>
+            <ul><li>1 critical VM(s) require urgent patching</li></ul>
+          </details>
+          <details>
+            <summary>Evidence still needed</summary>
+            <ul><li>software inventory, Defender for Endpoint vulnerability management</li></ul>
+          </details>
+        </article>
+    
+        <article class="answer">
+          <h3>A6.5.1: Confirm application automatic updates are enabled where possible.</h3>
+          <div class="meta">
+            <span class="pill">endpoint_required</span>
+            <span class="pill status-endpoint_required">endpoint_required</span>
+            <span class="pill">answer: Cannot determine</span>
+            <span class="pill">controls: CMP-001</span>
+          </div>
+          <p><strong>Answer basis:</strong> No CE Yes/No answer is proposed because endpoint evidence is required.</p>
+          <p class="muted">This entry requires endpoint, MDM, EDR, patch, local firewall, or device inventory evidence outside the current cloud-control-plane scope.</p>
+          <details>
+            <summary>Linked findings</summary>
+            <ul><li>CMP-001 Planned 42.69: Critical workloads remain unpatched beyond acceptable risk tolerance</li></ul>
+          </details>
+          <details>
+            <summary>Evidence snippets</summary>
+            <ul><li>1 critical VM(s) require urgent patching</li></ul>
+          </details>
+          <details>
+            <summary>Evidence still needed</summary>
+            <ul><li>Intune, MDM, application update policy</li></ul>
+          </details>
+        </article>
+    
+        <article class="answer">
+          <h3>A6.5.2: Describe update process where automatic application updates are not used.</h3>
+          <div class="meta">
+            <span class="pill">policy_required</span>
+            <span class="pill status-policy_required">policy_required</span>
+            <span class="pill">answer: Cannot determine</span>
+            <span class="pill">controls: CMP-001</span>
+          </div>
+          <p><strong>Answer basis:</strong> No CE Yes/No answer is proposed because policy or process evidence is required.</p>
+          <p class="muted">This entry requires policy, process, approval, contractual, or business-need evidence that cannot be proven from cloud telemetry alone.</p>
+          <details>
+            <summary>Linked findings</summary>
+            <ul><li>CMP-001 Planned 42.69: Critical workloads remain unpatched beyond acceptable risk tolerance</li></ul>
+          </details>
+          <details>
+            <summary>Evidence snippets</summary>
+            <ul><li>1 critical VM(s) require urgent patching</li></ul>
+          </details>
+          <details>
+            <summary>Evidence still needed</summary>
+            <ul><li>patch management process evidence</li></ul>
+          </details>
+        </article>
+    
+        <article class="answer">
+          <h3>A6.6: Confirm unsupported software has been removed from devices.</h3>
+          <div class="meta">
+            <span class="pill">endpoint_required</span>
+            <span class="pill status-endpoint_required">endpoint_required</span>
+            <span class="pill">answer: Cannot determine</span>
+            <span class="pill">controls: CMP-001</span>
+          </div>
+          <p><strong>Answer basis:</strong> No CE Yes/No answer is proposed because endpoint evidence is required.</p>
+          <p class="muted">This entry requires endpoint, MDM, EDR, patch, local firewall, or device inventory evidence outside the current cloud-control-plane scope.</p>
+          <details>
+            <summary>Linked findings</summary>
+            <ul><li>CMP-001 Planned 42.69: Critical workloads remain unpatched beyond acceptable risk tolerance</li></ul>
+          </details>
+          <details>
+            <summary>Evidence snippets</summary>
+            <ul><li>1 critical VM(s) require urgent patching</li></ul>
+          </details>
+          <details>
+            <summary>Evidence still needed</summary>
+            <ul><li>software inventory, EOL detection</li></ul>
+          </details>
+        </article>
+    
+        <article class="answer">
+          <h3>A6.7: Explain how unsupported software is isolated where there is a business need to retain it.</h3>
+          <div class="meta">
+            <span class="pill">policy_required</span>
+            <span class="pill status-policy_required">policy_required</span>
+            <span class="pill">answer: Cannot determine</span>
+            <span class="pill">controls: CMP-001, NET-002</span>
+          </div>
+          <p><strong>Answer basis:</strong> No CE Yes/No answer is proposed because policy or process evidence is required.</p>
+          <p class="muted">This entry requires policy, process, approval, contractual, or business-need evidence that cannot be proven from cloud telemetry alone.</p>
+          <details>
+            <summary>Linked findings</summary>
+            <ul><li>CMP-001 Planned 42.69: Critical workloads remain unpatched beyond acceptable risk tolerance</li><li>NET-002 Planned 44.71: Network security group rules are broader than expected</li></ul>
+          </details>
+          <details>
+            <summary>Evidence snippets</summary>
+            <ul><li>1 critical VM(s) require urgent patching</li><li>2 permissive NSG rule(s) were identified</li></ul>
+          </details>
+          <details>
+            <summary>Evidence still needed</summary>
+            <ul><li>segmentation evidence, exception register</li></ul>
+          </details>
+        </article>
+    
+      </section>
+    
+      <section class="panel" id="user_access_control">
+        <h2>User Access Control</h2>
+        
+        <article class="answer">
+          <h3>A7.1: Describe the approval process for creating user accounts.</h3>
+          <div class="meta">
+            <span class="pill">policy_required</span>
+            <span class="pill status-policy_required">policy_required</span>
+            <span class="pill">answer: Cannot determine</span>
+            <span class="pill">controls: IAM-002, IAM-003</span>
+          </div>
+          <p><strong>Answer basis:</strong> No CE Yes/No answer is proposed because policy or process evidence is required.</p>
+          <p class="muted">This entry requires policy, process, approval, contractual, or business-need evidence that cannot be proven from cloud telemetry alone.</p>
+          <details>
+            <summary>Linked findings</summary>
+            <ul><li>IAM-003 Monitor 23.34: Stale service principals or credentials require review</li></ul>
+          </details>
+          <details>
+            <summary>Evidence snippets</summary>
+            <ul><li>1 stale service principal(s) or credential set(s) were identified</li></ul>
+          </details>
+          <details>
+            <summary>Evidence still needed</summary>
+            <ul><li>identity governance workflow, joiner process</li></ul>
+          </details>
+        </article>
+    
+        <article class="answer">
+          <h3>A7.2: Confirm user and administrator accounts use unique credentials.</h3>
+          <div class="meta">
+            <span class="pill">inferred_cloud</span>
+            <span class="pill status-supported_risk_found">supported_risk_found</span>
+            <span class="pill">answer: No</span>
+            <span class="pill">controls: IAM-002, IAM-003</span>
+          </div>
+          <p><strong>Answer basis:</strong> A mapped CRIS-SME risk finding is present, so the candidate CE answer is No pending human verification.</p>
+          <p class="muted">CRIS-SME found related cloud evidence that may affect this answer. A responsible person must verify the final Cyber Essentials response.</p>
+          <details>
+            <summary>Linked findings</summary>
+            <ul><li>IAM-003 Monitor 23.34: Stale service principals or credentials require review</li></ul>
+          </details>
+          <details>
+            <summary>Evidence snippets</summary>
+            <ul><li>1 stale service principal(s) or credential set(s) were identified</li></ul>
+          </details>
+          <details>
+            <summary>Evidence still needed</summary>
+            <ul><li>Entra user inventory, shared account detection</li></ul>
+          </details>
+        </article>
+    
+        <article class="answer">
+          <h3>A7.3: Describe how leaver accounts are removed or disabled.</h3>
+          <div class="meta">
+            <span class="pill">inferred_cloud</span>
+            <span class="pill status-supported_risk_found">supported_risk_found</span>
+            <span class="pill">answer: No</span>
+            <span class="pill">controls: IAM-003</span>
+          </div>
+          <p><strong>Answer basis:</strong> A mapped CRIS-SME risk finding is present, so the candidate CE answer is No pending human verification.</p>
+          <p class="muted">CRIS-SME found related cloud evidence that may affect this answer. A responsible person must verify the final Cyber Essentials response.</p>
+          <details>
+            <summary>Linked findings</summary>
+            <ul><li>IAM-003 Monitor 23.34: Stale service principals or credentials require review</li></ul>
+          </details>
+          <details>
+            <summary>Evidence snippets</summary>
+            <ul><li>1 stale service principal(s) or credential set(s) were identified</li></ul>
+          </details>
+          <details>
+            <summary>Evidence still needed</summary>
+            <ul><li>Entra stale user and sign-in telemetry</li></ul>
+          </details>
+        </article>
+    
+        <article class="answer">
+          <h3>A7.4: Describe how least privilege is applied to staff access.</h3>
+          <div class="meta">
+            <span class="pill">inferred_cloud</span>
+            <span class="pill status-supported_no_issue">supported_no_issue</span>
+            <span class="pill">answer: Yes</span>
+            <span class="pill">controls: IAM-002</span>
+          </div>
+          <p><strong>Answer basis:</strong> No mapped CRIS-SME risk finding is currently present, so the candidate CE answer is Yes pending human verification.</p>
+          <p class="muted">No related CRIS-SME risk finding is currently present for the mapped controls. This is not a certification assertion and still requires human review.</p>
+          <details>
+            <summary>Linked findings</summary>
+            <ul><li>No linked CRIS-SME risk finding.</li></ul>
+          </details>
+          <details>
+            <summary>Evidence snippets</summary>
+            <ul><li>No evidence snippet attached.</li></ul>
+          </details>
+          <details>
+            <summary>Evidence still needed</summary>
+            <ul><li>role assignment review, PIM, access reviews</li></ul>
+          </details>
+        </article>
+    
+        <article class="answer">
+          <h3>A7.5: Describe the process for granting administrator-level access.</h3>
+          <div class="meta">
+            <span class="pill">policy_required</span>
+            <span class="pill status-policy_required">policy_required</span>
+            <span class="pill">answer: Cannot determine</span>
+            <span class="pill">controls: IAM-002, IAM-004</span>
+          </div>
+          <p><strong>Answer basis:</strong> No CE Yes/No answer is proposed because policy or process evidence is required.</p>
+          <p class="muted">This entry requires policy, process, approval, contractual, or business-need evidence that cannot be proven from cloud telemetry alone.</p>
+          <details>
+            <summary>Linked findings</summary>
+            <ul><li>No linked CRIS-SME risk finding.</li></ul>
+          </details>
+          <details>
+            <summary>Evidence snippets</summary>
+            <ul><li>No evidence snippet attached.</li></ul>
+          </details>
+          <details>
+            <summary>Evidence still needed</summary>
+            <ul><li>PIM, approval workflow, access review records</li></ul>
+          </details>
+        </article>
+    
+        <article class="answer">
+          <h3>A7.6: Confirm administrative tasks use separate administrator accounts.</h3>
+          <div class="meta">
+            <span class="pill">inferred_cloud</span>
+            <span class="pill status-supported_no_issue">supported_no_issue</span>
+            <span class="pill">answer: Yes</span>
+            <span class="pill">controls: IAM-002</span>
+          </div>
+          <p><strong>Answer basis:</strong> No mapped CRIS-SME risk finding is currently present, so the candidate CE answer is Yes pending human verification.</p>
+          <p class="muted">No related CRIS-SME risk finding is currently present for the mapped controls. This is not a certification assertion and still requires human review.</p>
+          <details>
+            <summary>Linked findings</summary>
+            <ul><li>No linked CRIS-SME risk finding.</li></ul>
+          </details>
+          <details>
+            <summary>Evidence snippets</summary>
+            <ul><li>No evidence snippet attached.</li></ul>
+          </details>
+          <details>
+            <summary>Evidence still needed</summary>
+            <ul><li>Entra account role separation evidence</li></ul>
+          </details>
+        </article>
+    
+        <article class="answer">
+          <h3>A7.7: Explain how administrator accounts are prevented from everyday use.</h3>
+          <div class="meta">
+            <span class="pill">policy_required</span>
+            <span class="pill status-policy_required">policy_required</span>
+            <span class="pill">answer: Cannot determine</span>
+            <span class="pill">controls: IAM-002</span>
+          </div>
+          <p><strong>Answer basis:</strong> No CE Yes/No answer is proposed because policy or process evidence is required.</p>
+          <p class="muted">This entry requires policy, process, approval, contractual, or business-need evidence that cannot be proven from cloud telemetry alone.</p>
+          <details>
+            <summary>Linked findings</summary>
+            <ul><li>No linked CRIS-SME risk finding.</li></ul>
+          </details>
+          <details>
+            <summary>Evidence snippets</summary>
+            <ul><li>No evidence snippet attached.</li></ul>
+          </details>
+          <details>
+            <summary>Evidence still needed</summary>
+            <ul><li>browser/email access restrictions, policy evidence</li></ul>
+          </details>
+        </article>
+    
+        <article class="answer">
+          <h3>A7.8: Confirm administrator account holders are tracked.</h3>
+          <div class="meta">
+            <span class="pill">direct_cloud</span>
+            <span class="pill status-supported_no_issue">supported_no_issue</span>
+            <span class="pill">answer: Yes</span>
+            <span class="pill">controls: IAM-002, IAM-004</span>
+          </div>
+          <p><strong>Answer basis:</strong> No mapped CRIS-SME risk finding is currently present, so the candidate CE answer is Yes pending human verification.</p>
+          <p class="muted">No related CRIS-SME risk finding is currently present for the mapped controls. This is not a certification assertion and still requires human review.</p>
+          <details>
+            <summary>Linked findings</summary>
+            <ul><li>No linked CRIS-SME risk finding.</li></ul>
+          </details>
+          <details>
+            <summary>Evidence snippets</summary>
+            <ul><li>No evidence snippet attached.</li></ul>
+          </details>
+          <details>
+            <summary>Evidence still needed</summary>
+            <ul><li>role assignments, directory roles, PIM</li></ul>
+          </details>
+        </article>
+    
+        <article class="answer">
+          <h3>A7.9: Confirm administrative access is reviewed regularly.</h3>
+          <div class="meta">
+            <span class="pill">inferred_cloud</span>
+            <span class="pill status-supported_no_issue">supported_no_issue</span>
+            <span class="pill">answer: Yes</span>
+            <span class="pill">controls: IAM-004</span>
+          </div>
+          <p><strong>Answer basis:</strong> No mapped CRIS-SME risk finding is currently present, so the candidate CE answer is Yes pending human verification.</p>
+          <p class="muted">No related CRIS-SME risk finding is currently present for the mapped controls. This is not a certification assertion and still requires human review.</p>
+          <details>
+            <summary>Linked findings</summary>
+            <ul><li>No linked CRIS-SME risk finding.</li></ul>
+          </details>
+          <details>
+            <summary>Evidence snippets</summary>
+            <ul><li>No evidence snippet attached.</li></ul>
+          </details>
+          <details>
+            <summary>Evidence still needed</summary>
+            <ul><li>Entra access reviews, PIM review history</li></ul>
+          </details>
+        </article>
+    
+        <article class="answer">
+          <h3>A7.10: Identify brute-force protection for password-based systems.</h3>
+          <div class="meta">
+            <span class="pill">inferred_cloud</span>
+            <span class="pill status-supported_risk_found">supported_risk_found</span>
+            <span class="pill">answer: No</span>
+            <span class="pill">controls: IAM-001</span>
+          </div>
+          <p><strong>Answer basis:</strong> A mapped CRIS-SME risk finding is present, so the candidate CE answer is No pending human verification.</p>
+          <p class="muted">CRIS-SME found related cloud evidence that may affect this answer. A responsible person must verify the final Cyber Essentials response.</p>
+          <details>
+            <summary>Linked findings</summary>
+            <ul><li>IAM-001 High 67.97: Privileged role assignments without MFA enforcement</li></ul>
+          </details>
+          <details>
+            <summary>Evidence snippets</summary>
+            <ul><li>1 privileged account(s) do not have MFA enabled</li><li>Conditional access for privileged administrators was not observable and is treated as unmet for deterministic scoring</li></ul>
+          </details>
+          <details>
+            <summary>Evidence still needed</summary>
+            <ul><li>Entra smart lockout, account lockout policy, app lockout settings</li></ul>
+          </details>
+        </article>
+    
+        <article class="answer">
+          <h3>A7.11: Identify technical controls used to maintain password quality.</h3>
+          <div class="meta">
+            <span class="pill">inferred_cloud</span>
+            <span class="pill status-supported_risk_found">supported_risk_found</span>
+            <span class="pill">answer: No</span>
+            <span class="pill">controls: IAM-001</span>
+          </div>
+          <p><strong>Answer basis:</strong> A mapped CRIS-SME risk finding is present, so the candidate CE answer is No pending human verification.</p>
+          <p class="muted">CRIS-SME found related cloud evidence that may affect this answer. A responsible person must verify the final Cyber Essentials response.</p>
+          <details>
+            <summary>Linked findings</summary>
+            <ul><li>IAM-001 High 67.97: Privileged role assignments without MFA enforcement</li></ul>
+          </details>
+          <details>
+            <summary>Evidence snippets</summary>
+            <ul><li>1 privileged account(s) do not have MFA enabled</li><li>Conditional access for privileged administrators was not observable and is treated as unmet for deterministic scoring</li></ul>
+          </details>
+          <details>
+            <summary>Evidence still needed</summary>
+            <ul><li>Entra authentication methods and password policy</li></ul>
+          </details>
+        </article>
+    
+        <article class="answer">
+          <h3>A7.12: Explain how users are encouraged to use unique and strong passwords.</h3>
+          <div class="meta">
+            <span class="pill">policy_required</span>
+            <span class="pill status-policy_required">policy_required</span>
+            <span class="pill">answer: Cannot determine</span>
+            <span class="pill">controls: IAM-001</span>
+          </div>
+          <p><strong>Answer basis:</strong> No CE Yes/No answer is proposed because policy or process evidence is required.</p>
+          <p class="muted">This entry requires policy, process, approval, contractual, or business-need evidence that cannot be proven from cloud telemetry alone.</p>
+          <details>
+            <summary>Linked findings</summary>
+            <ul><li>IAM-001 High 67.97: Privileged role assignments without MFA enforcement</li></ul>
+          </details>
+          <details>
+            <summary>Evidence snippets</summary>
+            <ul><li>1 privileged account(s) do not have MFA enabled</li><li>Conditional access for privileged administrators was not observable and is treated as unmet for deterministic scoring</li></ul>
+          </details>
+          <details>
+            <summary>Evidence still needed</summary>
+            <ul><li>security awareness and password manager policy evidence</li></ul>
+          </details>
+        </article>
+    
+        <article class="answer">
+          <h3>A7.13: Confirm there is a process for suspected password or account compromise.</h3>
+          <div class="meta">
+            <span class="pill">policy_required</span>
+            <span class="pill status-policy_required">policy_required</span>
+            <span class="pill">answer: Cannot determine</span>
+            <span class="pill">controls: IAM-001, MON-004</span>
+          </div>
+          <p><strong>Answer basis:</strong> No CE Yes/No answer is proposed because policy or process evidence is required.</p>
+          <p class="muted">This entry requires policy, process, approval, contractual, or business-need evidence that cannot be proven from cloud telemetry alone.</p>
+          <details>
+            <summary>Linked findings</summary>
+            <ul><li>IAM-001 High 67.97: Privileged role assignments without MFA enforcement</li></ul>
+          </details>
+          <details>
+            <summary>Evidence snippets</summary>
+            <ul><li>1 privileged account(s) do not have MFA enabled</li><li>Conditional access for privileged administrators was not observable and is treated as unmet for deterministic scoring</li></ul>
+          </details>
+          <details>
+            <summary>Evidence still needed</summary>
+            <ul><li>incident response process evidence</li></ul>
+          </details>
+        </article>
+    
+        <article class="answer">
+          <h3>A7.14: Confirm whether all cloud services provide MFA capability.</h3>
+          <div class="meta">
+            <span class="pill">inferred_cloud</span>
+            <span class="pill status-supported_risk_found">supported_risk_found</span>
+            <span class="pill">answer: No</span>
+            <span class="pill">controls: IAM-001, IAM-005</span>
+          </div>
+          <p><strong>Answer basis:</strong> A mapped CRIS-SME risk finding is present, so the candidate CE answer is No pending human verification.</p>
+          <p class="muted">CRIS-SME found related cloud evidence that may affect this answer. A responsible person must verify the final Cyber Essentials response.</p>
+          <details>
+            <summary>Linked findings</summary>
+            <ul><li>IAM-001 High 67.97: Privileged role assignments without MFA enforcement</li><li>IAM-005 Monitor 4.57: Identity governance observability is partial for this assessment scope</li></ul>
+          </details>
+          <details>
+            <summary>Evidence snippets</summary>
+            <ul><li>1 privileged account(s) do not have MFA enabled</li><li>Conditional access for privileged administrators was not observable and is treated as unmet for deterministic scoring</li><li>Subscription-scoped evidence was collected for privileged role assignments</li><li>Tenant-wide Entra controls such as conditional access were not directly observable in this run</li><li>The signed-in assessment identity exposed 1 Entra directory role(s)</li></ul>
+          </details>
+          <details>
+            <summary>Evidence still needed</summary>
+            <ul><li>SaaS inventory, cloud service MFA capability catalogue</li></ul>
+          </details>
+        </article>
+    
+        <article class="answer">
+          <h3>A7.15: List cloud services that do not offer MFA where applicable.</h3>
+          <div class="meta">
+            <span class="pill">manual_required</span>
+            <span class="pill status-manual_required">manual_required</span>
+            <span class="pill">answer: Cannot determine</span>
+            <span class="pill">controls: IAM-005</span>
+          </div>
+          <p><strong>Answer basis:</strong> No CE Yes/No answer is proposed because human context is required.</p>
+          <p class="muted">This entry requires human scoping, administrative context, or final applicant attestation.</p>
+          <details>
+            <summary>Linked findings</summary>
+            <ul><li>IAM-005 Monitor 4.57: Identity governance observability is partial for this assessment scope</li></ul>
+          </details>
+          <details>
+            <summary>Evidence snippets</summary>
+            <ul><li>Subscription-scoped evidence was collected for privileged role assignments</li><li>Tenant-wide Entra controls such as conditional access were not directly observable in this run</li><li>The signed-in assessment identity exposed 1 Entra directory role(s)</li><li>The tenant directory-role catalog was partially visible with 43 active role entry(ies)</li></ul>
+          </details>
+          <details>
+            <summary>Evidence still needed</summary>
+            <ul><li>SaaS inventory, MFA capability catalogue</li></ul>
+          </details>
+        </article>
+    
+        <article class="answer">
+          <h3>A7.16: Confirm MFA is applied to cloud service administrators where available.</h3>
+          <div class="meta">
+            <span class="pill">direct_cloud</span>
+            <span class="pill status-supported_risk_found">supported_risk_found</span>
+            <span class="pill">answer: No</span>
+            <span class="pill">controls: IAM-001, IAM-005</span>
+          </div>
+          <p><strong>Answer basis:</strong> A mapped CRIS-SME risk finding is present, so the candidate CE answer is No pending human verification.</p>
+          <p class="muted">CRIS-SME found related cloud evidence that may affect this answer. A responsible person must verify the final Cyber Essentials response.</p>
+          <details>
+            <summary>Linked findings</summary>
+            <ul><li>IAM-001 High 67.97: Privileged role assignments without MFA enforcement</li><li>IAM-005 Monitor 4.57: Identity governance observability is partial for this assessment scope</li></ul>
+          </details>
+          <details>
+            <summary>Evidence snippets</summary>
+            <ul><li>1 privileged account(s) do not have MFA enabled</li><li>Conditional access for privileged administrators was not observable and is treated as unmet for deterministic scoring</li><li>Subscription-scoped evidence was collected for privileged role assignments</li><li>Tenant-wide Entra controls such as conditional access were not directly observable in this run</li><li>The signed-in assessment identity exposed 1 Entra directory role(s)</li></ul>
+          </details>
+          <details>
+            <summary>Evidence still needed</summary>
+            <ul><li>Conditional Access policies, credential registration details</li></ul>
+          </details>
+        </article>
+    
+        <article class="answer">
+          <h3>A7.17: Confirm MFA is applied to cloud service users where available.</h3>
+          <div class="meta">
+            <span class="pill">inferred_cloud</span>
+            <span class="pill status-supported_risk_found">supported_risk_found</span>
+            <span class="pill">answer: No</span>
+            <span class="pill">controls: IAM-001, IAM-005</span>
+          </div>
+          <p><strong>Answer basis:</strong> A mapped CRIS-SME risk finding is present, so the candidate CE answer is No pending human verification.</p>
+          <p class="muted">CRIS-SME found related cloud evidence that may affect this answer. A responsible person must verify the final Cyber Essentials response.</p>
+          <details>
+            <summary>Linked findings</summary>
+            <ul><li>IAM-001 High 67.97: Privileged role assignments without MFA enforcement</li><li>IAM-005 Monitor 4.57: Identity governance observability is partial for this assessment scope</li></ul>
+          </details>
+          <details>
+            <summary>Evidence snippets</summary>
+            <ul><li>1 privileged account(s) do not have MFA enabled</li><li>Conditional access for privileged administrators was not observable and is treated as unmet for deterministic scoring</li><li>Subscription-scoped evidence was collected for privileged role assignments</li><li>Tenant-wide Entra controls such as conditional access were not directly observable in this run</li><li>The signed-in assessment identity exposed 1 Entra directory role(s)</li></ul>
+          </details>
+          <details>
+            <summary>Evidence still needed</summary>
+            <ul><li>Conditional Access policies, credential registration details</li></ul>
+          </details>
+        </article>
+    
+      </section>
+    
+      <section class="panel" id="malware_protection">
+        <h2>Malware Protection</h2>
+        
+        <article class="answer">
+          <h3>A8.1: Identify malware protection approach for in-scope end-user devices.</h3>
+          <div class="meta">
+            <span class="pill">endpoint_required</span>
+            <span class="pill status-endpoint_required">endpoint_required</span>
+            <span class="pill">answer: Cannot determine</span>
+            <span class="pill">controls: CMP-002, CMP-003</span>
+          </div>
+          <p><strong>Answer basis:</strong> No CE Yes/No answer is proposed because endpoint evidence is required.</p>
+          <p class="muted">This entry requires endpoint, MDM, EDR, patch, local firewall, or device inventory evidence outside the current cloud-control-plane scope.</p>
+          <details>
+            <summary>Linked findings</summary>
+            <ul><li>CMP-002 Planned 39.53: Endpoint protection coverage is below the expected workload baseline</li><li>CMP-003 Planned 38.49: Workload hardening baseline coverage is incomplete</li></ul>
+          </details>
+          <details>
+            <summary>Evidence snippets</summary>
+            <ul><li>Endpoint protection coverage is approximately 0%</li><li>Hardened baseline coverage is approximately 0%</li></ul>
+          </details>
+          <details>
+            <summary>Evidence still needed</summary>
+            <ul><li>Defender for Endpoint, Intune, MDM, app control inventory</li></ul>
+          </details>
+        </article>
+    
+        <article class="answer">
+          <h3>A8.2: Confirm anti-malware updates and execution blocking are configured where anti-malware is used.</h3>
+          <div class="meta">
+            <span class="pill">endpoint_required</span>
+            <span class="pill status-endpoint_required">endpoint_required</span>
+            <span class="pill">answer: Cannot determine</span>
+            <span class="pill">controls: CMP-002</span>
+          </div>
+          <p><strong>Answer basis:</strong> No CE Yes/No answer is proposed because endpoint evidence is required.</p>
+          <p class="muted">This entry requires endpoint, MDM, EDR, patch, local firewall, or device inventory evidence outside the current cloud-control-plane scope.</p>
+          <details>
+            <summary>Linked findings</summary>
+            <ul><li>CMP-002 Planned 39.53: Endpoint protection coverage is below the expected workload baseline</li></ul>
+          </details>
+          <details>
+            <summary>Evidence snippets</summary>
+            <ul><li>Endpoint protection coverage is approximately 0%</li></ul>
+          </details>
+          <details>
+            <summary>Evidence still needed</summary>
+            <ul><li>Defender for Endpoint health, AV policy inventory</li></ul>
+          </details>
+        </article>
+    
+        <article class="answer">
+          <h3>A8.3: Confirm malicious website blocking or warning is configured where anti-malware is used.</h3>
+          <div class="meta">
+            <span class="pill">endpoint_required</span>
+            <span class="pill status-endpoint_required">endpoint_required</span>
+            <span class="pill">answer: Cannot determine</span>
+            <span class="pill">controls: CMP-002</span>
+          </div>
+          <p><strong>Answer basis:</strong> No CE Yes/No answer is proposed because endpoint evidence is required.</p>
+          <p class="muted">This entry requires endpoint, MDM, EDR, patch, local firewall, or device inventory evidence outside the current cloud-control-plane scope.</p>
+          <details>
+            <summary>Linked findings</summary>
+            <ul><li>CMP-002 Planned 39.53: Endpoint protection coverage is below the expected workload baseline</li></ul>
+          </details>
+          <details>
+            <summary>Evidence snippets</summary>
+            <ul><li>Endpoint protection coverage is approximately 0%</li></ul>
+          </details>
+          <details>
+            <summary>Evidence still needed</summary>
+            <ul><li>Defender for Endpoint web protection, browser policy inventory</li></ul>
+          </details>
+        </article>
+    
+        <article class="answer">
+          <h3>A8.4: Confirm unsigned applications are blocked where application allow-listing or app-store restrictions are used.</h3>
+          <div class="meta">
+            <span class="pill">endpoint_required</span>
+            <span class="pill status-endpoint_required">endpoint_required</span>
+            <span class="pill">answer: Cannot determine</span>
+            <span class="pill">controls: CMP-003</span>
+          </div>
+          <p><strong>Answer basis:</strong> No CE Yes/No answer is proposed because endpoint evidence is required.</p>
+          <p class="muted">This entry requires endpoint, MDM, EDR, patch, local firewall, or device inventory evidence outside the current cloud-control-plane scope.</p>
+          <details>
+            <summary>Linked findings</summary>
+            <ul><li>CMP-003 Planned 38.49: Workload hardening baseline coverage is incomplete</li></ul>
+          </details>
+          <details>
+            <summary>Evidence snippets</summary>
+            <ul><li>Hardened baseline coverage is approximately 0%</li></ul>
+          </details>
+          <details>
+            <summary>Evidence still needed</summary>
+            <ul><li>Intune, application control, MDM restriction policy</li></ul>
+          </details>
+        </article>
+    
+        <article class="answer">
+          <h3>A8.5: Confirm approved-application controls and approved application lists are maintained where allow-listing is used.</h3>
+          <div class="meta">
+            <span class="pill">policy_required</span>
+            <span class="pill status-policy_required">policy_required</span>
+            <span class="pill">answer: Cannot determine</span>
+            <span class="pill">controls: CMP-003</span>
+          </div>
+          <p><strong>Answer basis:</strong> No CE Yes/No answer is proposed because policy or process evidence is required.</p>
+          <p class="muted">This entry requires policy, process, approval, contractual, or business-need evidence that cannot be proven from cloud telemetry alone.</p>
+          <details>
+            <summary>Linked findings</summary>
+            <ul><li>CMP-003 Planned 38.49: Workload hardening baseline coverage is incomplete</li></ul>
+          </details>
+          <details>
+            <summary>Evidence snippets</summary>
+            <ul><li>Hardened baseline coverage is approximately 0%</li></ul>
+          </details>
+          <details>
+            <summary>Evidence still needed</summary>
+            <ul><li>approved app list, MDM app policy, application control policy</li></ul>
+          </details>
+        </article>
+    
+      </section>
+    
+
+      <footer>No impact. This pack reads existing CRIS-SME findings and never changes deterministic risk scores.</footer>
+    </main>
+  </body>
+</html>

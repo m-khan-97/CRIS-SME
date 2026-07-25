@@ -1,0 +1,108 @@
+{
+  "version": "2026.06.0",
+  "scenarios": [
+    {
+      "id": "sigi-full-spectrum",
+      "title": "SIGI Technologies AWS Full-Spectrum Evidence Lab",
+      "organization_name": "SIGI Technologies",
+      "sector": "Technology Services",
+      "dataset_source_type": "vulnerable_lab",
+      "authorization_basis": "owned_controlled_lab",
+      "dataset_use": "full_spectrum_control_stress_test",
+      "risk_intent": "Create a tagged, production-shaped AWS estate with intentionally mixed security posture across network, data, monitoring, compute, governance, secrets, containers, and IoT evidence domains.",
+      "resource_types": [
+        "AWS::EC2::VPC",
+        "AWS::EC2::Subnet",
+        "AWS::EC2::SecurityGroup",
+        "AWS::EC2::Instance",
+        "AWS::EC2::Volume",
+        "AWS::EC2::EIP",
+        "AWS::S3::Bucket",
+        "AWS::RDS::DBInstance",
+        "AWS::SecretsManager::Secret",
+        "AWS::CloudTrail::Trail",
+        "AWS::Logs::LogGroup",
+        "AWS::CloudWatch::Alarm",
+        "AWS::SSM::Document",
+        "AWS::ECS::Cluster",
+        "AWS::IoT::ThingGroup",
+        "AWS::IoT::Thing",
+        "AWS::IoT::Policy"
+      ],
+      "expected_findings": [
+        {"control_id": "NET-001", "reason": "Public SSH, RDP, database, and broad ingress rules are present."},
+        {"control_id": "NET-002", "reason": "Security groups include broadly permissive ingress."},
+        {"control_id": "DATA-001", "reason": "An empty S3 bucket is publicly readable and the public RDS instance is unencrypted."},
+        {"control_id": "MON-001", "reason": "CloudTrail exists but has no CloudWatch Logs integration, so retention evidence is absent."},
+        {"control_id": "COMP-001", "reason": "The EC2 workload permits IMDSv1, is unmanaged by SSM, and has no AWS Backup coverage."},
+        {"control_id": "GOV-001", "reason": "No AWS Config recorder, budget alert, or organization SCP coverage is created."},
+        {"control_id": "IOT-001", "reason": "AWS IoT devices use an overbroad wildcard policy without Defender security profiles or private endpoints."}
+      ],
+      "safety_notes": [
+        "The EC2 instance has no key pair, credentials, application data, or IAM role.",
+        "The public S3 bucket remains empty and the RDS database contains no customer data.",
+        "All resources are tagged and managed by one CloudFormation stack.",
+        "The stack is intended for short-lived testing and carries a two-day deletion tag."
+      ]
+    },
+    {
+      "id": "public-exposure",
+      "title": "AWS Public Exposure Evidence Lab",
+      "dataset_source_type": "live_lab",
+      "authorization_basis": "owned_authorized_lab_account",
+      "dataset_use": "controlled_aws_evidence_lab",
+      "risk_intent": "Create controlled AWS control-plane evidence for public administrative ingress and public empty-object-storage exposure without launching EC2 workloads.",
+      "resource_types": [
+        "AWS::EC2::VPC",
+        "AWS::EC2::Subnet",
+        "AWS::EC2::InternetGateway",
+        "AWS::EC2::SecurityGroup",
+        "AWS::S3::Bucket"
+      ],
+      "expected_findings": [
+        {
+          "control_id": "NET-001",
+          "reason": "Security group allows SSH and RDP from 0.0.0.0/0."
+        },
+        {
+          "control_id": "DATA-001",
+          "reason": "Empty lab S3 bucket has public-access blocks disabled and an allow-public-read bucket policy."
+        },
+        {
+          "control_id": "GOV-001",
+          "reason": "The lab does not create AWS Budgets or organization policy coverage."
+        }
+      ],
+      "safety_notes": [
+        "No EC2 instances are launched.",
+        "The public S3 bucket is intended to remain empty.",
+        "The stack is tagged and can be deleted with the cleanup action."
+      ]
+    },
+    {
+      "id": "clean-baseline",
+      "title": "AWS Clean Baseline Evidence Lab",
+      "dataset_source_type": "live_lab",
+      "authorization_basis": "owned_authorized_lab_account",
+      "dataset_use": "controlled_aws_evidence_lab",
+      "risk_intent": "Create a small tagged AWS baseline with private-only network defaults and a private encrypted S3 bucket.",
+      "resource_types": [
+        "AWS::EC2::VPC",
+        "AWS::EC2::Subnet",
+        "AWS::EC2::SecurityGroup",
+        "AWS::S3::Bucket"
+      ],
+      "expected_findings": [
+        {
+          "control_id": "GOV-001",
+          "reason": "The lab does not create AWS Budgets or organization policy coverage."
+        }
+      ],
+      "safety_notes": [
+        "No EC2 instances are launched.",
+        "The S3 bucket blocks public access and uses server-side encryption.",
+        "The stack is tagged and can be deleted with the cleanup action."
+      ]
+    }
+  ]
+}

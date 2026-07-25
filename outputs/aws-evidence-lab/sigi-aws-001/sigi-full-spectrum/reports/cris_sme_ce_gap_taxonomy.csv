@@ -1,0 +1,5 @@
+count,description,evidence_class,rate,sample_question_ids
+24,"Endpoint, MDM, EDR, patch, or local device evidence required.",endpoint_required,22.64,A2.6; A2.6.1; A2.8; A4.1.1; A4.1.2; A5.1; A5.3; A5.8
+35,"Applicant scoping, company context, or final attestation required.",manual_required,33.02,A1.1; A1.2; A1.3; A1.4; A1.5; A1.5.1; A1.6; A1.6.1
+0,Required signal is outside current CRIS-SME observable evidence paths.,not_observable,0.0,
+19,"Policy, process, approval, or business-need evidence required.",policy_required,17.92,A1.16; A4.2; A4.2.1; A4.3; A4.4; A4.5; A4.6; A4.8

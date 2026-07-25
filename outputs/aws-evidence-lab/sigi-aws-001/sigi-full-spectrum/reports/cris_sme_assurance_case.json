@@ -1,0 +1,243 @@
+{
+  "case_schema_version": "1.0.0",
+  "case_name": "CRIS-SME Assessment Assurance Case",
+  "generated_at": "2026-07-04T18:15:03.071496Z",
+  "overall_conclusion": "caveated",
+  "assurance_score": 61.25,
+  "argument_count": 4,
+  "supported_argument_count": 0,
+  "caveated_argument_count": 4,
+  "arguments": [
+    {
+      "argument_id": "case_efd806b3b0786d",
+      "top_claim": "This assessment is replayable and integrity-backed.",
+      "conclusion": "caveated",
+      "confidence": 0.625,
+      "supporting_claim_ids": [
+        "clm_0302b5d56a4917",
+        "clm_f151063e0cc4a1"
+      ],
+      "evidence_refs": [],
+      "provenance_node_ids": [
+        "replay:assessment",
+        "snapshot:evs_38d7b6507aa3d94a",
+        "rbom:assessment"
+      ],
+      "rbom_artifact_refs": [
+        "evidence_snapshot",
+        "risk_bill_of_materials"
+      ],
+      "caveats": [
+        "Deterministic replay did not verify cleanly."
+      ],
+      "residual_gaps": [],
+      "reasoning": "Replay verifies deterministic reproduction while RBOM records report and artifact integrity."
+    },
+    {
+      "argument_id": "case_378821b933d316",
+      "top_claim": "Risk conclusions are traceable to scored findings and evidence references.",
+      "conclusion": "caveated",
+      "confidence": 0.8617,
+      "supporting_claim_ids": [
+        "clm_4a59bd33b3ac87",
+        "clm_e017e79f322bc4",
+        "clm_77c4416bb77e0a",
+        "clm_aeeb7cf0ac9829",
+        "clm_2d9e18ddaf4c14",
+        "clm_259ccdbe4f0eca"
+      ],
+      "evidence_refs": [
+        "evd_fdg_03484c44a1bea9_01",
+        "evd_fdg_0487a7973756c3_01",
+        "evd_fdg_0fc8904a5edd56_01",
+        "evd_fdg_1fcafc454b954f_01",
+        "evd_fdg_212e49f1a69dad_01",
+        "evd_fdg_212e49f1a69dad_02",
+        "evd_fdg_212e49f1a69dad_03",
+        "evd_fdg_22fa0573d52093_01",
+        "evd_fdg_22fa0573d52093_02",
+        "evd_fdg_22fa0573d52093_03",
+        "evd_fdg_32dfaf5364b4d6_01",
+        "evd_fdg_41e815a1b649a8_01",
+        "evd_fdg_45fead59d5ed86_01",
+        "evd_fdg_45fead59d5ed86_02",
+        "evd_fdg_47b2e528cc081f_01",
+        "evd_fdg_47b2e528cc081f_02",
+        "evd_fdg_4fdee149a387bc_01",
+        "evd_fdg_4fdee149a387bc_02",
+        "evd_fdg_514b77f2a83791_01",
+        "evd_fdg_514b77f2a83791_02",
+        "evd_fdg_81612c096e8237_01",
+        "evd_fdg_81612c096e8237_02",
+        "evd_fdg_59af495a1834f7_01",
+        "evd_fdg_994c549d0b3d2e_01",
+        "evd_fdg_994c549d0b3d2e_02",
+        "evd_fdg_e13f1fe2310b82_01"
+      ],
+      "provenance_node_ids": [
+        "snapshot:evs_38d7b6507aa3d94a",
+        "assurance:assessment",
+        "finding:fdg_514b77f2a83791",
+        "score:fdg_514b77f2a83791",
+        "evidence_sufficiency:fdg_514b77f2a83791",
+        "finding:fdg_81612c096e8237",
+        "score:fdg_81612c096e8237",
+        "evidence_sufficiency:fdg_81612c096e8237",
+        "finding:fdg_59af495a1834f7",
+        "score:fdg_59af495a1834f7",
+        "evidence_sufficiency:fdg_59af495a1834f7",
+        "finding:fdg_994c549d0b3d2e",
+        "score:fdg_994c549d0b3d2e",
+        "evidence_sufficiency:fdg_994c549d0b3d2e",
+        "finding:fdg_e13f1fe2310b82",
+        "score:fdg_e13f1fe2310b82",
+        "evidence_sufficiency:fdg_e13f1fe2310b82"
+      ],
+      "rbom_artifact_refs": [
+        "json_report",
+        "decision_provenance_graph"
+      ],
+      "caveats": [
+        "Deterministic replay is not verified.",
+        "2 high-priority evidence gaps remain.",
+        "Evidence snapshot replay is missing or did not match deterministically.",
+        "Evidence sufficiency is low; findings may be explainable but less assured.",
+        "Evidence sufficiency is unsupported."
+      ],
+      "residual_gaps": [],
+      "reasoning": "Overall and top-risk claims link to finding IDs, evidence references, and provenance nodes."
+    },
+    {
+      "argument_id": "case_f0ffb6395a4741",
+      "top_claim": "Executive, compliance, and insurance claims are explicitly verified or caveated.",
+      "conclusion": "caveated",
+      "confidence": 0.6663,
+      "supporting_claim_ids": [
+        "clm_05add4d49f86e9",
+        "clm_10031800d39adf",
+        "clm_8f98be1ee86a74",
+        "clm_4f7c3100bf948e",
+        "clm_9e3629aebd0692",
+        "clm_a84ad305d773d7",
+        "clm_fe015f3fdb4966",
+        "clm_05fa8951d42cd7",
+        "clm_7783c460a10712",
+        "clm_f515210453343a",
+        "clm_19f45c1ae66374",
+        "clm_1596204779edae",
+        "clm_cd08af035368dd"
+      ],
+      "evidence_refs": [
+        "1 privileged account(s) do not have MFA enabled",
+        "Conditional access for privileged administrators was not observable and is treated as unmet for deterministic scoring",
+        "Subscription-scoped evidence was collected for privileged role assignments",
+        "Tenant-wide Entra controls such as conditional access were not directly observable in this run",
+        "1 asset(s) expose RDP to the public internet",
+        "1 asset(s) expose SSH to the public internet",
+        "2 permissive NSG rule(s) were identified",
+        "1 critical VM(s) require urgent patching",
+        "Endpoint protection coverage is approximately 0%",
+        "Hardened baseline coverage is approximately 0%",
+        "Backup coverage is only 60%",
+        "Retention policy coverage is only 60%",
+        "Workload backup agent coverage is approximately 0%",
+        "Activity logs are retained for only 0 day(s)",
+        "Security monitoring coverage is approximately 0%"
+      ],
+      "provenance_node_ids": [
+        "trust_badge:report",
+        "assurance:assessment",
+        "snapshot:evs_38d7b6507aa3d94a",
+        "control:NET-001",
+        "control:NET-002",
+        "control:IAM-001",
+        "control:CMP-002",
+        "control:CMP-001",
+        "control:IAM-002",
+        "control:IAM-004",
+        "control:IAM-005",
+        "control:CMP-003",
+        "control:CMP-005",
+        "control:DATA-003",
+        "control:CMP-004",
+        "control:MON-001",
+        "control:MON-002",
+        "control:MON-003",
+        "control:MON-004"
+      ],
+      "rbom_artifact_refs": [
+        "json_report",
+        "cyber_insurance_pack.cyber_insurance_json"
+      ],
+      "caveats": [
+        "Deterministic replay is not verified.",
+        "2 high-priority evidence gaps remain.",
+        "Evidence snapshot replay is missing or did not match deterministically.",
+        "Evidence sufficiency is low; findings may be explainable but less assured.",
+        "Active mapped controls: NET-001, NET-002.",
+        "Active mapped controls: IAM-001.",
+        "Active mapped controls: CMP-002.",
+        "Active mapped controls: CMP-001.",
+        "Require MFA and admin-focused conditional access for privileged identities.",
+        "Broaden tenant-level identity evidence collection before treating IAM coverage as complete.",
+        "Restrict SSH and RDP exposure with private access paths, VPN, or just-in-time controls.",
+        "Patch critical workloads and enforce a stronger recurring patch policy.",
+        "Increase backup and retention coverage for business-critical data stores.",
+        "Increase log retention to support investigation, governance review, and evidence preservation."
+      ],
+      "residual_gaps": [],
+      "reasoning": "Stakeholder-facing claims preserve verification status, confidence, caveats, and mapped controls."
+    },
+    {
+      "argument_id": "case_21fe0444d2bb22",
+      "top_claim": "Evidence quality and assurance gaps are explicit.",
+      "conclusion": "caveated",
+      "confidence": 0.6125,
+      "supporting_claim_ids": [],
+      "evidence_refs": [],
+      "provenance_node_ids": [
+        "assurance:assessment",
+        "snapshot:evs_38d7b6507aa3d94a"
+      ],
+      "rbom_artifact_refs": [
+        "json_report",
+        "claim_verification_pack"
+      ],
+      "caveats": [
+        "Evidence snapshot replay is missing or did not match deterministically.",
+        "Evidence sufficiency is low; findings may be explainable but less assured.",
+        "2 high-priority evidence gaps remain."
+      ],
+      "residual_gaps": [
+        "Evidence snapshot replay is missing or did not match deterministically.",
+        "Evidence sufficiency is low; findings may be explainable but less assured.",
+        "2 high-priority evidence gaps remain."
+      ],
+      "reasoning": "Assessment Assurance and Evidence Gap Backlog expose residual evidence-quality limitations."
+    }
+  ],
+  "open_caveats": [
+    "2 high-priority evidence gaps remain.",
+    "Active mapped controls: CMP-001.",
+    "Active mapped controls: CMP-002.",
+    "Active mapped controls: IAM-001.",
+    "Active mapped controls: NET-001, NET-002.",
+    "Broaden tenant-level identity evidence collection before treating IAM coverage as complete.",
+    "Deterministic replay did not verify cleanly.",
+    "Deterministic replay is not verified.",
+    "Evidence snapshot replay is missing or did not match deterministically.",
+    "Evidence sufficiency is low; findings may be explainable but less assured.",
+    "Evidence sufficiency is unsupported.",
+    "Increase backup and retention coverage for business-critical data stores.",
+    "Increase log retention to support investigation, governance review, and evidence preservation.",
+    "Patch critical workloads and enforce a stronger recurring patch policy.",
+    "Require MFA and admin-focused conditional access for privileged identities.",
+    "Restrict SSH and RDP exposure with private access paths, VPN, or just-in-time controls."
+  ],
+  "residual_gaps": [
+    "2 high-priority evidence gaps remain.",
+    "Evidence snapshot replay is missing or did not match deterministically.",
+    "Evidence sufficiency is low; findings may be explainable but less assured."
+  ],
+  "deterministic_score_impact": "No impact. The assurance case argues for report trustworthiness and never changes deterministic CRIS-SME risk scores."
+}

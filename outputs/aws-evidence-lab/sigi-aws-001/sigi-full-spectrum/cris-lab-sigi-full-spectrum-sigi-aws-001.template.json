@@ -1,0 +1,1511 @@
+{
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Description": "CRIS-SME controlled, tagged AWS evidence lab managed as one stack.",
+  "Parameters": {
+    "LabName": {
+      "Type": "String"
+    },
+    "LabSuffix": {
+      "Type": "String"
+    },
+    "ScenarioId": {
+      "Type": "String"
+    },
+    "OrganizationName": {
+      "Type": "String",
+      "Default": "CRIS-SME Evidence Lab"
+    },
+    "LatestAmiId": {
+      "Type": "AWS::SSM::Parameter::Value<AWS::EC2::Image::Id>",
+      "Default": "/aws/service/ami-amazon-linux-latest/al2023-ami-kernel-default-x86_64"
+    }
+  },
+  "Resources": {
+    "Vpc": {
+      "Type": "AWS::EC2::VPC",
+      "Properties": {
+        "CidrBlock": "10.84.0.0/24",
+        "EnableDnsHostnames": true,
+        "EnableDnsSupport": true,
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "cris-sme-aws-lab-vpc"
+          },
+          {
+            "Key": "cris-sme-lab",
+            "Value": "true"
+          },
+          {
+            "Key": "cris-sme-scenario",
+            "Value": {
+              "Ref": "ScenarioId"
+            }
+          },
+          {
+            "Key": "cris-sme-run-id",
+            "Value": {
+              "Ref": "LabSuffix"
+            }
+          },
+          {
+            "Key": "cris-sme-purpose",
+            "Value": "evidence-dataset"
+          },
+          {
+            "Key": "cris-sme-managed-by",
+            "Value": "cris-sme-aws-evidence-lab"
+          },
+          {
+            "Key": "organization",
+            "Value": {
+              "Ref": "OrganizationName"
+            }
+          }
+        ]
+      }
+    },
+    "Subnet": {
+      "Type": "AWS::EC2::Subnet",
+      "Properties": {
+        "VpcId": {
+          "Ref": "Vpc"
+        },
+        "CidrBlock": "10.84.0.0/28",
+        "AvailabilityZone": {
+          "Fn::Select": [
+            0,
+            {
+              "Fn::GetAZs": ""
+            }
+          ]
+        },
+        "MapPublicIpOnLaunch": true,
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "cris-sme-aws-lab-subnet"
+          },
+          {
+            "Key": "cris-sme-lab",
+            "Value": "true"
+          },
+          {
+            "Key": "cris-sme-scenario",
+            "Value": {
+              "Ref": "ScenarioId"
+            }
+          },
+          {
+            "Key": "cris-sme-run-id",
+            "Value": {
+              "Ref": "LabSuffix"
+            }
+          },
+          {
+            "Key": "cris-sme-purpose",
+            "Value": "evidence-dataset"
+          },
+          {
+            "Key": "cris-sme-managed-by",
+            "Value": "cris-sme-aws-evidence-lab"
+          },
+          {
+            "Key": "organization",
+            "Value": {
+              "Ref": "OrganizationName"
+            }
+          }
+        ]
+      }
+    },
+    "InternetGateway": {
+      "Type": "AWS::EC2::InternetGateway",
+      "Properties": {
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "cris-sme-aws-lab-igw"
+          },
+          {
+            "Key": "cris-sme-lab",
+            "Value": "true"
+          },
+          {
+            "Key": "cris-sme-scenario",
+            "Value": {
+              "Ref": "ScenarioId"
+            }
+          },
+          {
+            "Key": "cris-sme-run-id",
+            "Value": {
+              "Ref": "LabSuffix"
+            }
+          },
+          {
+            "Key": "cris-sme-purpose",
+            "Value": "evidence-dataset"
+          },
+          {
+            "Key": "cris-sme-managed-by",
+            "Value": "cris-sme-aws-evidence-lab"
+          },
+          {
+            "Key": "organization",
+            "Value": {
+              "Ref": "OrganizationName"
+            }
+          }
+        ]
+      }
+    },
+    "GatewayAttachment": {
+      "Type": "AWS::EC2::VPCGatewayAttachment",
+      "Properties": {
+        "VpcId": {
+          "Ref": "Vpc"
+        },
+        "InternetGatewayId": {
+          "Ref": "InternetGateway"
+        }
+      }
+    },
+    "PublicSubnetB": {
+      "Type": "AWS::EC2::Subnet",
+      "Properties": {
+        "VpcId": {
+          "Ref": "Vpc"
+        },
+        "CidrBlock": "10.84.0.16/28",
+        "AvailabilityZone": {
+          "Fn::Select": [
+            1,
+            {
+              "Fn::GetAZs": ""
+            }
+          ]
+        },
+        "MapPublicIpOnLaunch": true,
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "sigi-public-subnet-b"
+          },
+          {
+            "Key": "cris-sme-lab",
+            "Value": "true"
+          },
+          {
+            "Key": "cris-sme-scenario",
+            "Value": {
+              "Ref": "ScenarioId"
+            }
+          },
+          {
+            "Key": "cris-sme-run-id",
+            "Value": {
+              "Ref": "LabSuffix"
+            }
+          },
+          {
+            "Key": "cris-sme-purpose",
+            "Value": "evidence-dataset"
+          },
+          {
+            "Key": "cris-sme-managed-by",
+            "Value": "cris-sme-aws-evidence-lab"
+          },
+          {
+            "Key": "organization",
+            "Value": {
+              "Ref": "OrganizationName"
+            }
+          }
+        ]
+      }
+    },
+    "PublicRouteTable": {
+      "Type": "AWS::EC2::RouteTable",
+      "Properties": {
+        "VpcId": {
+          "Ref": "Vpc"
+        },
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "sigi-public-routes"
+          },
+          {
+            "Key": "cris-sme-lab",
+            "Value": "true"
+          },
+          {
+            "Key": "cris-sme-scenario",
+            "Value": {
+              "Ref": "ScenarioId"
+            }
+          },
+          {
+            "Key": "cris-sme-run-id",
+            "Value": {
+              "Ref": "LabSuffix"
+            }
+          },
+          {
+            "Key": "cris-sme-purpose",
+            "Value": "evidence-dataset"
+          },
+          {
+            "Key": "cris-sme-managed-by",
+            "Value": "cris-sme-aws-evidence-lab"
+          },
+          {
+            "Key": "organization",
+            "Value": {
+              "Ref": "OrganizationName"
+            }
+          }
+        ]
+      }
+    },
+    "DefaultPublicRoute": {
+      "Type": "AWS::EC2::Route",
+      "DependsOn": "GatewayAttachment",
+      "Properties": {
+        "RouteTableId": {
+          "Ref": "PublicRouteTable"
+        },
+        "DestinationCidrBlock": "0.0.0.0/0",
+        "GatewayId": {
+          "Ref": "InternetGateway"
+        }
+      }
+    },
+    "PublicSubnetARouteAssociation": {
+      "Type": "AWS::EC2::SubnetRouteTableAssociation",
+      "Properties": {
+        "SubnetId": {
+          "Ref": "Subnet"
+        },
+        "RouteTableId": {
+          "Ref": "PublicRouteTable"
+        }
+      }
+    },
+    "PublicSubnetBRouteAssociation": {
+      "Type": "AWS::EC2::SubnetRouteTableAssociation",
+      "Properties": {
+        "SubnetId": {
+          "Ref": "PublicSubnetB"
+        },
+        "RouteTableId": {
+          "Ref": "PublicRouteTable"
+        }
+      }
+    },
+    "OpenAdminSecurityGroup": {
+      "Type": "AWS::EC2::SecurityGroup",
+      "Properties": {
+        "GroupDescription": "SIGI controlled lab public administration and database exposure",
+        "VpcId": {
+          "Ref": "Vpc"
+        },
+        "SecurityGroupIngress": [
+          {
+            "IpProtocol": "tcp",
+            "FromPort": 22,
+            "ToPort": 22,
+            "CidrIp": "0.0.0.0/0",
+            "Description": "Intentional public SSH lab signal"
+          },
+          {
+            "IpProtocol": "tcp",
+            "FromPort": 3389,
+            "ToPort": 3389,
+            "CidrIp": "0.0.0.0/0",
+            "Description": "Intentional public RDP lab signal"
+          },
+          {
+            "IpProtocol": "tcp",
+            "FromPort": 5432,
+            "ToPort": 5432,
+            "CidrIp": "0.0.0.0/0",
+            "Description": "Intentional public PostgreSQL lab signal"
+          },
+          {
+            "IpProtocol": "-1",
+            "CidrIp": "10.0.0.0/8",
+            "Description": "Intentionally broad private ingress"
+          }
+        ],
+        "SecurityGroupEgress": [
+          {
+            "IpProtocol": "-1",
+            "CidrIp": "0.0.0.0/0"
+          }
+        ],
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "sigi-open-admin-sg"
+          },
+          {
+            "Key": "cris-sme-lab",
+            "Value": "true"
+          },
+          {
+            "Key": "cris-sme-scenario",
+            "Value": {
+              "Ref": "ScenarioId"
+            }
+          },
+          {
+            "Key": "cris-sme-run-id",
+            "Value": {
+              "Ref": "LabSuffix"
+            }
+          },
+          {
+            "Key": "cris-sme-purpose",
+            "Value": "evidence-dataset"
+          },
+          {
+            "Key": "cris-sme-managed-by",
+            "Value": "cris-sme-aws-evidence-lab"
+          },
+          {
+            "Key": "organization",
+            "Value": {
+              "Ref": "OrganizationName"
+            }
+          }
+        ]
+      }
+    },
+    "WeakWorkload": {
+      "Type": "AWS::EC2::Instance",
+      "Properties": {
+        "ImageId": {
+          "Ref": "LatestAmiId"
+        },
+        "InstanceType": "t3.micro",
+        "SubnetId": {
+          "Ref": "Subnet"
+        },
+        "SecurityGroupIds": [
+          {
+            "Ref": "OpenAdminSecurityGroup"
+          }
+        ],
+        "MetadataOptions": {
+          "HttpEndpoint": "enabled",
+          "HttpTokens": "optional"
+        },
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "sigi-weak-workload"
+          },
+          {
+            "Key": "cris-sme-lab",
+            "Value": "true"
+          },
+          {
+            "Key": "cris-sme-scenario",
+            "Value": {
+              "Ref": "ScenarioId"
+            }
+          },
+          {
+            "Key": "cris-sme-run-id",
+            "Value": {
+              "Ref": "LabSuffix"
+            }
+          },
+          {
+            "Key": "cris-sme-purpose",
+            "Value": "evidence-dataset"
+          },
+          {
+            "Key": "cris-sme-managed-by",
+            "Value": "cris-sme-aws-evidence-lab"
+          },
+          {
+            "Key": "organization",
+            "Value": {
+              "Ref": "OrganizationName"
+            }
+          }
+        ]
+      }
+    },
+    "OrphanedVolume": {
+      "Type": "AWS::EC2::Volume",
+      "Properties": {
+        "AvailabilityZone": {
+          "Fn::GetAtt": [
+            "WeakWorkload",
+            "AvailabilityZone"
+          ]
+        },
+        "Size": 1,
+        "Encrypted": false,
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "sigi-orphaned-volume"
+          },
+          {
+            "Key": "cris-sme-lab",
+            "Value": "true"
+          },
+          {
+            "Key": "cris-sme-scenario",
+            "Value": {
+              "Ref": "ScenarioId"
+            }
+          },
+          {
+            "Key": "cris-sme-run-id",
+            "Value": {
+              "Ref": "LabSuffix"
+            }
+          },
+          {
+            "Key": "cris-sme-purpose",
+            "Value": "evidence-dataset"
+          },
+          {
+            "Key": "cris-sme-managed-by",
+            "Value": "cris-sme-aws-evidence-lab"
+          },
+          {
+            "Key": "organization",
+            "Value": {
+              "Ref": "OrganizationName"
+            }
+          }
+        ]
+      }
+    },
+    "OrphanedElasticIp": {
+      "Type": "AWS::EC2::EIP",
+      "Properties": {
+        "Domain": "vpc",
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "sigi-orphaned-eip"
+          },
+          {
+            "Key": "cris-sme-lab",
+            "Value": "true"
+          },
+          {
+            "Key": "cris-sme-scenario",
+            "Value": {
+              "Ref": "ScenarioId"
+            }
+          },
+          {
+            "Key": "cris-sme-run-id",
+            "Value": {
+              "Ref": "LabSuffix"
+            }
+          },
+          {
+            "Key": "cris-sme-purpose",
+            "Value": "evidence-dataset"
+          },
+          {
+            "Key": "cris-sme-managed-by",
+            "Value": "cris-sme-aws-evidence-lab"
+          },
+          {
+            "Key": "organization",
+            "Value": {
+              "Ref": "OrganizationName"
+            }
+          }
+        ]
+      }
+    },
+    "PublicDataBucket": {
+      "Type": "AWS::S3::Bucket",
+      "Properties": {
+        "BucketName": {
+          "Fn::Sub": [
+            "cris-sme-${Prefix}-${AWS::AccountId}-${AWS::Region}-${LabSuffix}",
+            {
+              "Prefix": "sigi-public"
+            }
+          ]
+        },
+        "PublicAccessBlockConfiguration": {
+          "BlockPublicAcls": false,
+          "BlockPublicPolicy": false,
+          "IgnorePublicAcls": false,
+          "RestrictPublicBuckets": false
+        },
+        "OwnershipControls": {
+          "Rules": [
+            {
+              "ObjectOwnership": "BucketOwnerPreferred"
+            }
+          ]
+        },
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "sigi-public-empty-public-bucket"
+          },
+          {
+            "Key": "cris-sme-lab",
+            "Value": "true"
+          },
+          {
+            "Key": "cris-sme-scenario",
+            "Value": {
+              "Ref": "ScenarioId"
+            }
+          },
+          {
+            "Key": "cris-sme-run-id",
+            "Value": {
+              "Ref": "LabSuffix"
+            }
+          },
+          {
+            "Key": "cris-sme-purpose",
+            "Value": "evidence-dataset"
+          },
+          {
+            "Key": "cris-sme-managed-by",
+            "Value": "cris-sme-aws-evidence-lab"
+          },
+          {
+            "Key": "organization",
+            "Value": {
+              "Ref": "OrganizationName"
+            }
+          }
+        ]
+      }
+    },
+    "PublicDataBucketPolicy": {
+      "Type": "AWS::S3::BucketPolicy",
+      "Properties": {
+        "Bucket": {
+          "Ref": "PublicDataBucket"
+        },
+        "PolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Sid": "CrisSmeLabPublicReadEmptyBucket",
+              "Effect": "Allow",
+              "Principal": "*",
+              "Action": "s3:GetObject",
+              "Resource": {
+                "Fn::Sub": "arn:${AWS::Partition}:s3:::${PublicDataBucket}/*"
+              }
+            }
+          ]
+        }
+      }
+    },
+    "ProtectedEvidenceBucket": {
+      "Type": "AWS::S3::Bucket",
+      "Properties": {
+        "BucketName": {
+          "Fn::Sub": [
+            "cris-sme-${Prefix}-${AWS::AccountId}-${AWS::Region}-${LabSuffix}",
+            {
+              "Prefix": "sigi-protected"
+            }
+          ]
+        },
+        "BucketEncryption": {
+          "ServerSideEncryptionConfiguration": [
+            {
+              "ServerSideEncryptionByDefault": {
+                "SSEAlgorithm": "AES256"
+              }
+            }
+          ]
+        },
+        "PublicAccessBlockConfiguration": {
+          "BlockPublicAcls": true,
+          "BlockPublicPolicy": true,
+          "IgnorePublicAcls": true,
+          "RestrictPublicBuckets": true
+        },
+        "VersioningConfiguration": {
+          "Status": "Enabled"
+        },
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "sigi-protected-private-bucket"
+          },
+          {
+            "Key": "cris-sme-lab",
+            "Value": "true"
+          },
+          {
+            "Key": "cris-sme-scenario",
+            "Value": {
+              "Ref": "ScenarioId"
+            }
+          },
+          {
+            "Key": "cris-sme-run-id",
+            "Value": {
+              "Ref": "LabSuffix"
+            }
+          },
+          {
+            "Key": "cris-sme-purpose",
+            "Value": "evidence-dataset"
+          },
+          {
+            "Key": "cris-sme-managed-by",
+            "Value": "cris-sme-aws-evidence-lab"
+          },
+          {
+            "Key": "organization",
+            "Value": {
+              "Ref": "OrganizationName"
+            }
+          }
+        ]
+      }
+    },
+    "TrailBucket": {
+      "Type": "AWS::S3::Bucket",
+      "Properties": {
+        "BucketName": {
+          "Fn::Sub": [
+            "cris-sme-${Prefix}-${AWS::AccountId}-${AWS::Region}-${LabSuffix}",
+            {
+              "Prefix": "sigi-trail"
+            }
+          ]
+        },
+        "BucketEncryption": {
+          "ServerSideEncryptionConfiguration": [
+            {
+              "ServerSideEncryptionByDefault": {
+                "SSEAlgorithm": "AES256"
+              }
+            }
+          ]
+        },
+        "PublicAccessBlockConfiguration": {
+          "BlockPublicAcls": true,
+          "BlockPublicPolicy": true,
+          "IgnorePublicAcls": true,
+          "RestrictPublicBuckets": true
+        },
+        "VersioningConfiguration": {
+          "Status": "Enabled"
+        },
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "sigi-trail-private-bucket"
+          },
+          {
+            "Key": "cris-sme-lab",
+            "Value": "true"
+          },
+          {
+            "Key": "cris-sme-scenario",
+            "Value": {
+              "Ref": "ScenarioId"
+            }
+          },
+          {
+            "Key": "cris-sme-run-id",
+            "Value": {
+              "Ref": "LabSuffix"
+            }
+          },
+          {
+            "Key": "cris-sme-purpose",
+            "Value": "evidence-dataset"
+          },
+          {
+            "Key": "cris-sme-managed-by",
+            "Value": "cris-sme-aws-evidence-lab"
+          },
+          {
+            "Key": "organization",
+            "Value": {
+              "Ref": "OrganizationName"
+            }
+          }
+        ]
+      }
+    },
+    "TrailBucketPolicy": {
+      "Type": "AWS::S3::BucketPolicy",
+      "Properties": {
+        "Bucket": {
+          "Ref": "TrailBucket"
+        },
+        "PolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Sid": "AWSCloudTrailAclCheck",
+              "Effect": "Allow",
+              "Principal": {
+                "Service": "cloudtrail.amazonaws.com"
+              },
+              "Action": "s3:GetBucketAcl",
+              "Resource": {
+                "Fn::GetAtt": [
+                  "TrailBucket",
+                  "Arn"
+                ]
+              },
+              "Condition": {
+                "StringEquals": {
+                  "AWS:SourceArn": {
+                    "Fn::Sub": "arn:${AWS::Partition}:cloudtrail:${AWS::Region}:${AWS::AccountId}:trail/${AWS::StackName}"
+                  }
+                }
+              }
+            },
+            {
+              "Sid": "AWSCloudTrailWrite",
+              "Effect": "Allow",
+              "Principal": {
+                "Service": "cloudtrail.amazonaws.com"
+              },
+              "Action": "s3:PutObject",
+              "Resource": {
+                "Fn::Sub": "${TrailBucket.Arn}/AWSLogs/${AWS::AccountId}/*"
+              },
+              "Condition": {
+                "StringEquals": {
+                  "s3:x-amz-acl": "bucket-owner-full-control",
+                  "AWS:SourceArn": {
+                    "Fn::Sub": "arn:${AWS::Partition}:cloudtrail:${AWS::Region}:${AWS::AccountId}:trail/${AWS::StackName}"
+                  }
+                }
+              }
+            }
+          ]
+        }
+      }
+    },
+    "AuditTrail": {
+      "Type": "AWS::CloudTrail::Trail",
+      "DependsOn": "TrailBucketPolicy",
+      "Properties": {
+        "TrailName": {
+          "Ref": "LabName"
+        },
+        "S3BucketName": {
+          "Ref": "TrailBucket"
+        },
+        "IsLogging": true,
+        "IsMultiRegionTrail": true,
+        "IncludeGlobalServiceEvents": true,
+        "EnableLogFileValidation": true,
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "sigi-audit-trail"
+          },
+          {
+            "Key": "cris-sme-lab",
+            "Value": "true"
+          },
+          {
+            "Key": "cris-sme-scenario",
+            "Value": {
+              "Ref": "ScenarioId"
+            }
+          },
+          {
+            "Key": "cris-sme-run-id",
+            "Value": {
+              "Ref": "LabSuffix"
+            }
+          },
+          {
+            "Key": "cris-sme-purpose",
+            "Value": "evidence-dataset"
+          },
+          {
+            "Key": "cris-sme-managed-by",
+            "Value": "cris-sme-aws-evidence-lab"
+          },
+          {
+            "Key": "organization",
+            "Value": {
+              "Ref": "OrganizationName"
+            }
+          }
+        ]
+      }
+    },
+    "ShortRetentionLogGroup": {
+      "Type": "AWS::Logs::LogGroup",
+      "Properties": {
+        "RetentionInDays": 7,
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "sigi-short-retention-logs"
+          },
+          {
+            "Key": "cris-sme-lab",
+            "Value": "true"
+          },
+          {
+            "Key": "cris-sme-scenario",
+            "Value": {
+              "Ref": "ScenarioId"
+            }
+          },
+          {
+            "Key": "cris-sme-run-id",
+            "Value": {
+              "Ref": "LabSuffix"
+            }
+          },
+          {
+            "Key": "cris-sme-purpose",
+            "Value": "evidence-dataset"
+          },
+          {
+            "Key": "cris-sme-managed-by",
+            "Value": "cris-sme-aws-evidence-lab"
+          },
+          {
+            "Key": "organization",
+            "Value": {
+              "Ref": "OrganizationName"
+            }
+          }
+        ]
+      }
+    },
+    "CpuAlarm": {
+      "Type": "AWS::CloudWatch::Alarm",
+      "Properties": {
+        "AlarmDescription": "SIGI controlled lab CPUUtilization signal",
+        "MetricName": "CPUUtilization",
+        "Namespace": "AWS/EC2",
+        "Statistic": "Average",
+        "Period": 300,
+        "EvaluationPeriods": 1,
+        "Threshold": 1,
+        "ComparisonOperator": "GreaterThanThreshold",
+        "TreatMissingData": "notBreaching",
+        "Dimensions": [
+          {
+            "Name": "InstanceId",
+            "Value": {
+              "Ref": "WeakWorkload"
+            }
+          }
+        ],
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "sigi-cpuutilization-alarm"
+          },
+          {
+            "Key": "cris-sme-lab",
+            "Value": "true"
+          },
+          {
+            "Key": "cris-sme-scenario",
+            "Value": {
+              "Ref": "ScenarioId"
+            }
+          },
+          {
+            "Key": "cris-sme-run-id",
+            "Value": {
+              "Ref": "LabSuffix"
+            }
+          },
+          {
+            "Key": "cris-sme-purpose",
+            "Value": "evidence-dataset"
+          },
+          {
+            "Key": "cris-sme-managed-by",
+            "Value": "cris-sme-aws-evidence-lab"
+          },
+          {
+            "Key": "organization",
+            "Value": {
+              "Ref": "OrganizationName"
+            }
+          }
+        ]
+      }
+    },
+    "StatusAlarm": {
+      "Type": "AWS::CloudWatch::Alarm",
+      "Properties": {
+        "AlarmDescription": "SIGI controlled lab StatusCheckFailed signal",
+        "MetricName": "StatusCheckFailed",
+        "Namespace": "AWS/EC2",
+        "Statistic": "Average",
+        "Period": 300,
+        "EvaluationPeriods": 1,
+        "Threshold": 1,
+        "ComparisonOperator": "GreaterThanThreshold",
+        "TreatMissingData": "notBreaching",
+        "Dimensions": [
+          {
+            "Name": "InstanceId",
+            "Value": {
+              "Ref": "WeakWorkload"
+            }
+          }
+        ],
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "sigi-statuscheckfailed-alarm"
+          },
+          {
+            "Key": "cris-sme-lab",
+            "Value": "true"
+          },
+          {
+            "Key": "cris-sme-scenario",
+            "Value": {
+              "Ref": "ScenarioId"
+            }
+          },
+          {
+            "Key": "cris-sme-run-id",
+            "Value": {
+              "Ref": "LabSuffix"
+            }
+          },
+          {
+            "Key": "cris-sme-purpose",
+            "Value": "evidence-dataset"
+          },
+          {
+            "Key": "cris-sme-managed-by",
+            "Value": "cris-sme-aws-evidence-lab"
+          },
+          {
+            "Key": "organization",
+            "Value": {
+              "Ref": "OrganizationName"
+            }
+          }
+        ]
+      }
+    },
+    "NetworkAlarm": {
+      "Type": "AWS::CloudWatch::Alarm",
+      "Properties": {
+        "AlarmDescription": "SIGI controlled lab NetworkIn signal",
+        "MetricName": "NetworkIn",
+        "Namespace": "AWS/EC2",
+        "Statistic": "Average",
+        "Period": 300,
+        "EvaluationPeriods": 1,
+        "Threshold": 1,
+        "ComparisonOperator": "GreaterThanThreshold",
+        "TreatMissingData": "notBreaching",
+        "Dimensions": [
+          {
+            "Name": "InstanceId",
+            "Value": {
+              "Ref": "WeakWorkload"
+            }
+          }
+        ],
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "sigi-networkin-alarm"
+          },
+          {
+            "Key": "cris-sme-lab",
+            "Value": "true"
+          },
+          {
+            "Key": "cris-sme-scenario",
+            "Value": {
+              "Ref": "ScenarioId"
+            }
+          },
+          {
+            "Key": "cris-sme-run-id",
+            "Value": {
+              "Ref": "LabSuffix"
+            }
+          },
+          {
+            "Key": "cris-sme-purpose",
+            "Value": "evidence-dataset"
+          },
+          {
+            "Key": "cris-sme-managed-by",
+            "Value": "cris-sme-aws-evidence-lab"
+          },
+          {
+            "Key": "organization",
+            "Value": {
+              "Ref": "OrganizationName"
+            }
+          }
+        ]
+      }
+    },
+    "DatabaseSecret": {
+      "Type": "AWS::SecretsManager::Secret",
+      "Properties": {
+        "Description": "Synthetic SIGI lab database credentials; no customer data",
+        "GenerateSecretString": {
+          "SecretStringTemplate": "{\"username\":\"sigiadmin\"}",
+          "GenerateStringKey": "password",
+          "PasswordLength": 24,
+          "ExcludePunctuation": true
+        },
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "sigi-database-secret"
+          },
+          {
+            "Key": "cris-sme-lab",
+            "Value": "true"
+          },
+          {
+            "Key": "cris-sme-scenario",
+            "Value": {
+              "Ref": "ScenarioId"
+            }
+          },
+          {
+            "Key": "cris-sme-run-id",
+            "Value": {
+              "Ref": "LabSuffix"
+            }
+          },
+          {
+            "Key": "cris-sme-purpose",
+            "Value": "evidence-dataset"
+          },
+          {
+            "Key": "cris-sme-managed-by",
+            "Value": "cris-sme-aws-evidence-lab"
+          },
+          {
+            "Key": "organization",
+            "Value": {
+              "Ref": "OrganizationName"
+            }
+          }
+        ]
+      }
+    },
+    "DatabaseSubnetGroup": {
+      "Type": "AWS::RDS::DBSubnetGroup",
+      "Properties": {
+        "DBSubnetGroupDescription": "SIGI controlled lab public database subnets",
+        "SubnetIds": [
+          {
+            "Ref": "Subnet"
+          },
+          {
+            "Ref": "PublicSubnetB"
+          }
+        ],
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "sigi-db-subnets"
+          },
+          {
+            "Key": "cris-sme-lab",
+            "Value": "true"
+          },
+          {
+            "Key": "cris-sme-scenario",
+            "Value": {
+              "Ref": "ScenarioId"
+            }
+          },
+          {
+            "Key": "cris-sme-run-id",
+            "Value": {
+              "Ref": "LabSuffix"
+            }
+          },
+          {
+            "Key": "cris-sme-purpose",
+            "Value": "evidence-dataset"
+          },
+          {
+            "Key": "cris-sme-managed-by",
+            "Value": "cris-sme-aws-evidence-lab"
+          },
+          {
+            "Key": "organization",
+            "Value": {
+              "Ref": "OrganizationName"
+            }
+          }
+        ]
+      }
+    },
+    "WeakDatabase": {
+      "Type": "AWS::RDS::DBInstance",
+      "DeletionPolicy": "Delete",
+      "Properties": {
+        "Engine": "postgres",
+        "DBInstanceClass": "db.t3.micro",
+        "AllocatedStorage": "20",
+        "StorageType": "gp2",
+        "StorageEncrypted": false,
+        "PubliclyAccessible": true,
+        "BackupRetentionPeriod": 0,
+        "DeletionProtection": false,
+        "MultiAZ": false,
+        "AutoMinorVersionUpgrade": false,
+        "MasterUsername": "sigiadmin",
+        "ManageMasterUserPassword": true,
+        "DBSubnetGroupName": {
+          "Ref": "DatabaseSubnetGroup"
+        },
+        "VPCSecurityGroups": [
+          {
+            "Ref": "OpenAdminSecurityGroup"
+          }
+        ],
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "sigi-weak-database"
+          },
+          {
+            "Key": "cris-sme-lab",
+            "Value": "true"
+          },
+          {
+            "Key": "cris-sme-scenario",
+            "Value": {
+              "Ref": "ScenarioId"
+            }
+          },
+          {
+            "Key": "cris-sme-run-id",
+            "Value": {
+              "Ref": "LabSuffix"
+            }
+          },
+          {
+            "Key": "cris-sme-purpose",
+            "Value": "evidence-dataset"
+          },
+          {
+            "Key": "cris-sme-managed-by",
+            "Value": "cris-sme-aws-evidence-lab"
+          },
+          {
+            "Key": "organization",
+            "Value": {
+              "Ref": "OrganizationName"
+            }
+          }
+        ]
+      }
+    },
+    "IncidentRunbook": {
+      "Type": "AWS::SSM::Document",
+      "Properties": {
+        "DocumentType": "Automation",
+        "Content": {
+          "schemaVersion": "0.3",
+          "description": "SIGI synthetic incident triage runbook",
+          "mainSteps": [
+            {
+              "name": "RecordTriage",
+              "action": "aws:executeScript",
+              "inputs": {
+                "Runtime": "python3.11",
+                "Handler": "handler",
+                "Script": "def handler(events, context):\n    return {'status': 'triage-recorded'}"
+              }
+            }
+          ]
+        },
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "sigi-incident-runbook"
+          },
+          {
+            "Key": "cris-sme-lab",
+            "Value": "true"
+          },
+          {
+            "Key": "cris-sme-scenario",
+            "Value": {
+              "Ref": "ScenarioId"
+            }
+          },
+          {
+            "Key": "cris-sme-run-id",
+            "Value": {
+              "Ref": "LabSuffix"
+            }
+          },
+          {
+            "Key": "cris-sme-purpose",
+            "Value": "evidence-dataset"
+          },
+          {
+            "Key": "cris-sme-managed-by",
+            "Value": "cris-sme-aws-evidence-lab"
+          },
+          {
+            "Key": "organization",
+            "Value": {
+              "Ref": "OrganizationName"
+            }
+          }
+        ]
+      }
+    },
+    "ApplicationCluster": {
+      "Type": "AWS::ECS::Cluster",
+      "Properties": {
+        "ClusterName": {
+          "Fn::Sub": "sigi-app-${LabSuffix}"
+        },
+        "ClusterSettings": [
+          {
+            "Name": "containerInsights",
+            "Value": "disabled"
+          }
+        ],
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "sigi-application-cluster"
+          },
+          {
+            "Key": "cris-sme-lab",
+            "Value": "true"
+          },
+          {
+            "Key": "cris-sme-scenario",
+            "Value": {
+              "Ref": "ScenarioId"
+            }
+          },
+          {
+            "Key": "cris-sme-run-id",
+            "Value": {
+              "Ref": "LabSuffix"
+            }
+          },
+          {
+            "Key": "cris-sme-purpose",
+            "Value": "evidence-dataset"
+          },
+          {
+            "Key": "cris-sme-managed-by",
+            "Value": "cris-sme-aws-evidence-lab"
+          },
+          {
+            "Key": "organization",
+            "Value": {
+              "Ref": "OrganizationName"
+            }
+          }
+        ]
+      }
+    },
+    "ClinicalThingGroup": {
+      "Type": "AWS::IoT::ThingGroup",
+      "Properties": {
+        "ThingGroupName": {
+          "Fn::Sub": "sigi-clinical-${LabSuffix}"
+        },
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "sigi-clinical-iot-group"
+          },
+          {
+            "Key": "cris-sme-lab",
+            "Value": "true"
+          },
+          {
+            "Key": "cris-sme-scenario",
+            "Value": {
+              "Ref": "ScenarioId"
+            }
+          },
+          {
+            "Key": "cris-sme-run-id",
+            "Value": {
+              "Ref": "LabSuffix"
+            }
+          },
+          {
+            "Key": "cris-sme-purpose",
+            "Value": "evidence-dataset"
+          },
+          {
+            "Key": "cris-sme-managed-by",
+            "Value": "cris-sme-aws-evidence-lab"
+          },
+          {
+            "Key": "organization",
+            "Value": {
+              "Ref": "OrganizationName"
+            }
+          }
+        ]
+      }
+    },
+    "ClinicalSensorOne": {
+      "Type": "AWS::IoT::Thing",
+      "Properties": {
+        "ThingName": {
+          "Fn::Sub": "sigi-sensor-01-${LabSuffix}"
+        },
+        "AttributePayload": {
+          "Attributes": {
+            "environment": "controlled-lab",
+            "organization": "SIGI-Technologies"
+          }
+        }
+      }
+    },
+    "ClinicalSensorTwo": {
+      "Type": "AWS::IoT::Thing",
+      "Properties": {
+        "ThingName": {
+          "Fn::Sub": "sigi-sensor-02-${LabSuffix}"
+        },
+        "AttributePayload": {
+          "Attributes": {
+            "environment": "controlled-lab",
+            "organization": "SIGI-Technologies"
+          }
+        }
+      }
+    },
+    "ClinicalGateway": {
+      "Type": "AWS::IoT::Thing",
+      "Properties": {
+        "ThingName": {
+          "Fn::Sub": "sigi-gateway-01-${LabSuffix}"
+        },
+        "AttributePayload": {
+          "Attributes": {
+            "environment": "controlled-lab",
+            "organization": "SIGI-Technologies"
+          }
+        }
+      }
+    },
+    "OverbroadIotPolicy": {
+      "Type": "AWS::IoT::Policy",
+      "Properties": {
+        "PolicyName": {
+          "Fn::Sub": "sigi-overbroad-${LabSuffix}"
+        },
+        "PolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "Action": "iot:*",
+              "Resource": "*"
+            }
+          ]
+        },
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "sigi-overbroad-iot-policy"
+          },
+          {
+            "Key": "cris-sme-lab",
+            "Value": "true"
+          },
+          {
+            "Key": "cris-sme-scenario",
+            "Value": {
+              "Ref": "ScenarioId"
+            }
+          },
+          {
+            "Key": "cris-sme-run-id",
+            "Value": {
+              "Ref": "LabSuffix"
+            }
+          },
+          {
+            "Key": "cris-sme-purpose",
+            "Value": "evidence-dataset"
+          },
+          {
+            "Key": "cris-sme-managed-by",
+            "Value": "cris-sme-aws-evidence-lab"
+          },
+          {
+            "Key": "organization",
+            "Value": {
+              "Ref": "OrganizationName"
+            }
+          }
+        ]
+      }
+    }
+  },
+  "Outputs": {
+    "VpcId": {
+      "Value": {
+        "Ref": "Vpc"
+      }
+    },
+    "ScenarioId": {
+      "Value": {
+        "Ref": "ScenarioId"
+      }
+    },
+    "WeakInstanceId": {
+      "Value": {
+        "Ref": "WeakWorkload"
+      }
+    },
+    "DatabaseEndpoint": {
+      "Value": {
+        "Fn::GetAtt": [
+          "WeakDatabase",
+          "Endpoint.Address"
+        ]
+      }
+    },
+    "PublicBucketName": {
+      "Value": {
+        "Ref": "PublicDataBucket"
+      }
+    }
+  }
+}

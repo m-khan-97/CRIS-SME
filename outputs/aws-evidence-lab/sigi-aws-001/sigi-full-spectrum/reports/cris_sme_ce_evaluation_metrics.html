@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>CRIS-SME Cyber Essentials Evaluation Metrics</title>
+    <style>
+      :root {
+        --bg: #f6f8fb;
+        --ink: #172033;
+        --muted: #617083;
+        --panel: #ffffff;
+        --line: #d8e2ec;
+        --accent: #0f766e;
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        background: var(--bg);
+        color: var(--ink);
+        font-family: "IBM Plex Sans", "Segoe UI", sans-serif;
+      }
+      main { max-width: 1220px; margin: 0 auto; padding: 28px 18px 56px; }
+      header { border-bottom: 1px solid var(--line); padding-bottom: 18px; margin-bottom: 18px; }
+      h1 { margin: 0; font-size: clamp(1.7rem, 4vw, 2.45rem); letter-spacing: 0; }
+      h2 { margin: 0 0 12px; font-size: 1.25rem; letter-spacing: 0; }
+      p { line-height: 1.55; overflow-wrap: anywhere; }
+      .muted { color: var(--muted); }
+      .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 190px), 1fr)); gap: 12px; }
+      .panel {
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        padding: 14px;
+        margin-bottom: 14px;
+        overflow: hidden;
+      }
+      .metric { font-size: 1.55rem; font-weight: 800; margin: 2px 0; overflow-wrap: anywhere; }
+      table { width: 100%; border-collapse: collapse; background: #fff; }
+      th, td { border-bottom: 1px solid var(--line); padding: 9px; text-align: left; vertical-align: top; overflow-wrap: anywhere; }
+      th { color: var(--muted); font-size: 0.78rem; text-transform: uppercase; }
+      .tables { display: grid; gap: 14px; }
+      footer { color: var(--muted); margin-top: 20px; font-size: 0.9rem; }
+    </style>
+  </head>
+  <body>
+    <main>
+      <header>
+        <h1>Cyber Essentials Evaluation Metrics</h1>
+        <p class="muted">Paper-ready measurements for CRIS-SME CE pre-population, review, observability, and evidence gaps.</p>
+      </header>
+
+      <section class="panel">
+        <h2>Evaluation Overview</h2>
+        <div class="grid">
+          <div class="panel"><div class="metric">106</div><div><strong>Questions</strong></div><div class="muted">mapped CE entries</div></div>
+          <div class="panel"><div class="metric">62</div><div><strong>Technical</strong></div><div class="muted">technical-control entries</div></div>
+          <div class="panel"><div class="metric">26.42%</div><div><strong>Cloud Observable</strong></div><div class="muted">28 entries</div></div>
+          <div class="panel"><div class="metric">35.48%</div><div><strong>Technical Cloud Observable</strong></div><div class="muted">22 entries</div></div>
+          <div class="panel"><div class="metric">0.0%</div><div><strong>Reviewed</strong></div><div class="muted">0 entries</div></div>
+          <div class="panel"><div class="metric">0.0%</div><div><strong>Human Agreement</strong></div><div class="muted">0 of 0</div></div>
+          <div class="panel"><div class="metric">0.0%</div><div><strong>Draft Acceptance</strong></div><div class="muted">0 of 0 AI-assisted</div></div>
+        </div>
+      </section>
+
+      <section class="panel">
+        <h2>Review Outcomes</h2>
+        <div class="grid">
+          <div class="panel"><div class="metric">0</div><div><strong>Accepted</strong></div><div class="muted">reviewer accepted</div></div>
+          <div class="panel"><div class="metric">0</div><div><strong>Overrides</strong></div><div class="muted">reviewer changed</div></div>
+          <div class="panel"><div class="metric">0</div><div><strong>Needs Evidence</strong></div><div class="muted">blocked entries</div></div>
+          <div class="panel"><div class="metric">106</div><div><strong>Pending</strong></div><div class="muted">awaiting review</div></div>
+        </div>
+      </section>
+
+      <section class="panel tables">
+        <h2>Paper Tables</h2>
+        <div><h2>Observability By Evidence Class</h2><table><thead><tr><th>Count</th><th>Label</th><th>Rate</th></tr></thead><tbody><tr><td>5</td><td>direct_cloud</td><td>4.72</td></tr><tr><td>24</td><td>endpoint_required</td><td>22.64</td></tr><tr><td>23</td><td>inferred_cloud</td><td>21.7</td></tr><tr><td>35</td><td>manual_required</td><td>33.02</td></tr><tr><td>19</td><td>policy_required</td><td>17.92</td></tr></tbody></table></div>
+        <div><h2>Technical Observability</h2><table><thead><tr><th>Count</th><th>Label</th><th>Rate</th></tr></thead><tbody><tr><td>5</td><td>direct_cloud</td><td>8.06</td></tr><tr><td>21</td><td>endpoint_required</td><td>33.87</td></tr><tr><td>17</td><td>inferred_cloud</td><td>27.42</td></tr><tr><td>1</td><td>manual_required</td><td>1.61</td></tr><tr><td>18</td><td>policy_required</td><td>29.03</td></tr></tbody></table></div>
+        <div><h2>Proposed Answers</h2><table><thead><tr><th>Count</th><th>Label</th><th>Rate</th></tr></thead><tbody><tr><td>78</td><td>Cannot determine</td><td>73.58</td></tr><tr><td>24</td><td>No</td><td>22.64</td></tr><tr><td>4</td><td>Yes</td><td>3.77</td></tr></tbody></table></div>
+        <div><h2>Final Reviewer Answers</h2><table><thead><tr><th>Count</th><th>Label</th><th>Rate</th></tr></thead><tbody><tr><td>106</td><td>pending_human_review</td><td>100.0</td></tr></tbody></table></div>
+        <div><h2>Section Coverage</h2><table><thead><tr><th>Cloud Supported Count</th><th>Cloud Supported Rate</th><th>Question Count</th><th>Reviewed Count</th><th>Section</th></tr></thead><tbody><tr><td>0</td><td>0.0</td><td>2</td><td>0</td><td>certificates</td></tr><tr><td>4</td><td>28.57</td><td>14</td><td>0</td><td>firewalls</td></tr><tr><td>0</td><td>0.0</td><td>3</td><td>0</td><td>insurance</td></tr><tr><td>0</td><td>0.0</td><td>5</td><td>0</td><td>malware_protection</td></tr><tr><td>6</td><td>33.33</td><td>18</td><td>0</td><td>scope_of_assessment</td></tr><tr><td>4</td><td>40.0</td><td>10</td><td>0</td><td>secure_configuration</td></tr><tr><td>3</td><td>18.75</td><td>16</td><td>0</td><td>security_update_management</td></tr><tr><td>11</td><td>64.71</td><td>17</td><td>0</td><td>user_access_control</td></tr><tr><td>0</td><td>0.0</td><td>21</td><td>0</td><td>your_company</td></tr></tbody></table></div>
+        <div><h2>Review Outcomes</h2><table><thead><tr><th>Count</th><th>Label</th><th>Rate</th></tr></thead><tbody><tr><td>106</td><td>pending</td><td>100.0</td></tr></tbody></table></div>
+        <div><h2>Control Failure Contribution</h2><table><thead><tr><th>Affected Question Count</th><th>Control Id</th><th>Max Linked Score</th><th>Sample Finding Titles</th></tr></thead><tbody><tr><td>9</td><td>IAM-001</td><td>67.97</td><td>Privileged role assignments without MFA enforcement</td></tr><tr><td>6</td><td>NET-002</td><td>44.71</td><td>Network security group rules are broader than expected</td></tr><tr><td>5</td><td>NET-001</td><td>72.12</td><td>Administrative services are exposed to the public internet</td></tr><tr><td>4</td><td>CMP-001</td><td>42.69</td><td>Critical workloads remain unpatched beyond acceptable risk tolerance</td></tr><tr><td>3</td><td>IAM-003</td><td>23.34</td><td>Stale service principals or credentials require review</td></tr><tr><td>3</td><td>IAM-005</td><td>4.57</td><td>Identity governance observability is partial for this assessment scope</td></tr><tr><td>2</td><td>DATA-001</td><td>48.35</td><td>Public storage access increases data exposure risk</td></tr><tr><td>1</td><td>CMP-003</td><td>38.49</td><td>Workload hardening baseline coverage is incomplete</td></tr><tr><td>1</td><td>GOV-003</td><td>33.88</td><td>Policy assignment coverage is below the baseline governance threshold</td></tr><tr><td>1</td><td>GOV-004</td><td>17.87</td><td>Orphaned resources increase governance and cost hygiene risk</td></tr></tbody></table></div>
+      </section>
+
+      <section class="panel">
+        <h2>Evidence Gaps</h2>
+        <div><h2>Evidence Gap Taxonomy</h2><table><thead><tr><th>Count</th><th>Description</th><th>Evidence Class</th><th>Rate</th><th>Sample Question Ids</th></tr></thead><tbody><tr><td>24</td><td>Endpoint, MDM, EDR, patch, or local device evidence required.</td><td>endpoint_required</td><td>22.64</td><td>A2.6, A2.6.1, A2.8, A4.1.1, A4.1.2, A5.1, A5.3, A5.8</td></tr><tr><td>35</td><td>Applicant scoping, company context, or final attestation required.</td><td>manual_required</td><td>33.02</td><td>A1.1, A1.2, A1.3, A1.4, A1.5, A1.5.1, A1.6, A1.6.1</td></tr><tr><td>0</td><td>Required signal is outside current CRIS-SME observable evidence paths.</td><td>not_observable</td><td>0.0</td><td></td></tr><tr><td>19</td><td>Policy, process, approval, or business-need evidence required.</td><td>policy_required</td><td>17.92</td><td>A1.16, A4.2, A4.2.1, A4.3, A4.4, A4.5, A4.6, A4.8</td></tr></tbody></table></div>
+      </section>
+
+      <section class="panel">
+        <h2>Status Counts</h2>
+        <div><h2>Proposed Status</h2><table><thead><tr><th>Count</th><th>Label</th><th>Rate</th></tr></thead><tbody><tr><td>24</td><td>endpoint_required</td><td>22.64</td></tr><tr><td>35</td><td>manual_required</td><td>33.02</td></tr><tr><td>19</td><td>policy_required</td><td>17.92</td></tr><tr><td>4</td><td>supported_no_issue</td><td>3.77</td></tr><tr><td>24</td><td>supported_risk_found</td><td>22.64</td></tr></tbody></table></div>
+      </section>
+
+      <footer>No impact. CE evaluation metrics are downstream measurements and never change CRIS-SME deterministic findings, priorities, or scores.</footer>
+    </main>
+  </body>
+</html>

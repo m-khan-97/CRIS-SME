@@ -1,0 +1,242 @@
+{
+  "pack_name": "CRIS-SME Cyber Insurance Evidence Pack",
+  "jurisdiction": "United Kingdom",
+  "generated_at": "2026-07-04T18:15:03.071496Z",
+  "collector_mode": "aws",
+  "overall_risk_score": 38.79,
+  "organizations": [
+    {
+      "organization_id": "aws-000832363767",
+      "organization_name": "SIGI Technologies",
+      "provider": "aws",
+      "sector": "Technology Services"
+    }
+  ],
+  "readiness_summary": {
+    "question_count": 6,
+    "met_count": 0,
+    "partial_count": 3,
+    "not_met_count": 3,
+    "unknown_count": 0,
+    "readiness_score": 25.0
+  },
+  "questions": [
+    {
+      "question_id": "INS-001",
+      "theme": "Access security",
+      "question": "Do you enforce multi-factor authentication for privileged and administrative accounts?",
+      "status": "not_met",
+      "insurer_relevance": "UK cyber insurers routinely ask whether administrator access is protected by MFA because privileged credential compromise drives high-impact claims.",
+      "primary_control_id": "IAM-001",
+      "related_controls": [
+        "IAM-001"
+      ],
+      "supporting_findings": [
+        {
+          "control_id": "IAM-001",
+          "title": "Privileged role assignments without MFA enforcement",
+          "priority": "High",
+          "score": 67.97,
+          "evidence": [
+            "1 privileged account(s) do not have MFA enabled",
+            "Conditional access for privileged administrators was not observable and is treated as unmet for deterministic scoring"
+          ],
+          "remediation_summary": "Require MFA and admin-focused conditional access for privileged identities."
+        }
+      ],
+      "evidence_statement": "CRIS-SME identified material evidence that this control area is not fully met. The strongest linked gap is IAM-001 at 67.97 risk (high priority).",
+      "recommended_next_step": "Require MFA and admin-focused conditional access for privileged identities."
+    },
+    {
+      "question_id": "INS-002",
+      "theme": "Least privilege",
+      "question": "Do you limit privileged access and review high-risk permissions regularly?",
+      "status": "partial",
+      "insurer_relevance": "Insurers assess whether privileged access is narrowly scoped and reviewed because excessive privilege expands ransomware and fraud blast radius.",
+      "primary_control_id": "IAM-002",
+      "related_controls": [
+        "IAM-002",
+        "IAM-004",
+        "IAM-005"
+      ],
+      "supporting_findings": [
+        {
+          "control_id": "IAM-005",
+          "title": "Identity governance observability is partial for this assessment scope",
+          "priority": "Monitor",
+          "score": 4.57,
+          "evidence": [
+            "Subscription-scoped evidence was collected for privileged role assignments",
+            "Tenant-wide Entra controls such as conditional access were not directly observable in this run",
+            "The signed-in assessment identity exposed 1 Entra directory role(s)",
+            "The tenant directory-role catalog was partially visible with 43 active role entry(ies)"
+          ],
+          "remediation_summary": "Broaden tenant-level identity evidence collection before treating IAM coverage as complete."
+        }
+      ],
+      "evidence_statement": "CRIS-SME identified partial evidence of control weakness or incomplete observability. The strongest linked gap is IAM-005 at 4.57 risk (monitor priority).",
+      "recommended_next_step": "Broaden tenant-level identity evidence collection before treating IAM coverage as complete."
+    },
+    {
+      "question_id": "INS-003",
+      "theme": "Perimeter exposure",
+      "question": "Are administrative services and internet-facing rules restricted to least-privilege network access?",
+      "status": "not_met",
+      "insurer_relevance": "Publicly reachable administrative services and permissive firewall rules are common signals in cyber insurance questionnaires and underwriting reviews.",
+      "primary_control_id": "NET-001",
+      "related_controls": [
+        "NET-001",
+        "NET-002"
+      ],
+      "supporting_findings": [
+        {
+          "control_id": "NET-001",
+          "title": "Administrative services are exposed to the public internet",
+          "priority": "High",
+          "score": 72.12,
+          "evidence": [
+            "1 asset(s) expose RDP to the public internet",
+            "1 asset(s) expose SSH to the public internet"
+          ],
+          "remediation_summary": "Restrict SSH and RDP exposure with private access paths, VPN, or just-in-time controls."
+        },
+        {
+          "control_id": "NET-002",
+          "title": "Network security group rules are broader than expected",
+          "priority": "Planned",
+          "score": 44.71,
+          "evidence": [
+            "2 permissive NSG rule(s) were identified"
+          ],
+          "remediation_summary": "Tighten overly permissive network rules to least-privilege source and port scopes."
+        }
+      ],
+      "evidence_statement": "CRIS-SME identified material evidence that this control area is not fully met. The strongest linked gap is NET-001 at 72.12 risk (high priority).",
+      "recommended_next_step": "Restrict SSH and RDP exposure with private access paths, VPN, or just-in-time controls."
+    },
+    {
+      "question_id": "INS-004",
+      "theme": "Patch and malware protection",
+      "question": "Are critical workloads patched promptly and protected with endpoint or anti-malware controls?",
+      "status": "partial",
+      "insurer_relevance": "Patch latency and missing endpoint protection are frequent prerequisites for claims involving ransomware and exploitation of known vulnerabilities.",
+      "primary_control_id": "CMP-001",
+      "related_controls": [
+        "CMP-001",
+        "CMP-002",
+        "CMP-003",
+        "CMP-005"
+      ],
+      "supporting_findings": [
+        {
+          "control_id": "CMP-001",
+          "title": "Critical workloads remain unpatched beyond acceptable risk tolerance",
+          "priority": "Planned",
+          "score": 42.69,
+          "evidence": [
+            "1 critical VM(s) require urgent patching"
+          ],
+          "remediation_summary": "Patch critical workloads and enforce a stronger recurring patch policy."
+        },
+        {
+          "control_id": "CMP-002",
+          "title": "Endpoint protection coverage is below the expected workload baseline",
+          "priority": "Planned",
+          "score": 39.53,
+          "evidence": [
+            "Endpoint protection coverage is approximately 0%"
+          ],
+          "remediation_summary": "Deploy endpoint protection or security agents to uncovered workloads."
+        },
+        {
+          "control_id": "CMP-003",
+          "title": "Workload hardening baseline coverage is incomplete",
+          "priority": "Planned",
+          "score": 38.49,
+          "evidence": [
+            "Hardened baseline coverage is approximately 0%"
+          ],
+          "remediation_summary": "Apply a hardened workload baseline across compute resources and administrative settings."
+        }
+      ],
+      "evidence_statement": "CRIS-SME identified partial evidence of control weakness or incomplete observability. The strongest linked gap is CMP-001 at 42.69 risk (planned priority).",
+      "recommended_next_step": "Patch critical workloads and enforce a stronger recurring patch policy."
+    },
+    {
+      "question_id": "INS-005",
+      "theme": "Backup and recovery",
+      "question": "Do you maintain resilient backups for critical workloads and business data?",
+      "status": "not_met",
+      "insurer_relevance": "Backup recoverability is a core underwriting concern because it directly affects business interruption exposure and ransom resilience.",
+      "primary_control_id": "DATA-003",
+      "related_controls": [
+        "DATA-003",
+        "CMP-004"
+      ],
+      "supporting_findings": [
+        {
+          "control_id": "DATA-003",
+          "title": "Backup and retention coverage fall below resilience expectations",
+          "priority": "Planned",
+          "score": 37.58,
+          "evidence": [
+            "Backup coverage is only 60%",
+            "Retention policy coverage is only 60%"
+          ],
+          "remediation_summary": "Increase backup and retention coverage for business-critical data stores."
+        },
+        {
+          "control_id": "CMP-004",
+          "title": "Workload backup agent coverage is below resilience expectations",
+          "priority": "Planned",
+          "score": 36.85,
+          "evidence": [
+            "Workload backup agent coverage is approximately 0%"
+          ],
+          "remediation_summary": "Enable workload backup protections for critical virtual machines and services."
+        }
+      ],
+      "evidence_statement": "CRIS-SME identified material evidence that this control area is not fully met. The strongest linked gap is DATA-003 at 37.58 risk (planned priority).",
+      "recommended_next_step": "Increase backup and retention coverage for business-critical data stores."
+    },
+    {
+      "question_id": "INS-006",
+      "theme": "Monitoring and response",
+      "question": "Do you retain logs, generate security alerts, and maintain incident response procedures?",
+      "status": "partial",
+      "insurer_relevance": "Cyber insurance applications often ask for logging, alerting, and response evidence to gauge the organisation's ability to detect and contain incidents.",
+      "primary_control_id": "MON-001",
+      "related_controls": [
+        "MON-001",
+        "MON-002",
+        "MON-003",
+        "MON-004"
+      ],
+      "supporting_findings": [
+        {
+          "control_id": "MON-001",
+          "title": "Activity log retention is below governance and investigation expectations",
+          "priority": "Planned",
+          "score": 35.79,
+          "evidence": [
+            "Activity logs are retained for only 0 day(s)"
+          ],
+          "remediation_summary": "Increase log retention to support investigation, governance review, and evidence preservation."
+        },
+        {
+          "control_id": "MON-003",
+          "title": "Security monitoring coverage is below the expected baseline",
+          "priority": "Planned",
+          "score": 36.94,
+          "evidence": [
+            "Security monitoring coverage is approximately 0%"
+          ],
+          "remediation_summary": "Expand security monitoring coverage across workloads and key cloud services."
+        }
+      ],
+      "evidence_statement": "CRIS-SME identified partial evidence of control weakness or incomplete observability. The strongest linked gap is MON-001 at 35.79 risk (planned priority).",
+      "recommended_next_step": "Increase log retention to support investigation, governance review, and evidence preservation."
+    }
+  ],
+  "disclaimer": "This evidence pack is an insurer-facing technical summary derived from the deterministic CRIS-SME assessment. It is not legal, regulatory, or insurance advice and should be reviewed alongside the organisation's formal insurance application."
+}

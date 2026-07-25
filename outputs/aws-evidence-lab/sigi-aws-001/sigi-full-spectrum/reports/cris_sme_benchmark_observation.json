@@ -1,0 +1,20 @@
+{
+  "observation_id": "aws-2026-07-04T18:15:03.071496Z",
+  "generated_at": "2026-07-04T18:15:03.071496Z",
+  "organization_label": "SIGI Technologies",
+  "provider": "aws",
+  "sector": "Technology Services",
+  "collector_mode": "aws",
+  "sample_source": "aws_live",
+  "organization_count": 1,
+  "overall_risk_score": 38.79,
+  "category_scores": {
+    "IAM": 31.96,
+    "Network": 52.92,
+    "Data": 42.76,
+    "Monitoring/Logging": 36.36,
+    "Compute/Workloads": 39.39,
+    "Cost/Governance Hygiene": 22.71,
+    "Healthcare IoT": 26.4
+  }
+}

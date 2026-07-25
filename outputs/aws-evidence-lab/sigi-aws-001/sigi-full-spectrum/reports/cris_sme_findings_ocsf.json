@@ -1,0 +1,3808 @@
+[
+  {
+    "activity_id": 1,
+    "activity_name": "Create",
+    "category_uid": 2,
+    "category_name": "Findings",
+    "class_uid": 2004,
+    "class_name": "Detection Finding",
+    "type_uid": 200401,
+    "type_name": "Detection Finding: Create",
+    "time": 1783188903071,
+    "time_dt": "2026-07-04T18:15:03.071496Z",
+    "severity_id": 5,
+    "severity": "Critical",
+    "status": "open",
+    "status_id": 1,
+    "count": 1,
+    "metadata": {
+      "version": "1.1.0",
+      "event_code": "finding",
+      "uid": "fdg_514b77f2a83791",
+      "correlation_uid": "run_29ea23f0b2d8ece7",
+      "processed_time": 1783188903071,
+      "processed_time_dt": "2026-07-04T18:15:03.071496Z",
+      "product": {
+        "vendor_name": "CRIS-SME",
+        "name": "CRIS-SME",
+        "feature": {
+          "name": "Risk Assessment"
+        },
+        "version": "2.0.0"
+      },
+      "profiles": [
+        "cloud",
+        "security_control"
+      ]
+    },
+    "finding_info": {
+      "uid": "fdg_514b77f2a83791",
+      "title": "Administrative services are exposed to the public internet",
+      "desc": "Deterministic scoring prioritization using severity, exposure, data sensitivity, confidence calibration, and remediation effort factors.",
+      "product_uid": "NET-001",
+      "created_time": 1783188903071,
+      "created_time_dt": "2026-07-04T18:15:03.071496Z",
+      "modified_time": 1783188903071,
+      "modified_time_dt": "2026-07-04T18:15:03.071496Z",
+      "types": [
+        "Network"
+      ]
+    },
+    "resources": [
+      {
+        "uid": "network:aws:aws-000832363767",
+        "name": "SIGI Technologies Network Surface",
+        "type": "network_surface",
+        "cloud_partition": "aws",
+        "criticality": "high",
+        "labels": [
+          "internet_exposed",
+          "criticality:high"
+        ]
+      }
+    ],
+    "evidences": [
+      {
+        "uid": "evd_fdg_514b77f2a83791_01",
+        "name": "control_evidence/NET-001",
+        "type": "observed",
+        "desc": "1 asset(s) expose RDP to the public internet",
+        "data": {
+          "finding_id": "fdg_514b77f2a83791",
+          "control_id": "NET-001",
+          "resource_scope": "000832363767",
+          "statement": "1 asset(s) expose RDP to the public internet"
+        }
+      },
+      {
+        "uid": "evd_fdg_514b77f2a83791_02",
+        "name": "control_evidence/NET-001",
+        "type": "observed",
+        "desc": "1 asset(s) expose SSH to the public internet",
+        "data": {
+          "finding_id": "fdg_514b77f2a83791",
+          "control_id": "NET-001",
+          "resource_scope": "000832363767",
+          "statement": "1 asset(s) expose SSH to the public internet"
+        }
+      }
+    ],
+    "remediation": {
+      "desc": "Restrict SSH and RDP exposure with private access paths, VPN, or just-in-time controls."
+    },
+    "cloud": {
+      "provider": "aws",
+      "account_uid": "aws-000832363767",
+      "account_name": "SIGI Technologies"
+    },
+    "unmapped": {
+      "cris_sme": {
+        "priority": "High",
+        "score": 72.12,
+        "resource_scope": "000832363767",
+        "asset_ids": [
+          "network:aws:aws-000832363767"
+        ],
+        "evidence_ids": [
+          "evd_fdg_514b77f2a83791_01",
+          "evd_fdg_514b77f2a83791_02"
+        ],
+        "evidence_quality": {
+          "observation_class": "observed",
+          "sufficiency": "unsupported",
+          "direct_evidence_count": 2,
+          "inferred_evidence_count": 0,
+          "unavailable_evidence_count": 0,
+          "provider_support": "research_preview",
+          "missing_requirements": [
+            "inbound exposure inventory",
+            "administrative path restriction evidence"
+          ]
+        },
+        "lifecycle": {
+          "status": "open",
+          "status_reason": "Active non-compliant finding in current assessment.",
+          "first_seen": "2026-07-04T18:13:19.019124Z",
+          "last_seen": "2026-07-04T18:15:03.071496Z",
+          "previous_seen": "2026-07-04T18:13:19.019124Z",
+          "is_new": false,
+          "seen_count": 2,
+          "recurrence_count": 1
+        },
+        "mapping": [
+          "CIS Azure Foundations Benchmark 6.1",
+          "ISO 27001 A.8.20",
+          "Cyber Essentials Firewalls",
+          "FCA SYSC 3.2.6R"
+        ],
+        "remediation_cost_tier": "medium",
+        "report_schema_version": "2.0.0",
+        "collector_mode": "aws"
+      }
+    }
+  },
+  {
+    "activity_id": 1,
+    "activity_name": "Create",
+    "category_uid": 2,
+    "category_name": "Findings",
+    "class_uid": 2004,
+    "class_name": "Detection Finding",
+    "type_uid": 200401,
+    "type_name": "Detection Finding: Create",
+    "time": 1783188903071,
+    "time_dt": "2026-07-04T18:15:03.071496Z",
+    "severity_id": 5,
+    "severity": "Critical",
+    "status": "open",
+    "status_id": 1,
+    "count": 1,
+    "metadata": {
+      "version": "1.1.0",
+      "event_code": "finding",
+      "uid": "fdg_81612c096e8237",
+      "correlation_uid": "run_29ea23f0b2d8ece7",
+      "processed_time": 1783188903071,
+      "processed_time_dt": "2026-07-04T18:15:03.071496Z",
+      "product": {
+        "vendor_name": "CRIS-SME",
+        "name": "CRIS-SME",
+        "feature": {
+          "name": "Risk Assessment"
+        },
+        "version": "2.0.0"
+      },
+      "profiles": [
+        "cloud",
+        "security_control"
+      ]
+    },
+    "finding_info": {
+      "uid": "fdg_81612c096e8237",
+      "title": "Privileged role assignments without MFA enforcement",
+      "desc": "Deterministic scoring prioritization using severity, exposure, data sensitivity, confidence calibration, and remediation effort factors.",
+      "product_uid": "IAM-001",
+      "created_time": 1783188903071,
+      "created_time_dt": "2026-07-04T18:15:03.071496Z",
+      "modified_time": 1783188903071,
+      "modified_time_dt": "2026-07-04T18:15:03.071496Z",
+      "types": [
+        "IAM"
+      ]
+    },
+    "resources": [
+      {
+        "uid": "identity:aws:aws-000832363767",
+        "name": "SIGI Technologies Identity",
+        "type": "identity_plane",
+        "cloud_partition": "aws",
+        "criticality": "high",
+        "labels": [
+          "criticality:high"
+        ]
+      }
+    ],
+    "evidences": [
+      {
+        "uid": "evd_fdg_81612c096e8237_01",
+        "name": "control_evidence/IAM-001",
+        "type": "observed",
+        "desc": "1 privileged account(s) do not have MFA enabled",
+        "data": {
+          "finding_id": "fdg_81612c096e8237",
+          "control_id": "IAM-001",
+          "resource_scope": "000832363767",
+          "statement": "1 privileged account(s) do not have MFA enabled"
+        }
+      },
+      {
+        "uid": "evd_fdg_81612c096e8237_02",
+        "name": "control_evidence/IAM-001",
+        "type": "observed",
+        "desc": "Conditional access for privileged administrators was not observable and is treated as unmet for deterministic scoring",
+        "data": {
+          "finding_id": "fdg_81612c096e8237",
+          "control_id": "IAM-001",
+          "resource_scope": "000832363767",
+          "statement": "Conditional access for privileged administrators was not observable and is treated as unmet for deterministic scoring"
+        }
+      }
+    ],
+    "remediation": {
+      "desc": "Require MFA and admin-focused conditional access for privileged identities."
+    },
+    "cloud": {
+      "provider": "aws",
+      "account_uid": "aws-000832363767",
+      "account_name": "SIGI Technologies"
+    },
+    "unmapped": {
+      "cris_sme": {
+        "priority": "High",
+        "score": 67.97,
+        "resource_scope": "000832363767",
+        "asset_ids": [
+          "identity:aws:aws-000832363767"
+        ],
+        "evidence_ids": [
+          "evd_fdg_81612c096e8237_01",
+          "evd_fdg_81612c096e8237_02"
+        ],
+        "evidence_quality": {
+          "observation_class": "observed",
+          "sufficiency": "unsupported",
+          "direct_evidence_count": 2,
+          "inferred_evidence_count": 0,
+          "unavailable_evidence_count": 0,
+          "provider_support": "research_preview",
+          "missing_requirements": [
+            "privileged assignment inventory",
+            "identity governance visibility context"
+          ]
+        },
+        "lifecycle": {
+          "status": "open",
+          "status_reason": "Active non-compliant finding in current assessment.",
+          "first_seen": "2026-07-04T18:13:19.019124Z",
+          "last_seen": "2026-07-04T18:15:03.071496Z",
+          "previous_seen": "2026-07-04T18:13:19.019124Z",
+          "is_new": false,
+          "seen_count": 2,
+          "recurrence_count": 1
+        },
+        "mapping": [
+          "CIS Azure Foundations Benchmark 1.4",
+          "ISO 27001 A.5.17",
+          "NIST PR.AA-02",
+          "Cyber Essentials Access control",
+          "UK GDPR Article 32",
+          "FCA SYSC 3.2.6R"
+        ],
+        "remediation_cost_tier": "free",
+        "report_schema_version": "2.0.0",
+        "collector_mode": "aws"
+      }
+    }
+  },
+  {
+    "activity_id": 1,
+    "activity_name": "Create",
+    "category_uid": 2,
+    "category_name": "Findings",
+    "class_uid": 2004,
+    "class_name": "Detection Finding",
+    "type_uid": 200401,
+    "type_name": "Detection Finding: Create",
+    "time": 1783188903071,
+    "time_dt": "2026-07-04T18:15:03.071496Z",
+    "severity_id": 4,
+    "severity": "High",
+    "status": "open",
+    "status_id": 1,
+    "count": 1,
+    "metadata": {
+      "version": "1.1.0",
+      "event_code": "finding",
+      "uid": "fdg_59af495a1834f7",
+      "correlation_uid": "run_29ea23f0b2d8ece7",
+      "processed_time": 1783188903071,
+      "processed_time_dt": "2026-07-04T18:15:03.071496Z",
+      "product": {
+        "vendor_name": "CRIS-SME",
+        "name": "CRIS-SME",
+        "feature": {
+          "name": "Risk Assessment"
+        },
+        "version": "2.0.0"
+      },
+      "profiles": [
+        "cloud",
+        "security_control"
+      ]
+    },
+    "finding_info": {
+      "uid": "fdg_59af495a1834f7",
+      "title": "Public storage access increases data exposure risk",
+      "desc": "Deterministic scoring prioritization using severity, exposure, data sensitivity, confidence calibration, and remediation effort factors.",
+      "product_uid": "DATA-001",
+      "created_time": 1783188903071,
+      "created_time_dt": "2026-07-04T18:15:03.071496Z",
+      "modified_time": 1783188903071,
+      "modified_time_dt": "2026-07-04T18:15:03.071496Z",
+      "types": [
+        "Data"
+      ]
+    },
+    "resources": [
+      {
+        "uid": "data:aws:aws-000832363767",
+        "name": "SIGI Technologies Data Services",
+        "type": "data_plane",
+        "cloud_partition": "aws",
+        "criticality": "high",
+        "labels": [
+          "internet_exposed",
+          "criticality:high"
+        ]
+      }
+    ],
+    "evidences": [
+      {
+        "uid": "evd_fdg_59af495a1834f7_01",
+        "name": "control_evidence/DATA-001",
+        "type": "observed",
+        "desc": "1 storage asset(s) allow public access",
+        "data": {
+          "finding_id": "fdg_59af495a1834f7",
+          "control_id": "DATA-001",
+          "resource_scope": "000832363767",
+          "statement": "1 storage asset(s) allow public access"
+        }
+      }
+    ],
+    "remediation": {
+      "desc": "Disable anonymous or public storage access and review data exposure paths."
+    },
+    "cloud": {
+      "provider": "aws",
+      "account_uid": "aws-000832363767",
+      "account_name": "SIGI Technologies"
+    },
+    "unmapped": {
+      "cris_sme": {
+        "priority": "Planned",
+        "score": 48.35,
+        "resource_scope": "000832363767",
+        "asset_ids": [
+          "data:aws:aws-000832363767"
+        ],
+        "evidence_ids": [
+          "evd_fdg_59af495a1834f7_01"
+        ],
+        "evidence_quality": {
+          "observation_class": "observed",
+          "sufficiency": "unsupported",
+          "direct_evidence_count": 1,
+          "inferred_evidence_count": 0,
+          "unavailable_evidence_count": 0,
+          "provider_support": "research_preview",
+          "missing_requirements": [
+            "public data-path and encryption evidence",
+            "backup/retention control-state evidence"
+          ]
+        },
+        "lifecycle": {
+          "status": "open",
+          "status_reason": "Active non-compliant finding in current assessment.",
+          "first_seen": "2026-07-04T18:13:19.019124Z",
+          "last_seen": "2026-07-04T18:15:03.071496Z",
+          "previous_seen": "2026-07-04T18:13:19.019124Z",
+          "is_new": false,
+          "seen_count": 2,
+          "recurrence_count": 1
+        },
+        "mapping": [
+          "GDPR Article 32",
+          "ISO 27001 A.8.12",
+          "UK GDPR Article 32"
+        ],
+        "remediation_cost_tier": "free",
+        "report_schema_version": "2.0.0",
+        "collector_mode": "aws"
+      }
+    }
+  },
+  {
+    "activity_id": 1,
+    "activity_name": "Create",
+    "category_uid": 2,
+    "category_name": "Findings",
+    "class_uid": 2004,
+    "class_name": "Detection Finding",
+    "type_uid": 200401,
+    "type_name": "Detection Finding: Create",
+    "time": 1783188903071,
+    "time_dt": "2026-07-04T18:15:03.071496Z",
+    "severity_id": 4,
+    "severity": "High",
+    "status": "open",
+    "status_id": 1,
+    "count": 1,
+    "metadata": {
+      "version": "1.1.0",
+      "event_code": "finding",
+      "uid": "fdg_994c549d0b3d2e",
+      "correlation_uid": "run_29ea23f0b2d8ece7",
+      "processed_time": 1783188903071,
+      "processed_time_dt": "2026-07-04T18:15:03.071496Z",
+      "product": {
+        "vendor_name": "CRIS-SME",
+        "name": "CRIS-SME",
+        "feature": {
+          "name": "Risk Assessment"
+        },
+        "version": "2.0.0"
+      },
+      "profiles": [
+        "cloud",
+        "security_control"
+      ]
+    },
+    "finding_info": {
+      "uid": "fdg_994c549d0b3d2e",
+      "title": "IoT Hub public network access is not sufficiently constrained",
+      "desc": "Deterministic scoring prioritization using severity, exposure, data sensitivity, confidence calibration, and remediation effort factors.",
+      "product_uid": "IOT-005",
+      "created_time": 1783188903071,
+      "created_time_dt": "2026-07-04T18:15:03.071496Z",
+      "modified_time": 1783188903071,
+      "modified_time_dt": "2026-07-04T18:15:03.071496Z",
+      "types": [
+        "Healthcare IoT"
+      ]
+    },
+    "resources": [
+      {
+        "uid": "data:aws:aws-000832363767",
+        "name": "SIGI Technologies Data Services",
+        "type": "data_plane",
+        "cloud_partition": "aws",
+        "criticality": "high",
+        "labels": [
+          "internet_exposed",
+          "criticality:high"
+        ]
+      }
+    ],
+    "evidences": [
+      {
+        "uid": "evd_fdg_994c549d0b3d2e_01",
+        "name": "control_evidence/IOT-005",
+        "type": "observed",
+        "desc": "IoT Hub public network access is enabled",
+        "data": {
+          "finding_id": "fdg_994c549d0b3d2e",
+          "control_id": "IOT-005",
+          "resource_scope": "000832363767",
+          "statement": "IoT Hub public network access is enabled"
+        }
+      },
+      {
+        "uid": "evd_fdg_994c549d0b3d2e_02",
+        "name": "control_evidence/IOT-005",
+        "type": "observed",
+        "desc": "No IP filter rules or private endpoints were observed for the hub scope",
+        "data": {
+          "finding_id": "fdg_994c549d0b3d2e",
+          "control_id": "IOT-005",
+          "resource_scope": "000832363767",
+          "statement": "No IP filter rules or private endpoints were observed for the hub scope"
+        }
+      }
+    ],
+    "remediation": {
+      "desc": "Restrict IoT Hub public access using IP filters, private endpoints, or documented clinical network boundaries."
+    },
+    "cloud": {
+      "provider": "aws",
+      "account_uid": "aws-000832363767",
+      "account_name": "SIGI Technologies"
+    },
+    "unmapped": {
+      "cris_sme": {
+        "priority": "Planned",
+        "score": 47.25,
+        "resource_scope": "000832363767",
+        "asset_ids": [
+          "data:aws:aws-000832363767"
+        ],
+        "evidence_ids": [
+          "evd_fdg_994c549d0b3d2e_01",
+          "evd_fdg_994c549d0b3d2e_02"
+        ],
+        "evidence_quality": {
+          "observation_class": "observed",
+          "sufficiency": "unsupported",
+          "direct_evidence_count": 2,
+          "inferred_evidence_count": 0,
+          "unavailable_evidence_count": 0,
+          "provider_support": "research_preview",
+          "missing_requirements": [
+            "IoT platform configuration evidence",
+            "device identity, telemetry, and clinical boundary evidence"
+          ]
+        },
+        "lifecycle": {
+          "status": "open",
+          "status_reason": "Active non-compliant finding in current assessment.",
+          "first_seen": "2026-07-04T18:13:19.019124Z",
+          "last_seen": "2026-07-04T18:15:03.071496Z",
+          "previous_seen": "2026-07-04T18:13:19.019124Z",
+          "is_new": false,
+          "seen_count": 2,
+          "recurrence_count": 1
+        },
+        "mapping": [
+          "NCSC CAF B4 System security",
+          "NHS DSPT Network security",
+          "Cyber Essentials Firewalls"
+        ],
+        "remediation_cost_tier": "low",
+        "report_schema_version": "2.0.0",
+        "collector_mode": "aws"
+      }
+    }
+  },
+  {
+    "activity_id": 1,
+    "activity_name": "Create",
+    "category_uid": 2,
+    "category_name": "Findings",
+    "class_uid": 2004,
+    "class_name": "Detection Finding",
+    "type_uid": 200401,
+    "type_name": "Detection Finding: Create",
+    "time": 1783188903071,
+    "time_dt": "2026-07-04T18:15:03.071496Z",
+    "severity_id": 4,
+    "severity": "High",
+    "status": "open",
+    "status_id": 1,
+    "count": 1,
+    "metadata": {
+      "version": "1.1.0",
+      "event_code": "finding",
+      "uid": "fdg_e13f1fe2310b82",
+      "correlation_uid": "run_29ea23f0b2d8ece7",
+      "processed_time": 1783188903071,
+      "processed_time_dt": "2026-07-04T18:15:03.071496Z",
+      "product": {
+        "vendor_name": "CRIS-SME",
+        "name": "CRIS-SME",
+        "feature": {
+          "name": "Risk Assessment"
+        },
+        "version": "2.0.0"
+      },
+      "profiles": [
+        "cloud",
+        "security_control"
+      ]
+    },
+    "finding_info": {
+      "uid": "fdg_e13f1fe2310b82",
+      "title": "Network security group rules are broader than expected",
+      "desc": "Deterministic scoring prioritization using severity, exposure, data sensitivity, confidence calibration, and remediation effort factors.",
+      "product_uid": "NET-002",
+      "created_time": 1783188903071,
+      "created_time_dt": "2026-07-04T18:15:03.071496Z",
+      "modified_time": 1783188903071,
+      "modified_time_dt": "2026-07-04T18:15:03.071496Z",
+      "types": [
+        "Network"
+      ]
+    },
+    "resources": [
+      {
+        "uid": "network:aws:aws-000832363767",
+        "name": "SIGI Technologies Network Surface",
+        "type": "network_surface",
+        "cloud_partition": "aws",
+        "criticality": "high",
+        "labels": [
+          "internet_exposed",
+          "criticality:high"
+        ]
+      }
+    ],
+    "evidences": [
+      {
+        "uid": "evd_fdg_e13f1fe2310b82_01",
+        "name": "control_evidence/NET-002",
+        "type": "observed",
+        "desc": "2 permissive NSG rule(s) were identified",
+        "data": {
+          "finding_id": "fdg_e13f1fe2310b82",
+          "control_id": "NET-002",
+          "resource_scope": "000832363767",
+          "statement": "2 permissive NSG rule(s) were identified"
+        }
+      }
+    ],
+    "remediation": {
+      "desc": "Tighten overly permissive network rules to least-privilege source and port scopes."
+    },
+    "cloud": {
+      "provider": "aws",
+      "account_uid": "aws-000832363767",
+      "account_name": "SIGI Technologies"
+    },
+    "unmapped": {
+      "cris_sme": {
+        "priority": "Planned",
+        "score": 44.71,
+        "resource_scope": "000832363767",
+        "asset_ids": [
+          "network:aws:aws-000832363767"
+        ],
+        "evidence_ids": [
+          "evd_fdg_e13f1fe2310b82_01"
+        ],
+        "evidence_quality": {
+          "observation_class": "observed",
+          "sufficiency": "unsupported",
+          "direct_evidence_count": 1,
+          "inferred_evidence_count": 0,
+          "unavailable_evidence_count": 0,
+          "provider_support": "research_preview",
+          "missing_requirements": [
+            "inbound exposure inventory",
+            "administrative path restriction evidence"
+          ]
+        },
+        "lifecycle": {
+          "status": "open",
+          "status_reason": "Active non-compliant finding in current assessment.",
+          "first_seen": "2026-07-04T18:13:19.019124Z",
+          "last_seen": "2026-07-04T18:15:03.071496Z",
+          "previous_seen": "2026-07-04T18:13:19.019124Z",
+          "is_new": false,
+          "seen_count": 2,
+          "recurrence_count": 1
+        },
+        "mapping": [
+          "CIS Azure Foundations Benchmark 6.1",
+          "NIST PR.AC-05",
+          "Cyber Essentials Firewalls"
+        ],
+        "remediation_cost_tier": "free",
+        "report_schema_version": "2.0.0",
+        "collector_mode": "aws"
+      }
+    }
+  },
+  {
+    "activity_id": 1,
+    "activity_name": "Create",
+    "category_uid": 2,
+    "category_name": "Findings",
+    "class_uid": 2004,
+    "class_name": "Detection Finding",
+    "type_uid": 200401,
+    "type_name": "Detection Finding: Create",
+    "time": 1783188903071,
+    "time_dt": "2026-07-04T18:15:03.071496Z",
+    "severity_id": 4,
+    "severity": "High",
+    "status": "open",
+    "status_id": 1,
+    "count": 1,
+    "metadata": {
+      "version": "1.1.0",
+      "event_code": "finding",
+      "uid": "fdg_dfbb1e782053b2",
+      "correlation_uid": "run_29ea23f0b2d8ece7",
+      "processed_time": 1783188903071,
+      "processed_time_dt": "2026-07-04T18:15:03.071496Z",
+      "product": {
+        "vendor_name": "CRIS-SME",
+        "name": "CRIS-SME",
+        "feature": {
+          "name": "Risk Assessment"
+        },
+        "version": "2.0.0"
+      },
+      "profiles": [
+        "cloud",
+        "security_control"
+      ]
+    },
+    "finding_info": {
+      "uid": "fdg_dfbb1e782053b2",
+      "title": "Critical workloads remain unpatched beyond acceptable risk tolerance",
+      "desc": "Deterministic scoring prioritization using severity, exposure, data sensitivity, confidence calibration, and remediation effort factors.",
+      "product_uid": "CMP-001",
+      "created_time": 1783188903071,
+      "created_time_dt": "2026-07-04T18:15:03.071496Z",
+      "modified_time": 1783188903071,
+      "modified_time_dt": "2026-07-04T18:15:03.071496Z",
+      "types": [
+        "Compute/Workloads"
+      ]
+    },
+    "resources": [
+      {
+        "uid": "compute:aws:aws-000832363767",
+        "name": "SIGI Technologies Compute",
+        "type": "compute_plane",
+        "cloud_partition": "aws",
+        "criticality": "medium",
+        "labels": [
+          "internet_exposed",
+          "criticality:medium"
+        ]
+      }
+    ],
+    "evidences": [
+      {
+        "uid": "evd_fdg_dfbb1e782053b2_01",
+        "name": "control_evidence/CMP-001",
+        "type": "observed",
+        "desc": "1 critical VM(s) require urgent patching",
+        "data": {
+          "finding_id": "fdg_dfbb1e782053b2",
+          "control_id": "CMP-001",
+          "resource_scope": "000832363767",
+          "statement": "1 critical VM(s) require urgent patching"
+        }
+      }
+    ],
+    "remediation": {
+      "desc": "Patch critical workloads and enforce a stronger recurring patch policy."
+    },
+    "cloud": {
+      "provider": "aws",
+      "account_uid": "aws-000832363767",
+      "account_name": "SIGI Technologies"
+    },
+    "unmapped": {
+      "cris_sme": {
+        "priority": "Planned",
+        "score": 42.69,
+        "resource_scope": "000832363767",
+        "asset_ids": [
+          "compute:aws:aws-000832363767"
+        ],
+        "evidence_ids": [
+          "evd_fdg_dfbb1e782053b2_01"
+        ],
+        "evidence_quality": {
+          "observation_class": "observed",
+          "sufficiency": "unsupported",
+          "direct_evidence_count": 1,
+          "inferred_evidence_count": 0,
+          "unavailable_evidence_count": 0,
+          "provider_support": "research_preview",
+          "missing_requirements": [
+            "patch posture proxy evidence",
+            "workload hardening and endpoint coverage evidence"
+          ]
+        },
+        "lifecycle": {
+          "status": "open",
+          "status_reason": "Active non-compliant finding in current assessment.",
+          "first_seen": "2026-07-04T18:13:19.019124Z",
+          "last_seen": "2026-07-04T18:15:03.071496Z",
+          "previous_seen": "2026-07-04T18:13:19.019124Z",
+          "is_new": false,
+          "seen_count": 2,
+          "recurrence_count": 1
+        },
+        "mapping": [
+          "Microsoft Cloud Security Benchmark PV-6",
+          "NIST PR.PS-03",
+          "Cyber Essentials Security update management",
+          "DSPT NDG Standard 6"
+        ],
+        "remediation_cost_tier": "medium",
+        "report_schema_version": "2.0.0",
+        "collector_mode": "aws"
+      }
+    }
+  },
+  {
+    "activity_id": 1,
+    "activity_name": "Create",
+    "category_uid": 2,
+    "category_name": "Findings",
+    "class_uid": 2004,
+    "class_name": "Detection Finding",
+    "type_uid": 200401,
+    "type_name": "Detection Finding: Create",
+    "time": 1783188903071,
+    "time_dt": "2026-07-04T18:15:03.071496Z",
+    "severity_id": 4,
+    "severity": "High",
+    "status": "open",
+    "status_id": 1,
+    "count": 1,
+    "metadata": {
+      "version": "1.1.0",
+      "event_code": "finding",
+      "uid": "fdg_fd9b74860f2318",
+      "correlation_uid": "run_29ea23f0b2d8ece7",
+      "processed_time": 1783188903071,
+      "processed_time_dt": "2026-07-04T18:15:03.071496Z",
+      "product": {
+        "vendor_name": "CRIS-SME",
+        "name": "CRIS-SME",
+        "feature": {
+          "name": "Risk Assessment"
+        },
+        "version": "2.0.0"
+      },
+      "profiles": [
+        "cloud",
+        "security_control"
+      ]
+    },
+    "finding_info": {
+      "uid": "fdg_fd9b74860f2318",
+      "title": "Data stores lack expected encryption protections",
+      "desc": "Deterministic scoring prioritization using severity, exposure, data sensitivity, confidence calibration, and remediation effort factors.",
+      "product_uid": "DATA-002",
+      "created_time": 1783188903071,
+      "created_time_dt": "2026-07-04T18:15:03.071496Z",
+      "modified_time": 1783188903071,
+      "modified_time_dt": "2026-07-04T18:15:03.071496Z",
+      "types": [
+        "Data"
+      ]
+    },
+    "resources": [
+      {
+        "uid": "data:aws:aws-000832363767",
+        "name": "SIGI Technologies Data Services",
+        "type": "data_plane",
+        "cloud_partition": "aws",
+        "criticality": "high",
+        "labels": [
+          "internet_exposed",
+          "criticality:high"
+        ]
+      }
+    ],
+    "evidences": [
+      {
+        "uid": "evd_fdg_fd9b74860f2318_01",
+        "name": "control_evidence/DATA-002",
+        "type": "observed",
+        "desc": "1 data store(s) appear to be unencrypted at rest",
+        "data": {
+          "finding_id": "fdg_fd9b74860f2318",
+          "control_id": "DATA-002",
+          "resource_scope": "000832363767",
+          "statement": "1 data store(s) appear to be unencrypted at rest"
+        }
+      }
+    ],
+    "remediation": {
+      "desc": "Enable encryption at rest for affected storage and database services."
+    },
+    "cloud": {
+      "provider": "aws",
+      "account_uid": "aws-000832363767",
+      "account_name": "SIGI Technologies"
+    },
+    "unmapped": {
+      "cris_sme": {
+        "priority": "Planned",
+        "score": 42.36,
+        "resource_scope": "000832363767",
+        "asset_ids": [
+          "data:aws:aws-000832363767"
+        ],
+        "evidence_ids": [
+          "evd_fdg_fd9b74860f2318_01"
+        ],
+        "evidence_quality": {
+          "observation_class": "observed",
+          "sufficiency": "unsupported",
+          "direct_evidence_count": 1,
+          "inferred_evidence_count": 0,
+          "unavailable_evidence_count": 0,
+          "provider_support": "research_preview",
+          "missing_requirements": [
+            "public data-path and encryption evidence",
+            "backup/retention control-state evidence"
+          ]
+        },
+        "lifecycle": {
+          "status": "open",
+          "status_reason": "Active non-compliant finding in current assessment.",
+          "first_seen": "2026-07-04T18:13:19.019124Z",
+          "last_seen": "2026-07-04T18:15:03.071496Z",
+          "previous_seen": "2026-07-04T18:13:19.019124Z",
+          "is_new": false,
+          "seen_count": 2,
+          "recurrence_count": 1
+        },
+        "mapping": [
+          "ISO 27001 A.8.24",
+          "NIST PR.DS-01",
+          "UK GDPR Article 32"
+        ],
+        "remediation_cost_tier": "low",
+        "report_schema_version": "2.0.0",
+        "collector_mode": "aws"
+      }
+    }
+  },
+  {
+    "activity_id": 1,
+    "activity_name": "Create",
+    "category_uid": 2,
+    "category_name": "Findings",
+    "class_uid": 2004,
+    "class_name": "Detection Finding",
+    "type_uid": 200401,
+    "type_name": "Detection Finding: Create",
+    "time": 1783188903071,
+    "time_dt": "2026-07-04T18:15:03.071496Z",
+    "severity_id": 4,
+    "severity": "High",
+    "status": "open",
+    "status_id": 1,
+    "count": 1,
+    "metadata": {
+      "version": "1.1.0",
+      "event_code": "finding",
+      "uid": "fdg_95befe3a0ef4d3",
+      "correlation_uid": "run_29ea23f0b2d8ece7",
+      "processed_time": 1783188903071,
+      "processed_time_dt": "2026-07-04T18:15:03.071496Z",
+      "product": {
+        "vendor_name": "CRIS-SME",
+        "name": "CRIS-SME",
+        "feature": {
+          "name": "Risk Assessment"
+        },
+        "version": "2.0.0"
+      },
+      "profiles": [
+        "cloud",
+        "security_control"
+      ]
+    },
+    "finding_info": {
+      "uid": "fdg_95befe3a0ef4d3",
+      "title": "Private endpoint coverage is incomplete for sensitive services",
+      "desc": "Deterministic scoring prioritization using severity, exposure, data sensitivity, confidence calibration, and remediation effort factors.",
+      "product_uid": "NET-004",
+      "created_time": 1783188903071,
+      "created_time_dt": "2026-07-04T18:15:03.071496Z",
+      "modified_time": 1783188903071,
+      "modified_time_dt": "2026-07-04T18:15:03.071496Z",
+      "types": [
+        "Network"
+      ]
+    },
+    "resources": [
+      {
+        "uid": "network:aws:aws-000832363767",
+        "name": "SIGI Technologies Network Surface",
+        "type": "network_surface",
+        "cloud_partition": "aws",
+        "criticality": "high",
+        "labels": [
+          "internet_exposed",
+          "criticality:high"
+        ]
+      }
+    ],
+    "evidences": [
+      {
+        "uid": "evd_fdg_95befe3a0ef4d3_01",
+        "name": "control_evidence/NET-004",
+        "type": "observed",
+        "desc": "5 required private endpoint(s) are not configured",
+        "data": {
+          "finding_id": "fdg_95befe3a0ef4d3",
+          "control_id": "NET-004",
+          "resource_scope": "000832363767",
+          "statement": "5 required private endpoint(s) are not configured"
+        }
+      },
+      {
+        "uid": "evd_fdg_95befe3a0ef4d3_02",
+        "name": "control_evidence/NET-004",
+        "type": "observed",
+        "desc": "0 of 5 expected private endpoint(s) are currently deployed",
+        "data": {
+          "finding_id": "fdg_95befe3a0ef4d3",
+          "control_id": "NET-004",
+          "resource_scope": "000832363767",
+          "statement": "0 of 5 expected private endpoint(s) are currently deployed"
+        }
+      }
+    ],
+    "remediation": {
+      "desc": "Extend private endpoints to sensitive services that should not rely on public routing."
+    },
+    "cloud": {
+      "provider": "aws",
+      "account_uid": "aws-000832363767",
+      "account_name": "SIGI Technologies"
+    },
+    "unmapped": {
+      "cris_sme": {
+        "priority": "Planned",
+        "score": 41.93,
+        "resource_scope": "000832363767",
+        "asset_ids": [
+          "network:aws:aws-000832363767"
+        ],
+        "evidence_ids": [
+          "evd_fdg_95befe3a0ef4d3_01",
+          "evd_fdg_95befe3a0ef4d3_02"
+        ],
+        "evidence_quality": {
+          "observation_class": "observed",
+          "sufficiency": "unsupported",
+          "direct_evidence_count": 2,
+          "inferred_evidence_count": 0,
+          "unavailable_evidence_count": 0,
+          "provider_support": "research_preview",
+          "missing_requirements": [
+            "inbound exposure inventory",
+            "administrative path restriction evidence"
+          ]
+        },
+        "lifecycle": {
+          "status": "open",
+          "status_reason": "Active non-compliant finding in current assessment.",
+          "first_seen": "2026-07-04T18:13:19.019124Z",
+          "last_seen": "2026-07-04T18:15:03.071496Z",
+          "previous_seen": "2026-07-04T18:13:19.019124Z",
+          "is_new": false,
+          "seen_count": 2,
+          "recurrence_count": 1
+        },
+        "mapping": [
+          "Microsoft Cloud Security Benchmark NS-2",
+          "NIST PR.AC-03"
+        ],
+        "remediation_cost_tier": "medium",
+        "report_schema_version": "2.0.0",
+        "collector_mode": "aws"
+      }
+    }
+  },
+  {
+    "activity_id": 1,
+    "activity_name": "Create",
+    "category_uid": 2,
+    "category_name": "Findings",
+    "class_uid": 2004,
+    "class_name": "Detection Finding",
+    "type_uid": 200401,
+    "type_name": "Detection Finding: Create",
+    "time": 1783188903071,
+    "time_dt": "2026-07-04T18:15:03.071496Z",
+    "severity_id": 4,
+    "severity": "High",
+    "status": "open",
+    "status_id": 1,
+    "count": 1,
+    "metadata": {
+      "version": "1.1.0",
+      "event_code": "finding",
+      "uid": "fdg_47b2e528cc081f",
+      "correlation_uid": "run_29ea23f0b2d8ece7",
+      "processed_time": 1783188903071,
+      "processed_time_dt": "2026-07-04T18:15:03.071496Z",
+      "product": {
+        "vendor_name": "CRIS-SME",
+        "name": "CRIS-SME",
+        "feature": {
+          "name": "Risk Assessment"
+        },
+        "version": "2.0.0"
+      },
+      "profiles": [
+        "cloud",
+        "security_control"
+      ]
+    },
+    "finding_info": {
+      "uid": "fdg_47b2e528cc081f",
+      "title": "IoT shared access policies exceed least-privilege expectations",
+      "desc": "Deterministic scoring prioritization using severity, exposure, data sensitivity, confidence calibration, and remediation effort factors.",
+      "product_uid": "IOT-002",
+      "created_time": 1783188903071,
+      "created_time_dt": "2026-07-04T18:15:03.071496Z",
+      "modified_time": 1783188903071,
+      "modified_time_dt": "2026-07-04T18:15:03.071496Z",
+      "types": [
+        "Healthcare IoT"
+      ]
+    },
+    "resources": [
+      {
+        "uid": "data:aws:aws-000832363767",
+        "name": "SIGI Technologies Data Services",
+        "type": "data_plane",
+        "cloud_partition": "aws",
+        "criticality": "high",
+        "labels": [
+          "internet_exposed",
+          "criticality:high"
+        ]
+      }
+    ],
+    "evidences": [
+      {
+        "uid": "evd_fdg_47b2e528cc081f_01",
+        "name": "control_evidence/IOT-002",
+        "type": "observed",
+        "desc": "1 IoT shared access policie(s) were observed",
+        "data": {
+          "finding_id": "fdg_47b2e528cc081f",
+          "control_id": "IOT-002",
+          "resource_scope": "000832363767",
+          "statement": "1 IoT shared access policie(s) were observed"
+        }
+      },
+      {
+        "uid": "evd_fdg_47b2e528cc081f_02",
+        "name": "control_evidence/IOT-002",
+        "type": "observed",
+        "desc": "1 shared access policie(s) appear overbroad",
+        "data": {
+          "finding_id": "fdg_47b2e528cc081f",
+          "control_id": "IOT-002",
+          "resource_scope": "000832363767",
+          "statement": "1 shared access policie(s) appear overbroad"
+        }
+      }
+    ],
+    "remediation": {
+      "desc": "Reduce IoT shared access policies, remove overbroad permissions, and rotate keys through governed operations."
+    },
+    "cloud": {
+      "provider": "aws",
+      "account_uid": "aws-000832363767",
+      "account_name": "SIGI Technologies"
+    },
+    "unmapped": {
+      "cris_sme": {
+        "priority": "Planned",
+        "score": 41.6,
+        "resource_scope": "000832363767",
+        "asset_ids": [
+          "data:aws:aws-000832363767"
+        ],
+        "evidence_ids": [
+          "evd_fdg_47b2e528cc081f_01",
+          "evd_fdg_47b2e528cc081f_02"
+        ],
+        "evidence_quality": {
+          "observation_class": "observed",
+          "sufficiency": "unsupported",
+          "direct_evidence_count": 2,
+          "inferred_evidence_count": 0,
+          "unavailable_evidence_count": 0,
+          "provider_support": "research_preview",
+          "missing_requirements": [
+            "IoT platform configuration evidence",
+            "device identity, telemetry, and clinical boundary evidence"
+          ]
+        },
+        "lifecycle": {
+          "status": "open",
+          "status_reason": "Active non-compliant finding in current assessment.",
+          "first_seen": "2026-07-04T18:13:19.019124Z",
+          "last_seen": "2026-07-04T18:15:03.071496Z",
+          "previous_seen": "2026-07-04T18:13:19.019124Z",
+          "is_new": false,
+          "seen_count": 2,
+          "recurrence_count": 1
+        },
+        "mapping": [
+          "NCSC CAF B2 Identity and access control",
+          "NHS DSPT Security management",
+          "IEC 62443 account management"
+        ],
+        "remediation_cost_tier": "free",
+        "report_schema_version": "2.0.0",
+        "collector_mode": "aws"
+      }
+    }
+  },
+  {
+    "activity_id": 1,
+    "activity_name": "Create",
+    "category_uid": 2,
+    "category_name": "Findings",
+    "class_uid": 2004,
+    "class_name": "Detection Finding",
+    "type_uid": 200401,
+    "type_name": "Detection Finding: Create",
+    "time": 1783188903071,
+    "time_dt": "2026-07-04T18:15:03.071496Z",
+    "severity_id": 4,
+    "severity": "High",
+    "status": "open",
+    "status_id": 1,
+    "count": 1,
+    "metadata": {
+      "version": "1.1.0",
+      "event_code": "finding",
+      "uid": "fdg_8de9e4b39be686",
+      "correlation_uid": "run_29ea23f0b2d8ece7",
+      "processed_time": 1783188903071,
+      "processed_time_dt": "2026-07-04T18:15:03.071496Z",
+      "product": {
+        "vendor_name": "CRIS-SME",
+        "name": "CRIS-SME",
+        "feature": {
+          "name": "Risk Assessment"
+        },
+        "version": "2.0.0"
+      },
+      "profiles": [
+        "cloud",
+        "security_control"
+      ]
+    },
+    "finding_info": {
+      "uid": "fdg_8de9e4b39be686",
+      "title": "Cloud device-identity registration posture is weak or unobservable",
+      "desc": "Deterministic scoring prioritization using severity, exposure, data sensitivity, confidence calibration, and remediation effort factors.",
+      "product_uid": "IOT-001",
+      "created_time": 1783188903071,
+      "created_time_dt": "2026-07-04T18:15:03.071496Z",
+      "modified_time": 1783188903071,
+      "modified_time_dt": "2026-07-04T18:15:03.071496Z",
+      "types": [
+        "Healthcare IoT"
+      ]
+    },
+    "resources": [
+      {
+        "uid": "data:aws:aws-000832363767",
+        "name": "SIGI Technologies Data Services",
+        "type": "data_plane",
+        "cloud_partition": "aws",
+        "criticality": "high",
+        "labels": [
+          "internet_exposed",
+          "criticality:high"
+        ]
+      }
+    ],
+    "evidences": [
+      {
+        "uid": "evd_fdg_8de9e4b39be686_01",
+        "name": "control_evidence/IOT-001",
+        "type": "observed",
+        "desc": "Certificate-authority based device authentication was not observed",
+        "data": {
+          "finding_id": "fdg_8de9e4b39be686",
+          "control_id": "IOT-001",
+          "resource_scope": "000832363767",
+          "statement": "Certificate-authority based device authentication was not observed"
+        }
+      }
+    ],
+    "remediation": {
+      "desc": "Inventory cloud-registered IoMT device identities and prefer certificate-based authentication for clinical device connections while validating device-side credential storage separately."
+    },
+    "cloud": {
+      "provider": "aws",
+      "account_uid": "aws-000832363767",
+      "account_name": "SIGI Technologies"
+    },
+    "unmapped": {
+      "cris_sme": {
+        "priority": "Planned",
+        "score": 40.65,
+        "resource_scope": "000832363767",
+        "asset_ids": [
+          "data:aws:aws-000832363767"
+        ],
+        "evidence_ids": [
+          "evd_fdg_8de9e4b39be686_01"
+        ],
+        "evidence_quality": {
+          "observation_class": "observed",
+          "sufficiency": "unsupported",
+          "direct_evidence_count": 1,
+          "inferred_evidence_count": 0,
+          "unavailable_evidence_count": 0,
+          "provider_support": "research_preview",
+          "missing_requirements": [
+            "IoT platform configuration evidence",
+            "device identity, telemetry, and clinical boundary evidence"
+          ]
+        },
+        "lifecycle": {
+          "status": "open",
+          "status_reason": "Active non-compliant finding in current assessment.",
+          "first_seen": "2026-07-04T18:13:19.019124Z",
+          "last_seen": "2026-07-04T18:15:03.071496Z",
+          "previous_seen": "2026-07-04T18:13:19.019124Z",
+          "is_new": false,
+          "seen_count": 2,
+          "recurrence_count": 1
+        },
+        "mapping": [
+          "NCSC CAF B2 Identity and access control",
+          "NHS DSPT Access control",
+          "IEC 80001-1 risk management"
+        ],
+        "remediation_cost_tier": "medium",
+        "report_schema_version": "2.0.0",
+        "collector_mode": "aws"
+      }
+    }
+  },
+  {
+    "activity_id": 1,
+    "activity_name": "Create",
+    "category_uid": 2,
+    "category_name": "Findings",
+    "class_uid": 2004,
+    "class_name": "Detection Finding",
+    "type_uid": 200401,
+    "type_name": "Detection Finding: Create",
+    "time": 1783188903071,
+    "time_dt": "2026-07-04T18:15:03.071496Z",
+    "severity_id": 4,
+    "severity": "High",
+    "status": "open",
+    "status_id": 1,
+    "count": 1,
+    "metadata": {
+      "version": "1.1.0",
+      "event_code": "finding",
+      "uid": "fdg_ba8563fa9c85b0",
+      "correlation_uid": "run_29ea23f0b2d8ece7",
+      "processed_time": 1783188903071,
+      "processed_time_dt": "2026-07-04T18:15:03.071496Z",
+      "product": {
+        "vendor_name": "CRIS-SME",
+        "name": "CRIS-SME",
+        "feature": {
+          "name": "Risk Assessment"
+        },
+        "version": "2.0.0"
+      },
+      "profiles": [
+        "cloud",
+        "security_control"
+      ]
+    },
+    "finding_info": {
+      "uid": "fdg_ba8563fa9c85b0",
+      "title": "Endpoint protection coverage is below the expected workload baseline",
+      "desc": "Deterministic scoring prioritization using severity, exposure, data sensitivity, confidence calibration, and remediation effort factors.",
+      "product_uid": "CMP-002",
+      "created_time": 1783188903071,
+      "created_time_dt": "2026-07-04T18:15:03.071496Z",
+      "modified_time": 1783188903071,
+      "modified_time_dt": "2026-07-04T18:15:03.071496Z",
+      "types": [
+        "Compute/Workloads"
+      ]
+    },
+    "resources": [
+      {
+        "uid": "compute:aws:aws-000832363767",
+        "name": "SIGI Technologies Compute",
+        "type": "compute_plane",
+        "cloud_partition": "aws",
+        "criticality": "medium",
+        "labels": [
+          "internet_exposed",
+          "criticality:medium"
+        ]
+      }
+    ],
+    "evidences": [
+      {
+        "uid": "evd_fdg_ba8563fa9c85b0_01",
+        "name": "control_evidence/CMP-002",
+        "type": "observed",
+        "desc": "Endpoint protection coverage is approximately 0%",
+        "data": {
+          "finding_id": "fdg_ba8563fa9c85b0",
+          "control_id": "CMP-002",
+          "resource_scope": "000832363767",
+          "statement": "Endpoint protection coverage is approximately 0%"
+        }
+      }
+    ],
+    "remediation": {
+      "desc": "Deploy endpoint protection or security agents to uncovered workloads."
+    },
+    "cloud": {
+      "provider": "aws",
+      "account_uid": "aws-000832363767",
+      "account_name": "SIGI Technologies"
+    },
+    "unmapped": {
+      "cris_sme": {
+        "priority": "Planned",
+        "score": 39.53,
+        "resource_scope": "000832363767",
+        "asset_ids": [
+          "compute:aws:aws-000832363767"
+        ],
+        "evidence_ids": [
+          "evd_fdg_ba8563fa9c85b0_01"
+        ],
+        "evidence_quality": {
+          "observation_class": "observed",
+          "sufficiency": "unsupported",
+          "direct_evidence_count": 1,
+          "inferred_evidence_count": 0,
+          "unavailable_evidence_count": 0,
+          "provider_support": "research_preview",
+          "missing_requirements": [
+            "patch posture proxy evidence",
+            "workload hardening and endpoint coverage evidence"
+          ]
+        },
+        "lifecycle": {
+          "status": "open",
+          "status_reason": "Active non-compliant finding in current assessment.",
+          "first_seen": "2026-07-04T18:13:19.019124Z",
+          "last_seen": "2026-07-04T18:15:03.071496Z",
+          "previous_seen": "2026-07-04T18:13:19.019124Z",
+          "is_new": false,
+          "seen_count": 2,
+          "recurrence_count": 1
+        },
+        "mapping": [
+          "Microsoft Cloud Security Benchmark LT-4",
+          "NIST PR.PS-01",
+          "Cyber Essentials Malware protection"
+        ],
+        "remediation_cost_tier": "medium",
+        "report_schema_version": "2.0.0",
+        "collector_mode": "aws"
+      }
+    }
+  },
+  {
+    "activity_id": 1,
+    "activity_name": "Create",
+    "category_uid": 2,
+    "category_name": "Findings",
+    "class_uid": 2004,
+    "class_name": "Detection Finding",
+    "type_uid": 200401,
+    "type_name": "Detection Finding: Create",
+    "time": 1783188903071,
+    "time_dt": "2026-07-04T18:15:03.071496Z",
+    "severity_id": 4,
+    "severity": "High",
+    "status": "open",
+    "status_id": 1,
+    "count": 1,
+    "metadata": {
+      "version": "1.1.0",
+      "event_code": "finding",
+      "uid": "fdg_1fcafc454b954f",
+      "correlation_uid": "run_29ea23f0b2d8ece7",
+      "processed_time": 1783188903071,
+      "processed_time_dt": "2026-07-04T18:15:03.071496Z",
+      "product": {
+        "vendor_name": "CRIS-SME",
+        "name": "CRIS-SME",
+        "feature": {
+          "name": "Risk Assessment"
+        },
+        "version": "2.0.0"
+      },
+      "profiles": [
+        "cloud",
+        "security_control"
+      ]
+    },
+    "finding_info": {
+      "uid": "fdg_1fcafc454b954f",
+      "title": "Workload hardening baseline coverage is incomplete",
+      "desc": "Deterministic scoring prioritization using severity, exposure, data sensitivity, confidence calibration, and remediation effort factors.",
+      "product_uid": "CMP-003",
+      "created_time": 1783188903071,
+      "created_time_dt": "2026-07-04T18:15:03.071496Z",
+      "modified_time": 1783188903071,
+      "modified_time_dt": "2026-07-04T18:15:03.071496Z",
+      "types": [
+        "Compute/Workloads"
+      ]
+    },
+    "resources": [
+      {
+        "uid": "compute:aws:aws-000832363767",
+        "name": "SIGI Technologies Compute",
+        "type": "compute_plane",
+        "cloud_partition": "aws",
+        "criticality": "medium",
+        "labels": [
+          "internet_exposed",
+          "criticality:medium"
+        ]
+      }
+    ],
+    "evidences": [
+      {
+        "uid": "evd_fdg_1fcafc454b954f_01",
+        "name": "control_evidence/CMP-003",
+        "type": "observed",
+        "desc": "Hardened baseline coverage is approximately 0%",
+        "data": {
+          "finding_id": "fdg_1fcafc454b954f",
+          "control_id": "CMP-003",
+          "resource_scope": "000832363767",
+          "statement": "Hardened baseline coverage is approximately 0%"
+        }
+      }
+    ],
+    "remediation": {
+      "desc": "Apply a hardened workload baseline across compute resources and administrative settings."
+    },
+    "cloud": {
+      "provider": "aws",
+      "account_uid": "aws-000832363767",
+      "account_name": "SIGI Technologies"
+    },
+    "unmapped": {
+      "cris_sme": {
+        "priority": "Planned",
+        "score": 38.49,
+        "resource_scope": "000832363767",
+        "asset_ids": [
+          "compute:aws:aws-000832363767"
+        ],
+        "evidence_ids": [
+          "evd_fdg_1fcafc454b954f_01"
+        ],
+        "evidence_quality": {
+          "observation_class": "observed",
+          "sufficiency": "unsupported",
+          "direct_evidence_count": 1,
+          "inferred_evidence_count": 0,
+          "unavailable_evidence_count": 0,
+          "provider_support": "research_preview",
+          "missing_requirements": [
+            "patch posture proxy evidence",
+            "workload hardening and endpoint coverage evidence"
+          ]
+        },
+        "lifecycle": {
+          "status": "open",
+          "status_reason": "Active non-compliant finding in current assessment.",
+          "first_seen": "2026-07-04T18:13:19.019124Z",
+          "last_seen": "2026-07-04T18:15:03.071496Z",
+          "previous_seen": "2026-07-04T18:13:19.019124Z",
+          "is_new": false,
+          "seen_count": 2,
+          "recurrence_count": 1
+        },
+        "mapping": [
+          "CIS Controls 4.1",
+          "NIST PR.IP-01"
+        ],
+        "remediation_cost_tier": "medium",
+        "report_schema_version": "2.0.0",
+        "collector_mode": "aws"
+      }
+    }
+  },
+  {
+    "activity_id": 1,
+    "activity_name": "Create",
+    "category_uid": 2,
+    "category_name": "Findings",
+    "class_uid": 2004,
+    "class_name": "Detection Finding",
+    "type_uid": 200401,
+    "type_name": "Detection Finding: Create",
+    "time": 1783188903071,
+    "time_dt": "2026-07-04T18:15:03.071496Z",
+    "severity_id": 4,
+    "severity": "High",
+    "status": "open",
+    "status_id": 1,
+    "count": 1,
+    "metadata": {
+      "version": "1.1.0",
+      "event_code": "finding",
+      "uid": "fdg_4fdee149a387bc",
+      "correlation_uid": "run_29ea23f0b2d8ece7",
+      "processed_time": 1783188903071,
+      "processed_time_dt": "2026-07-04T18:15:03.071496Z",
+      "product": {
+        "vendor_name": "CRIS-SME",
+        "name": "CRIS-SME",
+        "feature": {
+          "name": "Risk Assessment"
+        },
+        "version": "2.0.0"
+      },
+      "profiles": [
+        "cloud",
+        "security_control"
+      ]
+    },
+    "finding_info": {
+      "uid": "fdg_4fdee149a387bc",
+      "title": "Backup and retention coverage fall below resilience expectations",
+      "desc": "Deterministic scoring prioritization using severity, exposure, data sensitivity, confidence calibration, and remediation effort factors.",
+      "product_uid": "DATA-003",
+      "created_time": 1783188903071,
+      "created_time_dt": "2026-07-04T18:15:03.071496Z",
+      "modified_time": 1783188903071,
+      "modified_time_dt": "2026-07-04T18:15:03.071496Z",
+      "types": [
+        "Data"
+      ]
+    },
+    "resources": [
+      {
+        "uid": "data:aws:aws-000832363767",
+        "name": "SIGI Technologies Data Services",
+        "type": "data_plane",
+        "cloud_partition": "aws",
+        "criticality": "high",
+        "labels": [
+          "internet_exposed",
+          "criticality:high"
+        ]
+      }
+    ],
+    "evidences": [
+      {
+        "uid": "evd_fdg_4fdee149a387bc_01",
+        "name": "control_evidence/DATA-003",
+        "type": "observed",
+        "desc": "Backup coverage is only 60%",
+        "data": {
+          "finding_id": "fdg_4fdee149a387bc",
+          "control_id": "DATA-003",
+          "resource_scope": "000832363767",
+          "statement": "Backup coverage is only 60%"
+        }
+      },
+      {
+        "uid": "evd_fdg_4fdee149a387bc_02",
+        "name": "control_evidence/DATA-003",
+        "type": "observed",
+        "desc": "Retention policy coverage is only 60%",
+        "data": {
+          "finding_id": "fdg_4fdee149a387bc",
+          "control_id": "DATA-003",
+          "resource_scope": "000832363767",
+          "statement": "Retention policy coverage is only 60%"
+        }
+      }
+    ],
+    "remediation": {
+      "desc": "Increase backup and retention coverage for business-critical data stores."
+    },
+    "cloud": {
+      "provider": "aws",
+      "account_uid": "aws-000832363767",
+      "account_name": "SIGI Technologies"
+    },
+    "unmapped": {
+      "cris_sme": {
+        "priority": "Planned",
+        "score": 37.58,
+        "resource_scope": "000832363767",
+        "asset_ids": [
+          "data:aws:aws-000832363767"
+        ],
+        "evidence_ids": [
+          "evd_fdg_4fdee149a387bc_01",
+          "evd_fdg_4fdee149a387bc_02"
+        ],
+        "evidence_quality": {
+          "observation_class": "observed",
+          "sufficiency": "unsupported",
+          "direct_evidence_count": 2,
+          "inferred_evidence_count": 0,
+          "unavailable_evidence_count": 0,
+          "provider_support": "research_preview",
+          "missing_requirements": [
+            "public data-path and encryption evidence",
+            "backup/retention control-state evidence"
+          ]
+        },
+        "lifecycle": {
+          "status": "open",
+          "status_reason": "Active non-compliant finding in current assessment.",
+          "first_seen": "2026-07-04T18:13:19.019124Z",
+          "last_seen": "2026-07-04T18:15:03.071496Z",
+          "previous_seen": "2026-07-04T18:13:19.019124Z",
+          "is_new": false,
+          "seen_count": 2,
+          "recurrence_count": 1
+        },
+        "mapping": [
+          "ISO 27001 A.8.13",
+          "NIST PR.DS-04",
+          "DSPT NDG Standard 7"
+        ],
+        "remediation_cost_tier": "medium",
+        "report_schema_version": "2.0.0",
+        "collector_mode": "aws"
+      }
+    }
+  },
+  {
+    "activity_id": 1,
+    "activity_name": "Create",
+    "category_uid": 2,
+    "category_name": "Findings",
+    "class_uid": 2004,
+    "class_name": "Detection Finding",
+    "type_uid": 200401,
+    "type_name": "Detection Finding: Create",
+    "time": 1783188903071,
+    "time_dt": "2026-07-04T18:15:03.071496Z",
+    "severity_id": 4,
+    "severity": "High",
+    "status": "open",
+    "status_id": 1,
+    "count": 1,
+    "metadata": {
+      "version": "1.1.0",
+      "event_code": "finding",
+      "uid": "fdg_0fc8904a5edd56",
+      "correlation_uid": "run_29ea23f0b2d8ece7",
+      "processed_time": 1783188903071,
+      "processed_time_dt": "2026-07-04T18:15:03.071496Z",
+      "product": {
+        "vendor_name": "CRIS-SME",
+        "name": "CRIS-SME",
+        "feature": {
+          "name": "Risk Assessment"
+        },
+        "version": "2.0.0"
+      },
+      "profiles": [
+        "cloud",
+        "security_control"
+      ]
+    },
+    "finding_info": {
+      "uid": "fdg_0fc8904a5edd56",
+      "title": "Security monitoring coverage is below the expected baseline",
+      "desc": "Deterministic scoring prioritization using severity, exposure, data sensitivity, confidence calibration, and remediation effort factors.",
+      "product_uid": "MON-003",
+      "created_time": 1783188903071,
+      "created_time_dt": "2026-07-04T18:15:03.071496Z",
+      "modified_time": 1783188903071,
+      "modified_time_dt": "2026-07-04T18:15:03.071496Z",
+      "types": [
+        "Monitoring/Logging"
+      ]
+    },
+    "resources": [
+      {
+        "uid": "monitoring:aws:aws-000832363767",
+        "name": "SIGI Technologies Monitoring",
+        "type": "monitoring_plane",
+        "cloud_partition": "aws",
+        "criticality": "medium",
+        "labels": [
+          "criticality:medium"
+        ]
+      }
+    ],
+    "evidences": [
+      {
+        "uid": "evd_fdg_0fc8904a5edd56_01",
+        "name": "control_evidence/MON-003",
+        "type": "observed",
+        "desc": "Security monitoring coverage is approximately 0%",
+        "data": {
+          "finding_id": "fdg_0fc8904a5edd56",
+          "control_id": "MON-003",
+          "resource_scope": "000832363767",
+          "statement": "Security monitoring coverage is approximately 0%"
+        }
+      }
+    ],
+    "remediation": {
+      "desc": "Expand security monitoring coverage across workloads and key cloud services."
+    },
+    "cloud": {
+      "provider": "aws",
+      "account_uid": "aws-000832363767",
+      "account_name": "SIGI Technologies"
+    },
+    "unmapped": {
+      "cris_sme": {
+        "priority": "Planned",
+        "score": 36.94,
+        "resource_scope": "000832363767",
+        "asset_ids": [
+          "monitoring:aws:aws-000832363767"
+        ],
+        "evidence_ids": [
+          "evd_fdg_0fc8904a5edd56_01"
+        ],
+        "evidence_quality": {
+          "observation_class": "observed",
+          "sufficiency": "unsupported",
+          "direct_evidence_count": 1,
+          "inferred_evidence_count": 0,
+          "unavailable_evidence_count": 0,
+          "provider_support": "research_preview",
+          "missing_requirements": [
+            "log retention and alerting evidence",
+            "incident runbook or workflow evidence"
+          ]
+        },
+        "lifecycle": {
+          "status": "open",
+          "status_reason": "Active non-compliant finding in current assessment.",
+          "first_seen": "2026-07-04T18:13:19.019124Z",
+          "last_seen": "2026-07-04T18:15:03.071496Z",
+          "previous_seen": "2026-07-04T18:13:19.019124Z",
+          "is_new": false,
+          "seen_count": 2,
+          "recurrence_count": 1
+        },
+        "mapping": [
+          "Microsoft Cloud Security Benchmark LT-1",
+          "NIST DE.CM-02"
+        ],
+        "remediation_cost_tier": "medium",
+        "report_schema_version": "2.0.0",
+        "collector_mode": "aws"
+      }
+    }
+  },
+  {
+    "activity_id": 1,
+    "activity_name": "Create",
+    "category_uid": 2,
+    "category_name": "Findings",
+    "class_uid": 2004,
+    "class_name": "Detection Finding",
+    "type_uid": 200401,
+    "type_name": "Detection Finding: Create",
+    "time": 1783188903071,
+    "time_dt": "2026-07-04T18:15:03.071496Z",
+    "severity_id": 4,
+    "severity": "High",
+    "status": "open",
+    "status_id": 1,
+    "count": 1,
+    "metadata": {
+      "version": "1.1.0",
+      "event_code": "finding",
+      "uid": "fdg_32dfaf5364b4d6",
+      "correlation_uid": "run_29ea23f0b2d8ece7",
+      "processed_time": 1783188903071,
+      "processed_time_dt": "2026-07-04T18:15:03.071496Z",
+      "product": {
+        "vendor_name": "CRIS-SME",
+        "name": "CRIS-SME",
+        "feature": {
+          "name": "Risk Assessment"
+        },
+        "version": "2.0.0"
+      },
+      "profiles": [
+        "cloud",
+        "security_control"
+      ]
+    },
+    "finding_info": {
+      "uid": "fdg_32dfaf5364b4d6",
+      "title": "Workload backup agent coverage is below resilience expectations",
+      "desc": "Deterministic scoring prioritization using severity, exposure, data sensitivity, confidence calibration, and remediation effort factors.",
+      "product_uid": "CMP-004",
+      "created_time": 1783188903071,
+      "created_time_dt": "2026-07-04T18:15:03.071496Z",
+      "modified_time": 1783188903071,
+      "modified_time_dt": "2026-07-04T18:15:03.071496Z",
+      "types": [
+        "Compute/Workloads"
+      ]
+    },
+    "resources": [
+      {
+        "uid": "compute:aws:aws-000832363767",
+        "name": "SIGI Technologies Compute",
+        "type": "compute_plane",
+        "cloud_partition": "aws",
+        "criticality": "medium",
+        "labels": [
+          "internet_exposed",
+          "criticality:medium"
+        ]
+      }
+    ],
+    "evidences": [
+      {
+        "uid": "evd_fdg_32dfaf5364b4d6_01",
+        "name": "control_evidence/CMP-004",
+        "type": "observed",
+        "desc": "Workload backup agent coverage is approximately 0%",
+        "data": {
+          "finding_id": "fdg_32dfaf5364b4d6",
+          "control_id": "CMP-004",
+          "resource_scope": "000832363767",
+          "statement": "Workload backup agent coverage is approximately 0%"
+        }
+      }
+    ],
+    "remediation": {
+      "desc": "Enable workload backup protections for critical virtual machines and services."
+    },
+    "cloud": {
+      "provider": "aws",
+      "account_uid": "aws-000832363767",
+      "account_name": "SIGI Technologies"
+    },
+    "unmapped": {
+      "cris_sme": {
+        "priority": "Planned",
+        "score": 36.85,
+        "resource_scope": "000832363767",
+        "asset_ids": [
+          "compute:aws:aws-000832363767"
+        ],
+        "evidence_ids": [
+          "evd_fdg_32dfaf5364b4d6_01"
+        ],
+        "evidence_quality": {
+          "observation_class": "observed",
+          "sufficiency": "unsupported",
+          "direct_evidence_count": 1,
+          "inferred_evidence_count": 0,
+          "unavailable_evidence_count": 0,
+          "provider_support": "research_preview",
+          "missing_requirements": [
+            "patch posture proxy evidence",
+            "workload hardening and endpoint coverage evidence"
+          ]
+        },
+        "lifecycle": {
+          "status": "open",
+          "status_reason": "Active non-compliant finding in current assessment.",
+          "first_seen": "2026-07-04T18:13:19.019124Z",
+          "last_seen": "2026-07-04T18:15:03.071496Z",
+          "previous_seen": "2026-07-04T18:13:19.019124Z",
+          "is_new": false,
+          "seen_count": 2,
+          "recurrence_count": 1
+        },
+        "mapping": [
+          "ISO 27001 A.8.13",
+          "NIST PR.DS-04"
+        ],
+        "remediation_cost_tier": "medium",
+        "report_schema_version": "2.0.0",
+        "collector_mode": "aws"
+      }
+    }
+  },
+  {
+    "activity_id": 1,
+    "activity_name": "Create",
+    "category_uid": 2,
+    "category_name": "Findings",
+    "class_uid": 2004,
+    "class_name": "Detection Finding",
+    "type_uid": 200401,
+    "type_name": "Detection Finding: Create",
+    "time": 1783188903071,
+    "time_dt": "2026-07-04T18:15:03.071496Z",
+    "severity_id": 4,
+    "severity": "High",
+    "status": "open",
+    "status_id": 1,
+    "count": 1,
+    "metadata": {
+      "version": "1.1.0",
+      "event_code": "finding",
+      "uid": "fdg_03484c44a1bea9",
+      "correlation_uid": "run_29ea23f0b2d8ece7",
+      "processed_time": 1783188903071,
+      "processed_time_dt": "2026-07-04T18:15:03.071496Z",
+      "product": {
+        "vendor_name": "CRIS-SME",
+        "name": "CRIS-SME",
+        "feature": {
+          "name": "Risk Assessment"
+        },
+        "version": "2.0.0"
+      },
+      "profiles": [
+        "cloud",
+        "security_control"
+      ]
+    },
+    "finding_info": {
+      "uid": "fdg_03484c44a1bea9",
+      "title": "Activity log retention is below governance and investigation expectations",
+      "desc": "Deterministic scoring prioritization using severity, exposure, data sensitivity, confidence calibration, and remediation effort factors.",
+      "product_uid": "MON-001",
+      "created_time": 1783188903071,
+      "created_time_dt": "2026-07-04T18:15:03.071496Z",
+      "modified_time": 1783188903071,
+      "modified_time_dt": "2026-07-04T18:15:03.071496Z",
+      "types": [
+        "Monitoring/Logging"
+      ]
+    },
+    "resources": [
+      {
+        "uid": "monitoring:aws:aws-000832363767",
+        "name": "SIGI Technologies Monitoring",
+        "type": "monitoring_plane",
+        "cloud_partition": "aws",
+        "criticality": "medium",
+        "labels": [
+          "criticality:medium"
+        ]
+      }
+    ],
+    "evidences": [
+      {
+        "uid": "evd_fdg_03484c44a1bea9_01",
+        "name": "control_evidence/MON-001",
+        "type": "observed",
+        "desc": "Activity logs are retained for only 0 day(s)",
+        "data": {
+          "finding_id": "fdg_03484c44a1bea9",
+          "control_id": "MON-001",
+          "resource_scope": "000832363767",
+          "statement": "Activity logs are retained for only 0 day(s)"
+        }
+      }
+    ],
+    "remediation": {
+      "desc": "Increase log retention to support investigation, governance review, and evidence preservation."
+    },
+    "cloud": {
+      "provider": "aws",
+      "account_uid": "aws-000832363767",
+      "account_name": "SIGI Technologies"
+    },
+    "unmapped": {
+      "cris_sme": {
+        "priority": "Planned",
+        "score": 35.79,
+        "resource_scope": "000832363767",
+        "asset_ids": [
+          "monitoring:aws:aws-000832363767"
+        ],
+        "evidence_ids": [
+          "evd_fdg_03484c44a1bea9_01"
+        ],
+        "evidence_quality": {
+          "observation_class": "observed",
+          "sufficiency": "unsupported",
+          "direct_evidence_count": 1,
+          "inferred_evidence_count": 0,
+          "unavailable_evidence_count": 0,
+          "provider_support": "research_preview",
+          "missing_requirements": [
+            "log retention and alerting evidence",
+            "incident runbook or workflow evidence"
+          ]
+        },
+        "lifecycle": {
+          "status": "open",
+          "status_reason": "Active non-compliant finding in current assessment.",
+          "first_seen": "2026-07-04T18:13:19.019124Z",
+          "last_seen": "2026-07-04T18:15:03.071496Z",
+          "previous_seen": "2026-07-04T18:13:19.019124Z",
+          "is_new": false,
+          "seen_count": 2,
+          "recurrence_count": 1
+        },
+        "mapping": [
+          "CIS Azure Foundations Benchmark 5.2",
+          "NIST DE.CM-01",
+          "DSPT NDG Standard 6"
+        ],
+        "remediation_cost_tier": "low",
+        "report_schema_version": "2.0.0",
+        "collector_mode": "aws"
+      }
+    }
+  },
+  {
+    "activity_id": 1,
+    "activity_name": "Create",
+    "category_uid": 2,
+    "category_name": "Findings",
+    "class_uid": 2004,
+    "class_name": "Detection Finding",
+    "type_uid": 200401,
+    "type_name": "Detection Finding: Create",
+    "time": 1783188903071,
+    "time_dt": "2026-07-04T18:15:03.071496Z",
+    "severity_id": 4,
+    "severity": "High",
+    "status": "open",
+    "status_id": 1,
+    "count": 1,
+    "metadata": {
+      "version": "1.1.0",
+      "event_code": "finding",
+      "uid": "fdg_78fef0955deb69",
+      "correlation_uid": "run_29ea23f0b2d8ece7",
+      "processed_time": 1783188903071,
+      "processed_time_dt": "2026-07-04T18:15:03.071496Z",
+      "product": {
+        "vendor_name": "CRIS-SME",
+        "name": "CRIS-SME",
+        "feature": {
+          "name": "Risk Assessment"
+        },
+        "version": "2.0.0"
+      },
+      "profiles": [
+        "cloud",
+        "security_control"
+      ]
+    },
+    "finding_info": {
+      "uid": "fdg_78fef0955deb69",
+      "title": "Policy assignment coverage is below the baseline governance threshold",
+      "desc": "Deterministic scoring prioritization using severity, exposure, data sensitivity, confidence calibration, and remediation effort factors.",
+      "product_uid": "GOV-003",
+      "created_time": 1783188903071,
+      "created_time_dt": "2026-07-04T18:15:03.071496Z",
+      "modified_time": 1783188903071,
+      "modified_time_dt": "2026-07-04T18:15:03.071496Z",
+      "types": [
+        "Cost/Governance Hygiene"
+      ]
+    },
+    "resources": [
+      {
+        "uid": "tenant:aws:aws-000832363767",
+        "name": "SIGI Technologies",
+        "type": "tenant",
+        "cloud_partition": "aws",
+        "criticality": "high",
+        "labels": [
+          "criticality:high"
+        ]
+      }
+    ],
+    "evidences": [
+      {
+        "uid": "evd_fdg_78fef0955deb69_01",
+        "name": "control_evidence/GOV-003",
+        "type": "observed",
+        "desc": "Baseline policy assignment coverage is approximately 0%",
+        "data": {
+          "finding_id": "fdg_78fef0955deb69",
+          "control_id": "GOV-003",
+          "resource_scope": "000832363767",
+          "statement": "Baseline policy assignment coverage is approximately 0%"
+        }
+      }
+    ],
+    "remediation": {
+      "desc": "Increase baseline policy assignment coverage for governance and compliance controls."
+    },
+    "cloud": {
+      "provider": "aws",
+      "account_uid": "aws-000832363767",
+      "account_name": "SIGI Technologies"
+    },
+    "unmapped": {
+      "cris_sme": {
+        "priority": "Planned",
+        "score": 33.88,
+        "resource_scope": "000832363767",
+        "asset_ids": [
+          "tenant:aws:aws-000832363767"
+        ],
+        "evidence_ids": [
+          "evd_fdg_78fef0955deb69_01"
+        ],
+        "evidence_quality": {
+          "observation_class": "observed",
+          "sufficiency": "unsupported",
+          "direct_evidence_count": 1,
+          "inferred_evidence_count": 0,
+          "unavailable_evidence_count": 0,
+          "provider_support": "research_preview",
+          "missing_requirements": [
+            "resource inventory evidence",
+            "governance policy/budget/tagging control evidence"
+          ]
+        },
+        "lifecycle": {
+          "status": "open",
+          "status_reason": "Active non-compliant finding in current assessment.",
+          "first_seen": "2026-07-04T18:13:19.019124Z",
+          "last_seen": "2026-07-04T18:15:03.071496Z",
+          "previous_seen": "2026-07-04T18:13:19.019124Z",
+          "is_new": false,
+          "seen_count": 2,
+          "recurrence_count": 1
+        },
+        "mapping": [
+          "Azure Policy Baseline",
+          "NIST GV.PO-01"
+        ],
+        "remediation_cost_tier": "free",
+        "report_schema_version": "2.0.0",
+        "collector_mode": "aws"
+      }
+    }
+  },
+  {
+    "activity_id": 1,
+    "activity_name": "Create",
+    "category_uid": 2,
+    "category_name": "Findings",
+    "class_uid": 2004,
+    "class_name": "Detection Finding",
+    "type_uid": 200401,
+    "type_name": "Detection Finding: Create",
+    "time": 1783188903071,
+    "time_dt": "2026-07-04T18:15:03.071496Z",
+    "severity_id": 3,
+    "severity": "Medium",
+    "status": "open",
+    "status_id": 1,
+    "count": 1,
+    "metadata": {
+      "version": "1.1.0",
+      "event_code": "finding",
+      "uid": "fdg_c5f3db81b3965c",
+      "correlation_uid": "run_29ea23f0b2d8ece7",
+      "processed_time": 1783188903071,
+      "processed_time_dt": "2026-07-04T18:15:03.071496Z",
+      "product": {
+        "vendor_name": "CRIS-SME",
+        "name": "CRIS-SME",
+        "feature": {
+          "name": "Risk Assessment"
+        },
+        "version": "2.0.0"
+      },
+      "profiles": [
+        "cloud",
+        "security_control"
+      ]
+    },
+    "finding_info": {
+      "uid": "fdg_c5f3db81b3965c",
+      "title": "Stale service principals or credentials require review",
+      "desc": "Deterministic scoring prioritization using severity, exposure, data sensitivity, confidence calibration, and remediation effort factors.",
+      "product_uid": "IAM-003",
+      "created_time": 1783188903071,
+      "created_time_dt": "2026-07-04T18:15:03.071496Z",
+      "modified_time": 1783188903071,
+      "modified_time_dt": "2026-07-04T18:15:03.071496Z",
+      "types": [
+        "IAM"
+      ]
+    },
+    "resources": [
+      {
+        "uid": "identity:aws:aws-000832363767",
+        "name": "SIGI Technologies Identity",
+        "type": "identity_plane",
+        "cloud_partition": "aws",
+        "criticality": "high",
+        "labels": [
+          "criticality:high"
+        ]
+      }
+    ],
+    "evidences": [
+      {
+        "uid": "evd_fdg_c5f3db81b3965c_01",
+        "name": "control_evidence/IAM-003",
+        "type": "observed",
+        "desc": "1 stale service principal(s) or credential set(s) were identified",
+        "data": {
+          "finding_id": "fdg_c5f3db81b3965c",
+          "control_id": "IAM-003",
+          "resource_scope": "000832363767",
+          "statement": "1 stale service principal(s) or credential set(s) were identified"
+        }
+      }
+    ],
+    "remediation": {
+      "desc": "Rotate or remove stale service principal credentials and disable unused identities."
+    },
+    "cloud": {
+      "provider": "aws",
+      "account_uid": "aws-000832363767",
+      "account_name": "SIGI Technologies"
+    },
+    "unmapped": {
+      "cris_sme": {
+        "priority": "Monitor",
+        "score": 23.34,
+        "resource_scope": "000832363767",
+        "asset_ids": [
+          "identity:aws:aws-000832363767"
+        ],
+        "evidence_ids": [
+          "evd_fdg_c5f3db81b3965c_01"
+        ],
+        "evidence_quality": {
+          "observation_class": "observed",
+          "sufficiency": "unsupported",
+          "direct_evidence_count": 1,
+          "inferred_evidence_count": 0,
+          "unavailable_evidence_count": 0,
+          "provider_support": "research_preview",
+          "missing_requirements": [
+            "privileged assignment inventory",
+            "identity governance visibility context"
+          ]
+        },
+        "lifecycle": {
+          "status": "open",
+          "status_reason": "Active non-compliant finding in current assessment.",
+          "first_seen": "2026-07-04T18:13:19.019124Z",
+          "last_seen": "2026-07-04T18:15:03.071496Z",
+          "previous_seen": "2026-07-04T18:13:19.019124Z",
+          "is_new": false,
+          "seen_count": 2,
+          "recurrence_count": 1
+        },
+        "mapping": [
+          "Microsoft Cloud Security Benchmark IM-3",
+          "NIST PR.AA-01"
+        ],
+        "remediation_cost_tier": "free",
+        "report_schema_version": "2.0.0",
+        "collector_mode": "aws"
+      }
+    }
+  },
+  {
+    "activity_id": 1,
+    "activity_name": "Create",
+    "category_uid": 2,
+    "category_name": "Findings",
+    "class_uid": 2004,
+    "class_name": "Detection Finding",
+    "type_uid": 200401,
+    "type_name": "Detection Finding: Create",
+    "time": 1783188903071,
+    "time_dt": "2026-07-04T18:15:03.071496Z",
+    "severity_id": 3,
+    "severity": "Medium",
+    "status": "open",
+    "status_id": 1,
+    "count": 1,
+    "metadata": {
+      "version": "1.1.0",
+      "event_code": "finding",
+      "uid": "fdg_22fa0573d52093",
+      "correlation_uid": "run_29ea23f0b2d8ece7",
+      "processed_time": 1783188903071,
+      "processed_time_dt": "2026-07-04T18:15:03.071496Z",
+      "product": {
+        "vendor_name": "CRIS-SME",
+        "name": "CRIS-SME",
+        "feature": {
+          "name": "Risk Assessment"
+        },
+        "version": "2.0.0"
+      },
+      "profiles": [
+        "cloud",
+        "security_control"
+      ]
+    },
+    "finding_info": {
+      "uid": "fdg_22fa0573d52093",
+      "title": "Conditional private endpoint and network isolation posture is weak",
+      "desc": "Deterministic scoring prioritization using severity, exposure, data sensitivity, confidence calibration, and remediation effort factors.",
+      "product_uid": "IOT-006",
+      "created_time": 1783188903071,
+      "created_time_dt": "2026-07-04T18:15:03.071496Z",
+      "modified_time": 1783188903071,
+      "modified_time_dt": "2026-07-04T18:15:03.071496Z",
+      "types": [
+        "Healthcare IoT"
+      ]
+    },
+    "resources": [
+      {
+        "uid": "data:aws:aws-000832363767",
+        "name": "SIGI Technologies Data Services",
+        "type": "data_plane",
+        "cloud_partition": "aws",
+        "criticality": "high",
+        "labels": [
+          "internet_exposed",
+          "criticality:high"
+        ]
+      }
+    ],
+    "evidences": [
+      {
+        "uid": "evd_fdg_22fa0573d52093_01",
+        "name": "control_evidence/IOT-006",
+        "type": "observed",
+        "desc": "IoT Hub public network access is enabled without IP filter evidence",
+        "data": {
+          "finding_id": "fdg_22fa0573d52093",
+          "control_id": "IOT-006",
+          "resource_scope": "000832363767",
+          "statement": "IoT Hub public network access is enabled without IP filter evidence"
+        }
+      },
+      {
+        "uid": "evd_fdg_22fa0573d52093_02",
+        "name": "control_evidence/IOT-006",
+        "type": "observed",
+        "desc": "Certificate-authority based device authentication was not observed",
+        "data": {
+          "finding_id": "fdg_22fa0573d52093",
+          "control_id": "IOT-006",
+          "resource_scope": "000832363767",
+          "statement": "Certificate-authority based device authentication was not observed"
+        }
+      },
+      {
+        "uid": "evd_fdg_22fa0573d52093_03",
+        "name": "control_evidence/IOT-006",
+        "type": "observed",
+        "desc": "No private endpoint was observed for the IoT Hub scope",
+        "data": {
+          "finding_id": "fdg_22fa0573d52093",
+          "control_id": "IOT-006",
+          "resource_scope": "000832363767",
+          "statement": "No private endpoint was observed for the IoT Hub scope"
+        }
+      }
+    ],
+    "remediation": {
+      "desc": "Deploy private endpoints for sensitive IoMT telemetry services where public routing lacks documented and observable compensating controls."
+    },
+    "cloud": {
+      "provider": "aws",
+      "account_uid": "aws-000832363767",
+      "account_name": "SIGI Technologies"
+    },
+    "unmapped": {
+      "cris_sme": {
+        "priority": "Monitor",
+        "score": 23.33,
+        "resource_scope": "000832363767",
+        "asset_ids": [
+          "data:aws:aws-000832363767"
+        ],
+        "evidence_ids": [
+          "evd_fdg_22fa0573d52093_01",
+          "evd_fdg_22fa0573d52093_02",
+          "evd_fdg_22fa0573d52093_03"
+        ],
+        "evidence_quality": {
+          "observation_class": "observed",
+          "sufficiency": "unsupported",
+          "direct_evidence_count": 3,
+          "inferred_evidence_count": 0,
+          "unavailable_evidence_count": 0,
+          "provider_support": "research_preview",
+          "missing_requirements": [
+            "IoT platform configuration evidence",
+            "device identity, telemetry, and clinical boundary evidence"
+          ]
+        },
+        "lifecycle": {
+          "status": "open",
+          "status_reason": "Active non-compliant finding in current assessment.",
+          "first_seen": "2026-07-04T18:13:19.019124Z",
+          "last_seen": "2026-07-04T18:15:03.071496Z",
+          "previous_seen": "2026-07-04T18:13:19.019124Z",
+          "is_new": false,
+          "seen_count": 2,
+          "recurrence_count": 1
+        },
+        "mapping": [
+          "NCSC CAF B4 System security",
+          "NHS DSPT Network security",
+          "UK GDPR Article 32"
+        ],
+        "remediation_cost_tier": "medium",
+        "report_schema_version": "2.0.0",
+        "collector_mode": "aws"
+      }
+    }
+  },
+  {
+    "activity_id": 1,
+    "activity_name": "Create",
+    "category_uid": 2,
+    "category_name": "Findings",
+    "class_uid": 2004,
+    "class_name": "Detection Finding",
+    "type_uid": 200401,
+    "type_name": "Detection Finding: Create",
+    "time": 1783188903071,
+    "time_dt": "2026-07-04T18:15:03.071496Z",
+    "severity_id": 3,
+    "severity": "Medium",
+    "status": "open",
+    "status_id": 1,
+    "count": 1,
+    "metadata": {
+      "version": "1.1.0",
+      "event_code": "finding",
+      "uid": "fdg_45fead59d5ed86",
+      "correlation_uid": "run_29ea23f0b2d8ece7",
+      "processed_time": 1783188903071,
+      "processed_time_dt": "2026-07-04T18:15:03.071496Z",
+      "product": {
+        "vendor_name": "CRIS-SME",
+        "name": "CRIS-SME",
+        "feature": {
+          "name": "Risk Assessment"
+        },
+        "version": "2.0.0"
+      },
+      "profiles": [
+        "cloud",
+        "security_control"
+      ]
+    },
+    "finding_info": {
+      "uid": "fdg_45fead59d5ed86",
+      "title": "IoT credential governance is not linked to managed secret controls",
+      "desc": "Deterministic scoring prioritization using severity, exposure, data sensitivity, confidence calibration, and remediation effort factors.",
+      "product_uid": "IOT-008",
+      "created_time": 1783188903071,
+      "created_time_dt": "2026-07-04T18:15:03.071496Z",
+      "modified_time": 1783188903071,
+      "modified_time_dt": "2026-07-04T18:15:03.071496Z",
+      "types": [
+        "Healthcare IoT"
+      ]
+    },
+    "resources": [
+      {
+        "uid": "data:aws:aws-000832363767",
+        "name": "SIGI Technologies Data Services",
+        "type": "data_plane",
+        "cloud_partition": "aws",
+        "criticality": "high",
+        "labels": [
+          "internet_exposed",
+          "criticality:high"
+        ]
+      }
+    ],
+    "evidences": [
+      {
+        "uid": "evd_fdg_45fead59d5ed86_01",
+        "name": "control_evidence/IOT-008",
+        "type": "observed",
+        "desc": "IoT credentials were not linked to a governed key vault path",
+        "data": {
+          "finding_id": "fdg_45fead59d5ed86",
+          "control_id": "IOT-008",
+          "resource_scope": "000832363767",
+          "statement": "IoT credentials were not linked to a governed key vault path"
+        }
+      },
+      {
+        "uid": "evd_fdg_45fead59d5ed86_02",
+        "name": "control_evidence/IOT-008",
+        "type": "observed",
+        "desc": "IoT credential rotation evidence was not observable",
+        "data": {
+          "finding_id": "fdg_45fead59d5ed86",
+          "control_id": "IOT-008",
+          "resource_scope": "000832363767",
+          "statement": "IoT credential rotation evidence was not observable"
+        }
+      }
+    ],
+    "remediation": {
+      "desc": "Store and rotate IoT credentials through governed key-management services with owner accountability."
+    },
+    "cloud": {
+      "provider": "aws",
+      "account_uid": "aws-000832363767",
+      "account_name": "SIGI Technologies"
+    },
+    "unmapped": {
+      "cris_sme": {
+        "priority": "Monitor",
+        "score": 21.98,
+        "resource_scope": "000832363767",
+        "asset_ids": [
+          "data:aws:aws-000832363767"
+        ],
+        "evidence_ids": [
+          "evd_fdg_45fead59d5ed86_01",
+          "evd_fdg_45fead59d5ed86_02"
+        ],
+        "evidence_quality": {
+          "observation_class": "observed",
+          "sufficiency": "unsupported",
+          "direct_evidence_count": 2,
+          "inferred_evidence_count": 0,
+          "unavailable_evidence_count": 0,
+          "provider_support": "research_preview",
+          "missing_requirements": [
+            "IoT platform configuration evidence",
+            "device identity, telemetry, and clinical boundary evidence"
+          ]
+        },
+        "lifecycle": {
+          "status": "open",
+          "status_reason": "Active non-compliant finding in current assessment.",
+          "first_seen": "2026-07-04T18:13:19.019124Z",
+          "last_seen": "2026-07-04T18:15:03.071496Z",
+          "previous_seen": "2026-07-04T18:13:19.019124Z",
+          "is_new": false,
+          "seen_count": 2,
+          "recurrence_count": 1
+        },
+        "mapping": [
+          "NCSC CAF B2 Identity and access control",
+          "NHS DSPT Access control",
+          "ISO 27001 A.8.24"
+        ],
+        "remediation_cost_tier": "low",
+        "report_schema_version": "2.0.0",
+        "collector_mode": "aws"
+      }
+    }
+  },
+  {
+    "activity_id": 1,
+    "activity_name": "Create",
+    "category_uid": 2,
+    "category_name": "Findings",
+    "class_uid": 2004,
+    "class_name": "Detection Finding",
+    "type_uid": 200401,
+    "type_name": "Detection Finding: Create",
+    "time": 1783188903071,
+    "time_dt": "2026-07-04T18:15:03.071496Z",
+    "severity_id": 3,
+    "severity": "Medium",
+    "status": "open",
+    "status_id": 1,
+    "count": 1,
+    "metadata": {
+      "version": "1.1.0",
+      "event_code": "finding",
+      "uid": "fdg_74c023949b5311",
+      "correlation_uid": "run_29ea23f0b2d8ece7",
+      "processed_time": 1783188903071,
+      "processed_time_dt": "2026-07-04T18:15:03.071496Z",
+      "product": {
+        "vendor_name": "CRIS-SME",
+        "name": "CRIS-SME",
+        "feature": {
+          "name": "Risk Assessment"
+        },
+        "version": "2.0.0"
+      },
+      "profiles": [
+        "cloud",
+        "security_control"
+      ]
+    },
+    "finding_info": {
+      "uid": "fdg_74c023949b5311",
+      "title": "IoT diagnostic logging is incomplete for clinical telemetry investigation",
+      "desc": "Deterministic scoring prioritization using severity, exposure, data sensitivity, confidence calibration, and remediation effort factors.",
+      "product_uid": "IOT-003",
+      "created_time": 1783188903071,
+      "created_time_dt": "2026-07-04T18:15:03.071496Z",
+      "modified_time": 1783188903071,
+      "modified_time_dt": "2026-07-04T18:15:03.071496Z",
+      "types": [
+        "Healthcare IoT"
+      ]
+    },
+    "resources": [
+      {
+        "uid": "data:aws:aws-000832363767",
+        "name": "SIGI Technologies Data Services",
+        "type": "data_plane",
+        "cloud_partition": "aws",
+        "criticality": "high",
+        "labels": [
+          "internet_exposed",
+          "criticality:high"
+        ]
+      }
+    ],
+    "evidences": [
+      {
+        "uid": "evd_fdg_74c023949b5311_01",
+        "name": "control_evidence/IOT-003",
+        "type": "observed",
+        "desc": "IoT Hub diagnostic settings were not enabled",
+        "data": {
+          "finding_id": "fdg_74c023949b5311",
+          "control_id": "IOT-003",
+          "resource_scope": "000832363767",
+          "statement": "IoT Hub diagnostic settings were not enabled"
+        }
+      },
+      {
+        "uid": "evd_fdg_74c023949b5311_02",
+        "name": "control_evidence/IOT-003",
+        "type": "observed",
+        "desc": "No diagnostic destination was observed for IoT telemetry logs",
+        "data": {
+          "finding_id": "fdg_74c023949b5311",
+          "control_id": "IOT-003",
+          "resource_scope": "000832363767",
+          "statement": "No diagnostic destination was observed for IoT telemetry logs"
+        }
+      },
+      {
+        "uid": "evd_fdg_74c023949b5311_03",
+        "name": "control_evidence/IOT-003",
+        "type": "observed",
+        "desc": "IoT diagnostic category coverage is below the 80% baseline",
+        "data": {
+          "finding_id": "fdg_74c023949b5311",
+          "control_id": "IOT-003",
+          "resource_scope": "000832363767",
+          "statement": "IoT diagnostic category coverage is below the 80% baseline"
+        }
+      }
+    ],
+    "remediation": {
+      "desc": "Enable IoT Hub diagnostic settings and route core diagnostic categories to a monitored destination."
+    },
+    "cloud": {
+      "provider": "aws",
+      "account_uid": "aws-000832363767",
+      "account_name": "SIGI Technologies"
+    },
+    "unmapped": {
+      "cris_sme": {
+        "priority": "Monitor",
+        "score": 21.77,
+        "resource_scope": "000832363767",
+        "asset_ids": [
+          "data:aws:aws-000832363767"
+        ],
+        "evidence_ids": [
+          "evd_fdg_74c023949b5311_01",
+          "evd_fdg_74c023949b5311_02",
+          "evd_fdg_74c023949b5311_03"
+        ],
+        "evidence_quality": {
+          "observation_class": "observed",
+          "sufficiency": "unsupported",
+          "direct_evidence_count": 3,
+          "inferred_evidence_count": 0,
+          "unavailable_evidence_count": 0,
+          "provider_support": "research_preview",
+          "missing_requirements": [
+            "IoT platform configuration evidence",
+            "device identity, telemetry, and clinical boundary evidence"
+          ]
+        },
+        "lifecycle": {
+          "status": "open",
+          "status_reason": "Active non-compliant finding in current assessment.",
+          "first_seen": "2026-07-04T18:13:19.019124Z",
+          "last_seen": "2026-07-04T18:15:03.071496Z",
+          "previous_seen": "2026-07-04T18:13:19.019124Z",
+          "is_new": false,
+          "seen_count": 2,
+          "recurrence_count": 1
+        },
+        "mapping": [
+          "NCSC CAF C1 Security monitoring",
+          "NHS DSPT Logging and monitoring",
+          "ISO 27001 A.8.15"
+        ],
+        "remediation_cost_tier": "low",
+        "report_schema_version": "2.0.0",
+        "collector_mode": "aws"
+      }
+    }
+  },
+  {
+    "activity_id": 1,
+    "activity_name": "Create",
+    "category_uid": 2,
+    "category_name": "Findings",
+    "class_uid": 2004,
+    "class_name": "Detection Finding",
+    "type_uid": 200401,
+    "type_name": "Detection Finding: Create",
+    "time": 1783188903071,
+    "time_dt": "2026-07-04T18:15:03.071496Z",
+    "severity_id": 3,
+    "severity": "Medium",
+    "status": "open",
+    "status_id": 1,
+    "count": 1,
+    "metadata": {
+      "version": "1.1.0",
+      "event_code": "finding",
+      "uid": "fdg_0487a7973756c3",
+      "correlation_uid": "run_29ea23f0b2d8ece7",
+      "processed_time": 1783188903071,
+      "processed_time_dt": "2026-07-04T18:15:03.071496Z",
+      "product": {
+        "vendor_name": "CRIS-SME",
+        "name": "CRIS-SME",
+        "feature": {
+          "name": "Risk Assessment"
+        },
+        "version": "2.0.0"
+      },
+      "profiles": [
+        "cloud",
+        "security_control"
+      ]
+    },
+    "finding_info": {
+      "uid": "fdg_0487a7973756c3",
+      "title": "Defender for IoT or equivalent security monitoring is not evidenced",
+      "desc": "Deterministic scoring prioritization using severity, exposure, data sensitivity, confidence calibration, and remediation effort factors.",
+      "product_uid": "IOT-004",
+      "created_time": 1783188903071,
+      "created_time_dt": "2026-07-04T18:15:03.071496Z",
+      "modified_time": 1783188903071,
+      "modified_time_dt": "2026-07-04T18:15:03.071496Z",
+      "types": [
+        "Healthcare IoT"
+      ]
+    },
+    "resources": [
+      {
+        "uid": "data:aws:aws-000832363767",
+        "name": "SIGI Technologies Data Services",
+        "type": "data_plane",
+        "cloud_partition": "aws",
+        "criticality": "high",
+        "labels": [
+          "internet_exposed",
+          "criticality:high"
+        ]
+      }
+    ],
+    "evidences": [
+      {
+        "uid": "evd_fdg_0487a7973756c3_01",
+        "name": "control_evidence/IOT-004",
+        "type": "observed",
+        "desc": "Defender for IoT coverage was not observed for the hub scope",
+        "data": {
+          "finding_id": "fdg_0487a7973756c3",
+          "control_id": "IOT-004",
+          "resource_scope": "000832363767",
+          "statement": "Defender for IoT coverage was not observed for the hub scope"
+        }
+      }
+    ],
+    "remediation": {
+      "desc": "Enable Defender for IoT or document an equivalent monitoring path for clinical IoT assets."
+    },
+    "cloud": {
+      "provider": "aws",
+      "account_uid": "aws-000832363767",
+      "account_name": "SIGI Technologies"
+    },
+    "unmapped": {
+      "cris_sme": {
+        "priority": "Monitor",
+        "score": 21.5,
+        "resource_scope": "000832363767",
+        "asset_ids": [
+          "data:aws:aws-000832363767"
+        ],
+        "evidence_ids": [
+          "evd_fdg_0487a7973756c3_01"
+        ],
+        "evidence_quality": {
+          "observation_class": "observed",
+          "sufficiency": "unsupported",
+          "direct_evidence_count": 1,
+          "inferred_evidence_count": 0,
+          "unavailable_evidence_count": 0,
+          "provider_support": "research_preview",
+          "missing_requirements": [
+            "IoT platform configuration evidence",
+            "device identity, telemetry, and clinical boundary evidence"
+          ]
+        },
+        "lifecycle": {
+          "status": "open",
+          "status_reason": "Active non-compliant finding in current assessment.",
+          "first_seen": "2026-07-04T18:13:19.019124Z",
+          "last_seen": "2026-07-04T18:15:03.071496Z",
+          "previous_seen": "2026-07-04T18:13:19.019124Z",
+          "is_new": false,
+          "seen_count": 2,
+          "recurrence_count": 1
+        },
+        "mapping": [
+          "NCSC CAF C1 Security monitoring",
+          "NHS DSPT Security operations",
+          "IEC 62443 security monitoring"
+        ],
+        "remediation_cost_tier": "medium",
+        "report_schema_version": "2.0.0",
+        "collector_mode": "aws"
+      }
+    }
+  },
+  {
+    "activity_id": 1,
+    "activity_name": "Create",
+    "category_uid": 2,
+    "category_name": "Findings",
+    "class_uid": 2004,
+    "class_name": "Detection Finding",
+    "type_uid": 200401,
+    "type_name": "Detection Finding: Create",
+    "time": 1783188903071,
+    "time_dt": "2026-07-04T18:15:03.071496Z",
+    "severity_id": 3,
+    "severity": "Medium",
+    "status": "open",
+    "status_id": 1,
+    "count": 1,
+    "metadata": {
+      "version": "1.1.0",
+      "event_code": "finding",
+      "uid": "fdg_212e49f1a69dad",
+      "correlation_uid": "run_29ea23f0b2d8ece7",
+      "processed_time": 1783188903071,
+      "processed_time_dt": "2026-07-04T18:15:03.071496Z",
+      "product": {
+        "vendor_name": "CRIS-SME",
+        "name": "CRIS-SME",
+        "feature": {
+          "name": "Risk Assessment"
+        },
+        "version": "2.0.0"
+      },
+      "profiles": [
+        "cloud",
+        "security_control"
+      ]
+    },
+    "finding_info": {
+      "uid": "fdg_212e49f1a69dad",
+      "title": "IoMT telemetry routing and retention are below clinical evidence expectations",
+      "desc": "Deterministic scoring prioritization using severity, exposure, data sensitivity, confidence calibration, and remediation effort factors.",
+      "product_uid": "IOT-007",
+      "created_time": 1783188903071,
+      "created_time_dt": "2026-07-04T18:15:03.071496Z",
+      "modified_time": 1783188903071,
+      "modified_time_dt": "2026-07-04T18:15:03.071496Z",
+      "types": [
+        "Healthcare IoT"
+      ]
+    },
+    "resources": [
+      {
+        "uid": "data:aws:aws-000832363767",
+        "name": "SIGI Technologies Data Services",
+        "type": "data_plane",
+        "cloud_partition": "aws",
+        "criticality": "high",
+        "labels": [
+          "internet_exposed",
+          "criticality:high"
+        ]
+      }
+    ],
+    "evidences": [
+      {
+        "uid": "evd_fdg_212e49f1a69dad_01",
+        "name": "control_evidence/IOT-007",
+        "type": "observed",
+        "desc": "No IoT telemetry message route was observed",
+        "data": {
+          "finding_id": "fdg_212e49f1a69dad",
+          "control_id": "IOT-007",
+          "resource_scope": "000832363767",
+          "statement": "No IoT telemetry message route was observed"
+        }
+      },
+      {
+        "uid": "evd_fdg_212e49f1a69dad_02",
+        "name": "control_evidence/IOT-007",
+        "type": "observed",
+        "desc": "IoT telemetry retention is 0 day(s), below the 30-day baseline",
+        "data": {
+          "finding_id": "fdg_212e49f1a69dad",
+          "control_id": "IOT-007",
+          "resource_scope": "000832363767",
+          "statement": "IoT telemetry retention is 0 day(s), below the 30-day baseline"
+        }
+      },
+      {
+        "uid": "evd_fdg_212e49f1a69dad_03",
+        "name": "control_evidence/IOT-007",
+        "type": "observed",
+        "desc": "Telemetry storage governance was not observed",
+        "data": {
+          "finding_id": "fdg_212e49f1a69dad",
+          "control_id": "IOT-007",
+          "resource_scope": "000832363767",
+          "statement": "Telemetry storage governance was not observed"
+        }
+      }
+    ],
+    "remediation": {
+      "desc": "Route IoMT telemetry to governed storage and retain sufficient logs for investigation and clinical safety review."
+    },
+    "cloud": {
+      "provider": "aws",
+      "account_uid": "aws-000832363767",
+      "account_name": "SIGI Technologies"
+    },
+    "unmapped": {
+      "cris_sme": {
+        "priority": "Monitor",
+        "score": 20.93,
+        "resource_scope": "000832363767",
+        "asset_ids": [
+          "data:aws:aws-000832363767"
+        ],
+        "evidence_ids": [
+          "evd_fdg_212e49f1a69dad_01",
+          "evd_fdg_212e49f1a69dad_02",
+          "evd_fdg_212e49f1a69dad_03"
+        ],
+        "evidence_quality": {
+          "observation_class": "observed",
+          "sufficiency": "unsupported",
+          "direct_evidence_count": 3,
+          "inferred_evidence_count": 0,
+          "unavailable_evidence_count": 0,
+          "provider_support": "research_preview",
+          "missing_requirements": [
+            "IoT platform configuration evidence",
+            "device identity, telemetry, and clinical boundary evidence"
+          ]
+        },
+        "lifecycle": {
+          "status": "open",
+          "status_reason": "Active non-compliant finding in current assessment.",
+          "first_seen": "2026-07-04T18:13:19.019124Z",
+          "last_seen": "2026-07-04T18:15:03.071496Z",
+          "previous_seen": "2026-07-04T18:13:19.019124Z",
+          "is_new": false,
+          "seen_count": 2,
+          "recurrence_count": 1
+        },
+        "mapping": [
+          "NCSC CAF C1 Security monitoring",
+          "NHS DSPT Records management",
+          "ISO 27001 A.8.15"
+        ],
+        "remediation_cost_tier": "low",
+        "report_schema_version": "2.0.0",
+        "collector_mode": "aws"
+      }
+    }
+  },
+  {
+    "activity_id": 1,
+    "activity_name": "Create",
+    "category_uid": 2,
+    "category_name": "Findings",
+    "class_uid": 2004,
+    "class_name": "Detection Finding",
+    "type_uid": 200401,
+    "type_name": "Detection Finding: Create",
+    "time": 1783188903071,
+    "time_dt": "2026-07-04T18:15:03.071496Z",
+    "severity_id": 3,
+    "severity": "Medium",
+    "status": "open",
+    "status_id": 1,
+    "count": 1,
+    "metadata": {
+      "version": "1.1.0",
+      "event_code": "finding",
+      "uid": "fdg_f2db05d7f43d6a",
+      "correlation_uid": "run_29ea23f0b2d8ece7",
+      "processed_time": 1783188903071,
+      "processed_time_dt": "2026-07-04T18:15:03.071496Z",
+      "product": {
+        "vendor_name": "CRIS-SME",
+        "name": "CRIS-SME",
+        "feature": {
+          "name": "Risk Assessment"
+        },
+        "version": "2.0.0"
+      },
+      "profiles": [
+        "cloud",
+        "security_control"
+      ]
+    },
+    "finding_info": {
+      "uid": "fdg_f2db05d7f43d6a",
+      "title": "Clinical IoT alert routing is not operationally evidenced",
+      "desc": "Deterministic scoring prioritization using severity, exposure, data sensitivity, confidence calibration, and remediation effort factors.",
+      "product_uid": "IOT-009",
+      "created_time": 1783188903071,
+      "created_time_dt": "2026-07-04T18:15:03.071496Z",
+      "modified_time": 1783188903071,
+      "modified_time_dt": "2026-07-04T18:15:03.071496Z",
+      "types": [
+        "Healthcare IoT"
+      ]
+    },
+    "resources": [
+      {
+        "uid": "data:aws:aws-000832363767",
+        "name": "SIGI Technologies Data Services",
+        "type": "data_plane",
+        "cloud_partition": "aws",
+        "criticality": "high",
+        "labels": [
+          "internet_exposed",
+          "criticality:high"
+        ]
+      }
+    ],
+    "evidences": [
+      {
+        "uid": "evd_fdg_f2db05d7f43d6a_01",
+        "name": "control_evidence/IOT-009",
+        "type": "observed",
+        "desc": "No IoT-specific clinical or operational alert rule was observed",
+        "data": {
+          "finding_id": "fdg_f2db05d7f43d6a",
+          "control_id": "IOT-009",
+          "resource_scope": "000832363767",
+          "statement": "No IoT-specific clinical or operational alert rule was observed"
+        }
+      },
+      {
+        "uid": "evd_fdg_f2db05d7f43d6a_02",
+        "name": "control_evidence/IOT-009",
+        "type": "observed",
+        "desc": "No action group was observed for IoT alert routing",
+        "data": {
+          "finding_id": "fdg_f2db05d7f43d6a",
+          "control_id": "IOT-009",
+          "resource_scope": "000832363767",
+          "statement": "No action group was observed for IoT alert routing"
+        }
+      }
+    ],
+    "remediation": {
+      "desc": "Create IoT-specific alert rules and route them to accountable clinical or operational responders."
+    },
+    "cloud": {
+      "provider": "aws",
+      "account_uid": "aws-000832363767",
+      "account_name": "SIGI Technologies"
+    },
+    "unmapped": {
+      "cris_sme": {
+        "priority": "Monitor",
+        "score": 20.3,
+        "resource_scope": "000832363767",
+        "asset_ids": [
+          "data:aws:aws-000832363767"
+        ],
+        "evidence_ids": [
+          "evd_fdg_f2db05d7f43d6a_01",
+          "evd_fdg_f2db05d7f43d6a_02"
+        ],
+        "evidence_quality": {
+          "observation_class": "observed",
+          "sufficiency": "unsupported",
+          "direct_evidence_count": 2,
+          "inferred_evidence_count": 0,
+          "unavailable_evidence_count": 0,
+          "provider_support": "research_preview",
+          "missing_requirements": [
+            "IoT platform configuration evidence",
+            "device identity, telemetry, and clinical boundary evidence"
+          ]
+        },
+        "lifecycle": {
+          "status": "open",
+          "status_reason": "Active non-compliant finding in current assessment.",
+          "first_seen": "2026-07-04T18:13:19.019124Z",
+          "last_seen": "2026-07-04T18:15:03.071496Z",
+          "previous_seen": "2026-07-04T18:13:19.019124Z",
+          "is_new": false,
+          "seen_count": 2,
+          "recurrence_count": 1
+        },
+        "mapping": [
+          "NCSC CAF C2 Proactive security event discovery",
+          "NHS DSPT Incident management",
+          "IEC 80001-1 operational risk"
+        ],
+        "remediation_cost_tier": "low",
+        "report_schema_version": "2.0.0",
+        "collector_mode": "aws"
+      }
+    }
+  },
+  {
+    "activity_id": 1,
+    "activity_name": "Create",
+    "category_uid": 2,
+    "category_name": "Findings",
+    "class_uid": 2004,
+    "class_name": "Detection Finding",
+    "type_uid": 200401,
+    "type_name": "Detection Finding: Create",
+    "time": 1783188903071,
+    "time_dt": "2026-07-04T18:15:03.071496Z",
+    "severity_id": 3,
+    "severity": "Medium",
+    "status": "open",
+    "status_id": 1,
+    "count": 1,
+    "metadata": {
+      "version": "1.1.0",
+      "event_code": "finding",
+      "uid": "fdg_6c25430ff366c3",
+      "correlation_uid": "run_29ea23f0b2d8ece7",
+      "processed_time": 1783188903071,
+      "processed_time_dt": "2026-07-04T18:15:03.071496Z",
+      "product": {
+        "vendor_name": "CRIS-SME",
+        "name": "CRIS-SME",
+        "feature": {
+          "name": "Risk Assessment"
+        },
+        "version": "2.0.0"
+      },
+      "profiles": [
+        "cloud",
+        "security_control"
+      ]
+    },
+    "finding_info": {
+      "uid": "fdg_6c25430ff366c3",
+      "title": "Orphaned resources increase governance and cost hygiene risk",
+      "desc": "Deterministic scoring prioritization using severity, exposure, data sensitivity, confidence calibration, and remediation effort factors.",
+      "product_uid": "GOV-004",
+      "created_time": 1783188903071,
+      "created_time_dt": "2026-07-04T18:15:03.071496Z",
+      "modified_time": 1783188903071,
+      "modified_time_dt": "2026-07-04T18:15:03.071496Z",
+      "types": [
+        "Cost/Governance Hygiene"
+      ]
+    },
+    "resources": [
+      {
+        "uid": "tenant:aws:aws-000832363767",
+        "name": "SIGI Technologies",
+        "type": "tenant",
+        "cloud_partition": "aws",
+        "criticality": "high",
+        "labels": [
+          "criticality:high"
+        ]
+      }
+    ],
+    "evidences": [
+      {
+        "uid": "evd_fdg_6c25430ff366c3_01",
+        "name": "control_evidence/GOV-004",
+        "type": "observed",
+        "desc": "2 orphaned resource(s) were identified",
+        "data": {
+          "finding_id": "fdg_6c25430ff366c3",
+          "control_id": "GOV-004",
+          "resource_scope": "000832363767",
+          "statement": "2 orphaned resource(s) were identified"
+        }
+      }
+    ],
+    "remediation": {
+      "desc": "Review and remove unused or orphaned resources to reduce cost and governance noise."
+    },
+    "cloud": {
+      "provider": "aws",
+      "account_uid": "aws-000832363767",
+      "account_name": "SIGI Technologies"
+    },
+    "unmapped": {
+      "cris_sme": {
+        "priority": "Monitor",
+        "score": 17.87,
+        "resource_scope": "000832363767",
+        "asset_ids": [
+          "tenant:aws:aws-000832363767"
+        ],
+        "evidence_ids": [
+          "evd_fdg_6c25430ff366c3_01"
+        ],
+        "evidence_quality": {
+          "observation_class": "observed",
+          "sufficiency": "unsupported",
+          "direct_evidence_count": 1,
+          "inferred_evidence_count": 0,
+          "unavailable_evidence_count": 0,
+          "provider_support": "research_preview",
+          "missing_requirements": [
+            "resource inventory evidence",
+            "governance policy/budget/tagging control evidence"
+          ]
+        },
+        "lifecycle": {
+          "status": "open",
+          "status_reason": "Active non-compliant finding in current assessment.",
+          "first_seen": "2026-07-04T18:13:19.019124Z",
+          "last_seen": "2026-07-04T18:15:03.071496Z",
+          "previous_seen": "2026-07-04T18:13:19.019124Z",
+          "is_new": false,
+          "seen_count": 2,
+          "recurrence_count": 1
+        },
+        "mapping": [
+          "Azure CAF Governance Discipline",
+          "FinOps Asset Hygiene"
+        ],
+        "remediation_cost_tier": "free",
+        "report_schema_version": "2.0.0",
+        "collector_mode": "aws"
+      }
+    }
+  },
+  {
+    "activity_id": 1,
+    "activity_name": "Create",
+    "category_uid": 2,
+    "category_name": "Findings",
+    "class_uid": 2004,
+    "class_name": "Detection Finding",
+    "type_uid": 200401,
+    "type_name": "Detection Finding: Create",
+    "time": 1783188903071,
+    "time_dt": "2026-07-04T18:15:03.071496Z",
+    "severity_id": 3,
+    "severity": "Medium",
+    "status": "open",
+    "status_id": 1,
+    "count": 1,
+    "metadata": {
+      "version": "1.1.0",
+      "event_code": "finding",
+      "uid": "fdg_41e815a1b649a8",
+      "correlation_uid": "run_29ea23f0b2d8ece7",
+      "processed_time": 1783188903071,
+      "processed_time_dt": "2026-07-04T18:15:03.071496Z",
+      "product": {
+        "vendor_name": "CRIS-SME",
+        "name": "CRIS-SME",
+        "feature": {
+          "name": "Risk Assessment"
+        },
+        "version": "2.0.0"
+      },
+      "profiles": [
+        "cloud",
+        "security_control"
+      ]
+    },
+    "finding_info": {
+      "uid": "fdg_41e815a1b649a8",
+      "title": "Budget alerting is not enabled for cloud cost governance",
+      "desc": "Deterministic scoring prioritization using severity, exposure, data sensitivity, confidence calibration, and remediation effort factors.",
+      "product_uid": "GOV-002",
+      "created_time": 1783188903071,
+      "created_time_dt": "2026-07-04T18:15:03.071496Z",
+      "modified_time": 1783188903071,
+      "modified_time_dt": "2026-07-04T18:15:03.071496Z",
+      "types": [
+        "Cost/Governance Hygiene"
+      ]
+    },
+    "resources": [
+      {
+        "uid": "tenant:aws:aws-000832363767",
+        "name": "SIGI Technologies",
+        "type": "tenant",
+        "cloud_partition": "aws",
+        "criticality": "high",
+        "labels": [
+          "criticality:high"
+        ]
+      }
+    ],
+    "evidences": [
+      {
+        "uid": "evd_fdg_41e815a1b649a8_01",
+        "name": "control_evidence/GOV-002",
+        "type": "observed",
+        "desc": "Budget or spend alerting is not configured",
+        "data": {
+          "finding_id": "fdg_41e815a1b649a8",
+          "control_id": "GOV-002",
+          "resource_scope": "000832363767",
+          "statement": "Budget or spend alerting is not configured"
+        }
+      }
+    ],
+    "remediation": {
+      "desc": "Configure budget thresholds and spend alerts for cost oversight."
+    },
+    "cloud": {
+      "provider": "aws",
+      "account_uid": "aws-000832363767",
+      "account_name": "SIGI Technologies"
+    },
+    "unmapped": {
+      "cris_sme": {
+        "priority": "Monitor",
+        "score": 16.39,
+        "resource_scope": "000832363767",
+        "asset_ids": [
+          "tenant:aws:aws-000832363767"
+        ],
+        "evidence_ids": [
+          "evd_fdg_41e815a1b649a8_01"
+        ],
+        "evidence_quality": {
+          "observation_class": "observed",
+          "sufficiency": "unsupported",
+          "direct_evidence_count": 1,
+          "inferred_evidence_count": 0,
+          "unavailable_evidence_count": 0,
+          "provider_support": "research_preview",
+          "missing_requirements": [
+            "resource inventory evidence",
+            "governance policy/budget/tagging control evidence"
+          ]
+        },
+        "lifecycle": {
+          "status": "open",
+          "status_reason": "Active non-compliant finding in current assessment.",
+          "first_seen": "2026-07-04T18:13:19.019124Z",
+          "last_seen": "2026-07-04T18:15:03.071496Z",
+          "previous_seen": "2026-07-04T18:13:19.019124Z",
+          "is_new": false,
+          "seen_count": 2,
+          "recurrence_count": 1
+        },
+        "mapping": [
+          "FinOps Cost Governance",
+          "ISO 27001 A.5.36"
+        ],
+        "remediation_cost_tier": "free",
+        "report_schema_version": "2.0.0",
+        "collector_mode": "aws"
+      }
+    }
+  },
+  {
+    "activity_id": 1,
+    "activity_name": "Create",
+    "category_uid": 2,
+    "category_name": "Findings",
+    "class_uid": 2004,
+    "class_name": "Detection Finding",
+    "type_uid": 200401,
+    "type_name": "Detection Finding: Create",
+    "time": 1783188903071,
+    "time_dt": "2026-07-04T18:15:03.071496Z",
+    "severity_id": 2,
+    "severity": "Low",
+    "status": "open",
+    "status_id": 1,
+    "count": 1,
+    "metadata": {
+      "version": "1.1.0",
+      "event_code": "finding",
+      "uid": "fdg_bd7c18a97bdfc6",
+      "correlation_uid": "run_29ea23f0b2d8ece7",
+      "processed_time": 1783188903071,
+      "processed_time_dt": "2026-07-04T18:15:03.071496Z",
+      "product": {
+        "vendor_name": "CRIS-SME",
+        "name": "CRIS-SME",
+        "feature": {
+          "name": "Risk Assessment"
+        },
+        "version": "2.0.0"
+      },
+      "profiles": [
+        "cloud",
+        "security_control"
+      ]
+    },
+    "finding_info": {
+      "uid": "fdg_bd7c18a97bdfc6",
+      "title": "Clinical-operational ownership boundaries require human validation",
+      "desc": "Deterministic scoring prioritization using severity, exposure, data sensitivity, confidence calibration, and remediation effort factors.",
+      "product_uid": "IOT-010",
+      "created_time": 1783188903071,
+      "created_time_dt": "2026-07-04T18:15:03.071496Z",
+      "modified_time": 1783188903071,
+      "modified_time_dt": "2026-07-04T18:15:03.071496Z",
+      "types": [
+        "Healthcare IoT"
+      ]
+    },
+    "resources": [
+      {
+        "uid": "data:aws:aws-000832363767",
+        "name": "SIGI Technologies Data Services",
+        "type": "data_plane",
+        "cloud_partition": "aws",
+        "criticality": "high",
+        "labels": [
+          "internet_exposed",
+          "criticality:high"
+        ]
+      }
+    ],
+    "evidences": [
+      {
+        "uid": "evd_fdg_bd7c18a97bdfc6_01",
+        "name": "control_evidence/IOT-010",
+        "type": "observed",
+        "desc": "Clinical and operational ownership boundary was not documented in collected evidence",
+        "data": {
+          "finding_id": "fdg_bd7c18a97bdfc6",
+          "control_id": "IOT-010",
+          "resource_scope": "000832363767",
+          "statement": "Clinical and operational ownership boundary was not documented in collected evidence"
+        }
+      },
+      {
+        "uid": "evd_fdg_bd7c18a97bdfc6_02",
+        "name": "control_evidence/IOT-010",
+        "type": "observed",
+        "desc": "1 operational evidence item(s) require human confirmation",
+        "data": {
+          "finding_id": "fdg_bd7c18a97bdfc6",
+          "control_id": "IOT-010",
+          "resource_scope": "000832363767",
+          "statement": "1 operational evidence item(s) require human confirmation"
+        }
+      }
+    ],
+    "remediation": {
+      "desc": "Document clinical, operational, and supplier ownership boundaries for IoMT assets and validate device-level evidence manually."
+    },
+    "cloud": {
+      "provider": "aws",
+      "account_uid": "aws-000832363767",
+      "account_name": "SIGI Technologies"
+    },
+    "unmapped": {
+      "cris_sme": {
+        "priority": "Monitor",
+        "score": 4.72,
+        "resource_scope": "000832363767",
+        "asset_ids": [
+          "data:aws:aws-000832363767"
+        ],
+        "evidence_ids": [
+          "evd_fdg_bd7c18a97bdfc6_01",
+          "evd_fdg_bd7c18a97bdfc6_02"
+        ],
+        "evidence_quality": {
+          "observation_class": "observed",
+          "sufficiency": "unsupported",
+          "direct_evidence_count": 2,
+          "inferred_evidence_count": 0,
+          "unavailable_evidence_count": 0,
+          "provider_support": "research_preview",
+          "missing_requirements": [
+            "IoT platform configuration evidence",
+            "device identity, telemetry, and clinical boundary evidence"
+          ]
+        },
+        "lifecycle": {
+          "status": "open",
+          "status_reason": "Active non-compliant finding in current assessment.",
+          "first_seen": "2026-07-04T18:13:19.019124Z",
+          "last_seen": "2026-07-04T18:15:03.071496Z",
+          "previous_seen": "2026-07-04T18:13:19.019124Z",
+          "is_new": false,
+          "seen_count": 2,
+          "recurrence_count": 1
+        },
+        "mapping": [
+          "NCSC CAF A1 Governance",
+          "NHS DSPT Leadership and governance",
+          "IEC 80001-1 responsibility agreements"
+        ],
+        "remediation_cost_tier": "free",
+        "report_schema_version": "2.0.0",
+        "collector_mode": "aws"
+      }
+    }
+  },
+  {
+    "activity_id": 1,
+    "activity_name": "Create",
+    "category_uid": 2,
+    "category_name": "Findings",
+    "class_uid": 2004,
+    "class_name": "Detection Finding",
+    "type_uid": 200401,
+    "type_name": "Detection Finding: Create",
+    "time": 1783188903071,
+    "time_dt": "2026-07-04T18:15:03.071496Z",
+    "severity_id": 2,
+    "severity": "Low",
+    "status": "open",
+    "status_id": 1,
+    "count": 1,
+    "metadata": {
+      "version": "1.1.0",
+      "event_code": "finding",
+      "uid": "fdg_8ce865e5eb6019",
+      "correlation_uid": "run_29ea23f0b2d8ece7",
+      "processed_time": 1783188903071,
+      "processed_time_dt": "2026-07-04T18:15:03.071496Z",
+      "product": {
+        "vendor_name": "CRIS-SME",
+        "name": "CRIS-SME",
+        "feature": {
+          "name": "Risk Assessment"
+        },
+        "version": "2.0.0"
+      },
+      "profiles": [
+        "cloud",
+        "security_control"
+      ]
+    },
+    "finding_info": {
+      "uid": "fdg_8ce865e5eb6019",
+      "title": "Identity governance observability is partial for this assessment scope",
+      "desc": "Deterministic scoring prioritization using severity, exposure, data sensitivity, confidence calibration, and remediation effort factors.",
+      "product_uid": "IAM-005",
+      "created_time": 1783188903071,
+      "created_time_dt": "2026-07-04T18:15:03.071496Z",
+      "modified_time": 1783188903071,
+      "modified_time_dt": "2026-07-04T18:15:03.071496Z",
+      "types": [
+        "IAM"
+      ]
+    },
+    "resources": [
+      {
+        "uid": "identity:aws:aws-000832363767",
+        "name": "SIGI Technologies Identity",
+        "type": "identity_plane",
+        "cloud_partition": "aws",
+        "criticality": "high",
+        "labels": [
+          "criticality:high"
+        ]
+      }
+    ],
+    "evidences": [
+      {
+        "uid": "evd_fdg_8ce865e5eb6019_01",
+        "name": "control_evidence/IAM-005",
+        "type": "observed",
+        "desc": "Subscription-scoped evidence was collected for privileged role assignments",
+        "data": {
+          "finding_id": "fdg_8ce865e5eb6019",
+          "control_id": "IAM-005",
+          "resource_scope": "000832363767",
+          "statement": "Subscription-scoped evidence was collected for privileged role assignments"
+        }
+      },
+      {
+        "uid": "evd_fdg_8ce865e5eb6019_02",
+        "name": "control_evidence/IAM-005",
+        "type": "observed",
+        "desc": "Tenant-wide Entra controls such as conditional access were not directly observable in this run",
+        "data": {
+          "finding_id": "fdg_8ce865e5eb6019",
+          "control_id": "IAM-005",
+          "resource_scope": "000832363767",
+          "statement": "Tenant-wide Entra controls such as conditional access were not directly observable in this run"
+        }
+      },
+      {
+        "uid": "evd_fdg_8ce865e5eb6019_03",
+        "name": "control_evidence/IAM-005",
+        "type": "observed",
+        "desc": "The signed-in assessment identity exposed 1 Entra directory role(s)",
+        "data": {
+          "finding_id": "fdg_8ce865e5eb6019",
+          "control_id": "IAM-005",
+          "resource_scope": "000832363767",
+          "statement": "The signed-in assessment identity exposed 1 Entra directory role(s)"
+        }
+      },
+      {
+        "uid": "evd_fdg_8ce865e5eb6019_04",
+        "name": "control_evidence/IAM-005",
+        "type": "observed",
+        "desc": "The tenant directory-role catalog was partially visible with 43 active role entry(ies)",
+        "data": {
+          "finding_id": "fdg_8ce865e5eb6019",
+          "control_id": "IAM-005",
+          "resource_scope": "000832363767",
+          "statement": "The tenant directory-role catalog was partially visible with 43 active role entry(ies)"
+        }
+      }
+    ],
+    "remediation": {
+      "desc": "Broaden tenant-level identity evidence collection before treating IAM coverage as complete."
+    },
+    "cloud": {
+      "provider": "aws",
+      "account_uid": "aws-000832363767",
+      "account_name": "SIGI Technologies"
+    },
+    "unmapped": {
+      "cris_sme": {
+        "priority": "Monitor",
+        "score": 4.57,
+        "resource_scope": "000832363767",
+        "asset_ids": [
+          "identity:aws:aws-000832363767"
+        ],
+        "evidence_ids": [
+          "evd_fdg_8ce865e5eb6019_01",
+          "evd_fdg_8ce865e5eb6019_02",
+          "evd_fdg_8ce865e5eb6019_03",
+          "evd_fdg_8ce865e5eb6019_04"
+        ],
+        "evidence_quality": {
+          "observation_class": "inferred",
+          "sufficiency": "unsupported",
+          "direct_evidence_count": 4,
+          "inferred_evidence_count": 0,
+          "unavailable_evidence_count": 1,
+          "provider_support": "research_preview",
+          "missing_requirements": [
+            "privileged assignment inventory",
+            "identity governance visibility context"
+          ]
+        },
+        "lifecycle": {
+          "status": "open",
+          "status_reason": "Active non-compliant finding in current assessment.",
+          "first_seen": "2026-07-04T18:13:19.019124Z",
+          "last_seen": "2026-07-04T18:15:03.071496Z",
+          "previous_seen": "2026-07-04T18:13:19.019124Z",
+          "is_new": false,
+          "seen_count": 2,
+          "recurrence_count": 1
+        },
+        "mapping": [
+          "ISO 27001 A.5.15",
+          "NIST GV.RM-01"
+        ],
+        "remediation_cost_tier": "low",
+        "report_schema_version": "2.0.0",
+        "collector_mode": "aws"
+      }
+    }
+  }
+]

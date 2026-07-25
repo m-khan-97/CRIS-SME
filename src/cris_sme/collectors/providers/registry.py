@@ -1,12 +1,14 @@
 # Provider adapter registry for routing raw posture records to the correct normalizer.
 from __future__ import annotations
 
+from cris_sme.collectors.providers.aws_adapter import AwsProfileAdapter
 from cris_sme.collectors.providers.azure_adapter import AzureProfileAdapter
 from cris_sme.collectors.providers.base import ProviderProfileAdapter
 
 
 _PROFILE_ADAPTERS: dict[str, ProviderProfileAdapter] = {
     "azure": AzureProfileAdapter(),
+    "aws": AwsProfileAdapter(),
 }
 
 

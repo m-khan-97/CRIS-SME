@@ -1,0 +1,10 @@
+cloud_supported_count,cloud_supported_rate,question_count,reviewed_count,section
+0,0.0,2,0,certificates
+4,28.57,14,0,firewalls
+0,0.0,3,0,insurance
+0,0.0,5,0,malware_protection
+6,33.33,18,0,scope_of_assessment
+4,40.0,10,0,secure_configuration
+3,18.75,16,0,security_update_management
+11,64.71,17,0,user_access_control
+0,0.0,21,0,your_company

@@ -1,0 +1,6 @@
+count,label,rate
+5,direct_cloud,4.72
+24,endpoint_required,22.64
+23,inferred_cloud,21.7
+35,manual_required,33.02
+19,policy_required,17.92

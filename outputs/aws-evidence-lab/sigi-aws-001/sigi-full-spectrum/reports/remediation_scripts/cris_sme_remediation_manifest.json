@@ -1,0 +1,119 @@
+{
+  "generated_from": "prioritized_risks",
+  "execution_policy": "non_executing_reference_only",
+  "provider": "aws",
+  "controls": [
+    {
+      "control_id": "DATA-001",
+      "title": "Public storage access increases data exposure risk",
+      "domain": "Data",
+      "severity": "High",
+      "remediation_summary": "Disable anonymous or public storage access and review data exposure paths.",
+      "remediation_cost_tier": "free",
+      "manual_steps": [
+        "Confirm whether public storage access is intentional and documented.",
+        "Disable public access for sensitive storage unless a signed exception exists.",
+        "Review exposed data paths and notify accountable business owners where required."
+      ],
+      "code": [
+        {
+          "kind": "aws_cli",
+          "label": "Review public S3 and RDS exposure",
+          "snippet": "aws s3api list-buckets --query 'Buckets[].Name' --output table && aws rds describe-db-instances --query 'DBInstances[].{Id:DBInstanceIdentifier,Public:PubliclyAccessible}' --output table"
+        }
+      ],
+      "findings": [
+        {
+          "finding_id": "fdg_59af495a1834f7",
+          "title": "Public storage access increases data exposure risk",
+          "priority": "Planned",
+          "organization": "SIGI Technologies"
+        }
+      ]
+    },
+    {
+      "control_id": "IAM-001",
+      "title": "Privileged role assignments without MFA enforcement",
+      "domain": "IAM",
+      "severity": "Critical",
+      "remediation_summary": "Require MFA and admin-focused conditional access for privileged identities.",
+      "remediation_cost_tier": "free",
+      "manual_steps": [
+        "Review all privileged role assignments and confirm each principal has a named owner.",
+        "Require MFA for privileged users and emergency access accounts through an approved policy.",
+        "Create a decision record for any exception, including expiry and compensating control."
+      ],
+      "code": [
+        {
+          "kind": "aws_cli",
+          "label": "Review IAM users and MFA devices",
+          "snippet": "aws iam list-users --output table"
+        }
+      ],
+      "findings": [
+        {
+          "finding_id": "fdg_81612c096e8237",
+          "title": "Privileged role assignments without MFA enforcement",
+          "priority": "High",
+          "organization": "SIGI Technologies"
+        }
+      ]
+    },
+    {
+      "control_id": "MON-001",
+      "title": "Activity log retention is below governance and investigation expectations",
+      "domain": "Monitoring/Logging",
+      "severity": "Medium",
+      "remediation_summary": "Increase log retention to support investigation, governance review, and evidence preservation.",
+      "remediation_cost_tier": "low",
+      "manual_steps": [
+        "Set an activity log retention period that matches the SME governance and incident review window.",
+        "Route important logs to a monitored workspace or archive destination.",
+        "Document retention costs and any constrained-scope exception."
+      ],
+      "code": [
+        {
+          "kind": "aws_cli",
+          "label": "Review CloudTrail and CloudWatch Logs retention",
+          "snippet": "aws cloudtrail describe-trails --include-shadow-trails false --output table && aws logs describe-log-groups --query 'logGroups[].{Name:logGroupName,Retention:retentionInDays}' --output table"
+        }
+      ],
+      "findings": [
+        {
+          "finding_id": "fdg_03484c44a1bea9",
+          "title": "Activity log retention is below governance and investigation expectations",
+          "priority": "Planned",
+          "organization": "SIGI Technologies"
+        }
+      ]
+    },
+    {
+      "control_id": "NET-001",
+      "title": "Administrative services are exposed to the public internet",
+      "domain": "Network",
+      "severity": "Critical",
+      "remediation_summary": "Restrict SSH and RDP exposure with private access paths, VPN, or just-in-time controls.",
+      "remediation_cost_tier": "medium",
+      "manual_steps": [
+        "Identify the exposed workload, rule, source range, and business owner.",
+        "Replace public administrative access with VPN, private endpoint, bastion, or just-in-time access.",
+        "Record any temporary exposure as a time-bound governance exception."
+      ],
+      "code": [
+        {
+          "kind": "aws_cli",
+          "label": "Review security-group ingress on administrative ports",
+          "snippet": "aws ec2 describe-security-groups --query 'SecurityGroups[].{GroupId:GroupId,Ingress:IpPermissions}' --output json"
+        }
+      ],
+      "findings": [
+        {
+          "finding_id": "fdg_514b77f2a83791",
+          "title": "Administrative services are exposed to the public internet",
+          "priority": "High",
+          "organization": "SIGI Technologies"
+        }
+      ]
+    }
+  ]
+}

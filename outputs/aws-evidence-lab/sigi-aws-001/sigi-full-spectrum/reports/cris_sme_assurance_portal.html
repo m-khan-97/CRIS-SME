@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>CRIS-SME Assurance Portal</title>
+    <style>
+      :root {
+        --bg: #f6f8fb;
+        --ink: #162231;
+        --muted: #66788f;
+        --panel: #ffffff;
+        --line: #d9e2ec;
+        --accent: #0d9488;
+        --accent-2: #2563eb;
+        --warn: #b45309;
+        --ok: #15803d;
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        background: var(--bg);
+        color: var(--ink);
+        font-family: "IBM Plex Sans", "Segoe UI", sans-serif;
+      }
+      .wrap { max-width: 1180px; margin: 0 auto; padding: 24px 18px 48px; }
+      header {
+        border-bottom: 1px solid var(--line);
+        padding-bottom: 18px;
+        margin-bottom: 20px;
+      }
+      h1 { margin: 0; font-size: 2rem; }
+      h2 { margin: 0 0 10px; font-size: 1.1rem; }
+      p { line-height: 1.55; }
+      .muted { color: var(--muted); }
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+        gap: 14px;
+        margin-bottom: 16px;
+      }
+      .panel {
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        padding: 14px;
+      }
+      .badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        color: #042f2e;
+        background: #ccfbf1;
+        border: 1px solid #99f6e4;
+        border-radius: 999px;
+        padding: 6px 10px;
+        font-weight: 700;
+      }
+      .metric { font-size: 1.65rem; font-weight: 800; margin: 4px 0; }
+      .list { display: grid; gap: 10px; }
+      .item {
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        padding: 10px;
+        background: #fbfdff;
+      }
+      .claim-id {
+        font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+        font-size: 0.82rem;
+        color: var(--accent-2);
+      }
+      .status-verified { color: var(--ok); font-weight: 700; }
+      .status-caveated, .status-unverified { color: var(--warn); font-weight: 700; }
+      .path {
+        font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+        font-size: 0.82rem;
+        overflow-wrap: anywhere;
+        color: #334155;
+      }
+      footer { margin-top: 22px; color: var(--muted); font-size: 0.9rem; }
+    </style>
+  </head>
+  <body>
+    <main class="wrap">
+      <header>
+        <h1>CRIS-SME Assurance Portal</h1>
+        <p class="muted">Customer-facing view of report trust, replay, claims, assurance case, provenance paths, and caveats.</p>
+        <span class="badge">CRIS-SME Limited Assurance</span>
+      </header>
+
+      <section class="grid">
+        <article class="panel"><h2>Assurance Score</h2><div class="metric">61.25</div><p class="muted">caveated</p></article>
+        <article class="panel"><h2>Claims</h2><div class="metric">21</div><p class="muted">4 verified</p></article>
+        <article class="panel"><h2>Replay</h2><div class="metric">Not verified</div><p class="muted">Delta 0.00</p></article>
+        <article class="panel"><h2>RBOM</h2><div class="metric">Present</div><p class="muted">36 artifacts</p></article>
+        <article class="panel"><h2>Evidence Gaps</h2><div class="metric">64</div><p class="muted">2 high priority</p></article>
+        <article class="panel"><h2>Provenance</h2><div class="metric">28</div><p class="muted">164 nodes</p></article>
+      </section>
+
+      <section class="panel">
+        <h2>Claim-Bound Narrative</h2>
+        <div class="list"><article class="item"><h2>Executive Summary</h2><p>Overall CRIS-SME risk score is 38.79/100. [clm_4a59bd33b3ac87] Report is explainable but has assurance gaps that should be reviewed before external reliance. This claim is caveated. Caveat: Deterministic replay is not verified.; 2 high-priority evidence gaps remain. [clm_05add4d49f86e9]</p><p class="claim-id">Claims: clm_4a59bd33b3ac87, clm_05add4d49f86e9</p><p><strong>Caveats:</strong> Deterministic replay is not verified.; 2 high-priority evidence gaps remain.; Evidence snapshot replay is missing or did not match deterministically.; Evidence sufficiency is low; findings may be explainable but less assured.</p></article><article class="item"><h2>Replay And Integrity</h2><p>Assessment replay is not verified for this report. This claim is caveated. Caveat: Deterministic replay did not verify cleanly. [clm_0302b5d56a4917] Report includes a Risk Bill of Materials integrity manifest. [clm_f151063e0cc4a1]</p><p class="claim-id">Claims: clm_0302b5d56a4917, clm_f151063e0cc4a1</p><p><strong>Caveats:</strong> Deterministic replay did not verify cleanly.</p></article><article class="item"><h2>Top Risk Claims</h2><p>NET-001 is a High risk with score 72.12. This claim is caveated. Caveat: Evidence sufficiency is unsupported. [clm_e017e79f322bc4] IAM-001 is a High risk with score 67.97. This claim is caveated. Caveat: Evidence sufficiency is unsupported. [clm_77c4416bb77e0a] DATA-001 is a Planned risk with score 48.35. This claim is caveated. Caveat: Evidence sufficiency is unsupported. [clm_aeeb7cf0ac9829] IOT-005 is a Planned risk with score 47.25. This claim is caveated. Caveat: Evidence sufficiency is unsupported. [clm_2d9e18ddaf4c14] NET-002 is a Planned risk with score 44.71. This claim is caveated. Caveat: Evidence sufficiency is unsupported. [clm_259ccdbe4f0eca]</p><p class="claim-id">Claims: clm_e017e79f322bc4, clm_77c4416bb77e0a, clm_aeeb7cf0ac9829, clm_2d9e18ddaf4c14, clm_259ccdbe4f0eca</p><p><strong>Caveats:</strong> Evidence sufficiency is unsupported.</p></article><article class="item"><h2>Cyber Essentials Readiness</h2><p>Cyber Essentials readiness score is 33.33/100. [clm_10031800d39adf] Firewalls readiness is gap. This claim is caveated. Caveat: Active mapped controls: NET-001, NET-002. [clm_8f98be1ee86a74] Secure configuration readiness is ready. [clm_4f7c3100bf948e] Access control readiness is partial. This claim is caveated. Caveat: Active mapped controls: IAM-001. [clm_9e3629aebd0692] Malware protection readiness is gap. This claim is caveated. Caveat: Active mapped controls: CMP-002. [clm_a84ad305d773d7] Security update management readiness is gap. This claim is caveated. Caveat: Active mapped controls: CMP-001. [clm_fe015f3fdb4966]</p><p class="claim-id">Claims: clm_10031800d39adf, clm_8f98be1ee86a74, clm_4f7c3100bf948e, clm_9e3629aebd0692, clm_a84ad305d773d7, clm_fe015f3fdb4966</p><p><strong>Caveats:</strong> Deterministic replay is not verified.; 2 high-priority evidence gaps remain.; Evidence snapshot replay is missing or did not match deterministically.; Evidence sufficiency is low; findings may be explainable but less assured.; Active mapped controls: NET-001, NET-002.; Active mapped controls: IAM-001.; Active mapped controls: CMP-002.; Active mapped controls: CMP-001.</p></article><article class="item"><h2>Insurance Evidence Claims</h2><p>INS-001 status is not_met: CRIS-SME identified material evidence that this control area is not fully met. The strongest linked gap is IAM-001 at 67.97 risk (high priority). This claim is caveated. Caveat: Require MFA and admin-focused conditional access for privileged identities. [clm_05fa8951d42cd7] INS-002 status is partial: CRIS-SME identified partial evidence of control weakness or incomplete observability. The strongest linked gap is IAM-005 at 4.57 risk (monitor priority). This claim is caveated. Caveat: Broaden tenant-level identity evidence collection before treating IAM coverage as complete. [clm_7783c460a10712] INS-003 status is not_met: CRIS-SME identified material evidence that this control area is not fully met. The strongest linked gap is NET-001 at 72.12 risk (high priority). This claim is caveated. Caveat: Restrict SSH and RDP exposure with private access paths, VPN, or just-in-time controls. [clm_f515210453343a] INS-004 status is partial: CRIS-SME identified partial evidence of control weakness or incomplete observability. The strongest linked gap is CMP-001 at 42.69 risk (planned priority). This claim is caveated. Caveat: Patch critical workloads and enforce a stronger recurring patch policy. [clm_19f45c1ae66374] INS-005 status is not_met: CRIS-SME identified material evidence that this control area is not fully met. The strongest linked gap is DATA-003 at 37.58 risk (planned priority). This claim is caveated. Caveat: Increase backup and retention coverage for business-critical data stores. [clm_1596204779edae] INS-006 status is partial: CRIS-SME identified partial evidence of control weakness or incomplete observability. The strongest linked gap is MON-001 at 35.79 risk (planned priority). This claim is caveated. Caveat: Increase log retention to support investigation, governance review, and evidence preservation. [clm_cd08af035368dd]</p><p class="claim-id">Claims: clm_05fa8951d42cd7, clm_7783c460a10712, clm_f515210453343a, clm_19f45c1ae66374, clm_1596204779edae, clm_cd08af035368dd</p><p><strong>Caveats:</strong> Require MFA and admin-focused conditional access for privileged identities.; Broaden tenant-level identity evidence collection before treating IAM coverage as complete.; Restrict SSH and RDP exposure with private access paths, VPN, or just-in-time controls.; Patch critical workloads and enforce a stronger recurring patch policy.; Increase backup and retention coverage for business-critical data stores.; Increase log retention to support investigation, governance review, and evidence preservation.</p></article></div>
+      </section>
+
+      <section class="grid">
+        <div class="panel">
+          <h2>Assurance Case Arguments</h2>
+          <div class="list"><article class="item"><h2>This assessment is replayable and integrity-backed.</h2><p><strong>Conclusion:</strong> caveated | <strong>Confidence:</strong> 0.62</p><p>Replay verifies deterministic reproduction while RBOM records report and artifact integrity.</p><p class="claim-id">Supporting claims: clm_0302b5d56a4917, clm_f151063e0cc4a1</p></article><article class="item"><h2>Risk conclusions are traceable to scored findings and evidence references.</h2><p><strong>Conclusion:</strong> caveated | <strong>Confidence:</strong> 0.86</p><p>Overall and top-risk claims link to finding IDs, evidence references, and provenance nodes.</p><p class="claim-id">Supporting claims: clm_4a59bd33b3ac87, clm_e017e79f322bc4, clm_77c4416bb77e0a, clm_aeeb7cf0ac9829, clm_2d9e18ddaf4c14, clm_259ccdbe4f0eca</p></article><article class="item"><h2>Executive, compliance, and insurance claims are explicitly verified or caveated.</h2><p><strong>Conclusion:</strong> caveated | <strong>Confidence:</strong> 0.67</p><p>Stakeholder-facing claims preserve verification status, confidence, caveats, and mapped controls.</p><p class="claim-id">Supporting claims: clm_05add4d49f86e9, clm_10031800d39adf, clm_8f98be1ee86a74, clm_4f7c3100bf948e, clm_9e3629aebd0692, clm_a84ad305d773d7, clm_fe015f3fdb4966, clm_05fa8951d42cd7, clm_7783c460a10712, clm_f515210453343a, clm_19f45c1ae66374, clm_1596204779edae, clm_cd08af035368dd</p></article><article class="item"><h2>Evidence quality and assurance gaps are explicit.</h2><p><strong>Conclusion:</strong> caveated | <strong>Confidence:</strong> 0.61</p><p>Assessment Assurance and Evidence Gap Backlog expose residual evidence-quality limitations.</p><p class="claim-id">Supporting claims: </p></article></div>
+        </div>
+        <div class="panel">
+          <h2>Verified And Caveated Claims</h2>
+          <div class="list"><article class="item"><div class="claim-id">clm_4a59bd33b3ac87</div><p class="status-verified">verified</p><p>Overall CRIS-SME risk score is 38.79/100.</p></article><article class="item"><div class="claim-id">clm_0302b5d56a4917</div><p class="status-caveated">caveated</p><p>Assessment replay is not verified for this report.</p></article><article class="item"><div class="claim-id">clm_f151063e0cc4a1</div><p class="status-verified">verified</p><p>Report includes a Risk Bill of Materials integrity manifest.</p></article><article class="item"><div class="claim-id">clm_05add4d49f86e9</div><p class="status-caveated">caveated</p><p>Report is explainable but has assurance gaps that should be reviewed before external reliance.</p></article><article class="item"><div class="claim-id">clm_e017e79f322bc4</div><p class="status-caveated">caveated</p><p>NET-001 is a High risk with score 72.12.</p></article><article class="item"><div class="claim-id">clm_77c4416bb77e0a</div><p class="status-caveated">caveated</p><p>IAM-001 is a High risk with score 67.97.</p></article><article class="item"><div class="claim-id">clm_aeeb7cf0ac9829</div><p class="status-caveated">caveated</p><p>DATA-001 is a Planned risk with score 48.35.</p></article><article class="item"><div class="claim-id">clm_2d9e18ddaf4c14</div><p class="status-caveated">caveated</p><p>IOT-005 is a Planned risk with score 47.25.</p></article><article class="item"><div class="claim-id">clm_259ccdbe4f0eca</div><p class="status-caveated">caveated</p><p>NET-002 is a Planned risk with score 44.71.</p></article><article class="item"><div class="claim-id">clm_10031800d39adf</div><p class="status-verified">verified</p><p>Cyber Essentials readiness score is 33.33/100.</p></article><article class="item"><div class="claim-id">clm_8f98be1ee86a74</div><p class="status-caveated">caveated</p><p>Firewalls readiness is gap.</p></article><article class="item"><div class="claim-id">clm_4f7c3100bf948e</div><p class="status-verified">verified</p><p>Secure configuration readiness is ready.</p></article></div>
+        </div>
+      </section>
+
+      <section class="panel">
+        <h2>Top Provenance Paths</h2>
+        <div class="list"><article class="item"><h2>NET-001</h2><p>NET-001 decision path links evidence, policy, finding, score, assurance, and review state.</p><div class="path">snapshot:evs_38d7b6507aa3d94a -&gt; policy_pack:2026.04.0 -&gt; control:NET-001 -&gt; provider_contract:aws:NET-001 -&gt; finding:fdg_514b77f2a83791 -&gt; evidence_sufficiency:fdg_514b77f2a83791 -&gt; score:fdg_514b77f2a83791 -&gt; decision_review:drv_4101b93513209e -&gt; assurance:assessment -&gt; trust_badge:report</div></article><article class="item"><h2>IAM-001</h2><p>IAM-001 decision path links evidence, policy, finding, score, assurance, and review state.</p><div class="path">snapshot:evs_38d7b6507aa3d94a -&gt; policy_pack:2026.04.0 -&gt; control:IAM-001 -&gt; provider_contract:aws:IAM-001 -&gt; finding:fdg_81612c096e8237 -&gt; evidence_sufficiency:fdg_81612c096e8237 -&gt; score:fdg_81612c096e8237 -&gt; decision_review:drv_e7403d177a8470 -&gt; assurance:assessment -&gt; trust_badge:report</div></article><article class="item"><h2>DATA-001</h2><p>DATA-001 decision path links evidence, policy, finding, score, assurance, and review state.</p><div class="path">snapshot:evs_38d7b6507aa3d94a -&gt; policy_pack:2026.04.0 -&gt; control:DATA-001 -&gt; provider_contract:aws:DATA-001 -&gt; finding:fdg_59af495a1834f7 -&gt; evidence_sufficiency:fdg_59af495a1834f7 -&gt; score:fdg_59af495a1834f7 -&gt; decision_review:drv_0fe7e2ead315c3 -&gt; assurance:assessment -&gt; trust_badge:report</div></article><article class="item"><h2>IOT-005</h2><p>IOT-005 decision path links evidence, policy, finding, score, assurance, and review state.</p><div class="path">snapshot:evs_38d7b6507aa3d94a -&gt; policy_pack:2026.04.0 -&gt; control:IOT-005 -&gt; provider_contract:aws:IOT-005 -&gt; finding:fdg_994c549d0b3d2e -&gt; evidence_sufficiency:fdg_994c549d0b3d2e -&gt; score:fdg_994c549d0b3d2e -&gt; decision_review:drv_e34602ec9ea91b -&gt; assurance:assessment -&gt; trust_badge:report</div></article><article class="item"><h2>NET-002</h2><p>NET-002 decision path links evidence, policy, finding, score, assurance, and review state.</p><div class="path">snapshot:evs_38d7b6507aa3d94a -&gt; policy_pack:2026.04.0 -&gt; control:NET-002 -&gt; provider_contract:aws:NET-002 -&gt; finding:fdg_e13f1fe2310b82 -&gt; evidence_sufficiency:fdg_e13f1fe2310b82 -&gt; score:fdg_e13f1fe2310b82 -&gt; decision_review:drv_9a9a546b69bfe8 -&gt; assurance:assessment -&gt; trust_badge:report</div></article><article class="item"><h2>CMP-001</h2><p>CMP-001 decision path links evidence, policy, finding, score, assurance, and review state.</p><div class="path">snapshot:evs_38d7b6507aa3d94a -&gt; policy_pack:2026.04.0 -&gt; control:CMP-001 -&gt; provider_contract:aws:CMP-001 -&gt; finding:fdg_dfbb1e782053b2 -&gt; evidence_sufficiency:fdg_dfbb1e782053b2 -&gt; score:fdg_dfbb1e782053b2 -&gt; decision_review:drv_71aed28f266bb5 -&gt; assurance:assessment -&gt; trust_badge:report</div></article><article class="item"><h2>DATA-002</h2><p>DATA-002 decision path links evidence, policy, finding, score, assurance, and review state.</p><div class="path">snapshot:evs_38d7b6507aa3d94a -&gt; policy_pack:2026.04.0 -&gt; control:DATA-002 -&gt; provider_contract:aws:DATA-002 -&gt; finding:fdg_fd9b74860f2318 -&gt; evidence_sufficiency:fdg_fd9b74860f2318 -&gt; score:fdg_fd9b74860f2318 -&gt; decision_review:drv_265642e37d44ef -&gt; assurance:assessment -&gt; trust_badge:report</div></article><article class="item"><h2>NET-004</h2><p>NET-004 decision path links evidence, policy, finding, score, assurance, and review state.</p><div class="path">snapshot:evs_38d7b6507aa3d94a -&gt; policy_pack:2026.04.0 -&gt; control:NET-004 -&gt; provider_contract:aws:NET-004 -&gt; finding:fdg_95befe3a0ef4d3 -&gt; evidence_sufficiency:fdg_95befe3a0ef4d3 -&gt; score:fdg_95befe3a0ef4d3 -&gt; decision_review:drv_603cf37ee7a853 -&gt; assurance:assessment -&gt; trust_badge:report</div></article></div>
+      </section>
+
+      <footer>
+        No impact. The trust badge summarizes report assurance signals and never changes deterministic CRIS-SME risk scores.
+      </footer>
+    </main>
+  </body>
+</html>

@@ -1,0 +1,475 @@
+{
+  "rbom_schema_version": "1.0.0",
+  "generated_at": "2026-07-04T18:15:03.071496Z",
+  "run_id": "run_29ea23f0b2d8ece7",
+  "report_schema_version": "2.0.0",
+  "engine_version": "2.0.0",
+  "scoring_model": "cris_sme_deterministic_scoring_v2",
+  "policy_pack_version": "2026.04.0",
+  "collector_mode": "aws",
+  "providers_in_scope": [
+    "aws"
+  ],
+  "canonical_report_sha256": "f369359029834b56494f8eef3c2b8e12a1c99b1e35d3467268c29ef23a6bfbb0",
+  "control_ids": [
+    "CMP-001",
+    "CMP-002",
+    "CMP-003",
+    "CMP-004",
+    "DATA-001",
+    "DATA-002",
+    "DATA-003",
+    "GOV-002",
+    "GOV-003",
+    "GOV-004",
+    "IAM-001",
+    "IAM-003",
+    "IAM-005",
+    "IOT-001",
+    "IOT-002",
+    "IOT-003",
+    "IOT-004",
+    "IOT-005",
+    "IOT-006",
+    "IOT-007",
+    "IOT-008",
+    "IOT-009",
+    "IOT-010",
+    "MON-001",
+    "MON-003",
+    "NET-001",
+    "NET-002",
+    "NET-004"
+  ],
+  "finding_ids": [
+    "fdg_03484c44a1bea9",
+    "fdg_0487a7973756c3",
+    "fdg_0fc8904a5edd56",
+    "fdg_1fcafc454b954f",
+    "fdg_212e49f1a69dad",
+    "fdg_22fa0573d52093",
+    "fdg_32dfaf5364b4d6",
+    "fdg_41e815a1b649a8",
+    "fdg_45fead59d5ed86",
+    "fdg_47b2e528cc081f",
+    "fdg_4fdee149a387bc",
+    "fdg_514b77f2a83791",
+    "fdg_59af495a1834f7",
+    "fdg_6c25430ff366c3",
+    "fdg_74c023949b5311",
+    "fdg_78fef0955deb69",
+    "fdg_81612c096e8237",
+    "fdg_8ce865e5eb6019",
+    "fdg_8de9e4b39be686",
+    "fdg_95befe3a0ef4d3",
+    "fdg_994c549d0b3d2e",
+    "fdg_ba8563fa9c85b0",
+    "fdg_bd7c18a97bdfc6",
+    "fdg_c5f3db81b3965c",
+    "fdg_dfbb1e782053b2",
+    "fdg_e13f1fe2310b82",
+    "fdg_f2db05d7f43d6a",
+    "fdg_fd9b74860f2318"
+  ],
+  "evidence_refs": [
+    "evd_fdg_03484c44a1bea9_01",
+    "evd_fdg_0487a7973756c3_01",
+    "evd_fdg_0fc8904a5edd56_01",
+    "evd_fdg_1fcafc454b954f_01",
+    "evd_fdg_212e49f1a69dad_01",
+    "evd_fdg_212e49f1a69dad_02",
+    "evd_fdg_212e49f1a69dad_03",
+    "evd_fdg_22fa0573d52093_01",
+    "evd_fdg_22fa0573d52093_02",
+    "evd_fdg_22fa0573d52093_03",
+    "evd_fdg_32dfaf5364b4d6_01",
+    "evd_fdg_41e815a1b649a8_01",
+    "evd_fdg_45fead59d5ed86_01",
+    "evd_fdg_45fead59d5ed86_02",
+    "evd_fdg_47b2e528cc081f_01",
+    "evd_fdg_47b2e528cc081f_02",
+    "evd_fdg_4fdee149a387bc_01",
+    "evd_fdg_4fdee149a387bc_02",
+    "evd_fdg_514b77f2a83791_01",
+    "evd_fdg_514b77f2a83791_02",
+    "evd_fdg_59af495a1834f7_01",
+    "evd_fdg_6c25430ff366c3_01",
+    "evd_fdg_74c023949b5311_01",
+    "evd_fdg_74c023949b5311_02",
+    "evd_fdg_74c023949b5311_03",
+    "evd_fdg_78fef0955deb69_01",
+    "evd_fdg_81612c096e8237_01",
+    "evd_fdg_81612c096e8237_02",
+    "evd_fdg_8ce865e5eb6019_01",
+    "evd_fdg_8ce865e5eb6019_02",
+    "evd_fdg_8ce865e5eb6019_03",
+    "evd_fdg_8ce865e5eb6019_04",
+    "evd_fdg_8de9e4b39be686_01",
+    "evd_fdg_95befe3a0ef4d3_01",
+    "evd_fdg_95befe3a0ef4d3_02",
+    "evd_fdg_994c549d0b3d2e_01",
+    "evd_fdg_994c549d0b3d2e_02",
+    "evd_fdg_ba8563fa9c85b0_01",
+    "evd_fdg_bd7c18a97bdfc6_01",
+    "evd_fdg_bd7c18a97bdfc6_02",
+    "evd_fdg_c5f3db81b3965c_01",
+    "evd_fdg_dfbb1e782053b2_01",
+    "evd_fdg_e13f1fe2310b82_01",
+    "evd_fdg_f2db05d7f43d6a_01",
+    "evd_fdg_f2db05d7f43d6a_02",
+    "evd_fdg_fd9b74860f2318_01"
+  ],
+  "evidence_sufficiency_counts": {
+    "unsupported": 28
+  },
+  "decision_ledger_event_counts": {
+    "assessment_recorded": 1,
+    "finding_recurred": 28
+  },
+  "artifacts": [
+    {
+      "artifact_name": "action_plan_30_day.action_plan_json",
+      "path": "/home/muhammad-ibrahim/Github/CRIS-SME/outputs/aws-evidence-lab/sigi-aws-001/sigi-full-spectrum/reports/cris_sme_30_day_action_plan.json",
+      "sha256": "7cea2d8e3b13582b917eaaecc2932c413331c1d8f9e80e933543791873d0ec9e",
+      "size_bytes": 11479
+    },
+    {
+      "artifact_name": "action_plan_30_day.action_plan_markdown",
+      "path": "/home/muhammad-ibrahim/Github/CRIS-SME/outputs/aws-evidence-lab/sigi-aws-001/sigi-full-spectrum/reports/cris_sme_30_day_action_plan.md",
+      "sha256": "2a285381624d7df13ade6cf6f3f5cb52e0d41e95a4a27e3ed0a555a12153cc7e",
+      "size_bytes": 3270
+    },
+    {
+      "artifact_name": "appendix_tables.prioritized_risks_csv",
+      "path": "/home/muhammad-ibrahim/Github/CRIS-SME/outputs/aws-evidence-lab/sigi-aws-001/sigi-full-spectrum/reports/prioritized_risks.csv",
+      "sha256": "406082607079ea1067b575e53c59c1d3d602b75f18adf4e4e59f6a692a371d15",
+      "size_bytes": 7441
+    },
+    {
+      "artifact_name": "appendix_tables.results_appendix_markdown",
+      "path": "/home/muhammad-ibrahim/Github/CRIS-SME/outputs/aws-evidence-lab/sigi-aws-001/sigi-full-spectrum/reports/results_appendix.md",
+      "sha256": "b36775ca633b064be4d68801623a0b84da01c63b8c46c9ae285c5af7158094c0",
+      "size_bytes": 2176
+    },
+    {
+      "artifact_name": "assessment_summary",
+      "path": "/home/muhammad-ibrahim/Github/CRIS-SME/outputs/aws-evidence-lab/sigi-aws-001/sigi-full-spectrum/reports/cris_sme_assessment_summary.json",
+      "sha256": "79941ed762ced60e1d44e478b596d60a04604f420f05dff813e2e9e452884a47",
+      "size_bytes": 8535
+    },
+    {
+      "artifact_name": "assurance_case",
+      "path": "/home/muhammad-ibrahim/Github/CRIS-SME/outputs/aws-evidence-lab/sigi-aws-001/sigi-full-spectrum/reports/cris_sme_assurance_case.json",
+      "sha256": "deff61b2b5f2a9465afcf0d40124fb72ceebcf1dd3e2475966371a0e834132f8",
+      "size_bytes": 9905
+    },
+    {
+      "artifact_name": "assurance_portal",
+      "path": "/home/muhammad-ibrahim/Github/CRIS-SME/outputs/aws-evidence-lab/sigi-aws-001/sigi-full-spectrum/reports/cris_sme_assurance_portal.html",
+      "sha256": "bf4be5ada5b01a334abce82f79afcdbae4d709eea86df9250ac6e38159603ae6",
+      "size_bytes": 17859
+    },
+    {
+      "artifact_name": "benchmark_outputs.benchmark_comparison_markdown",
+      "path": "/home/muhammad-ibrahim/Github/CRIS-SME/outputs/aws-evidence-lab/sigi-aws-001/sigi-full-spectrum/reports/cris_sme_benchmark_comparison.md",
+      "sha256": "8a7a0a14d8500466cf3f1102cebcf8d508843622d1d64ce8513844e208aa5b37",
+      "size_bytes": 294
+    },
+    {
+      "artifact_name": "benchmark_outputs.benchmark_observation_json",
+      "path": "/home/muhammad-ibrahim/Github/CRIS-SME/outputs/aws-evidence-lab/sigi-aws-001/sigi-full-spectrum/reports/cris_sme_benchmark_observation.json",
+      "sha256": "c2a9111ac76f5a70b204dd419463775277e0a5f8505cf4ffa93f9ad05b0c6c85",
+      "size_bytes": 540
+    },
+    {
+      "artifact_name": "claim_bound_narrative.claim_bound_narrative_json",
+      "path": "/home/muhammad-ibrahim/Github/CRIS-SME/outputs/aws-evidence-lab/sigi-aws-001/sigi-full-spectrum/reports/cris_sme_claim_bound_narrative.json",
+      "sha256": "682cc0baba21c901bf13ae57cdea0370a90417b9bb5614291b5c49cbdbdc96c1",
+      "size_bytes": 7233
+    },
+    {
+      "artifact_name": "claim_bound_narrative.claim_bound_narrative_markdown",
+      "path": "/home/muhammad-ibrahim/Github/CRIS-SME/outputs/aws-evidence-lab/sigi-aws-001/sigi-full-spectrum/reports/cris_sme_claim_bound_narrative.md",
+      "sha256": "7d366dfe82904e5755889ae005af435ef44817ef2c8668b4bd8ab619edfdf658",
+      "size_bytes": 6169
+    },
+    {
+      "artifact_name": "claim_verification_pack",
+      "path": "/home/muhammad-ibrahim/Github/CRIS-SME/outputs/aws-evidence-lab/sigi-aws-001/sigi-full-spectrum/reports/cris_sme_claim_verification_pack.json",
+      "sha256": "26d3a3fc94fde99544ec9d41f3f321828ea58f7afe3161bef663afc8e96a5034",
+      "size_bytes": 23589
+    },
+    {
+      "artifact_name": "csv_exports.actions_csv",
+      "path": "/home/muhammad-ibrahim/Github/CRIS-SME/outputs/aws-evidence-lab/sigi-aws-001/sigi-full-spectrum/reports/cris_sme_actions.csv",
+      "sha256": "f3d6f362643275930eb7025a7b6e294365a3375cbfdae142b3092bf0936a399d",
+      "size_bytes": 6475
+    },
+    {
+      "artifact_name": "csv_exports.assets_csv",
+      "path": "/home/muhammad-ibrahim/Github/CRIS-SME/outputs/aws-evidence-lab/sigi-aws-001/sigi-full-spectrum/reports/cris_sme_assets.csv",
+      "sha256": "babbbe89f2f7f22c1afc611b017d67aafdd7bc4ea569ee924c0977cc328a50c6",
+      "size_bytes": 691
+    },
+    {
+      "artifact_name": "csv_exports.evidence_csv",
+      "path": "/home/muhammad-ibrahim/Github/CRIS-SME/outputs/aws-evidence-lab/sigi-aws-001/sigi-full-spectrum/reports/cris_sme_evidence.csv",
+      "sha256": "5740a7d999ef7cd98d728ad350833bb04b25f264d3e8e67ad865ec71ae7c007e",
+      "size_bytes": 10818
+    },
+    {
+      "artifact_name": "csv_exports.findings_csv",
+      "path": "/home/muhammad-ibrahim/Github/CRIS-SME/outputs/aws-evidence-lab/sigi-aws-001/sigi-full-spectrum/reports/cris_sme_findings.csv",
+      "sha256": "8a0751841573a8a30bad2081a207f4622aca48681db9517a2cfd276ab10d4591",
+      "size_bytes": 12467
+    },
+    {
+      "artifact_name": "cyber_essentials_evaluation_metrics.html",
+      "path": "/home/muhammad-ibrahim/Github/CRIS-SME/outputs/aws-evidence-lab/sigi-aws-001/sigi-full-spectrum/reports/cris_sme_ce_evaluation_metrics.html",
+      "sha256": "4160ad6fd80c2ee03342459a8eea77284355c41ce639eea3975424d2e087ad5f",
+      "size_bytes": 9572
+    },
+    {
+      "artifact_name": "cyber_essentials_evaluation_metrics.json",
+      "path": "/home/muhammad-ibrahim/Github/CRIS-SME/outputs/aws-evidence-lab/sigi-aws-001/sigi-full-spectrum/reports/cris_sme_ce_evaluation_metrics.json",
+      "sha256": "81d50756ea201f31d01118ec61b851b489e922893a7725078da16c420a6d4b71",
+      "size_bytes": 13157
+    },
+    {
+      "artifact_name": "cyber_essentials_paper_exports.ce_chart_data_json",
+      "path": "/home/muhammad-ibrahim/Github/CRIS-SME/outputs/aws-evidence-lab/sigi-aws-001/sigi-full-spectrum/reports/cris_sme_ce_chart_data.json",
+      "sha256": "8586adf2e415069e418e25b51df17692ada7f1272189b90b870736ac7d053e9b",
+      "size_bytes": 7937
+    },
+    {
+      "artifact_name": "cyber_essentials_paper_exports.ce_gap_taxonomy_csv",
+      "path": "/home/muhammad-ibrahim/Github/CRIS-SME/outputs/aws-evidence-lab/sigi-aws-001/sigi-full-spectrum/reports/cris_sme_ce_gap_taxonomy.csv",
+      "sha256": "0b437f2123fd827bd214104ca001806474caef68165f4a507e97bad0bebded8e",
+      "size_bytes": 585
+    },
+    {
+      "artifact_name": "cyber_essentials_paper_exports.ce_observability_summary_csv",
+      "path": "/home/muhammad-ibrahim/Github/CRIS-SME/outputs/aws-evidence-lab/sigi-aws-001/sigi-full-spectrum/reports/cris_sme_ce_observability_summary.csv",
+      "sha256": "a6c89959e3e07238803b195ffea9f3a3844cdb515cd364ec60aa0f5a0bf9163f",
+      "size_bytes": 143
+    },
+    {
+      "artifact_name": "cyber_essentials_paper_exports.ce_paper_tables_csv",
+      "path": "/home/muhammad-ibrahim/Github/CRIS-SME/outputs/aws-evidence-lab/sigi-aws-001/sigi-full-spectrum/reports/cris_sme_ce_paper_tables.csv",
+      "sha256": "dc6d4f34387f774594982930da97aa9a11b5ffb8e3bb13d1ebcb7116d1309dd6",
+      "size_bytes": 3538
+    },
+    {
+      "artifact_name": "cyber_essentials_paper_exports.ce_paper_tables_markdown",
+      "path": "/home/muhammad-ibrahim/Github/CRIS-SME/outputs/aws-evidence-lab/sigi-aws-001/sigi-full-spectrum/reports/cris_sme_ce_paper_tables.md",
+      "sha256": "4639e84f990b5570e753b56dc821503d86e50aa7b7e0a73d10312d32e87f37ac",
+      "size_bytes": 4299
+    },
+    {
+      "artifact_name": "cyber_essentials_paper_exports.ce_section_coverage_csv",
+      "path": "/home/muhammad-ibrahim/Github/CRIS-SME/outputs/aws-evidence-lab/sigi-aws-001/sigi-full-spectrum/reports/cris_sme_ce_section_coverage.csv",
+      "sha256": "964f45a0c9b394ff6b18958298bf68068166d40ac66029a5fe4c1f75e505a3e2",
+      "size_bytes": 350
+    },
+    {
+      "artifact_name": "cyber_essentials_review_console.html",
+      "path": "/home/muhammad-ibrahim/Github/CRIS-SME/outputs/aws-evidence-lab/sigi-aws-001/sigi-full-spectrum/reports/cris_sme_ce_review_console.html",
+      "sha256": "4ead1d9c89eb137d2400e1bd43e56898cf884b1c2728f0b95c9b9c4d59ec06eb",
+      "size_bytes": 459531
+    },
+    {
+      "artifact_name": "cyber_essentials_review_console.json",
+      "path": "/home/muhammad-ibrahim/Github/CRIS-SME/outputs/aws-evidence-lab/sigi-aws-001/sigi-full-spectrum/reports/cris_sme_ce_review_console.json",
+      "sha256": "4c702b667f7b140d5399eacf21bbc462dc5b205c85dee3499c496c59961c2dc0",
+      "size_bytes": 198335
+    },
+    {
+      "artifact_name": "cyber_essentials_self_assessment.html",
+      "path": "/home/muhammad-ibrahim/Github/CRIS-SME/outputs/aws-evidence-lab/sigi-aws-001/sigi-full-spectrum/reports/cris_sme_ce_self_assessment.html",
+      "sha256": "b9b7a0dd2711ad12e2aa295e5a3a3a558d2a3ad16637cc3197e87f0ff2e80152",
+      "size_bytes": 144698
+    },
+    {
+      "artifact_name": "cyber_essentials_self_assessment.json",
+      "path": "/home/muhammad-ibrahim/Github/CRIS-SME/outputs/aws-evidence-lab/sigi-aws-001/sigi-full-spectrum/reports/cris_sme_ce_self_assessment.json",
+      "sha256": "2ffa2f45801418434c76e47ae7f5e4f39fffef2a4be088b3af6c254ba2530e99",
+      "size_bytes": 169875
+    },
+    {
+      "artifact_name": "cyber_insurance_pack.cyber_insurance_json",
+      "path": "/home/muhammad-ibrahim/Github/CRIS-SME/outputs/aws-evidence-lab/sigi-aws-001/sigi-full-spectrum/reports/cris_sme_cyber_insurance_evidence.json",
+      "sha256": "bf95d9541aaffbd43731b82c9bd9723fc789c25c88e6d988c393fedd5e434413",
+      "size_bytes": 11096
+    },
+    {
+      "artifact_name": "cyber_insurance_pack.cyber_insurance_markdown",
+      "path": "/home/muhammad-ibrahim/Github/CRIS-SME/outputs/aws-evidence-lab/sigi-aws-001/sigi-full-spectrum/reports/cris_sme_cyber_insurance_evidence.md",
+      "sha256": "96a0ca9209b29c547c79a12186aaec30c20147adf4c0492521b2e57e17b0dbe8",
+      "size_bytes": 6100
+    },
+    {
+      "artifact_name": "dashboard.dashboard_html",
+      "path": "/home/muhammad-ibrahim/Github/CRIS-SME/outputs/aws-evidence-lab/sigi-aws-001/sigi-full-spectrum/reports/cris_sme_dashboard.html",
+      "sha256": "2e6331522d56cc40aa0987be4207c75261a3c89fa40afe8a745aef8fa064f570",
+      "size_bytes": 184428
+    },
+    {
+      "artifact_name": "dashboard.dashboard_payload_json",
+      "path": "/home/muhammad-ibrahim/Github/CRIS-SME/outputs/aws-evidence-lab/sigi-aws-001/sigi-full-spectrum/reports/cris_sme_dashboard_payload.json",
+      "sha256": "2a44d51edacb72ab61bbd459018159903709edfe32ce9217c83f7a531cd332e9",
+      "size_bytes": 220572
+    },
+    {
+      "artifact_name": "decision_provenance_graph",
+      "path": "/home/muhammad-ibrahim/Github/CRIS-SME/outputs/aws-evidence-lab/sigi-aws-001/sigi-full-spectrum/reports/cris_sme_decision_provenance_graph.json",
+      "sha256": "2da0df0ac8d70aebdbd33d7c38658fc2a788595251481a89874c7e85e52c73d8",
+      "size_bytes": 159818
+    },
+    {
+      "artifact_name": "evidence_snapshot",
+      "path": "/home/muhammad-ibrahim/Github/CRIS-SME/outputs/aws-evidence-lab/sigi-aws-001/sigi-full-spectrum/reports/cris_sme_evidence_snapshot.json",
+      "sha256": "4360cc4bdf03410165c81bfe9cd983234596a90ca621a15d17d6e50695c081e8",
+      "size_bytes": 68896
+    },
+    {
+      "artifact_name": "executive_pack.executive_pack_json",
+      "path": "/home/muhammad-ibrahim/Github/CRIS-SME/outputs/aws-evidence-lab/sigi-aws-001/sigi-full-spectrum/reports/cris_sme_executive_pack.json",
+      "sha256": "5af07dd6ea9c945ef00413cde6ddacbc5cb05e28fd57cdef495a7ae393a15743",
+      "size_bytes": 15520
+    },
+    {
+      "artifact_name": "executive_pack.executive_pack_markdown",
+      "path": "/home/muhammad-ibrahim/Github/CRIS-SME/outputs/aws-evidence-lab/sigi-aws-001/sigi-full-spectrum/reports/cris_sme_executive_pack.md",
+      "sha256": "1608ef5851f26bc89620bc5e671b60b94b2d3bd50163d6fdce62ece85b04196d",
+      "size_bytes": 1372
+    },
+    {
+      "artifact_name": "figures.category_scores",
+      "path": "/home/muhammad-ibrahim/Github/CRIS-SME/outputs/aws-evidence-lab/sigi-aws-001/sigi-full-spectrum/figures/live_category_scores.svg",
+      "sha256": "aecd3b0073e6228a4a2a660129c112061331985714fe2f6fa8d46ff81974939c",
+      "size_bytes": 2552
+    },
+    {
+      "artifact_name": "figures.category_scores_png",
+      "path": "/home/muhammad-ibrahim/Github/CRIS-SME/outputs/aws-evidence-lab/sigi-aws-001/sigi-full-spectrum/figures/live_category_scores.png",
+      "sha256": "8e96198252a234563fab2c24b1ce6efa60f6453630c4b265aa72468f4b22f2f9",
+      "size_bytes": 37838
+    },
+    {
+      "artifact_name": "figures.priority_distribution",
+      "path": "/home/muhammad-ibrahim/Github/CRIS-SME/outputs/aws-evidence-lab/sigi-aws-001/sigi-full-spectrum/figures/live_priority_distribution.svg",
+      "sha256": "bee8f916b4065158001ce13370e5f01c3adc917cff1b9c79f192162be9fe904c",
+      "size_bytes": 1410
+    },
+    {
+      "artifact_name": "figures.priority_distribution_png",
+      "path": "/home/muhammad-ibrahim/Github/CRIS-SME/outputs/aws-evidence-lab/sigi-aws-001/sigi-full-spectrum/figures/live_priority_distribution.png",
+      "sha256": "cfe68ac94fafd335a7e359e7185f2c313d888a77402dda973bcc41d6b35d6769",
+      "size_bytes": 16348
+    },
+    {
+      "artifact_name": "figures.risk_trend",
+      "path": "/home/muhammad-ibrahim/Github/CRIS-SME/outputs/aws-evidence-lab/sigi-aws-001/sigi-full-spectrum/figures/risk_trend.svg",
+      "sha256": "0673425ef96866e1a09febd44b751e37fd3e846dab229d0b2a2cf44b95721a83",
+      "size_bytes": 1223
+    },
+    {
+      "artifact_name": "figures.risk_trend_png",
+      "path": "/home/muhammad-ibrahim/Github/CRIS-SME/outputs/aws-evidence-lab/sigi-aws-001/sigi-full-spectrum/figures/risk_trend.png",
+      "sha256": "07daeeab7dc8ea982e106ceea5dc87b032d5fda8273b8dac9f1bf49be05248a0",
+      "size_bytes": 16577
+    },
+    {
+      "artifact_name": "figures.run_comparison",
+      "path": "/home/muhammad-ibrahim/Github/CRIS-SME/outputs/aws-evidence-lab/sigi-aws-001/sigi-full-spectrum/figures/run_comparison.svg",
+      "sha256": "4f8d5d2b47bcc690c4df10d31caf0e91888c86de9ba9e92371ca48d53262a6b9",
+      "size_bytes": 1175
+    },
+    {
+      "artifact_name": "figures.run_comparison_png",
+      "path": "/home/muhammad-ibrahim/Github/CRIS-SME/outputs/aws-evidence-lab/sigi-aws-001/sigi-full-spectrum/figures/run_comparison.png",
+      "sha256": "819bcfecab74e3676778b0b8ea34c25d4dfcf239fcea34a7a597de1d05db326f",
+      "size_bytes": 15838
+    },
+    {
+      "artifact_name": "history_figures.risk_trend",
+      "path": "/home/muhammad-ibrahim/Github/CRIS-SME/outputs/aws-evidence-lab/sigi-aws-001/sigi-full-spectrum/figures/risk_trend.svg",
+      "sha256": "0673425ef96866e1a09febd44b751e37fd3e846dab229d0b2a2cf44b95721a83",
+      "size_bytes": 1223
+    },
+    {
+      "artifact_name": "history_figures.risk_trend_png",
+      "path": "/home/muhammad-ibrahim/Github/CRIS-SME/outputs/aws-evidence-lab/sigi-aws-001/sigi-full-spectrum/figures/risk_trend.png",
+      "sha256": "07daeeab7dc8ea982e106ceea5dc87b032d5fda8273b8dac9f1bf49be05248a0",
+      "size_bytes": 16577
+    },
+    {
+      "artifact_name": "history_figures.run_comparison",
+      "path": "/home/muhammad-ibrahim/Github/CRIS-SME/outputs/aws-evidence-lab/sigi-aws-001/sigi-full-spectrum/figures/run_comparison.svg",
+      "sha256": "4f8d5d2b47bcc690c4df10d31caf0e91888c86de9ba9e92371ca48d53262a6b9",
+      "size_bytes": 1175
+    },
+    {
+      "artifact_name": "history_figures.run_comparison_png",
+      "path": "/home/muhammad-ibrahim/Github/CRIS-SME/outputs/aws-evidence-lab/sigi-aws-001/sigi-full-spectrum/figures/run_comparison.png",
+      "sha256": "819bcfecab74e3676778b0b8ea34c25d4dfcf239fcea34a7a597de1d05db326f",
+      "size_bytes": 15838
+    },
+    {
+      "artifact_name": "history_snapshot",
+      "path": "/home/muhammad-ibrahim/Github/CRIS-SME/outputs/aws-evidence-lab/sigi-aws-001/sigi-full-spectrum/reports/history/cris_sme_report_20260704T181503Z.json",
+      "sha256": "6bde5ef9fa8d52b9587e28783cb04665ec95713d2f0d5e06c1e883c28b7863b2",
+      "size_bytes": 1406831
+    },
+    {
+      "artifact_name": "html_report",
+      "path": "/home/muhammad-ibrahim/Github/CRIS-SME/outputs/aws-evidence-lab/sigi-aws-001/sigi-full-spectrum/reports/cris_sme_report.html",
+      "sha256": "3ad8276637db41ee8ae87d18299ac149f66dbe7dc1860dbf35c38a6f988497c4",
+      "size_bytes": 107775
+    },
+    {
+      "artifact_name": "ocsf_findings",
+      "path": "/home/muhammad-ibrahim/Github/CRIS-SME/outputs/aws-evidence-lab/sigi-aws-001/sigi-full-spectrum/reports/cris_sme_findings_ocsf.json",
+      "sha256": "742e33bd7d38dd8e6e12fe22e1a08096943a7b8a3a7a6b75e3955b585a7a115a",
+      "size_bytes": 119804
+    },
+    {
+      "artifact_name": "remediation_script_pack.aws_cli_script",
+      "path": "/home/muhammad-ibrahim/Github/CRIS-SME/outputs/aws-evidence-lab/sigi-aws-001/sigi-full-spectrum/reports/remediation_scripts/cris_sme_remediation_aws_cli.sh",
+      "sha256": "baa0f497aecf49e93be1d7ddb1364992d96695014b762f240af981a1dc6ea42f",
+      "size_bytes": 1289
+    },
+    {
+      "artifact_name": "remediation_script_pack.manifest",
+      "path": "/home/muhammad-ibrahim/Github/CRIS-SME/outputs/aws-evidence-lab/sigi-aws-001/sigi-full-spectrum/reports/remediation_scripts/cris_sme_remediation_manifest.json",
+      "sha256": "c4d04667b367da030b630f2026f0ac67619aadc3013005952562ca8d97ef8dd3",
+      "size_bytes": 4866
+    },
+    {
+      "artifact_name": "sarif_report",
+      "path": "/home/muhammad-ibrahim/Github/CRIS-SME/outputs/aws-evidence-lab/sigi-aws-001/sigi-full-spectrum/reports/cris_sme_report.sarif",
+      "sha256": "15eba316451ba9016f815244a9d7b3e5861d825d692084bd7bcfd73cfc47a85f",
+      "size_bytes": 129411
+    },
+    {
+      "artifact_name": "selective_disclosure.evidence_room_html",
+      "path": "/home/muhammad-ibrahim/Github/CRIS-SME/outputs/aws-evidence-lab/sigi-aws-001/sigi-full-spectrum/reports/cris_sme_evidence_room.html",
+      "sha256": "e3bc1f35651bad7fb867cd796ce85f8b56a047552e8405c7d203e09f676dcc05",
+      "size_bytes": 77480
+    },
+    {
+      "artifact_name": "selective_disclosure.selective_disclosure_json",
+      "path": "/home/muhammad-ibrahim/Github/CRIS-SME/outputs/aws-evidence-lab/sigi-aws-001/sigi-full-spectrum/reports/cris_sme_selective_disclosure.json",
+      "sha256": "6978e599f14d617481f1dbe00cb2f7ea325e620ac8fb37666d3bbed3d185c897",
+      "size_bytes": 312405
+    },
+    {
+      "artifact_name": "summary_report",
+      "path": "/home/muhammad-ibrahim/Github/CRIS-SME/outputs/aws-evidence-lab/sigi-aws-001/sigi-full-spectrum/reports/cris_sme_summary.txt",
+      "sha256": "b38c32bdbb2fdd8a69e19023791da240dab0fc52dbc431cda58522612500d030",
+      "size_bytes": 1557
+    }
+  ],
+  "integrity_algorithm": "sha256",
+  "signature_note": "This RBOM is an integrity manifest using deterministic SHA-256 hashes. It is not a public-key cryptographic signature until an external signing key or certificate workflow is attached."
+}

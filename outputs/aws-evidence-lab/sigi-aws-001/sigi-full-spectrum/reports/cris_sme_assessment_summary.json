@@ -1,0 +1,331 @@
+{
+  "summary_schema_version": "1.0.0",
+  "generated_at": "2026-07-04T18:15:03.071496Z",
+  "collector_mode": "aws",
+  "overall_risk_score": 38.79,
+  "risk_band": "moderate",
+  "finding_summary": {
+    "finding_count": 28,
+    "non_compliant_finding_count": 28,
+    "severity_counts": {
+      "Critical": 2,
+      "High": 15,
+      "Low": 2,
+      "Medium": 9
+    },
+    "priority_counts": {
+      "High": 2,
+      "Monitor": 11,
+      "Planned": 15
+    },
+    "category_counts": {
+      "Compute/Workloads": 4,
+      "Cost/Governance Hygiene": 3,
+      "Data": 3,
+      "Healthcare IoT": 10,
+      "IAM": 3,
+      "Monitoring/Logging": 2,
+      "Network": 3
+    },
+    "top_controls": [
+      {
+        "control_id": "NET-001",
+        "finding_count": 1
+      },
+      {
+        "control_id": "IAM-001",
+        "finding_count": 1
+      },
+      {
+        "control_id": "DATA-001",
+        "finding_count": 1
+      },
+      {
+        "control_id": "IOT-005",
+        "finding_count": 1
+      },
+      {
+        "control_id": "NET-002",
+        "finding_count": 1
+      },
+      {
+        "control_id": "CMP-001",
+        "finding_count": 1
+      },
+      {
+        "control_id": "DATA-002",
+        "finding_count": 1
+      },
+      {
+        "control_id": "NET-004",
+        "finding_count": 1
+      },
+      {
+        "control_id": "IOT-002",
+        "finding_count": 1
+      },
+      {
+        "control_id": "IOT-001",
+        "finding_count": 1
+      }
+    ],
+    "top_risks": [
+      {
+        "finding_id": "fdg_514b77f2a83791",
+        "control_id": "NET-001",
+        "title": "Administrative services are exposed to the public internet",
+        "priority": "High",
+        "score": 72.12,
+        "category": "Network"
+      },
+      {
+        "finding_id": "fdg_81612c096e8237",
+        "control_id": "IAM-001",
+        "title": "Privileged role assignments without MFA enforcement",
+        "priority": "High",
+        "score": 67.97,
+        "category": "IAM"
+      },
+      {
+        "finding_id": "fdg_59af495a1834f7",
+        "control_id": "DATA-001",
+        "title": "Public storage access increases data exposure risk",
+        "priority": "Planned",
+        "score": 48.35,
+        "category": "Data"
+      },
+      {
+        "finding_id": "fdg_994c549d0b3d2e",
+        "control_id": "IOT-005",
+        "title": "IoT Hub public network access is not sufficiently constrained",
+        "priority": "Planned",
+        "score": 47.25,
+        "category": "Healthcare IoT"
+      },
+      {
+        "finding_id": "fdg_e13f1fe2310b82",
+        "control_id": "NET-002",
+        "title": "Network security group rules are broader than expected",
+        "priority": "Planned",
+        "score": 44.71,
+        "category": "Network"
+      },
+      {
+        "finding_id": "fdg_dfbb1e782053b2",
+        "control_id": "CMP-001",
+        "title": "Critical workloads remain unpatched beyond acceptable risk tolerance",
+        "priority": "Planned",
+        "score": 42.69,
+        "category": "Compute/Workloads"
+      },
+      {
+        "finding_id": "fdg_fd9b74860f2318",
+        "control_id": "DATA-002",
+        "title": "Data stores lack expected encryption protections",
+        "priority": "Planned",
+        "score": 42.36,
+        "category": "Data"
+      },
+      {
+        "finding_id": "fdg_95befe3a0ef4d3",
+        "control_id": "NET-004",
+        "title": "Private endpoint coverage is incomplete for sensitive services",
+        "priority": "Planned",
+        "score": 41.93,
+        "category": "Network"
+      },
+      {
+        "finding_id": "fdg_47b2e528cc081f",
+        "control_id": "IOT-002",
+        "title": "IoT shared access policies exceed least-privilege expectations",
+        "priority": "Planned",
+        "score": 41.6,
+        "category": "Healthcare IoT"
+      },
+      {
+        "finding_id": "fdg_8de9e4b39be686",
+        "control_id": "IOT-001",
+        "title": "Cloud device-identity registration posture is weak or unobservable",
+        "priority": "Planned",
+        "score": 40.65,
+        "category": "Healthcare IoT"
+      }
+    ]
+  },
+  "compliance_summary": {
+    "framework_count": 13,
+    "frameworks_covered": [
+      "Azure CAF",
+      "Azure Policy Baseline",
+      "CIS Azure Foundations Benchmark",
+      "CIS Controls",
+      "Cyber Essentials",
+      "DSPT",
+      "FCA SYSC",
+      "FinOps Foundation",
+      "GDPR",
+      "ISO 27001",
+      "Microsoft Cloud Security Benchmark",
+      "NIST CSF 2.0",
+      "UK GDPR"
+    ],
+    "findings_by_framework": {
+      "Azure CAF": 1,
+      "Azure Policy Baseline": 1,
+      "CIS Azure Foundations Benchmark": 4,
+      "CIS Controls": 1,
+      "Cyber Essentials": 5,
+      "DSPT": 3,
+      "FCA SYSC": 2,
+      "FinOps Foundation": 2,
+      "GDPR": 1,
+      "ISO 27001": 8,
+      "Microsoft Cloud Security Benchmark": 5,
+      "NIST CSF 2.0": 14,
+      "UK GDPR": 3
+    },
+    "uk_sme_mapped_control_count": 9,
+    "uk_sme_profile": {
+      "profile_name": "UK SME regulatory profile",
+      "frameworks_covered": [
+        "Cyber Essentials",
+        "DSPT",
+        "FCA SYSC",
+        "UK GDPR"
+      ],
+      "findings_by_framework": {
+        "Cyber Essentials": 5,
+        "DSPT": 3,
+        "FCA SYSC": 2,
+        "UK GDPR": 3
+      },
+      "mapped_control_ids": [
+        "CMP-001",
+        "CMP-002",
+        "DATA-001",
+        "DATA-002",
+        "DATA-003",
+        "IAM-001",
+        "MON-001",
+        "NET-001",
+        "NET-002"
+      ],
+      "mapped_control_count": 9,
+      "mapped_finding_count": 9
+    },
+    "cyber_essentials_overall_readiness_score": 33.33,
+    "cyber_essentials_pillar_count": 5
+  },
+  "resource_summary": {
+    "context_model": "cris_sme_resource_evidence_context_v1",
+    "asset_count": 6,
+    "evidence_record_count": 46,
+    "finding_asset_link_count": 28,
+    "asset_type_counts": {
+      "compute_plane": 1,
+      "data_plane": 1,
+      "identity_plane": 1,
+      "monitoring_plane": 1,
+      "network_surface": 1,
+      "tenant": 1
+    },
+    "provider_counts": {
+      "aws": 6
+    },
+    "exposure_counts": {},
+    "linked_finding_count": 28
+  },
+  "evidence_summary": {
+    "sufficiency_counts": {
+      "unsupported": 28
+    },
+    "observation_class_counts": {
+      "inferred": 1,
+      "observed": 27
+    },
+    "direct_evidence_count": 46,
+    "inferred_evidence_count": 0,
+    "unavailable_evidence_count": 1,
+    "evidence_gap_backlog_count": 64,
+    "high_priority_gap_count": 2,
+    "replayable": true,
+    "deterministic_replay_match": false,
+    "evidence_changed_since_previous": false
+  },
+  "lifecycle_summary": {
+    "status_counts": {
+      "open": 28
+    },
+    "summary_status_counts": {
+      "open": 28
+    },
+    "new_finding_count": 0,
+    "recurring_finding_count": 28,
+    "exception_applied_count": 0
+  },
+  "drift_summary": {
+    "risk_drift_status": "insufficient_history",
+    "risk_drift_direction": null,
+    "risk_drift_overall_delta": null,
+    "control_drift_comparable": true,
+    "control_drift_primary_attribution": "unchanged",
+    "control_drift_overall_delta": 0.0,
+    "control_drift_attribution_counts": {
+      "unchanged": 28
+    },
+    "evidence_changed": false,
+    "policy_pack_changed": false,
+    "collector_mode_changed": false
+  },
+  "claim_summary": {
+    "pack_schema_version": "1.0.0",
+    "claim_count": 21,
+    "verified_claim_count": 4,
+    "caveated_claim_count": 19,
+    "claim_type_counts": {
+      "overall_risk": 1,
+      "replay": 1,
+      "integrity": 1,
+      "trust_badge": 1,
+      "top_risk": 5,
+      "cyber_essentials_readiness": 1,
+      "cyber_essentials_pillar": 5,
+      "insurance_question": 6
+    }
+  },
+  "action_summary": {
+    "phase_count": 3,
+    "action_count": 17,
+    "phase_action_counts": {
+      "Fix this week": 5,
+      "Complete this month": 7,
+      "Plan next": 5
+    },
+    "owner_counts": {
+      "Unassigned": 17
+    }
+  },
+  "provider_summary": {
+    "contract_schema_version": "1.0.0",
+    "provider_count": 3,
+    "control_count": 36,
+    "contract_count": 108,
+    "support_status_counts": {
+      "active": 26,
+      "research_preview": 46,
+      "planned": 36
+    },
+    "conformance_passed": true,
+    "active_contract_count": 26,
+    "planned_contract_count": 36,
+    "failed_contract_count": 0
+  },
+  "assurance_summary": {
+    "assessment_assurance_score": 61.25,
+    "assessment_assurance_level": "limited",
+    "trust_badge_level": "limited",
+    "trust_badge_assurance_score": 61.25,
+    "assurance_case_conclusion": "caveated",
+    "assurance_case_score": 61.25
+  }
+}

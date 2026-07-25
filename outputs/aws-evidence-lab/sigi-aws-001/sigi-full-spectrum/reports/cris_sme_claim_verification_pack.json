@@ -1,0 +1,760 @@
+{
+  "pack_schema_version": "1.0.0",
+  "pack_name": "CRIS-SME Claim Verification Pack",
+  "generated_at": "2026-07-04T18:15:03.071496Z",
+  "claim_count": 21,
+  "verified_claim_count": 4,
+  "caveated_claim_count": 19,
+  "claim_type_counts": {
+    "overall_risk": 1,
+    "replay": 1,
+    "integrity": 1,
+    "trust_badge": 1,
+    "top_risk": 5,
+    "cyber_essentials_readiness": 1,
+    "cyber_essentials_pillar": 5,
+    "insurance_question": 6
+  },
+  "claims": [
+    {
+      "claim_id": "clm_4a59bd33b3ac87",
+      "claim_type": "overall_risk",
+      "audience": "executive",
+      "statement": "Overall CRIS-SME risk score is 38.79/100.",
+      "verification_status": "verified",
+      "confidence": 0.95,
+      "source_sections": [
+        "summary",
+        "overall_risk_score",
+        "category_scores"
+      ],
+      "evidence_refs": [
+        "evd_fdg_03484c44a1bea9_01",
+        "evd_fdg_0487a7973756c3_01",
+        "evd_fdg_0fc8904a5edd56_01",
+        "evd_fdg_1fcafc454b954f_01",
+        "evd_fdg_212e49f1a69dad_01",
+        "evd_fdg_212e49f1a69dad_02",
+        "evd_fdg_212e49f1a69dad_03",
+        "evd_fdg_22fa0573d52093_01",
+        "evd_fdg_22fa0573d52093_02",
+        "evd_fdg_22fa0573d52093_03",
+        "evd_fdg_32dfaf5364b4d6_01",
+        "evd_fdg_41e815a1b649a8_01",
+        "evd_fdg_45fead59d5ed86_01",
+        "evd_fdg_45fead59d5ed86_02",
+        "evd_fdg_47b2e528cc081f_01",
+        "evd_fdg_47b2e528cc081f_02",
+        "evd_fdg_4fdee149a387bc_01",
+        "evd_fdg_4fdee149a387bc_02",
+        "evd_fdg_514b77f2a83791_01",
+        "evd_fdg_514b77f2a83791_02"
+      ],
+      "control_ids": [
+        "CMP-001",
+        "CMP-002",
+        "CMP-003",
+        "CMP-004",
+        "DATA-001",
+        "DATA-002",
+        "DATA-003",
+        "GOV-002",
+        "GOV-003",
+        "GOV-004",
+        "IAM-001",
+        "IAM-003",
+        "IAM-005",
+        "IOT-001",
+        "IOT-002",
+        "IOT-003",
+        "IOT-004",
+        "IOT-005",
+        "IOT-006",
+        "IOT-007",
+        "IOT-008",
+        "IOT-009",
+        "IOT-010",
+        "MON-001",
+        "MON-003",
+        "NET-001",
+        "NET-002",
+        "NET-004"
+      ],
+      "finding_ids": [
+        "fdg_03484c44a1bea9",
+        "fdg_0487a7973756c3",
+        "fdg_0fc8904a5edd56",
+        "fdg_1fcafc454b954f",
+        "fdg_212e49f1a69dad",
+        "fdg_22fa0573d52093",
+        "fdg_32dfaf5364b4d6",
+        "fdg_41e815a1b649a8",
+        "fdg_45fead59d5ed86",
+        "fdg_47b2e528cc081f",
+        "fdg_4fdee149a387bc",
+        "fdg_514b77f2a83791",
+        "fdg_59af495a1834f7",
+        "fdg_6c25430ff366c3",
+        "fdg_74c023949b5311",
+        "fdg_78fef0955deb69",
+        "fdg_81612c096e8237",
+        "fdg_8ce865e5eb6019",
+        "fdg_8de9e4b39be686",
+        "fdg_95befe3a0ef4d3",
+        "fdg_994c549d0b3d2e",
+        "fdg_ba8563fa9c85b0",
+        "fdg_bd7c18a97bdfc6",
+        "fdg_c5f3db81b3965c",
+        "fdg_dfbb1e782053b2",
+        "fdg_e13f1fe2310b82",
+        "fdg_f2db05d7f43d6a",
+        "fdg_fd9b74860f2318"
+      ],
+      "provenance_node_ids": [
+        "snapshot:evs_38d7b6507aa3d94a",
+        "assurance:assessment"
+      ],
+      "rbom_artifact_refs": [
+        "json_report"
+      ],
+      "caveats": [
+        "Deterministic replay is not verified.",
+        "2 high-priority evidence gaps remain.",
+        "Evidence snapshot replay is missing or did not match deterministically.",
+        "Evidence sufficiency is low; findings may be explainable but less assured."
+      ],
+      "deterministic_score_impact": "No impact. Claim verification records report statements and never changes deterministic risk scores."
+    },
+    {
+      "claim_id": "clm_0302b5d56a4917",
+      "claim_type": "replay",
+      "audience": "assurance",
+      "statement": "Assessment replay is not verified for this report.",
+      "verification_status": "caveated",
+      "confidence": 0.35,
+      "source_sections": [
+        "assessment_replay",
+        "evidence_snapshot"
+      ],
+      "evidence_refs": [],
+      "control_ids": [],
+      "finding_ids": [],
+      "provenance_node_ids": [
+        "replay:assessment",
+        "snapshot:evs_38d7b6507aa3d94a"
+      ],
+      "rbom_artifact_refs": [
+        "evidence_snapshot"
+      ],
+      "caveats": [
+        "Deterministic replay did not verify cleanly."
+      ],
+      "deterministic_score_impact": "No impact. Replay verifies deterministic scoring but does not alter it."
+    },
+    {
+      "claim_id": "clm_f151063e0cc4a1",
+      "claim_type": "integrity",
+      "audience": "assurance",
+      "statement": "Report includes a Risk Bill of Materials integrity manifest.",
+      "verification_status": "verified",
+      "confidence": 1.0,
+      "source_sections": [
+        "risk_bill_of_materials",
+        "report_artifacts"
+      ],
+      "evidence_refs": [],
+      "control_ids": [],
+      "finding_ids": [],
+      "provenance_node_ids": [
+        "rbom:assessment"
+      ],
+      "rbom_artifact_refs": [
+        "risk_bill_of_materials"
+      ],
+      "caveats": [],
+      "deterministic_score_impact": "No impact. RBOM verifies artifact integrity and never changes risk scoring."
+    },
+    {
+      "claim_id": "clm_05add4d49f86e9",
+      "claim_type": "trust_badge",
+      "audience": "executive",
+      "statement": "Report is explainable but has assurance gaps that should be reviewed before external reliance.",
+      "verification_status": "caveated",
+      "confidence": 0.6125,
+      "source_sections": [
+        "report_trust_badge",
+        "assessment_assurance"
+      ],
+      "evidence_refs": [],
+      "control_ids": [],
+      "finding_ids": [],
+      "provenance_node_ids": [
+        "trust_badge:report",
+        "assurance:assessment"
+      ],
+      "rbom_artifact_refs": [
+        "json_report"
+      ],
+      "caveats": [
+        "Deterministic replay is not verified.",
+        "2 high-priority evidence gaps remain."
+      ],
+      "deterministic_score_impact": "No impact. The trust badge summarizes report assurance signals and never changes deterministic CRIS-SME risk scores."
+    },
+    {
+      "claim_id": "clm_e017e79f322bc4",
+      "claim_type": "top_risk",
+      "audience": "executive",
+      "statement": "NET-001 is a High risk with score 72.12.",
+      "verification_status": "caveated",
+      "confidence": 0.95,
+      "source_sections": [
+        "prioritized_risks",
+        "decision_provenance_graph"
+      ],
+      "evidence_refs": [
+        "evd_fdg_514b77f2a83791_01",
+        "evd_fdg_514b77f2a83791_02"
+      ],
+      "control_ids": [
+        "NET-001"
+      ],
+      "finding_ids": [
+        "fdg_514b77f2a83791"
+      ],
+      "provenance_node_ids": [
+        "finding:fdg_514b77f2a83791",
+        "score:fdg_514b77f2a83791",
+        "evidence_sufficiency:fdg_514b77f2a83791"
+      ],
+      "rbom_artifact_refs": [
+        "json_report",
+        "decision_provenance_graph"
+      ],
+      "caveats": [
+        "Evidence sufficiency is unsupported."
+      ],
+      "deterministic_score_impact": "No impact. This claim describes an already-scored finding."
+    },
+    {
+      "claim_id": "clm_77c4416bb77e0a",
+      "claim_type": "top_risk",
+      "audience": "executive",
+      "statement": "IAM-001 is a High risk with score 67.97.",
+      "verification_status": "caveated",
+      "confidence": 0.924,
+      "source_sections": [
+        "prioritized_risks",
+        "decision_provenance_graph"
+      ],
+      "evidence_refs": [
+        "evd_fdg_81612c096e8237_01",
+        "evd_fdg_81612c096e8237_02"
+      ],
+      "control_ids": [
+        "IAM-001"
+      ],
+      "finding_ids": [
+        "fdg_81612c096e8237"
+      ],
+      "provenance_node_ids": [
+        "finding:fdg_81612c096e8237",
+        "score:fdg_81612c096e8237",
+        "evidence_sufficiency:fdg_81612c096e8237"
+      ],
+      "rbom_artifact_refs": [
+        "json_report",
+        "decision_provenance_graph"
+      ],
+      "caveats": [
+        "Evidence sufficiency is unsupported."
+      ],
+      "deterministic_score_impact": "No impact. This claim describes an already-scored finding."
+    },
+    {
+      "claim_id": "clm_aeeb7cf0ac9829",
+      "claim_type": "top_risk",
+      "audience": "executive",
+      "statement": "DATA-001 is a Planned risk with score 48.35.",
+      "verification_status": "caveated",
+      "confidence": 0.915,
+      "source_sections": [
+        "prioritized_risks",
+        "decision_provenance_graph"
+      ],
+      "evidence_refs": [
+        "evd_fdg_59af495a1834f7_01"
+      ],
+      "control_ids": [
+        "DATA-001"
+      ],
+      "finding_ids": [
+        "fdg_59af495a1834f7"
+      ],
+      "provenance_node_ids": [
+        "finding:fdg_59af495a1834f7",
+        "score:fdg_59af495a1834f7",
+        "evidence_sufficiency:fdg_59af495a1834f7"
+      ],
+      "rbom_artifact_refs": [
+        "json_report",
+        "decision_provenance_graph"
+      ],
+      "caveats": [
+        "Evidence sufficiency is unsupported."
+      ],
+      "deterministic_score_impact": "No impact. This claim describes an already-scored finding."
+    },
+    {
+      "claim_id": "clm_2d9e18ddaf4c14",
+      "claim_type": "top_risk",
+      "audience": "executive",
+      "statement": "IOT-005 is a Planned risk with score 47.25.",
+      "verification_status": "caveated",
+      "confidence": 0.856,
+      "source_sections": [
+        "prioritized_risks",
+        "decision_provenance_graph"
+      ],
+      "evidence_refs": [
+        "evd_fdg_994c549d0b3d2e_01",
+        "evd_fdg_994c549d0b3d2e_02"
+      ],
+      "control_ids": [
+        "IOT-005"
+      ],
+      "finding_ids": [
+        "fdg_994c549d0b3d2e"
+      ],
+      "provenance_node_ids": [
+        "finding:fdg_994c549d0b3d2e",
+        "score:fdg_994c549d0b3d2e",
+        "evidence_sufficiency:fdg_994c549d0b3d2e"
+      ],
+      "rbom_artifact_refs": [
+        "json_report",
+        "decision_provenance_graph"
+      ],
+      "caveats": [
+        "Evidence sufficiency is unsupported."
+      ],
+      "deterministic_score_impact": "No impact. This claim describes an already-scored finding."
+    },
+    {
+      "claim_id": "clm_259ccdbe4f0eca",
+      "claim_type": "top_risk",
+      "audience": "executive",
+      "statement": "NET-002 is a Planned risk with score 44.71.",
+      "verification_status": "caveated",
+      "confidence": 0.875,
+      "source_sections": [
+        "prioritized_risks",
+        "decision_provenance_graph"
+      ],
+      "evidence_refs": [
+        "evd_fdg_e13f1fe2310b82_01"
+      ],
+      "control_ids": [
+        "NET-002"
+      ],
+      "finding_ids": [
+        "fdg_e13f1fe2310b82"
+      ],
+      "provenance_node_ids": [
+        "finding:fdg_e13f1fe2310b82",
+        "score:fdg_e13f1fe2310b82",
+        "evidence_sufficiency:fdg_e13f1fe2310b82"
+      ],
+      "rbom_artifact_refs": [
+        "json_report",
+        "decision_provenance_graph"
+      ],
+      "caveats": [
+        "Evidence sufficiency is unsupported."
+      ],
+      "deterministic_score_impact": "No impact. This claim describes an already-scored finding."
+    },
+    {
+      "claim_id": "clm_10031800d39adf",
+      "claim_type": "cyber_essentials_readiness",
+      "audience": "compliance",
+      "statement": "Cyber Essentials readiness score is 33.33/100.",
+      "verification_status": "verified",
+      "confidence": 0.85,
+      "source_sections": [
+        "cyber_essentials_readiness"
+      ],
+      "evidence_refs": [],
+      "control_ids": [
+        "CMP-001",
+        "CMP-002",
+        "IAM-001",
+        "NET-001",
+        "NET-002"
+      ],
+      "finding_ids": [],
+      "provenance_node_ids": [
+        "snapshot:evs_38d7b6507aa3d94a"
+      ],
+      "rbom_artifact_refs": [
+        "json_report"
+      ],
+      "caveats": [
+        "Deterministic replay is not verified.",
+        "2 high-priority evidence gaps remain.",
+        "Evidence snapshot replay is missing or did not match deterministically.",
+        "Evidence sufficiency is low; findings may be explainable but less assured."
+      ],
+      "deterministic_score_impact": "No impact. Readiness claims summarize mapped controls without changing risk scores."
+    },
+    {
+      "claim_id": "clm_8f98be1ee86a74",
+      "claim_type": "cyber_essentials_pillar",
+      "audience": "compliance",
+      "statement": "Firewalls readiness is gap.",
+      "verification_status": "caveated",
+      "confidence": 0.7,
+      "source_sections": [
+        "cyber_essentials_readiness"
+      ],
+      "evidence_refs": [],
+      "control_ids": [
+        "NET-001",
+        "NET-002"
+      ],
+      "finding_ids": [
+        "fdg_514b77f2a83791",
+        "fdg_e13f1fe2310b82"
+      ],
+      "provenance_node_ids": [
+        "control:NET-001",
+        "control:NET-002"
+      ],
+      "rbom_artifact_refs": [
+        "json_report"
+      ],
+      "caveats": [
+        "Active mapped controls: NET-001, NET-002."
+      ],
+      "deterministic_score_impact": "No impact. Pillar claims summarize mapped controls without changing scores."
+    },
+    {
+      "claim_id": "clm_4f7c3100bf948e",
+      "claim_type": "cyber_essentials_pillar",
+      "audience": "compliance",
+      "statement": "Secure configuration readiness is ready.",
+      "verification_status": "verified",
+      "confidence": 0.85,
+      "source_sections": [
+        "cyber_essentials_readiness"
+      ],
+      "evidence_refs": [],
+      "control_ids": [],
+      "finding_ids": [],
+      "provenance_node_ids": [],
+      "rbom_artifact_refs": [
+        "json_report"
+      ],
+      "caveats": [],
+      "deterministic_score_impact": "No impact. Pillar claims summarize mapped controls without changing scores."
+    },
+    {
+      "claim_id": "clm_9e3629aebd0692",
+      "claim_type": "cyber_essentials_pillar",
+      "audience": "compliance",
+      "statement": "Access control readiness is partial.",
+      "verification_status": "caveated",
+      "confidence": 0.7,
+      "source_sections": [
+        "cyber_essentials_readiness"
+      ],
+      "evidence_refs": [],
+      "control_ids": [
+        "IAM-001"
+      ],
+      "finding_ids": [
+        "fdg_81612c096e8237"
+      ],
+      "provenance_node_ids": [
+        "control:IAM-001"
+      ],
+      "rbom_artifact_refs": [
+        "json_report"
+      ],
+      "caveats": [
+        "Active mapped controls: IAM-001."
+      ],
+      "deterministic_score_impact": "No impact. Pillar claims summarize mapped controls without changing scores."
+    },
+    {
+      "claim_id": "clm_a84ad305d773d7",
+      "claim_type": "cyber_essentials_pillar",
+      "audience": "compliance",
+      "statement": "Malware protection readiness is gap.",
+      "verification_status": "caveated",
+      "confidence": 0.7,
+      "source_sections": [
+        "cyber_essentials_readiness"
+      ],
+      "evidence_refs": [],
+      "control_ids": [
+        "CMP-002"
+      ],
+      "finding_ids": [
+        "fdg_ba8563fa9c85b0"
+      ],
+      "provenance_node_ids": [
+        "control:CMP-002"
+      ],
+      "rbom_artifact_refs": [
+        "json_report"
+      ],
+      "caveats": [
+        "Active mapped controls: CMP-002."
+      ],
+      "deterministic_score_impact": "No impact. Pillar claims summarize mapped controls without changing scores."
+    },
+    {
+      "claim_id": "clm_fe015f3fdb4966",
+      "claim_type": "cyber_essentials_pillar",
+      "audience": "compliance",
+      "statement": "Security update management readiness is gap.",
+      "verification_status": "caveated",
+      "confidence": 0.7,
+      "source_sections": [
+        "cyber_essentials_readiness"
+      ],
+      "evidence_refs": [],
+      "control_ids": [
+        "CMP-001"
+      ],
+      "finding_ids": [
+        "fdg_dfbb1e782053b2"
+      ],
+      "provenance_node_ids": [
+        "control:CMP-001"
+      ],
+      "rbom_artifact_refs": [
+        "json_report"
+      ],
+      "caveats": [
+        "Active mapped controls: CMP-001."
+      ],
+      "deterministic_score_impact": "No impact. Pillar claims summarize mapped controls without changing scores."
+    },
+    {
+      "claim_id": "clm_05fa8951d42cd7",
+      "claim_type": "insurance_question",
+      "audience": "insurance",
+      "statement": "INS-001 status is not_met: CRIS-SME identified material evidence that this control area is not fully met. The strongest linked gap is IAM-001 at 67.97 risk (high priority).",
+      "verification_status": "caveated",
+      "confidence": 0.75,
+      "source_sections": [
+        "cyber_insurance_evidence"
+      ],
+      "evidence_refs": [
+        "1 privileged account(s) do not have MFA enabled",
+        "Conditional access for privileged administrators was not observable and is treated as unmet for deterministic scoring"
+      ],
+      "control_ids": [
+        "IAM-001"
+      ],
+      "finding_ids": [
+        "fdg_81612c096e8237"
+      ],
+      "provenance_node_ids": [
+        "control:IAM-001"
+      ],
+      "rbom_artifact_refs": [
+        "cyber_insurance_pack.cyber_insurance_json"
+      ],
+      "caveats": [
+        "Require MFA and admin-focused conditional access for privileged identities."
+      ],
+      "deterministic_score_impact": "No impact. Insurance claims summarize mapped control evidence without changing scores."
+    },
+    {
+      "claim_id": "clm_7783c460a10712",
+      "claim_type": "insurance_question",
+      "audience": "insurance",
+      "statement": "INS-002 status is partial: CRIS-SME identified partial evidence of control weakness or incomplete observability. The strongest linked gap is IAM-005 at 4.57 risk (monitor priority).",
+      "verification_status": "caveated",
+      "confidence": 0.65,
+      "source_sections": [
+        "cyber_insurance_evidence"
+      ],
+      "evidence_refs": [
+        "Subscription-scoped evidence was collected for privileged role assignments",
+        "Tenant-wide Entra controls such as conditional access were not directly observable in this run"
+      ],
+      "control_ids": [
+        "IAM-002",
+        "IAM-004",
+        "IAM-005"
+      ],
+      "finding_ids": [
+        "fdg_8ce865e5eb6019"
+      ],
+      "provenance_node_ids": [
+        "control:IAM-002",
+        "control:IAM-004",
+        "control:IAM-005"
+      ],
+      "rbom_artifact_refs": [
+        "cyber_insurance_pack.cyber_insurance_json"
+      ],
+      "caveats": [
+        "Broaden tenant-level identity evidence collection before treating IAM coverage as complete."
+      ],
+      "deterministic_score_impact": "No impact. Insurance claims summarize mapped control evidence without changing scores."
+    },
+    {
+      "claim_id": "clm_f515210453343a",
+      "claim_type": "insurance_question",
+      "audience": "insurance",
+      "statement": "INS-003 status is not_met: CRIS-SME identified material evidence that this control area is not fully met. The strongest linked gap is NET-001 at 72.12 risk (high priority).",
+      "verification_status": "caveated",
+      "confidence": 0.75,
+      "source_sections": [
+        "cyber_insurance_evidence"
+      ],
+      "evidence_refs": [
+        "1 asset(s) expose RDP to the public internet",
+        "1 asset(s) expose SSH to the public internet",
+        "2 permissive NSG rule(s) were identified"
+      ],
+      "control_ids": [
+        "NET-001",
+        "NET-002"
+      ],
+      "finding_ids": [
+        "fdg_514b77f2a83791",
+        "fdg_e13f1fe2310b82"
+      ],
+      "provenance_node_ids": [
+        "control:NET-001",
+        "control:NET-002"
+      ],
+      "rbom_artifact_refs": [
+        "cyber_insurance_pack.cyber_insurance_json"
+      ],
+      "caveats": [
+        "Restrict SSH and RDP exposure with private access paths, VPN, or just-in-time controls."
+      ],
+      "deterministic_score_impact": "No impact. Insurance claims summarize mapped control evidence without changing scores."
+    },
+    {
+      "claim_id": "clm_19f45c1ae66374",
+      "claim_type": "insurance_question",
+      "audience": "insurance",
+      "statement": "INS-004 status is partial: CRIS-SME identified partial evidence of control weakness or incomplete observability. The strongest linked gap is CMP-001 at 42.69 risk (planned priority).",
+      "verification_status": "caveated",
+      "confidence": 0.65,
+      "source_sections": [
+        "cyber_insurance_evidence"
+      ],
+      "evidence_refs": [
+        "1 critical VM(s) require urgent patching",
+        "Endpoint protection coverage is approximately 0%",
+        "Hardened baseline coverage is approximately 0%"
+      ],
+      "control_ids": [
+        "CMP-001",
+        "CMP-002",
+        "CMP-003",
+        "CMP-005"
+      ],
+      "finding_ids": [
+        "fdg_dfbb1e782053b2",
+        "fdg_ba8563fa9c85b0",
+        "fdg_1fcafc454b954f"
+      ],
+      "provenance_node_ids": [
+        "control:CMP-001",
+        "control:CMP-002",
+        "control:CMP-003",
+        "control:CMP-005"
+      ],
+      "rbom_artifact_refs": [
+        "cyber_insurance_pack.cyber_insurance_json"
+      ],
+      "caveats": [
+        "Patch critical workloads and enforce a stronger recurring patch policy."
+      ],
+      "deterministic_score_impact": "No impact. Insurance claims summarize mapped control evidence without changing scores."
+    },
+    {
+      "claim_id": "clm_1596204779edae",
+      "claim_type": "insurance_question",
+      "audience": "insurance",
+      "statement": "INS-005 status is not_met: CRIS-SME identified material evidence that this control area is not fully met. The strongest linked gap is DATA-003 at 37.58 risk (planned priority).",
+      "verification_status": "caveated",
+      "confidence": 0.75,
+      "source_sections": [
+        "cyber_insurance_evidence"
+      ],
+      "evidence_refs": [
+        "Backup coverage is only 60%",
+        "Retention policy coverage is only 60%",
+        "Workload backup agent coverage is approximately 0%"
+      ],
+      "control_ids": [
+        "DATA-003",
+        "CMP-004"
+      ],
+      "finding_ids": [
+        "fdg_4fdee149a387bc",
+        "fdg_32dfaf5364b4d6"
+      ],
+      "provenance_node_ids": [
+        "control:DATA-003",
+        "control:CMP-004"
+      ],
+      "rbom_artifact_refs": [
+        "cyber_insurance_pack.cyber_insurance_json"
+      ],
+      "caveats": [
+        "Increase backup and retention coverage for business-critical data stores."
+      ],
+      "deterministic_score_impact": "No impact. Insurance claims summarize mapped control evidence without changing scores."
+    },
+    {
+      "claim_id": "clm_cd08af035368dd",
+      "claim_type": "insurance_question",
+      "audience": "insurance",
+      "statement": "INS-006 status is partial: CRIS-SME identified partial evidence of control weakness or incomplete observability. The strongest linked gap is MON-001 at 35.79 risk (planned priority).",
+      "verification_status": "caveated",
+      "confidence": 0.65,
+      "source_sections": [
+        "cyber_insurance_evidence"
+      ],
+      "evidence_refs": [
+        "Activity logs are retained for only 0 day(s)",
+        "Security monitoring coverage is approximately 0%"
+      ],
+      "control_ids": [
+        "MON-001",
+        "MON-002",
+        "MON-003",
+        "MON-004"
+      ],
+      "finding_ids": [
+        "fdg_0fc8904a5edd56",
+        "fdg_03484c44a1bea9"
+      ],
+      "provenance_node_ids": [
+        "control:MON-001",
+        "control:MON-002",
+        "control:MON-003",
+        "control:MON-004"
+      ],
+      "rbom_artifact_refs": [
+        "cyber_insurance_pack.cyber_insurance_json"
+      ],
+      "caveats": [
+        "Increase log retention to support investigation, governance review, and evidence preservation."
+      ],
+      "deterministic_score_impact": "No impact. Insurance claims summarize mapped control evidence without changing scores."
+    }
+  ]
+}

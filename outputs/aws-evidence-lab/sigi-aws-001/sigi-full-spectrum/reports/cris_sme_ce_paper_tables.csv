@@ -1,0 +1,39 @@
+affected_question_count,cloud_supported_count,cloud_supported_rate,control_id,count,description,evidence_class,label,max_linked_score,question_count,rate,reviewed_count,sample_finding_titles,sample_question_ids,section,table
+,,,,5,,,direct_cloud,,,4.72,,,,,observability_by_evidence_class
+,,,,24,,,endpoint_required,,,22.64,,,,,observability_by_evidence_class
+,,,,23,,,inferred_cloud,,,21.7,,,,,observability_by_evidence_class
+,,,,35,,,manual_required,,,33.02,,,,,observability_by_evidence_class
+,,,,19,,,policy_required,,,17.92,,,,,observability_by_evidence_class
+,,,,5,,,direct_cloud,,,8.06,,,,,technical_observability_by_evidence_class
+,,,,21,,,endpoint_required,,,33.87,,,,,technical_observability_by_evidence_class
+,,,,17,,,inferred_cloud,,,27.42,,,,,technical_observability_by_evidence_class
+,,,,1,,,manual_required,,,1.61,,,,,technical_observability_by_evidence_class
+,,,,18,,,policy_required,,,29.03,,,,,technical_observability_by_evidence_class
+,,,,24,"Endpoint, MDM, EDR, patch, or local device evidence required.",endpoint_required,,,,22.64,,,A2.6; A2.6.1; A2.8; A4.1.1; A4.1.2; A5.1; A5.3; A5.8,,evidence_gap_taxonomy
+,,,,35,"Applicant scoping, company context, or final attestation required.",manual_required,,,,33.02,,,A1.1; A1.2; A1.3; A1.4; A1.5; A1.5.1; A1.6; A1.6.1,,evidence_gap_taxonomy
+,,,,0,Required signal is outside current CRIS-SME observable evidence paths.,not_observable,,,,0.0,,,,,evidence_gap_taxonomy
+,,,,19,"Policy, process, approval, or business-need evidence required.",policy_required,,,,17.92,,,A1.16; A4.2; A4.2.1; A4.3; A4.4; A4.5; A4.6; A4.8,,evidence_gap_taxonomy
+,,,,106,,,pending,,,100.0,,,,,review_outcomes
+,,,,78,,,Cannot determine,,,73.58,,,,,proposed_answers
+,,,,24,,,No,,,22.64,,,,,proposed_answers
+,,,,4,,,Yes,,,3.77,,,,,proposed_answers
+,,,,106,,,pending_human_review,,,100.0,,,,,final_answers
+9,,,IAM-001,,,,,67.97,,,,Privileged role assignments without MFA enforcement,,,control_failure_contribution
+6,,,NET-002,,,,,44.71,,,,Network security group rules are broader than expected,,,control_failure_contribution
+5,,,NET-001,,,,,72.12,,,,Administrative services are exposed to the public internet,,,control_failure_contribution
+4,,,CMP-001,,,,,42.69,,,,Critical workloads remain unpatched beyond acceptable risk tolerance,,,control_failure_contribution
+3,,,IAM-003,,,,,23.34,,,,Stale service principals or credentials require review,,,control_failure_contribution
+3,,,IAM-005,,,,,4.57,,,,Identity governance observability is partial for this assessment scope,,,control_failure_contribution
+2,,,DATA-001,,,,,48.35,,,,Public storage access increases data exposure risk,,,control_failure_contribution
+1,,,CMP-003,,,,,38.49,,,,Workload hardening baseline coverage is incomplete,,,control_failure_contribution
+1,,,GOV-003,,,,,33.88,,,,Policy assignment coverage is below the baseline governance threshold,,,control_failure_contribution
+1,,,GOV-004,,,,,17.87,,,,Orphaned resources increase governance and cost hygiene risk,,,control_failure_contribution
+,0,0.0,,,,,,,2,,0,,,certificates,section_coverage
+,4,28.57,,,,,,,14,,0,,,firewalls,section_coverage
+,0,0.0,,,,,,,3,,0,,,insurance,section_coverage
+,0,0.0,,,,,,,5,,0,,,malware_protection,section_coverage
+,6,33.33,,,,,,,18,,0,,,scope_of_assessment,section_coverage
+,4,40.0,,,,,,,10,,0,,,secure_configuration,section_coverage
+,3,18.75,,,,,,,16,,0,,,security_update_management,section_coverage
+,11,64.71,,,,,,,17,,0,,,user_access_control,section_coverage
+,0,0.0,,,,,,,21,,0,,,your_company,section_coverage

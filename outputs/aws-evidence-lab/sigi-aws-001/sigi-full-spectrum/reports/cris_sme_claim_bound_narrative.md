@@ -1,0 +1,80 @@
+# CRIS-SME Claim-Bound Narrative
+
+- Generated at: `2026-07-04T18:15:03.071496Z`
+- Narrative model: `cris_sme_claim_bound_narrative_v1`
+- Cited claims: `21`
+
+## Executive Summary
+
+Overall CRIS-SME risk score is 38.79/100. [clm_4a59bd33b3ac87] Report is explainable but has assurance gaps that should be reviewed before external reliance. This claim is caveated. Caveat: Deterministic replay is not verified.; 2 high-priority evidence gaps remain. [clm_05add4d49f86e9]
+
+Supported claims: clm_4a59bd33b3ac87, clm_05add4d49f86e9
+
+Caveats:
+
+- Deterministic replay is not verified.
+- 2 high-priority evidence gaps remain.
+- Evidence snapshot replay is missing or did not match deterministically.
+- Evidence sufficiency is low; findings may be explainable but less assured.
+
+## Replay And Integrity
+
+Assessment replay is not verified for this report. This claim is caveated. Caveat: Deterministic replay did not verify cleanly. [clm_0302b5d56a4917] Report includes a Risk Bill of Materials integrity manifest. [clm_f151063e0cc4a1]
+
+Supported claims: clm_0302b5d56a4917, clm_f151063e0cc4a1
+
+Caveats:
+
+- Deterministic replay did not verify cleanly.
+
+## Top Risk Claims
+
+NET-001 is a High risk with score 72.12. This claim is caveated. Caveat: Evidence sufficiency is unsupported. [clm_e017e79f322bc4] IAM-001 is a High risk with score 67.97. This claim is caveated. Caveat: Evidence sufficiency is unsupported. [clm_77c4416bb77e0a] DATA-001 is a Planned risk with score 48.35. This claim is caveated. Caveat: Evidence sufficiency is unsupported. [clm_aeeb7cf0ac9829] IOT-005 is a Planned risk with score 47.25. This claim is caveated. Caveat: Evidence sufficiency is unsupported. [clm_2d9e18ddaf4c14] NET-002 is a Planned risk with score 44.71. This claim is caveated. Caveat: Evidence sufficiency is unsupported. [clm_259ccdbe4f0eca]
+
+Supported claims: clm_e017e79f322bc4, clm_77c4416bb77e0a, clm_aeeb7cf0ac9829, clm_2d9e18ddaf4c14, clm_259ccdbe4f0eca
+
+Caveats:
+
+- Evidence sufficiency is unsupported.
+
+## Cyber Essentials Readiness
+
+Cyber Essentials readiness score is 33.33/100. [clm_10031800d39adf] Firewalls readiness is gap. This claim is caveated. Caveat: Active mapped controls: NET-001, NET-002. [clm_8f98be1ee86a74] Secure configuration readiness is ready. [clm_4f7c3100bf948e] Access control readiness is partial. This claim is caveated. Caveat: Active mapped controls: IAM-001. [clm_9e3629aebd0692] Malware protection readiness is gap. This claim is caveated. Caveat: Active mapped controls: CMP-002. [clm_a84ad305d773d7] Security update management readiness is gap. This claim is caveated. Caveat: Active mapped controls: CMP-001. [clm_fe015f3fdb4966]
+
+Supported claims: clm_10031800d39adf, clm_8f98be1ee86a74, clm_4f7c3100bf948e, clm_9e3629aebd0692, clm_a84ad305d773d7, clm_fe015f3fdb4966
+
+Caveats:
+
+- Deterministic replay is not verified.
+- 2 high-priority evidence gaps remain.
+- Evidence snapshot replay is missing or did not match deterministically.
+- Evidence sufficiency is low; findings may be explainable but less assured.
+- Active mapped controls: NET-001, NET-002.
+- Active mapped controls: IAM-001.
+- Active mapped controls: CMP-002.
+- Active mapped controls: CMP-001.
+
+## Insurance Evidence Claims
+
+INS-001 status is not_met: CRIS-SME identified material evidence that this control area is not fully met. The strongest linked gap is IAM-001 at 67.97 risk (high priority). This claim is caveated. Caveat: Require MFA and admin-focused conditional access for privileged identities. [clm_05fa8951d42cd7] INS-002 status is partial: CRIS-SME identified partial evidence of control weakness or incomplete observability. The strongest linked gap is IAM-005 at 4.57 risk (monitor priority). This claim is caveated. Caveat: Broaden tenant-level identity evidence collection before treating IAM coverage as complete. [clm_7783c460a10712] INS-003 status is not_met: CRIS-SME identified material evidence that this control area is not fully met. The strongest linked gap is NET-001 at 72.12 risk (high priority). This claim is caveated. Caveat: Restrict SSH and RDP exposure with private access paths, VPN, or just-in-time controls. [clm_f515210453343a] INS-004 status is partial: CRIS-SME identified partial evidence of control weakness or incomplete observability. The strongest linked gap is CMP-001 at 42.69 risk (planned priority). This claim is caveated. Caveat: Patch critical workloads and enforce a stronger recurring patch policy. [clm_19f45c1ae66374] INS-005 status is not_met: CRIS-SME identified material evidence that this control area is not fully met. The strongest linked gap is DATA-003 at 37.58 risk (planned priority). This claim is caveated. Caveat: Increase backup and retention coverage for business-critical data stores. [clm_1596204779edae] INS-006 status is partial: CRIS-SME identified partial evidence of control weakness or incomplete observability. The strongest linked gap is MON-001 at 35.79 risk (planned priority). This claim is caveated. Caveat: Increase log retention to support investigation, governance review, and evidence preservation. [clm_cd08af035368dd]
+
+Supported claims: clm_05fa8951d42cd7, clm_7783c460a10712, clm_f515210453343a, clm_19f45c1ae66374, clm_1596204779edae, clm_cd08af035368dd
+
+Caveats:
+
+- Require MFA and admin-focused conditional access for privileged identities.
+- Broaden tenant-level identity evidence collection before treating IAM coverage as complete.
+- Restrict SSH and RDP exposure with private access paths, VPN, or just-in-time controls.
+- Patch critical workloads and enforce a stronger recurring patch policy.
+- Increase backup and retention coverage for business-critical data stores.
+- Increase log retention to support investigation, governance review, and evidence preservation.
+
+## Guardrails
+
+- Narrative is generated only from Claim Verification Pack claims.
+- Verified claims may be stated plainly.
+- Caveated claims must preserve caveat language.
+- Unverified claims must be described as not verified.
+- Narrative does not change deterministic CRIS-SME scores.
+
+No impact. Claim-bound narrative explains verified/caveated claims and never changes deterministic CRIS-SME risk scores.

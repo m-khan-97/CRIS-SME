@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="860" height="496" viewBox="0 0 860 496" role="img" aria-labelledby="title desc">
+  <title id="title">CRIS-SME Category Risk Scores</title>
+  <desc id="desc">Live Azure-backed category scores from the current CRIS-SME assessment</desc>
+  <rect width="860" height="496" fill="#f6fbff" rx="18" />
+  <text x="24" y="34" font-size="26" font-weight="700" fill="#12314b">CRIS-SME Category Risk Scores</text>
+  <text x="24" y="58" font-size="15" fill="#547089">Live Azure-backed category scores from the current CRIS-SME assessment</text>
+  <text x="24" y="90" font-size="18" fill="#17324d">IAM</text>
+<rect x="240" y="70" width="480" height="26" rx="8" fill="#d9e6f2" />
+<rect x="240" y="70" width="153.41" height="26" rx="8" fill="#1f6aa5" />
+<text x="738" y="90" font-size="18" fill="#17324d">31.96</text>
+<text x="24" y="148" font-size="18" fill="#17324d">Network</text>
+<rect x="240" y="128" width="480" height="26" rx="8" fill="#d9e6f2" />
+<rect x="240" y="128" width="254.02" height="26" rx="8" fill="#1f6aa5" />
+<text x="738" y="148" font-size="18" fill="#17324d">52.92</text>
+<text x="24" y="206" font-size="18" fill="#17324d">Data</text>
+<rect x="240" y="186" width="480" height="26" rx="8" fill="#d9e6f2" />
+<rect x="240" y="186" width="205.25" height="26" rx="8" fill="#1f6aa5" />
+<text x="738" y="206" font-size="18" fill="#17324d">42.76</text>
+<text x="24" y="264" font-size="18" fill="#17324d">Monitoring/Logging</text>
+<rect x="240" y="244" width="480" height="26" rx="8" fill="#d9e6f2" />
+<rect x="240" y="244" width="174.53" height="26" rx="8" fill="#1f6aa5" />
+<text x="738" y="264" font-size="18" fill="#17324d">36.36</text>
+<text x="24" y="322" font-size="18" fill="#17324d">Compute/Workloads</text>
+<rect x="240" y="302" width="480" height="26" rx="8" fill="#d9e6f2" />
+<rect x="240" y="302" width="189.07" height="26" rx="8" fill="#1f6aa5" />
+<text x="738" y="322" font-size="18" fill="#17324d">39.39</text>
+<text x="24" y="380" font-size="18" fill="#17324d">Cost/Governance Hygiene</text>
+<rect x="240" y="360" width="480" height="26" rx="8" fill="#d9e6f2" />
+<rect x="240" y="360" width="109.01" height="26" rx="8" fill="#1f6aa5" />
+<text x="738" y="380" font-size="18" fill="#17324d">22.71</text>
+<text x="24" y="438" font-size="18" fill="#17324d">Healthcare IoT</text>
+<rect x="240" y="418" width="480" height="26" rx="8" fill="#d9e6f2" />
+<rect x="240" y="418" width="126.72" height="26" rx="8" fill="#1f6aa5" />
+<text x="738" y="438" font-size="18" fill="#17324d">26.40</text>
+</svg>

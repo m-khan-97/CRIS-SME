@@ -1,0 +1,7 @@
+asset_id,provider,asset_type,name,scope,criticality,internet_exposed,tags,metadata
+tenant:aws:aws-000832363767,aws,tenant,SIGI Technologies,000832363767,high,False,,
+identity:aws:aws-000832363767,aws,identity_plane,SIGI Technologies Identity,000832363767,high,False,,
+network:aws:aws-000832363767,aws,network_surface,SIGI Technologies Network Surface,000832363767,high,True,,
+data:aws:aws-000832363767,aws,data_plane,SIGI Technologies Data Services,000832363767,high,True,,
+compute:aws:aws-000832363767,aws,compute_plane,SIGI Technologies Compute,000832363767,medium,True,,
+monitoring:aws:aws-000832363767,aws,monitoring_plane,SIGI Technologies Monitoring,000832363767,medium,False,,
