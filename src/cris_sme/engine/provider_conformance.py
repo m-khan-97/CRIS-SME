@@ -106,7 +106,12 @@ def _build_provider_signal(provider: str) -> ProviderImplementationSignal:
     else:
         notes.append("Provider capability documentation is not present.")
 
-    if adapter_registered and live_collector_present and collector_tests_present and docs_present:
+    if (
+        adapter_registered
+        and live_collector_present
+        and collector_tests_present
+        and docs_present
+    ):
         status = "active_ready"
     elif adapter_registered or live_collector_present:
         status = "partial"
@@ -129,17 +134,23 @@ def _build_contract_check(
     signal: ProviderImplementationSignal,
 ) -> ProviderContractConformanceCheck:
     support_status = str(getattr(contract, "support_status"))
-    required_signals = _required_signals_for_status(support_status)
+    implementation_signals = _required_signals_for_status(support_status)
+    required_signals = [*implementation_signals, "contract_metadata_complete"]
     satisfied_signals = [
         name
-        for name in required_signals
+        for name in implementation_signals
         if _signal_is_satisfied(name, signal)
     ]
     findings = [
         _finding_for_missing_signal(name, signal.provider, support_status)
-        for name in required_signals
+        for name in implementation_signals
         if name not in satisfied_signals
     ]
+    metadata_findings = _contract_metadata_findings(contract)
+    if metadata_findings:
+        findings.extend(metadata_findings)
+    else:
+        satisfied_signals.append("contract_metadata_complete")
     return ProviderContractConformanceCheck(
         contract_id=str(getattr(contract, "contract_id")),
         provider=str(getattr(contract, "provider")),
@@ -184,6 +195,8 @@ def _signal_is_satisfied(name: str, signal: ProviderImplementationSignal) -> boo
         return signal.collector_tests_present
     if name == "docs_present":
         return signal.docs_present
+    if name == "contract_metadata_complete":
+        return False
     return False
 
 
@@ -200,7 +213,40 @@ def _finding_for_missing_signal(name: str, provider: str, support_status: str) -
         return f"{provider} is marked {support_status} but lacks provider collector tests."
     if name == "docs_present":
         return f"{provider} is marked {support_status} but lacks provider documentation."
+    if name == "contract_metadata_complete":
+        return f"{provider} contract is missing provider metadata."
     return f"{provider} is missing conformance signal {name}."
+
+
+def _contract_metadata_findings(contract: object) -> list[str]:
+    findings: list[str] = []
+    required_fields = (
+        "identity",
+        "scopes",
+        "auth",
+        "permissions",
+        "evidence_capabilities",
+        "freshness_policy",
+        "limitations",
+    )
+    for field_name in required_fields:
+        value = getattr(contract, field_name, None)
+        if value is None or value == []:
+            findings.append(f"Contract metadata field '{field_name}' is missing.")
+    permissions = getattr(contract, "permissions", None)
+    if permissions is not None and not getattr(
+        permissions,
+        "required_permissions",
+        [],
+    ):
+        findings.append("Contract permissions must declare required permissions.")
+    auth = getattr(contract, "auth", None)
+    if auth is not None and not getattr(auth, "auth_modes", []):
+        findings.append("Contract auth must declare supported auth modes.")
+    scopes = getattr(contract, "scopes", None)
+    if scopes is not None and not getattr(scopes, "supported_scopes", []):
+        findings.append("Contract scopes must declare supported scopes.")
+    return findings
 
 
 def _adapter_registered(provider: str) -> bool:

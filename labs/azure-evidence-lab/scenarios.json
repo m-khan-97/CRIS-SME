@@ -168,6 +168,91 @@
       ]
     },
     {
+      "id": "sigi-full-spectrum",
+      "title": "SIGI Technologies Full-Spectrum Azure Lab",
+      "organization_name": "SIGI Technologies",
+      "sector": "Technology Services",
+      "dataset_source_type": "vulnerable_lab",
+      "authorization_basis": "owned_controlled_lab",
+      "dataset_use": "full_spectrum_control_stress_test",
+      "risk_intent": "Exercise every CRIS-SME Azure evidence domain with a realistic mixed-posture estate spanning identity, network, data, monitoring, compute, governance, and healthcare IoT signals.",
+      "expected_findings": [
+        {
+          "control_id": "IAM-002",
+          "expectation": "May fire because the assessment principal has a subscription Owner assignment."
+        },
+        {
+          "control_id": "NET-001",
+          "expectation": "Should fire because the edge NSG allows public SSH and RDP and the legacy VM has a public IP."
+        },
+        {
+          "control_id": "DATA-001",
+          "expectation": "Should fire because the public evidence storage account allows anonymous blob access."
+        },
+        {
+          "control_id": "DATA-004",
+          "expectation": "Should fire because one Key Vault intentionally lacks purge protection."
+        },
+        {
+          "control_id": "MON-003",
+          "expectation": "May fire because centralized logging and alerts are present but Defender plan coverage is intentionally left at the subscription default."
+        },
+        {
+          "control_id": "CMP-002",
+          "expectation": "Should fire because only the hardened VM receives an Azure Monitor agent signal."
+        },
+        {
+          "control_id": "CMP-004",
+          "expectation": "Should fire because only the hardened VM is protected by Azure Backup."
+        },
+        {
+          "control_id": "CMP-005",
+          "expectation": "Should fire because the isolated legacy Linux VM intentionally permits password authentication."
+        },
+        {
+          "control_id": "GOV-001",
+          "expectation": "May fire because selected orphan and drift resources are intentionally left untagged."
+        },
+        {
+          "control_id": "GOV-004",
+          "expectation": "Should fire because an unattached public IP is intentionally created."
+        },
+        {
+          "control_id": "IOT-002",
+          "expectation": "Should fire because the IoT Hub includes an intentionally overbroad shared-access policy."
+        },
+        {
+          "control_id": "IOT-005",
+          "expectation": "Should fire because the IoT Hub remains publicly reachable for the stress test."
+        },
+        {
+          "control_id": "IOT-010",
+          "expectation": "Should remain human-validation-required because clinical-operational ownership cannot be proven from cloud configuration."
+        }
+      ],
+      "resources": [
+        "segmented_virtual_network_and_mixed_network_security_groups",
+        "legacy_public_linux_vm_with_password_authentication",
+        "hardened_private_linux_vm_with_monitoring_and_backup",
+        "public_and_retained_private_storage_accounts",
+        "public_azure_sql_database",
+        "weak_and_purge_protected_key_vaults",
+        "log_analytics_workspace_and_activity_log_alerts",
+        "logic_app_incident_response_runbook",
+        "resource_group_scoped_audit_policy",
+        "subscription_cost_budget",
+        "orphaned_public_ip",
+        "iot_hub_devices_certificate_diagnostics_alert_and_storage_route"
+      ],
+      "safety_notes": [
+        "The intentionally public data stores contain no real or sensitive data.",
+        "The weak VM uses a generated password and has no application or customer data.",
+        "VM evidence is skipped only when the active Azure offer blocks every available regional VM SKU; this limitation is disclosed in the run manifest status.",
+        "All lab resources are isolated in a dedicated tagged resource group.",
+        "Subscription-level budget artifacts use deterministic CRIS names for cleanup."
+      ]
+    },
+    {
       "id": "iomt-clean-baseline",
       "title": "IoMT Clean Healthcare Baseline",
       "dataset_source_type": "live_lab",

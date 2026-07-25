@@ -367,6 +367,11 @@ class AzureCollector:
                     "rbac_review_privileged_scope_count"
                 ],
                 "rbac_review_scope": iam_metadata["rbac_review_scope"],
+                "pim_observable": iam_metadata["pim_observable"],
+                "pim_eligible_role_assignment_count": iam_metadata[
+                    "pim_eligible_role_assignment_count"
+                ],
+                "pim_eligible_ratio": iam_metadata["pim_eligible_ratio"],
                 "collector_stage": "azure_live_enriched",
                 "network_collection_mode": network_metadata["network_collection_mode"],
                 "data_collection_mode": data_metadata["data_collection_mode"],
@@ -411,6 +416,9 @@ class AzureCollector:
                 "defender_standard_plan_count": monitoring_metadata[
                     "defender_standard_plan_count"
                 ],
+                "defender_total_plan_count": monitoring_metadata[
+                    "defender_total_plan_count"
+                ],
                 "compute_collection_mode": compute_metadata["compute_collection_mode"],
                 "virtual_machine_count": compute_metadata["virtual_machine_count"],
                 "vm_extension_covered_count": compute_metadata[
@@ -446,6 +454,15 @@ class AzureCollector:
                 "budget_alert_count": governance_metadata["budget_alert_count"],
                 "budget_evidence_state": governance_metadata[
                     "budget_evidence_state"
+                ],
+                "policy_compliance_state_observable": governance_metadata[
+                    "policy_compliance_state_observable"
+                ],
+                "policy_noncompliant_resource_count": governance_metadata[
+                    "policy_noncompliant_resource_count"
+                ],
+                "policy_noncompliant_policy_count": governance_metadata[
+                    "policy_noncompliant_policy_count"
                 ],
                 "iot_collection_mode": iot_metadata["iot_collection_mode"],
                 "iot_hub_count": iot_metadata["iot_hub_count"],
@@ -572,6 +589,19 @@ class AzureCollector:
             privileged_principal_ids=privileged_principal_ids,
         )
         access_review_posture = self._collect_rbac_review_posture()
+        (
+            pim_eligible_role_assignment_count,
+            pim_observable,
+        ) = self._collect_pim_eligible_role_signal()
+        pim_eligible_ratio = (
+            round(
+                pim_eligible_role_assignment_count
+                / (pim_eligible_role_assignment_count + privileged_assignment_count),
+                4,
+            )
+            if pim_observable and (pim_eligible_role_assignment_count + privileged_assignment_count)
+            else 0.0
+        )
 
         return (
             IamProfile(
@@ -639,8 +669,50 @@ class AzureCollector:
                     access_review_posture.privileged_scope_count
                 ),
                 "rbac_review_scope": access_review_posture.scope,
+                "pim_observable": pim_observable,
+                "pim_eligible_role_assignment_count": pim_eligible_role_assignment_count,
+                "pim_eligible_ratio": pim_eligible_ratio,
             },
         )
+
+    def _collect_pim_eligible_role_signal(self) -> tuple[int, bool]:
+        """Return (eligible_role_assignment_count, observable) from PIM-eligible role schedules.
+
+        Standing role assignments (`_collect_role_assignments_from_cli`)
+        only show roles that are permanently active; PIM-eligible
+        assignments are time-bound/just-in-time and are invisible to that
+        call entirely. Without this, a tenant using PIM correctly (granting
+        no standing privileged access at all) would look identical to one
+        with zero privileged-access governance.
+        """
+        completed = self._run_cli_command_allow_failure(
+            [
+                "az",
+                "rest",
+                "--method",
+                "get",
+                "--url",
+                (
+                    "https://graph.microsoft.com/v1.0/roleManagement/directory/"
+                    "roleEligibilityScheduleInstances?$select=id,principalId,"
+                    "roleDefinitionId,directoryScopeId"
+                ),
+            ],
+            timeout=20,
+        )
+        if completed is None or completed.returncode != 0:
+            return (0, False)
+
+        try:
+            payload = json.loads(completed.stdout)
+        except json.JSONDecodeError:
+            return (0, False)
+
+        instances = payload.get("value", []) if isinstance(payload, dict) else []
+        if not isinstance(instances, list):
+            return (0, False)
+
+        return (len(instances), True)
 
     def _collect_compute_profile(
         self,
@@ -1324,20 +1396,21 @@ class AzureCollector:
 
         critical_alert_coverage_ratio = min(len(activity_log_alerts) / 3.0, 1.0)
 
-        relevant_pricing_names = {"VirtualMachines", "SqlServers", "CloudPosture"}
-        relevant_pricings = [
-            pricing
-            for pricing in security_pricings
-            if str(pricing.get("name")) in relevant_pricing_names
-        ]
+        # Score coverage across every Defender plan the subscription has a
+        # pricing record for (Storage, KeyVaults, Containers, AppServices,
+        # Dns, Arm, OpenSourceRelationalDatabases, etc.), not just the
+        # original three (VMs/SQL/CloudPosture). Limiting to three plans
+        # materially understated real Defender coverage: a subscription
+        # with every plan enabled except Containers would have scored 100%
+        # under the old allowlist despite having an uncovered attack surface.
         defender_standard_plan_count = sum(
             1
-            for pricing in relevant_pricings
+            for pricing in security_pricings
             if str(pricing.get("pricingTier", "")).lower() == "standard"
         )
         defender_coverage_ratio = (
-            round(defender_standard_plan_count / len(relevant_pricings), 4)
-            if relevant_pricings
+            round(defender_standard_plan_count / len(security_pricings), 4)
+            if security_pricings
             else 0.0
         )
 
@@ -1354,6 +1427,7 @@ class AzureCollector:
                 "activity_log_alert_count": len(activity_log_alerts),
                 "logic_app_workflow_count": len(workflows),
                 "defender_standard_plan_count": defender_standard_plan_count,
+                "defender_total_plan_count": len(security_pricings),
             },
         )
 
@@ -1391,6 +1465,9 @@ class AzureCollector:
             subscription_id
         )
         policy_assignment_coverage_ratio = min(policy_assignment_count / 5.0, 1.0)
+        policy_compliance_state = self._collect_policy_compliance_state_from_cli(
+            subscription_id
+        )
         if self._network_client_factory is None and self._credential_factory is None:
             orphaned_resource_count = self._collect_orphaned_resource_count_from_cli(
                 subscription_id
@@ -1425,8 +1502,68 @@ class AzureCollector:
                 "budget_api_accessible": budget_posture.api_accessible,
                 "budget_alert_count": budget_posture.budget_count,
                 "budget_evidence_state": budget_posture.state,
+                **policy_compliance_state,
             },
         )
+
+    def _collect_policy_compliance_state_from_cli(self, subscription_id: str) -> dict[str, Any]:
+        """Return real Azure Policy compliance state, alongside the existing assignment-count heuristic.
+
+        `policy_assignment_coverage_ratio` only proves policies are
+        *assigned* (capped at "5 assignments = full coverage"); it says
+        nothing about whether the resources those policies govern are
+        actually compliant. `az policy state summarize` is the cheap,
+        single-call Policy Insights aggregate (unlike `policy state list`,
+        which enumerates every individual resource) for that distinct
+        signal.
+        """
+        completed = self._run_cli_command_allow_failure(
+            [
+                "az",
+                "policy",
+                "state",
+                "summarize",
+                "--subscription",
+                subscription_id,
+                "--output",
+                "json",
+            ],
+            timeout=20,
+        )
+        if completed is None or completed.returncode != 0:
+            return {
+                "policy_compliance_state_observable": False,
+                "policy_noncompliant_resource_count": 0,
+                "policy_noncompliant_policy_count": 0,
+            }
+
+        try:
+            payload = json.loads(completed.stdout)
+        except json.JSONDecodeError:
+            return {
+                "policy_compliance_state_observable": False,
+                "policy_noncompliant_resource_count": 0,
+                "policy_noncompliant_policy_count": 0,
+            }
+
+        values = payload.get("value", []) if isinstance(payload, dict) else []
+        if not isinstance(values, list) or not values:
+            return {
+                "policy_compliance_state_observable": True,
+                "policy_noncompliant_resource_count": 0,
+                "policy_noncompliant_policy_count": 0,
+            }
+
+        results = values[0].get("results", {}) if isinstance(values[0], dict) else {}
+        return {
+            "policy_compliance_state_observable": True,
+            "policy_noncompliant_resource_count": int(
+                results.get("nonCompliantResources", 0) or 0
+            ),
+            "policy_noncompliant_policy_count": int(
+                results.get("nonCompliantPolicies", 0) or 0
+            ),
+        }
 
     def _collect_iot_profile(
         self,

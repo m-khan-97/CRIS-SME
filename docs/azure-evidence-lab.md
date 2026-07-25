@@ -16,6 +16,37 @@ The Azure Evidence Lab is the third track, with a clean-baseline option for cont
 
 ## Scenarios
 
+### SIGI Technologies Full-Spectrum Lab
+
+`sigi-full-spectrum` is the comprehensive mixed-posture scenario. It creates
+a dedicated SIGI Technologies estate spanning all Azure domains currently
+observed by CRIS-SME:
+
+- identity context from subscription RBAC and tenant observability
+- segmented networking with intentionally public SSH/RDP evidence
+- public and retained private storage, Azure SQL, and mixed Key Vault posture
+- two contrasting Linux VMs, Azure Monitor Agent, and partial VM backup
+- Log Analytics, three activity-log alerts, and a Logic App runbook
+- an audit-only Azure Policy assignment, cost budget, and orphaned public IP
+- an IoT Hub with simulated devices, a certificate, mixed shared-access
+  policy posture, diagnostics, alerting, and governed storage routing
+
+The public storage and SQL resources are empty controlled evidence assets.
+The scenario does not contain real customer, employee, patient, or production
+data. Subscription artifacts use deterministic `cris-sigi-*` names and the
+cleanup action removes the budget before deleting the resource group.
+
+Deploy, assess, and retain it for console inspection:
+
+```bash
+python3 scripts/azure_evidence_lab.py cycle \
+  --scenario sigi-full-spectrum \
+  --location uksouth \
+  --run-id sigi-full-001 \
+  --keep \
+  --yes
+```
+
 Scenario definitions live in:
 
 `labs/azure-evidence-lab/scenarios.json`

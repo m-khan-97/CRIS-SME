@@ -21,6 +21,7 @@ def test_catalog_lists_expected_lab_scenarios() -> None:
         "data-risk",
         "media-office-demo",
         "media-office-delegated",
+        "sigi-full-spectrum",
         "iomt-hardened-clinic",
     } <= ids
     public_exposure = next(item for item in summary["scenarios"] if item["id"] == "public-exposure")
@@ -253,6 +254,70 @@ def test_deploy_media_office_delegated_builds_segmented_architecture(monkeypatch
     assert not any("Allow-Internet-3389" in command for command in joined)
 
 
+def test_deploy_sigi_full_spectrum_exercises_all_azure_domains(monkeypatch, tmp_path) -> None:
+    commands: list[list[str]] = []
+    monkeypatch.setattr(lab, "DEFAULT_OUTPUT_ROOT", tmp_path)
+
+    def fake_run(command, cwd=None, env=None, check=False, stdout=None, stderr=None, text=None):
+        commands.append(command)
+        return subprocess.CompletedProcess(command, 0, stdout="fake-output\n", stderr="")
+
+    monkeypatch.setattr(lab.subprocess, "run", fake_run)
+    scenario = lab.find_scenario(lab.load_catalog(), "sigi-full-spectrum")
+    context = lab.build_context(
+        scenario=scenario,
+        run_id="sigi-001",
+        location="uksouth",
+        resource_group="cris-lab-sigi-full-spectrum-sigi-001",
+        dry_run=False,
+    )
+
+    lab.deploy(context)
+
+    joined = [" ".join(command) for command in commands]
+    assert any("network vnet create" in command for command in joined)
+    assert any("Allow-Internet-22" in command for command in joined)
+    assert any("storage account create" in command and "--allow-blob-public-access true" in command for command in joined)
+    assert any("storage account blob-service-properties update" in command for command in joined)
+    assert any("sql db create" in command and "--service-objective Basic" in command for command in joined)
+    assert sum("keyvault create" in command for command in joined) == 2
+    assert sum("az vm create" in command for command in joined) == 2
+    assert any("vm extension set" in command and "AzureMonitorLinuxAgent" in command for command in joined)
+    assert any("backup protection enable-for-vm" in command for command in joined)
+    assert sum("monitor activity-log alert create" in command for command in joined) == 3
+    assert any("Microsoft.Logic/workflows" in command for command in joined)
+    assert any("policy assignment create" in command for command in joined)
+    assert any("az rest --method put" in command and "cris-sigi-budget" in command for command in joined)
+    assert any("network public-ip create" in command and "sigi-orphan-pip" in command for command in joined)
+    assert any("iot hub create" in command and "sigiiot" in command for command in joined)
+    assert any("iot hub routing-endpoint create" in command for command in joined)
+    assert context.tags["organization"] == "SIGI Technologies"
+
+
+def test_assess_uses_scenario_organization_and_sector(monkeypatch, tmp_path) -> None:
+    calls: list[dict] = []
+    monkeypatch.setattr(lab, "DEFAULT_OUTPUT_ROOT", tmp_path)
+
+    def fake_run(command, cwd=None, env=None, check=False):
+        calls.append({"command": command, "env": env})
+        return subprocess.CompletedProcess(command, 0)
+
+    monkeypatch.setattr(lab.subprocess, "run", fake_run)
+    scenario = lab.find_scenario(lab.load_catalog(), "sigi-full-spectrum")
+    context = lab.build_context(
+        scenario=scenario,
+        run_id="sigi-001",
+        location="uksouth",
+        resource_group="cris-lab-sigi-full-spectrum-sigi-001",
+        dry_run=False,
+    )
+
+    lab.assess(context, tmp_path / "dataset")
+
+    assert calls[0]["env"]["CRIS_SME_AZURE_ORGANIZATION_NAME"] == "SIGI Technologies"
+    assert calls[0]["env"]["CRIS_SME_AZURE_SECTOR"] == "Technology Services"
+
+
 def test_deploy_iomt_hardened_clinic_builds_stronger_iomt_signals(monkeypatch, tmp_path) -> None:
     commands: list[list[str]] = []
     monkeypatch.setattr(lab, "DEFAULT_OUTPUT_ROOT", tmp_path)
@@ -299,6 +364,8 @@ def test_redact_command_for_logging_masks_sensitive_values() -> None:
         "create",
         "--connection-string",
         "AccountKey=secret",
+        "--admin-password",
+        "NeverPrintThisPassword!1",
         "--container-name",
         "telemetry",
     ]
@@ -306,7 +373,9 @@ def test_redact_command_for_logging_masks_sensitive_values() -> None:
     redacted = lab.redact_command_for_logging(command)
 
     assert "AccountKey=secret" not in redacted
+    assert "NeverPrintThisPassword!1" not in redacted
     assert redacted[redacted.index("--connection-string") + 1] == "[redacted]"
+    assert redacted[redacted.index("--admin-password") + 1] == "[redacted]"
     assert redacted[-1] == "telemetry"
 
 
@@ -341,3 +410,34 @@ def test_cleanup_deletes_resource_group_and_waits(monkeypatch, tmp_path) -> None
         "cris-lab-public-exposure-cleanup-run",
         "--deleted",
     ]
+
+
+def test_sigi_cleanup_removes_subscription_budget_before_resource_group(monkeypatch, tmp_path) -> None:
+    commands: list[list[str]] = []
+    monkeypatch.setattr(lab, "DEFAULT_OUTPUT_ROOT", tmp_path)
+
+    def fake_run(command, cwd=None, env=None, check=False, stdout=None, stderr=None, text=None):
+        commands.append(command)
+        return subprocess.CompletedProcess(command, 0, stdout="test-subscription\n", stderr="")
+
+    monkeypatch.setattr(lab.subprocess, "run", fake_run)
+    scenario = lab.find_scenario(lab.load_catalog(), "sigi-full-spectrum")
+    context = lab.build_context(
+        scenario=scenario,
+        run_id="sigi-cleanup",
+        location="uksouth",
+        resource_group="cris-lab-sigi-full-spectrum-sigi-cleanup",
+        dry_run=False,
+    )
+
+    lab.cleanup(context)
+
+    joined = [" ".join(command) for command in commands]
+    log_profile_index = next(i for i, command in enumerate(joined) if "monitor log-profiles delete" in command)
+    policy_index = next(i for i, command in enumerate(joined) if "policy assignment delete" in command)
+    budget_index = next(
+        i for i, command in enumerate(joined)
+        if "az rest --method delete" in command and "cris-sigi-budget" in command
+    )
+    group_index = next(i for i, command in enumerate(joined) if "group delete" in command)
+    assert log_profile_index < policy_index < budget_index < group_index

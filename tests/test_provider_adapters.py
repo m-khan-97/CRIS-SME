@@ -10,9 +10,15 @@ def test_get_profile_adapter_returns_azure_adapter() -> None:
     assert adapter.provider_name == "azure"
 
 
+def test_get_profile_adapter_returns_aws_adapter() -> None:
+    adapter = get_profile_adapter("aws")
+
+    assert adapter.provider_name == "aws"
+
+
 def test_get_profile_adapter_raises_for_unknown_provider() -> None:
     try:
-        get_profile_adapter("aws")
+        get_profile_adapter("gcp")
     except ValueError as exc:
         assert "Unsupported cloud provider" in str(exc)
     else:

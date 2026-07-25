@@ -8,6 +8,16 @@ The purpose is simple: CRIS-SME must never claim live multi-cloud coverage just 
 
 For each Provider Evidence Contract, CRIS-SME validates whether the declared support state matches implementation evidence.
 
+Every contract also requires complete provider metadata:
+
+- provider identity context
+- collection scopes and scope limitations
+- authentication modes and secret-handling posture
+- least-privilege permissions
+- evidence capabilities and resource types
+- freshness policy
+- visible provider limitations
+
 Active provider support requires:
 
 - adapter registered for active profile normalization
@@ -34,8 +44,8 @@ The current conformance gate expects:
 Across the current policy pack:
 
 - active contracts: 26
-- planned contracts: 52
-- total contracts: 78
+- planned contracts: 72
+- total contracts: 108
 
 ## Report Output
 
@@ -47,6 +57,10 @@ JSON reports include:
 - `provider_contract_conformance.failed_contract_count`
 - `provider_contract_conformance.provider_signals`
 - `provider_contract_conformance.checks`
+
+Each check includes `contract_metadata_complete` in `required_signals` so incomplete
+provider identity, scope, auth, permission, capability, freshness, or limitation
+metadata fails the contract even if implementation files are present.
 
 The dashboard payload includes a compact conformance summary under:
 

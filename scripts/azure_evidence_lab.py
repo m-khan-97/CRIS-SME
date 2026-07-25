@@ -5,6 +5,7 @@ import argparse
 import json
 import os
 import re
+import secrets
 import shutil
 import subprocess
 import sys
@@ -195,6 +196,7 @@ def build_context(
         "cris-sme-owner": os.getenv("CRIS_SME_AZURE_LAB_OWNER", os.getenv("USER", "unknown")),
         "cris-sme-delete-after": (datetime.now(UTC) + timedelta(days=2)).date().isoformat(),
         "cris-sme-managed-by": "cris-sme-azure-evidence-lab",
+        "organization": str(scenario.get("organization_name", scenario.get("title", "Azure Evidence Lab"))),
     }
     return LabContext(
         scenario=scenario,
@@ -235,6 +237,8 @@ def deploy(context: LabContext) -> None:
         create_media_office_demo(context)
     elif scenario_id == "media-office-delegated":
         create_media_office_delegated(context)
+    elif scenario_id == "sigi-full-spectrum":
+        create_sigi_full_spectrum(context)
     elif scenario_id == "iomt-clean-baseline":
         create_iomt_clean_baseline(context)
     elif scenario_id == "iomt-weak-baseline":
@@ -260,8 +264,10 @@ def assess(context: LabContext, output_root: Path) -> None:
 
     env = os.environ.copy()
     env["PYTHONPATH"] = str(REPO_ROOT / "src")
-    env["CRIS_SME_AZURE_ORGANIZATION_NAME"] = str(context.scenario.get("title", "Azure Evidence Lab"))
-    env["CRIS_SME_AZURE_SECTOR"] = "Research Lab"
+    env["CRIS_SME_AZURE_ORGANIZATION_NAME"] = str(
+        context.scenario.get("organization_name", context.scenario.get("title", "Azure Evidence Lab"))
+    )
+    env["CRIS_SME_AZURE_SECTOR"] = str(context.scenario.get("sector", "Research Lab"))
     env["CRIS_SME_AZURE_RESOURCE_GROUP_SCOPE"] = context.resource_group
 
     command = [
@@ -288,6 +294,8 @@ def assess(context: LabContext, output_root: Path) -> None:
 
 def cleanup(context: LabContext) -> None:
     print(f"Deleting Azure evidence lab resource group {context.resource_group}")
+    if context.scenario["id"] == "sigi-full-spectrum":
+        delete_sigi_subscription_artifacts(context)
     run_az(
         [
             "group",
@@ -379,8 +387,6 @@ def create_data_risk(context: LabContext) -> None:
             context.resource_group,
             "--location",
             context.location,
-            "--enable-purge-protection",
-            "false",
             *tag_args(context.tags),
         ],
         context,
@@ -490,6 +496,620 @@ def create_media_office_delegated(context: LabContext) -> None:
             "--sku",
             "PerGB2018",
             *tag_args(context.tags),
+        ],
+        context,
+    )
+
+
+def create_sigi_full_spectrum(context: LabContext) -> None:
+    """Create a mixed-posture estate spanning every CRIS-SME Azure domain."""
+    vnet_name = f"sigi-vnet-{context.run_id}"[:64]
+    create_vnet_with_subnets(context, vnet_name)
+    edge_nsg = create_nsg(
+        context,
+        "sigi-edge-open-admin-nsg",
+        allow_management=True,
+        web_only=True,
+        tags=context.tags,
+    )
+    internal_nsg = create_nsg(
+        context,
+        "sigi-internal-nsg",
+        allow_management=False,
+        internal_only=True,
+        tags=context.tags,
+    )
+    create_nsg(
+        context,
+        "sigi-untagged-drift-nsg",
+        allow_management=False,
+        tags={},
+    )
+
+    public_storage = create_storage(
+        context,
+        "sigipublic",
+        public_blob=True,
+        intentional_public=False,
+        tags=context.tags,
+    )
+    private_storage = create_storage(
+        context,
+        "sigiprivate",
+        public_blob=False,
+        tags=context.tags,
+    )
+    run_az(
+        [
+            "storage",
+            "account",
+            "blob-service-properties",
+            "update",
+            "--account-name",
+            private_storage,
+            "--resource-group",
+            context.resource_group,
+            "--enable-delete-retention",
+            "true",
+            "--delete-retention-days",
+            "30",
+            "--enable-container-delete-retention",
+            "true",
+            "--container-delete-retention-days",
+            "30",
+        ],
+        context,
+    )
+    create_sigi_log_profile(context, private_storage)
+
+    create_sigi_key_vaults(context)
+    create_sigi_sql(context)
+    workspace_name = create_log_analytics_workspace(context, "sigi-law")
+    create_sigi_monitoring(context, workspace_name)
+    if os.getenv("CRIS_SME_AZURE_LAB_SKIP_COMPUTE", "").lower() in {"1", "true", "yes"}:
+        print("Skipping SIGI VM deployment because the subscription offer has no available VM SKU.")
+    else:
+        create_sigi_compute(
+            context,
+            vnet_name=vnet_name,
+            edge_nsg=edge_nsg,
+            internal_nsg=internal_nsg,
+        )
+    create_sigi_governance(context)
+
+    hub_name = create_iot_hub(context, "sigiiot", public_network_access="Enabled")
+    for device_id in (
+        "sigi-ward-monitor-001",
+        "sigi-building-sensor-002",
+        "sigi-mobile-gateway-003",
+    ):
+        create_iot_device_identity(context, hub_name, device_id)
+    create_iot_certificate(context, hub_name, "sigi-lab-root-ca")
+    create_iot_policy(
+        context,
+        hub_name,
+        "sigi-legacy-all-access",
+        ["RegistryWrite", "ServiceConnect", "DeviceConnect"],
+    )
+    configure_iot_diagnostics(context, hub_name, workspace_name)
+    create_iot_metric_alert(context, hub_name, "sigi-iot-message-alert")
+    configure_iot_storage_route(
+        context,
+        hub_name=hub_name,
+        storage_account_name=private_storage,
+        container_name="sigi-iot-telemetry",
+        endpoint_name="sigiGovernedTelemetryStorage",
+        route_name="sigiGovernedTelemetryRoute",
+    )
+
+    # Keep one public address unattached so GOV-004 has deterministic evidence.
+    run_az(
+        [
+            "network",
+            "public-ip",
+            "create",
+            "--name",
+            f"sigi-orphan-pip-{context.run_id}"[:80],
+            "--resource-group",
+            context.resource_group,
+            "--location",
+            context.location,
+            "--sku",
+            "Standard",
+            "--allocation-method",
+            "Static",
+        ],
+        context,
+    )
+
+    print(
+        "SIGI full-spectrum resources created: "
+        f"public storage={public_storage}, private storage={private_storage}, IoT Hub={hub_name}"
+    )
+
+
+def create_sigi_key_vaults(context: LabContext) -> None:
+    for prefix, purge_protection in (
+        ("sigiweak", "false"),
+        ("sigiprotected", "true"),
+    ):
+        vault_name = unique_name(f"cris{prefix}kv", context.suffix, max_len=24)
+        command = [
+            "keyvault",
+            "create",
+            "--name",
+            vault_name,
+            "--resource-group",
+            context.resource_group,
+            "--location",
+            context.location,
+            "--retention-days",
+            "7",
+        ]
+        if purge_protection == "true":
+            command.extend(["--enable-purge-protection", "true"])
+        command.extend(tag_args(context.tags))
+        run_az(command, context)
+
+
+def create_sigi_sql(context: LabContext) -> None:
+    server_name = unique_name("crissigisql", context.suffix, max_len=63)
+    password = f"Cris!{secrets.token_urlsafe(24)}"
+    run_az(
+        [
+            "sql",
+            "server",
+            "create",
+            "--name",
+            server_name,
+            "--resource-group",
+            context.resource_group,
+            "--location",
+            context.location,
+            "--admin-user",
+            "crisadmin",
+            "--admin-password",
+            password,
+            "--enable-public-network",
+            "true",
+            *tag_args(context.tags),
+        ],
+        context,
+    )
+    run_az(
+        [
+            "sql",
+            "server",
+            "firewall-rule",
+            "create",
+            "--name",
+            "AllowInternetForControlledLab",
+            "--resource-group",
+            context.resource_group,
+            "--server",
+            server_name,
+            "--start-ip-address",
+            "0.0.0.0",
+            "--end-ip-address",
+            "255.255.255.255",
+        ],
+        context,
+    )
+    run_az(
+        [
+            "sql",
+            "db",
+            "create",
+            "--name",
+            "sigi-app-db",
+            "--resource-group",
+            context.resource_group,
+            "--server",
+            server_name,
+            "--service-objective",
+            "Basic",
+            "--backup-storage-redundancy",
+            "Local",
+            *tag_args(context.tags),
+        ],
+        context,
+    )
+
+
+def create_sigi_compute(
+    context: LabContext,
+    *,
+    vnet_name: str,
+    edge_nsg: str,
+    internal_nsg: str,
+) -> None:
+    legacy_vm = f"sigi-legacy-vm-{context.run_id}"[:64]
+    hardened_vm = f"sigi-hardened-vm-{context.run_id}"[:64]
+    password = f"Cris!{secrets.token_urlsafe(24)}"
+    vm_size = os.getenv("CRIS_SME_AZURE_LAB_VM_SIZE", "Standard_B1s")
+    vm_image = os.getenv("CRIS_SME_AZURE_LAB_VM_IMAGE", "Ubuntu2204")
+    common = [
+        "--resource-group",
+        context.resource_group,
+        "--location",
+        context.location,
+        "--image",
+        vm_image,
+        "--size",
+        vm_size,
+        "--vnet-name",
+        vnet_name,
+        "--admin-username",
+        "crisadmin",
+        *tag_args(context.tags),
+    ]
+    run_az(
+        [
+            "vm",
+            "create",
+            "--name",
+            legacy_vm,
+            *common,
+            "--subnet",
+            "edge",
+            "--nsg",
+            edge_nsg,
+            "--authentication-type",
+            "password",
+            "--admin-password",
+            password,
+            "--patch-mode",
+            "ImageDefault",
+            "--public-ip-sku",
+            "Standard",
+        ],
+        context,
+    )
+    hardened_command = [
+        "vm",
+        "create",
+        "--name",
+        hardened_vm,
+        *common,
+        "--subnet",
+        "monitoring",
+        "--nsg",
+        internal_nsg,
+        "--authentication-type",
+        "ssh",
+        "--generate-ssh-keys",
+        "--public-ip-address",
+        "",
+        "--patch-mode",
+        "AutomaticByPlatform",
+        "--enable-agent",
+        "true",
+    ]
+    if not vm_size.lower().startswith("basic_"):
+        hardened_command.extend(
+            [
+                "--security-type",
+                "TrustedLaunch",
+                "--enable-secure-boot",
+                "true",
+                "--enable-vtpm",
+                "true",
+            ]
+        )
+    run_az(hardened_command, context)
+    run_az(
+        [
+            "vm",
+            "extension",
+            "set",
+            "--resource-group",
+            context.resource_group,
+            "--vm-name",
+            hardened_vm,
+            "--publisher",
+            "Microsoft.Azure.Monitor",
+            "--name",
+            "AzureMonitorLinuxAgent",
+            "--enable-auto-upgrade",
+            "true",
+        ],
+        context,
+    )
+    vault_name = unique_name("sigibackupvault", context.suffix, max_len=50)
+    run_az(
+        [
+            "backup",
+            "vault",
+            "create",
+            "--name",
+            vault_name,
+            "--resource-group",
+            context.resource_group,
+            "--location",
+            context.location,
+            *tag_args(context.tags),
+        ],
+        context,
+    )
+    run_az(
+        [
+            "backup",
+            "protection",
+            "enable-for-vm",
+            "--resource-group",
+            context.resource_group,
+            "--vault-name",
+            vault_name,
+            "--policy-name",
+            "DefaultPolicy",
+            "--vm",
+            hardened_vm,
+        ],
+        context,
+    )
+
+
+def create_sigi_monitoring(context: LabContext, workspace_name: str) -> None:
+    _ = workspace_name
+    for suffix, condition in (
+        ("critical-admin", "category=Administrative and level=Critical"),
+        ("security-events", "category=Security"),
+        ("service-health", "category=ServiceHealth and level=Error"),
+    ):
+        run_az(
+            [
+                "monitor",
+                "activity-log",
+                "alert",
+                "create",
+                "--name",
+                f"sigi-{suffix}-{context.run_id}"[:64],
+                "--resource-group",
+                context.resource_group,
+                "--condition",
+                condition,
+                "--description",
+                "SIGI Technologies controlled CRIS-SME evidence-lab alert",
+                *tag_args(context.tags),
+            ],
+            context,
+        )
+    create_sigi_logic_app(context)
+
+
+def create_sigi_logic_app(context: LabContext) -> None:
+    workflow_name = f"sigi-incident-runbook-{context.run_id}"[:80]
+    workflow_properties = {
+        "state": "Enabled",
+        "definition": {
+            "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
+            "contentVersion": "1.0.0.0",
+            "parameters": {},
+            "triggers": {},
+            "actions": {},
+            "outputs": {},
+        },
+    }
+    run_az(
+        [
+            "resource",
+            "create",
+            "--resource-group",
+            context.resource_group,
+            "--resource-type",
+            "Microsoft.Logic/workflows",
+            "--api-version",
+            "2019-05-01",
+            "--name",
+            workflow_name,
+            "--location",
+            context.location,
+            "--properties",
+            json.dumps(workflow_properties, separators=(",", ":")),
+        ],
+        context,
+    )
+    run_az(
+        [
+            "resource",
+            "tag",
+            "--resource-group",
+            context.resource_group,
+            "--resource-type",
+            "Microsoft.Logic/workflows",
+            "--name",
+            workflow_name,
+            *tag_args(context.tags),
+        ],
+        context,
+    )
+
+
+def create_sigi_log_profile(context: LabContext, storage_account_name: str) -> None:
+    storage_id = (
+        "/subscriptions/00000000-0000-0000-0000-000000000000/"
+        f"resourceGroups/{context.resource_group}/providers/Microsoft.Storage/"
+        f"storageAccounts/{storage_account_name}"
+        if context.dry_run
+        else capture_az_text(
+            [
+                "storage",
+                "account",
+                "show",
+                "--name",
+                storage_account_name,
+                "--resource-group",
+                context.resource_group,
+                "--query",
+                "id",
+                "--output",
+                "tsv",
+            ],
+            context,
+        )
+    )
+    run_az(
+        [
+            "monitor",
+            "log-profiles",
+            "create",
+            "--name",
+            sigi_log_profile_name(context),
+            "--location",
+            context.location,
+            "--locations",
+            context.location,
+            "global",
+            "--categories",
+            "Write",
+            "Delete",
+            "Action",
+            "--days",
+            "30",
+            "--enabled",
+            "true",
+            "--storage-account-id",
+            storage_id,
+            *tag_args(context.tags),
+        ],
+        context,
+    )
+
+
+def create_sigi_governance(context: LabContext) -> None:
+    subscription_scope = f"/subscriptions/{current_subscription_id(context)}"
+    run_az(
+        [
+            "policy",
+            "assignment",
+            "create",
+            "--name",
+            sigi_policy_assignment_name(context),
+            "--display-name",
+            "CRIS SIGI audit required environment tag",
+            "--scope",
+            subscription_scope,
+            "--policy",
+            "871b6d14-10aa-478d-b590-94f262ecfa99",
+            "--params",
+            json.dumps({"tagName": {"value": "environment"}}),
+            "--enforcement-mode",
+            "DoNotEnforce",
+        ],
+        context,
+    )
+    create_sigi_budget(context)
+
+
+def create_sigi_budget(context: LabContext) -> None:
+    subscription_id = current_subscription_id(context)
+    now = datetime.now(UTC)
+    start_date = now.date().replace(day=1)
+    end_date = start_date.replace(year=start_date.year + 5)
+    contact_email = (
+        "security@example.invalid"
+        if context.dry_run
+        else capture_az_text(
+            ["account", "show", "--query", "user.name", "--output", "tsv"],
+            context,
+        )
+    )
+    properties = {
+        "category": "Cost",
+        "amount": 250,
+        "timeGrain": "Monthly",
+        "timePeriod": {
+            "startDate": f"{start_date.isoformat()}T00:00:00Z",
+            "endDate": f"{end_date.isoformat()}T00:00:00Z",
+        },
+        "notifications": {
+            "Actual_GreaterThan_80_Percent": {
+                "enabled": True,
+                "operator": "GreaterThan",
+                "threshold": 80,
+                "thresholdType": "Actual",
+                "contactEmails": [contact_email],
+                "contactGroups": [],
+                "contactRoles": [],
+                "locale": "en-gb",
+            }
+        },
+    }
+    uri = (
+        f"https://management.azure.com/subscriptions/{subscription_id}/providers/"
+        f"Microsoft.Consumption/budgets/{sigi_budget_name(context)}?api-version=2023-05-01"
+    )
+    run_az(
+        [
+            "rest",
+            "--method",
+            "put",
+            "--uri",
+            uri,
+            "--body",
+            json.dumps({"properties": properties}, separators=(",", ":")),
+        ],
+        context,
+    )
+
+
+def sigi_budget_name(context: LabContext) -> str:
+    return f"cris-sigi-budget-{context.run_id}"[:63]
+
+
+def sigi_policy_assignment_name(context: LabContext) -> str:
+    return f"cris-sigi-tag-audit-{context.run_id}"[:64]
+
+
+def sigi_log_profile_name(context: LabContext) -> str:
+    return f"cris-sigi-activity-{context.run_id}"[:64]
+
+
+def current_subscription_id(context: LabContext) -> str:
+    if context.dry_run:
+        return "00000000-0000-0000-0000-000000000000"
+    return capture_az_text(
+        ["account", "show", "--query", "id", "--output", "tsv"],
+        context,
+    )
+
+
+def delete_sigi_subscription_artifacts(context: LabContext) -> None:
+    subscription_id = current_subscription_id(context)
+    subscription_scope = f"/subscriptions/{subscription_id}"
+    run_az(
+        [
+            "monitor",
+            "log-profiles",
+            "delete",
+            "--name",
+            sigi_log_profile_name(context),
+        ],
+        context,
+    )
+    run_az(
+        [
+            "policy",
+            "assignment",
+            "delete",
+            "--name",
+            sigi_policy_assignment_name(context),
+            "--scope",
+            subscription_scope,
+        ],
+        context,
+    )
+    run_az(
+        [
+            "rest",
+            "--method",
+            "delete",
+            "--uri",
+            (
+                f"https://management.azure.com/subscriptions/{subscription_id}/providers/"
+                f"Microsoft.Consumption/budgets/{sigi_budget_name(context)}"
+                "?api-version=2023-05-01"
+            ),
         ],
         context,
     )
@@ -717,6 +1337,8 @@ def create_iot_device_identity(
             device_id,
             "--auth-method",
             "shared_private_key",
+            "--output",
+            "none",
         ],
         context,
     )
@@ -741,6 +1363,8 @@ def create_iot_certificate(context: LabContext, hub_name: str, certificate_name:
             certificate_name,
             "--path",
             str(certificate_path),
+            "--output",
+            "none",
         ],
         context,
     )
@@ -792,6 +1416,8 @@ def create_iot_policy(
             policy_name,
             "--permissions",
             *rights,
+            "--output",
+            "none",
         ],
         context,
     )
@@ -967,7 +1593,7 @@ def configure_iot_storage_route(
             "--account-name",
             storage_account_name,
             "--auth-mode",
-            "login",
+            "key",
         ],
         context,
     )
@@ -1026,6 +1652,8 @@ def configure_iot_storage_route(
             "300",
             "--chunk-size",
             "100",
+            "--output",
+            "none",
         ],
         context,
     )
@@ -1049,6 +1677,8 @@ def configure_iot_storage_route(
             "true",
             "--enabled",
             "true",
+            "--output",
+            "none",
         ],
         context,
     )
@@ -1341,7 +1971,7 @@ def create_nsg(
     tags: dict[str, str],
     web_only: bool = False,
     internal_only: bool = False,
-) -> None:
+) -> str:
     nsg_name = f"{name}-{context.run_id}"[:80]
     run_az(
         [
@@ -1456,6 +2086,7 @@ def create_nsg(
                 ],
                 context,
             )
+    return nsg_name
 
 
 def create_storage(
@@ -1507,7 +2138,7 @@ def create_storage(
                 "--public-access",
                 "blob",
                 "--auth-mode",
-                "login",
+                "key",
             ],
             context,
         )
@@ -1580,6 +2211,7 @@ def redact_command_for_logging(command: list[str]) -> list[str]:
         "--account-key",
         "--key",
         "--password",
+        "--admin-password",
         "--client-secret",
     }
     for index, value in enumerate(redacted[:-1]):

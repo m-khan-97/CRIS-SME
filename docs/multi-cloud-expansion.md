@@ -5,7 +5,7 @@ CRIS-SME is architected for provider-neutral decisions but currently Azure-first
 ## Current Reality
 
 - Azure: active in adapter registry and live collector path
-- AWS: adapter scaffold only (not active in registry for live runs)
+- AWS: adapter registered, research-preview boto3 collector (`AwsCollector`) covering IAM, Network, Data, Monitoring, Compute, Governance, and IoT — unit-tested against fake clients, not yet verified against a real AWS account
 - GCP: adapter scaffold only (not active in registry for live runs)
 
 ## Expansion Goals
@@ -37,6 +37,7 @@ When adding AWS/GCP, preserve:
 
 ## Near-Term Practical Target
 
-- keep Azure as validated live path
-- add richer mock AWS/GCP fixtures for cross-provider model testing
-- graduate to live collectors incrementally
+- keep Azure as the validated, `active` live path
+- verify the AWS research-preview collector against a real AWS account, then graduate AWS provider contracts from `research_preview` to `active`/`supported`
+- add richer mock GCP fixtures for cross-provider model testing
+- graduate GCP to a live collector incrementally, following the same boto3-equivalent (google-cloud SDK) pattern AWS used

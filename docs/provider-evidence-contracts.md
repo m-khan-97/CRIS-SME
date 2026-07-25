@@ -8,6 +8,9 @@ They answer:
 - what evidence is required for a sufficient decision?
 - how fresh should that evidence be?
 - what confidence penalties apply when evidence is partial?
+- what provider identity, auth mode, and scope rules apply?
+- what least-privilege permissions are required?
+- what provider capabilities can collect resource-level evidence?
 - what limitations must remain visible in reports?
 - what gate must be satisfied before planned provider support can be claimed?
 
@@ -36,6 +39,27 @@ Each contract includes:
 - `confidence_penalty_rules`
 - `known_limitations`
 - `activation_gate`
+- `identity`
+- `scopes`
+- `auth`
+- `permissions`
+- `evidence_capabilities`
+- `freshness_policy`
+- `limitations`
+
+The expanded fields are intentionally explicit:
+
+- `identity`: provider account/tenant labels and identity sources, such as Azure subscription plus tenant context.
+- `scopes`: supported collection scopes and scope limitations, such as tenant, subscription, and resource group.
+- `auth`: supported authentication modes and secret-handling posture.
+- `permissions`: required and optional least-privilege permissions for the provider/control path.
+- `evidence_capabilities`: collection method, resource types, resource-level evidence support, and freshness-check support.
+- `freshness_policy`: when evidence becomes stale and how stale evidence should be handled.
+- `limitations`: provider-specific limitations that must remain visible in assurance outputs.
+
+For the active Azure path, see [Azure Least-Privilege Setup](azure-least-privilege-setup.md)
+and the custom role artifact at
+`infra/azure/role-definitions/cris-sme-assessment-reader.json`.
 
 ## Support States
 
@@ -66,6 +90,7 @@ A planned provider path should only be marked active after:
 - adapter routing is implemented
 - tests cover the provider path
 - limitations are documented
+- identity, scope, auth, permission, capability, freshness, and limitation metadata is complete
 - evidence sufficiency behavior is visible in reports
 
 This is a core guardrail for CRIS-SME's multi-cloud expansion.

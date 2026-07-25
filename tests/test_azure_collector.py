@@ -560,6 +560,8 @@ def test_azure_collector_enriches_iam_profile_from_role_assignments_and_graph(
             return FakeCompletedProcess("[]")
         if command[:4] == ["az", "policy", "assignment", "list"]:
             return FakeCompletedProcess("[]")
+        if command[:4] == ["az", "policy", "state", "summarize"]:
+            return FakeCompletedProcess('{"value":[]}')
         if command[:3] == ["az", "keyvault", "list"]:
             return FakeCompletedProcess("[]")
         if command[:4] == ["az", "keyvault", "show"]:
@@ -579,6 +581,11 @@ def test_azure_collector_enriches_iam_profile_from_role_assignments_and_graph(
         if (
             command[:5] == ["az", "rest", "--method", "get", "--url"]
             and "Consumption/budgets" in command[5]
+        ):
+            return FakeCompletedProcess('{"value":[]}')
+        if (
+            command[:5] == ["az", "rest", "--method", "get", "--url"]
+            and "roleEligibilityScheduleInstances" in command[5]
         ):
             return FakeCompletedProcess('{"value":[]}')
         raise AssertionError(f"Unexpected CLI command: {command}")
@@ -690,6 +697,66 @@ def test_azure_collector_treats_inaccessible_conditional_access_as_unmet(
     assert enforced is False
     assert accessible is False
     assert policy_count == 0
+
+
+def test_azure_collector_counts_pim_eligible_role_instances(monkeypatch) -> None:
+    """PIM-eligible (time-bound) role assignments are invisible to standing role-assignment listing.
+
+    A tenant relying on PIM correctly would show zero standing privileged
+    role assignments and previously looked indistinguishable from a tenant
+    with no privileged-access governance at all.
+    """
+
+    def fake_run_cli_command_allow_failure(
+        command: list[str],
+        timeout: int,
+    ) -> subprocess.CompletedProcess[str]:
+        _ = timeout
+        assert "roleEligibilityScheduleInstances" in command[5]
+        return subprocess.CompletedProcess(
+            args=command,
+            returncode=0,
+            stdout='{"value":[{"id":"a"},{"id":"b"},{"id":"c"}]}',
+            stderr="",
+        )
+
+    monkeypatch.setattr(
+        AzureCollector,
+        "_run_cli_command_allow_failure",
+        staticmethod(fake_run_cli_command_allow_failure),
+    )
+
+    collector = AzureCollector()
+
+    eligible_count, observable = collector._collect_pim_eligible_role_signal()
+
+    assert eligible_count == 3
+    assert observable is True
+
+
+def test_azure_collector_treats_inaccessible_pim_endpoint_as_unobservable(monkeypatch) -> None:
+    def fake_run_cli_command_allow_failure(
+        command: list[str],
+        timeout: int,
+    ) -> subprocess.CompletedProcess[str]:
+        _ = command
+        _ = timeout
+        return subprocess.CompletedProcess(
+            args=[], returncode=1, stdout="", stderr="Authorization_RequestDenied"
+        )
+
+    monkeypatch.setattr(
+        AzureCollector,
+        "_run_cli_command_allow_failure",
+        staticmethod(fake_run_cli_command_allow_failure),
+    )
+
+    collector = AzureCollector()
+
+    eligible_count, observable = collector._collect_pim_eligible_role_signal()
+
+    assert eligible_count == 0
+    assert observable is False
 
 
 def test_azure_collector_requires_purge_protection_on_all_key_vaults(
@@ -838,6 +905,72 @@ def test_azure_collector_classifies_generic_access_reviews_as_proxy(
     assert posture.age_days > 90
 
 
+def test_azure_collector_reads_policy_compliance_state_summary(monkeypatch) -> None:
+    """Policy compliance state is a distinct signal from assignment count.
+
+    `policy_assignment_coverage_ratio` only proves policies are assigned; it
+    says nothing about whether the governed resources are actually
+    compliant. This proves the `az policy state summarize` aggregate count
+    surfaces independently.
+    """
+
+    def fake_run_cli_command_allow_failure(
+        command: list[str],
+        timeout: int,
+    ) -> subprocess.CompletedProcess[str]:
+        _ = timeout
+        assert command[:4] == ["az", "policy", "state", "summarize"]
+        return subprocess.CompletedProcess(
+            args=command,
+            returncode=0,
+            stdout=(
+                '{"value":[{"results":'
+                '{"nonCompliantResources":12,"nonCompliantPolicies":3}}]}'
+            ),
+            stderr="",
+        )
+
+    monkeypatch.setattr(
+        AzureCollector,
+        "_run_cli_command_allow_failure",
+        staticmethod(fake_run_cli_command_allow_failure),
+    )
+
+    collector = AzureCollector()
+
+    state = collector._collect_policy_compliance_state_from_cli("sub-123")
+
+    assert state["policy_compliance_state_observable"] is True
+    assert state["policy_noncompliant_resource_count"] == 12
+    assert state["policy_noncompliant_policy_count"] == 3
+
+
+def test_azure_collector_treats_inaccessible_policy_state_as_unobservable(monkeypatch) -> None:
+    def fake_run_cli_command_allow_failure(
+        command: list[str],
+        timeout: int,
+    ) -> subprocess.CompletedProcess[str]:
+        _ = command
+        _ = timeout
+        return subprocess.CompletedProcess(
+            args=[], returncode=1, stdout="", stderr="Authorization_RequestDenied"
+        )
+
+    monkeypatch.setattr(
+        AzureCollector,
+        "_run_cli_command_allow_failure",
+        staticmethod(fake_run_cli_command_allow_failure),
+    )
+
+    collector = AzureCollector()
+
+    state = collector._collect_policy_compliance_state_from_cli("sub-123")
+
+    assert state["policy_compliance_state_observable"] is False
+    assert state["policy_noncompliant_resource_count"] == 0
+    assert state["policy_noncompliant_policy_count"] == 0
+
+
 def test_azure_collector_derives_private_endpoint_requirement_with_public_exceptions() -> None:
     requirement = AzureCollector._derive_private_endpoint_requirement(
         storage_account_count=3,
@@ -891,6 +1024,8 @@ def test_azure_collector_enriches_governance_profile_from_resource_inventory(
             return FakeCompletedProcess("[]")
         if command[:4] == ["az", "policy", "assignment", "list"]:
             return FakeCompletedProcess('[{"name":"baseline-1"},{"name":"baseline-2"}]')
+        if command[:4] == ["az", "policy", "state", "summarize"]:
+            return FakeCompletedProcess('{"value":[]}')
         if command[:4] == ["az", "monitor", "log-profiles", "list"]:
             return FakeCompletedProcess("[]")
         if command[:5] == ["az", "monitor", "activity-log", "alert", "list"]:
@@ -913,6 +1048,11 @@ def test_azure_collector_enriches_governance_profile_from_resource_inventory(
         if (
             command[:5] == ["az", "rest", "--method", "get", "--url"]
             and "Consumption/budgets" in command[5]
+        ):
+            return FakeCompletedProcess('{"value":[]}')
+        if (
+            command[:5] == ["az", "rest", "--method", "get", "--url"]
+            and "roleEligibilityScheduleInstances" in command[5]
         ):
             return FakeCompletedProcess('{"value":[]}')
         raise AssertionError(f"Unexpected CLI command: {command}")
@@ -997,6 +1137,8 @@ def test_azure_collector_enriches_monitoring_profile_from_cli_and_workflows(
             return FakeCompletedProcess("[]")
         if command[:4] == ["az", "policy", "assignment", "list"]:
             return FakeCompletedProcess("[]")
+        if command[:4] == ["az", "policy", "state", "summarize"]:
+            return FakeCompletedProcess('{"value":[]}')
         if command[:3] == ["az", "keyvault", "list"]:
             return FakeCompletedProcess("[]")
         if command[:4] == ["az", "keyvault", "show"]:
@@ -1006,6 +1148,11 @@ def test_azure_collector_enriches_monitoring_profile_from_cli_and_workflows(
         if (
             command[:5] == ["az", "rest", "--method", "get", "--url"]
             and "Consumption/budgets" in command[5]
+        ):
+            return FakeCompletedProcess('{"value":[]}')
+        if (
+            command[:5] == ["az", "rest", "--method", "get", "--url"]
+            and "roleEligibilityScheduleInstances" in command[5]
         ):
             return FakeCompletedProcess('{"value":[]}')
         raise AssertionError(f"Unexpected CLI command: {command}")
@@ -1038,6 +1185,109 @@ def test_azure_collector_enriches_monitoring_profile_from_cli_and_workflows(
     assert profile.metadata["monitoring_collection_mode"] == "azure_monitor_cli_inventory"
     assert profile.metadata["activity_log_alert_count"] == 2
     assert profile.metadata["logic_app_workflow_count"] == 2
+    assert profile.metadata["defender_total_plan_count"] == 3
+
+
+def test_azure_collector_scores_defender_coverage_across_all_pricing_plans(
+    monkeypatch,
+) -> None:
+    """Defender coverage must reflect every plan Azure returns, not just VMs/SQL/CloudPosture.
+
+    A subscription with Storage/KeyVaults/Containers Defender plans enabled
+    previously contributed nothing to defender_coverage_ratio because those
+    plan names were outside the old 3-name allowlist; this proves they now
+    count.
+    """
+    subscriptions = [
+        SimpleNamespace(
+            subscription_id="sub-123",
+            display_name="Monitoring Subscription",
+            tenant_id="tenant-001",
+            state="Enabled",
+        )
+    ]
+    resources: list[SimpleNamespace] = []
+
+    class FakeCompletedProcess:
+        def __init__(self, stdout: str) -> None:
+            self.stdout = stdout
+
+    def fake_run_cli_command(command: list[str], *_args, **_kwargs) -> FakeCompletedProcess:
+        if command[:3] == ["az", "account", "list"]:
+            return FakeCompletedProcess(
+                '[{"id":"sub-123","name":"Monitoring Subscription","tenantId":"tenant-001","state":"Enabled"}]'
+            )
+        if command[:4] == ["az", "role", "assignment", "list"]:
+            return FakeCompletedProcess("[]")
+        if command[:4] == ["az", "monitor", "log-profiles", "list"]:
+            return FakeCompletedProcess("[]")
+        if command[:5] == ["az", "monitor", "activity-log", "alert", "list"]:
+            return FakeCompletedProcess("[]")
+        if command[:4] == ["az", "security", "pricing", "list"]:
+            return FakeCompletedProcess(
+                '{"value":['
+                '{"name":"VirtualMachines","pricingTier":"Standard"},'
+                '{"name":"SqlServers","pricingTier":"Standard"},'
+                '{"name":"CloudPosture","pricingTier":"Standard"},'
+                '{"name":"StorageAccounts","pricingTier":"Free"},'
+                '{"name":"KeyVaults","pricingTier":"Free"}'
+                ']}'
+            )
+        if command[:4] == ["az", "security", "assessment", "list"]:
+            return FakeCompletedProcess("[]")
+        if (
+            command[:3] == ["az", "resource", "list"]
+            and "Microsoft.Devices/IotHubs" in command
+        ):
+            return FakeCompletedProcess("[]")
+        if command[:4] == ["az", "policy", "assignment", "list"]:
+            return FakeCompletedProcess("[]")
+        if command[:4] == ["az", "policy", "state", "summarize"]:
+            return FakeCompletedProcess('{"value":[]}')
+        if command[:3] == ["az", "keyvault", "list"]:
+            return FakeCompletedProcess("[]")
+        if command[:4] == ["az", "keyvault", "show"]:
+            return FakeCompletedProcess("{}")
+        if command[:4] == ["az", "consumption", "budget", "list"]:
+            return FakeCompletedProcess("[]")
+        if (
+            command[:5] == ["az", "rest", "--method", "get", "--url"]
+            and "Consumption/budgets" in command[5]
+        ):
+            return FakeCompletedProcess('{"value":[]}')
+        if (
+            command[:5] == ["az", "rest", "--method", "get", "--url"]
+            and "roleEligibilityScheduleInstances" in command[5]
+        ):
+            return FakeCompletedProcess('{"value":[]}')
+        raise AssertionError(f"Unexpected CLI command: {command}")
+
+    monkeypatch.setattr(
+        AzureCollector,
+        "_run_cli_command",
+        staticmethod(fake_run_cli_command),
+    )
+
+    collector = AzureCollector(
+        credential_factory=lambda: object(),
+        subscription_client_factory=lambda _credential: FakeSubscriptionClient(
+            subscriptions
+        ),
+        resource_client_factory=lambda _credential, _subscription_id: FakeResourceManagementClient(
+            resources
+        ),
+    )
+
+    profiles = collector.collect_profiles()
+
+    assert len(profiles) == 1
+    profile = profiles[0]
+    # 3 of 5 plans are "Standard" -- under the old 3-name allowlist this
+    # would have scored 1.0 (all 3 allowlisted plans happen to be Standard
+    # here); scored across all 5 returned plans it is 0.6.
+    assert profile.monitoring.defender_coverage_ratio == 0.6
+    assert profile.metadata["defender_standard_plan_count"] == 3
+    assert profile.metadata["defender_total_plan_count"] == 5
 
 
 def test_azure_collector_collects_native_security_recommendations(
@@ -1080,6 +1330,8 @@ def test_azure_collector_collects_native_security_recommendations(
             return FakeCompletedProcess("[]")
         if command[:4] == ["az", "policy", "assignment", "list"]:
             return FakeCompletedProcess("[]")
+        if command[:4] == ["az", "policy", "state", "summarize"]:
+            return FakeCompletedProcess('{"value":[]}')
         if command[:3] == ["az", "keyvault", "list"]:
             return FakeCompletedProcess("[]")
         if command[:4] == ["az", "keyvault", "show"]:
@@ -1089,6 +1341,11 @@ def test_azure_collector_collects_native_security_recommendations(
         if (
             command[:5] == ["az", "rest", "--method", "get", "--url"]
             and "Consumption/budgets" in command[5]
+        ):
+            return FakeCompletedProcess('{"value":[]}')
+        if (
+            command[:5] == ["az", "rest", "--method", "get", "--url"]
+            and "roleEligibilityScheduleInstances" in command[5]
         ):
             return FakeCompletedProcess('{"value":[]}')
         raise AssertionError(f"Unexpected CLI command: {command}")
@@ -1351,6 +1608,8 @@ def test_azure_collector_enriches_compute_profile_from_vm_inventory(
             return FakeCompletedProcess('{"value":[]}')
         if command[:4] == ["az", "policy", "assignment", "list"]:
             return FakeCompletedProcess("[]")
+        if command[:4] == ["az", "policy", "state", "summarize"]:
+            return FakeCompletedProcess('{"value":[]}')
         raise AssertionError(f"Unexpected CLI command: {command}")
 
     monkeypatch.setattr(
