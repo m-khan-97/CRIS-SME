@@ -1,0 +1,60 @@
+digraph CRIS_SME_Overview {
+  graph [
+    rankdir=LR,
+    bgcolor="#ffffff",
+    pad=0.25,
+    nodesep=0.34,
+    ranksep=0.68,
+    splines=ortho,
+    fontname="Arial",
+    fontsize=12,
+    labelloc=t,
+    label="CRIS-SME: Evidence in. Decisions out."
+  ];
+
+  node [
+    shape=box,
+    style="rounded,filled",
+    fontname="Arial",
+    fontsize=10,
+    margin="0.16,0.11",
+    penwidth=1.2,
+    color="#708096",
+    fontcolor="#172033"
+  ];
+  edge [color="#66758a", penwidth=1.25, arrowsize=0.72, fontname="Arial", fontsize=9];
+
+  subgraph cluster_sources {
+    label="AUTHORISED EVIDENCE";
+    color="#9dcdb6";
+    fillcolor="#f1faf5";
+    style="rounded,filled";
+    fontcolor="#236246";
+
+    azure [label="Microsoft Azure\nlive verified", fillcolor="#e5f7ee", color="#2d8a62"];
+    aws [label="Amazon Web Services\nresearch preview", fillcolor="#fff5df", color="#b7791f"];
+    mock [label="Mock fixtures\nreproducible CI", fillcolor="#f5f7fa"];
+    { rank=same; azure; aws; mock; }
+  }
+
+  subgraph cluster_platform {
+    label="CRIS-SME TRUST BOUNDARY";
+    color="#8aa2e8";
+    fillcolor="#f4f7ff";
+    style="rounded,filled";
+    fontcolor="#2949a3";
+
+    api [label="Local Assessment API\ndurable run orchestration", fillcolor="#e9efff", color="#4f6edb"];
+    normalize [label="Provider-neutral evidence\nassets + provenance", fillcolor="#e9efff", color="#4f6edb"];
+    decide [label="Deterministic engine\ncontrols + risk + sufficiency", fillcolor="#e9efff", color="#4f6edb"];
+    govern [label="Governance + assurance\nlifecycle + mappings + claims", fillcolor="#e9efff", color="#4f6edb"];
+    outputs [label="Canonical assessment\nreports + evidence packs", fillcolor="#e9efff", color="#4f6edb"];
+    console [label="React Assurance Console\ntechnical to executive views", fillcolor="#dde6ff", color="#3457d5", penwidth=1.6];
+  }
+
+  azure -> api;
+  aws -> api;
+  mock -> api;
+  api -> normalize -> decide -> govern -> outputs -> console;
+  console -> api [xlabel="start / inspect", style=dashed, color="#3457d5", constraint=false];
+}

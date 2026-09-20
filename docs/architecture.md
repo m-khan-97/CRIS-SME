@@ -62,8 +62,10 @@ hosted-service evolution, not a claim about the current product.
 
 ![CRIS-SME component architecture](diagrams/component-architecture.svg)
 
+Editable source: [Graphviz DOT](diagrams/component-architecture.dot).
+
 <details>
-<summary>Editable Mermaid source</summary>
+<summary>Equivalent Mermaid source</summary>
 
 ```text
 flowchart TB

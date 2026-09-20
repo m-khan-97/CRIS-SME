@@ -1,0 +1,163 @@
+digraph CRIS_SME_Architecture {
+  graph [
+    rankdir=TB,
+    bgcolor="#ffffff",
+    pad=0.28,
+    nodesep=0.30,
+    ranksep=0.62,
+    splines=ortho,
+    compound=true,
+    newrank=true,
+    fontname="Arial",
+    fontsize=13,
+    labelloc=t,
+    label="CRIS-SME Component Architecture"
+  ];
+
+  node [
+    shape=box,
+    style="rounded,filled",
+    fontname="Arial",
+    fontsize=9.5,
+    margin="0.14,0.10",
+    width=1.72,
+    height=0.58,
+    penwidth=1.15,
+    color="#65758b",
+    fontcolor="#172033",
+    fillcolor="#ffffff"
+  ];
+  edge [color="#68778b", penwidth=1.1, arrowsize=0.67, fontname="Arial", fontsize=8.5];
+
+  subgraph cluster_experience {
+    label="1  EXPERIENCE AND INTEGRATION";
+    color="#8aa2e8";
+    fillcolor="#f3f6ff";
+    style="rounded,filled";
+    fontcolor="#2949a3";
+
+    ui [label="Assurance Console\n18 focused views", fillcolor="#e4ebff", color="#3457d5", penwidth=1.5];
+    static [label="Static demo bundle\nVercel / static host", fillcolor="#edf2ff", color="#5874d8"];
+    cli [label="CLI + automation", fillcolor="#edf2ff", color="#5874d8"];
+    mcp [label="Optional MCP tools", fillcolor="#edf2ff", color="#5874d8"];
+    { rank=same; ui; static; cli; mcp; }
+  }
+
+  subgraph cluster_orchestration {
+    label="2  ASSESSMENT ORCHESTRATION";
+    color="#9aafe8";
+    fillcolor="#f7f9ff";
+    style="rounded,filled";
+    fontcolor="#2949a3";
+
+    api [label="Local API runner\nvalidation + job control", fillcolor="#e9efff", color="#4f6edb"];
+    run_db [shape=cylinder, label="SQLite run ledger\nprocess state", fillcolor="#fff4d6", color="#b7791f"];
+    runner [label="AssessmentRunner\nfive deterministic phases", fillcolor="#e9efff", color="#4f6edb"];
+    events [label="Structured events\nJSONL progress", fillcolor="#e9efff", color="#4f6edb"];
+    { rank=same; api; run_db; runner; events; }
+  }
+
+  subgraph cluster_evidence {
+    label="3  PROVIDER ACCESS AND EVIDENCE";
+    color="#8bc5a8";
+    fillcolor="#f1faf5";
+    style="rounded,filled";
+    fontcolor="#236246";
+
+    azure [label="Azure collector\nlive verified", fillcolor="#e3f6ec", color="#2d8a62"];
+    aws [label="AWS collector\nresearch preview", fillcolor="#fff4dc", color="#b7791f"];
+    mock [label="Mock collector\nreproducible fixtures", fillcolor="#edf8f2", color="#4c9a73"];
+    exposure [label="Public exposure\nDNS + HTTP + TLS", fillcolor="#edf8f2", color="#4c9a73"];
+    contracts [label="Evidence contracts\ncoverage + gaps", fillcolor="#edf8f2", color="#4c9a73"];
+    { rank=same; azure; aws; mock; exposure; contracts; }
+  }
+
+  subgraph cluster_decision {
+    label="4  PROVIDER-NEUTRAL DECISION ENGINE";
+    color="#8aa2e8";
+    fillcolor="#f3f6ff";
+    style="rounded,filled";
+    fontcolor="#2949a3";
+
+    normalized [label="CloudProfile + assets\nrelationships + evidence", fillcolor="#e9efff", color="#4f6edb"];
+    controls [label="Versioned controls\n7 domains + policy metadata", fillcolor="#e9efff", color="#4f6edb"];
+    evaluate [label="Deterministic evaluation\ntrace + evidence references", fillcolor="#dfe8ff", color="#3457d5", penwidth=1.5];
+    score [label="Risk + confidence\ngraph context + priority", fillcolor="#e9efff", color="#4f6edb"];
+    sufficiency [label="Evidence sufficiency\nobserved + inferred + gaps", fillcolor="#e9efff", color="#4f6edb"];
+    governance [label="Governance + readiness\nlifecycle + exceptions + mappings", fillcolor="#dfe8ff", color="#3457d5", penwidth=1.5];
+
+    { rank=same; normalized; controls; }
+    { rank=same; score; sufficiency; }
+  }
+
+  subgraph cluster_assurance {
+    label="5  ASSURANCE AND OUTPUTS";
+    color="#c6a34b";
+    fillcolor="#fffaf0";
+    style="rounded,filled";
+    fontcolor="#72530c";
+
+    canonical [label="Canonical JSON\nassessment", fillcolor="#fff0c7", color="#b7791f", penwidth=1.5];
+    history [shape=cylinder, label="File-backed history\nreport snapshots", fillcolor="#fff4d6", color="#b7791f"];
+    technical [label="Technical\nHTML + CSV + SARIF + OCSF", fillcolor="#fff8e8", color="#c0942d"];
+    remediation [label="Decision support\nremediation + budget simulation", fillcolor="#fff8e8", color="#c0942d"];
+    compliance [label="Compliance\nCyber Essentials + mappings", fillcolor="#fff8e8", color="#c0942d"];
+    trust [label="Trust\nRBOM + replay + provenance", fillcolor="#fff8e8", color="#c0942d"];
+    executive [label="Stakeholder\nexecutive + insurer + disclosure", fillcolor="#fff8e8", color="#c0942d"];
+    { rank=same; history; technical; remediation; compliance; trust; executive; }
+  }
+
+  subgraph cluster_future {
+    label="PLANNED HOSTED PLATFORM";
+    color="#9ba3ad";
+    fillcolor="#f7f7f8";
+    style="rounded,dashed,filled";
+    fontcolor="#555d68";
+
+    auth [label="Authentication + RBAC", style="rounded,dashed,filled", fillcolor="#ffffff", color="#8a929d"];
+    tenants [label="Tenant-isolated API\n+ data stores", style="rounded,dashed,filled", fillcolor="#ffffff", color="#8a929d"];
+    schedules [label="Scheduling\n+ notifications", style="rounded,dashed,filled", fillcolor="#ffffff", color="#8a929d"];
+    { rank=same; auth; tenants; schedules; }
+  }
+
+  ui -> api;
+  cli -> runner;
+  mcp -> runner;
+  api -> run_db [dir=both, arrowtail=none];
+  api -> runner;
+  runner -> events;
+  events -> api [constraint=false];
+
+  runner -> azure;
+  runner -> aws;
+  runner -> mock;
+  api -> exposure;
+  contracts -> azure [constraint=false];
+  contracts -> aws [constraint=false];
+
+  azure -> normalized;
+  aws -> normalized;
+  mock -> normalized;
+  normalized -> evaluate;
+  controls -> evaluate;
+  evaluate -> score;
+  evaluate -> sufficiency;
+  score -> governance;
+  sufficiency -> governance;
+
+  governance -> canonical;
+  exposure -> canonical;
+  canonical -> history;
+  canonical -> technical;
+  canonical -> remediation;
+  canonical -> compliance;
+  canonical -> trust;
+  canonical -> executive;
+  canonical -> ui [constraint=false];
+  canonical -> static [constraint=false];
+  history -> api [constraint=false];
+
+  api -> auth [style=dashed, color="#8a929d", xlabel="future evolution"];
+  auth -> tenants [style=dashed, color="#8a929d"];
+  tenants -> schedules [style=dashed, color="#8a929d"];
+}

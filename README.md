@@ -91,8 +91,10 @@ See [transformation strategy](docs/product-strategy.md), [innovation and UKRI re
 
 ![CRIS-SME architecture overview](docs/diagrams/readme-overview.svg)
 
+Editable source: [Graphviz DOT](docs/diagrams/readme-overview.dot).
+
 <details>
-<summary>Editable diagram source</summary>
+<summary>Equivalent Mermaid source</summary>
 
 ```text
 flowchart LR
