@@ -1,0 +1,37 @@
+sequenceDiagram
+    autonumber
+    actor User as Authorised operator
+    participant UI as Assurance Console
+    participant API as Local API runner
+    participant DB as SQLite run ledger
+    participant Auth as Provider identity
+    participant Cloud as Cloud control plane
+    participant Run as AssessmentRunner
+    participant Core as Decision engine
+    participant Files as Report and artifact store
+
+    User->>UI: Select provider, organisation and scope
+    UI->>API: POST assessment with authorisation acknowledgement
+    API->>Auth: Validate Azure session or AWS role
+    Auth-->>API: Account and permission context
+    API->>DB: Persist queued run
+    API-->>UI: 202 Accepted with run ID
+    API->>Run: Start assessment subprocess
+    Run->>DB: Mark run running
+    Run->>Cloud: Read authorised control-plane evidence
+    Cloud-->>Run: Provider observations and visibility gaps
+    Run->>Core: Normalized profiles and evidence records
+    Core->>Core: Evaluate controls and build finding lineage
+    Core->>Core: Score risk, confidence and graph context
+    Core->>Core: Map compliance and assess sufficiency
+    Core-->>Run: Deterministic assessment result
+    Run->>Files: Write report and derived artifacts
+    Run->>DB: Persist terminal state and output location
+    loop Until terminal state
+        UI->>API: GET run status
+        API->>DB: Read durable process state
+        API-->>UI: Phase events and status
+    end
+    UI->>API: GET selected assessment report
+    API->>Files: Resolve report snapshot
+    Files-->>UI: Findings, evidence, history and artifacts

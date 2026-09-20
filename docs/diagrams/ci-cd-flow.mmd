@@ -1,0 +1,8 @@
+flowchart TD
+    PR["Pull Request"] --> PRV["PR validation<br/>lint, type checks, tests and mock run"]
+    MAIN["Push to main"] --> BUILD["Build static site artifacts<br/>and upload dist bundle"]
+    TAG["Version tag"] --> REL["Package and publish<br/>GitHub release"]
+    SCHED["Schedule or manual dispatch"] --> SCH["Periodic assessment<br/>artifacts"]
+    PR --> DEPREV["Dependency review"]
+    MAIN --> CODEQL["CodeQL analysis"]
+    BUILD --> VERCEL["Vercel direct Git<br/>deployment"]

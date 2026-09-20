@@ -1,0 +1,31 @@
+flowchart LR
+    operator["Security operator<br/>or authorised assessor"]
+    stakeholder["SME leadership, engineers,<br/>auditors and insurers"]
+
+    subgraph estate["Authorised assessment scope"]
+        azure["Microsoft Azure<br/>control-plane APIs"]
+        aws["Amazon Web Services<br/>control-plane APIs"]
+        public["Explicitly authorised<br/>public endpoints"]
+    end
+
+    subgraph cris["CRIS-SME trust boundary"]
+        console["Assurance Console<br/>React + TypeScript"]
+        api["Local Assessment API<br/>Python HTTP service"]
+        engine["Deterministic Decision Engine<br/>controls, scoring and governance"]
+        reports["Assurance Artifacts<br/>reports, packs and evidence lineage"]
+    end
+
+    operator --> console
+    console -->|"assessment request"| api
+    api -->|"read-only collection"| azure
+    api -->|"read-only collection"| aws
+    api -->|"bounded observation"| public
+    api --> engine
+    engine --> reports
+    reports --> console
+    reports --> stakeholder
+
+    classDef external fill:#f6f7f9,stroke:#697386,color:#172033
+    classDef product fill:#eef4ff,stroke:#3457d5,color:#172033
+    class azure,aws,public,operator,stakeholder external
+    class console,api,engine,reports product

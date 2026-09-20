@@ -27,7 +27,12 @@ interactive application.
 
 ## Data Direction
 
-```mermaid
+![CRIS-SME frontend data flow](diagrams/frontend-data-flow.svg)
+
+<details>
+<summary>Editable Mermaid source</summary>
+
+```text
 flowchart LR
     REPORT["Canonical assessment JSON"] --> CLIENT["Defensive API client"]
     API["Local assessment API"] --> CLIENT
@@ -35,6 +40,8 @@ flowchart LR
     CACHE --> ROUTES["Route-split React views"]
     ROUTES --> USER["Technical, governance and executive users"]
 ```
+
+</details>
 
 Missing report fields render as unavailable or not observed. They are never
 inferred in the UI. See [Frontend Console](frontend-console.md) for routes, build

@@ -1,0 +1,6 @@
+flowchart LR
+    REPORT["Canonical assessment JSON"] --> CLIENT["Defensive API client"]
+    API["Local assessment API"] --> CLIENT
+    CLIENT --> CACHE["TanStack Query cache"]
+    CACHE --> ROUTES["Route-split React views"]
+    ROUTES --> USER["Technical, governance and executive users"]

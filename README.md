@@ -89,7 +89,12 @@ See [transformation strategy](docs/product-strategy.md), [innovation and UKRI re
 
 ## Architecture
 
-```mermaid
+![CRIS-SME architecture overview](docs/diagrams/readme-overview.svg)
+
+<details>
+<summary>Editable diagram source</summary>
+
+```text
 flowchart LR
     subgraph evidence["Authorised evidence sources"]
         AZ["Azure<br/>live verified"]
@@ -113,6 +118,8 @@ flowchart LR
     UI -->|"start and inspect runs"| API
 ```
 
+</details>
+
 Provider credentials stay at the local/self-hosted runner boundary. The console
 never calculates findings or scores: every view is projected from the same
 canonical, provenance-aware assessment. Run process state is stored in SQLite;
@@ -126,7 +133,12 @@ explicit distinction between implemented and planned SaaS capabilities.
 
 ## CI/CD and Hosting Flow
 
-```mermaid
+![CRIS-SME CI/CD and hosting flow](docs/diagrams/ci-cd-flow.svg)
+
+<details>
+<summary>Editable diagram source</summary>
+
+```text
 flowchart TD
     PR[Pull Request] --> PRV[pr-validation.yml\nLint + Type + Test + Mock Run]
     MAIN[Push to main] --> BUILD[build-static-site-artifacts.yml\nBuild + Upload dist bundle]
@@ -136,6 +148,8 @@ flowchart TD
     MAIN --> CODEQL[codeql.yml]
     BUILD --> VERCEL[Vercel Option 1\nDirect Git deployment]
 ```
+
+</details>
 
 ---
 

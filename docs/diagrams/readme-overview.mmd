@@ -1,0 +1,21 @@
+flowchart LR
+    subgraph evidence["Authorised evidence sources"]
+        AZ["Azure<br/>live verified"]
+        AWS["AWS<br/>research preview"]
+        MOCK["Mock<br/>reproducible CI"]
+    end
+
+    subgraph platform["CRIS-SME"]
+        API["Local assessment API<br/>durable run orchestration"]
+        NORM["Provider-neutral evidence<br/>assets and provenance"]
+        CORE["Deterministic decision engine<br/>controls, risk and sufficiency"]
+        GOV["Governance and assurance<br/>lifecycle, mappings and claims"]
+        OUT["Canonical assessment<br/>reports and evidence packs"]
+        UI["React Assurance Console<br/>technical to executive views"]
+    end
+
+    AZ --> API
+    AWS --> API
+    MOCK --> API
+    API --> NORM --> CORE --> GOV --> OUT --> UI
+    UI -->|"start and inspect runs"| API

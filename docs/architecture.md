@@ -12,7 +12,12 @@ evidence; deterministic controls turn that evidence into explainable findings;
 and one canonical assessment model feeds technical, executive, compliance, and
 assurance outputs.
 
-```mermaid
+![CRIS-SME system context](diagrams/system-context.svg)
+
+<details>
+<summary>Editable Mermaid source</summary>
+
+```text
 flowchart LR
     operator["Security operator<br/>or authorised assessor"]
     stakeholder["SME leadership, engineers,<br/>auditors and insurers"]
@@ -46,6 +51,8 @@ flowchart LR
     class console,api,engine,reports product
 ```
 
+</details>
+
 ## Component Architecture
 
 The major components are separated so provider authentication, collection,
@@ -53,7 +60,12 @@ decision logic, persistence, and presentation can evolve independently. Solid
 arrows below are implemented paths. The final dashed boundary is the planned
 hosted-service evolution, not a claim about the current product.
 
-```mermaid
+![CRIS-SME component architecture](diagrams/component-architecture.svg)
+
+<details>
+<summary>Editable Mermaid source</summary>
+
+```text
 flowchart TB
     subgraph experience["Experience and integration plane"]
         ui["Assurance Console<br/>18 focused views"]
@@ -153,13 +165,20 @@ flowchart TB
     class auth,tenants,schedules planned
 ```
 
+</details>
+
 ## Assessment Flow
 
 Each live run keeps cloud credentials outside the browser. The API starts a
 background process, records process state in SQLite, emits structured progress,
 and publishes the completed report snapshot and derived artifacts.
 
-```mermaid
+![CRIS-SME assessment flow](diagrams/assessment-flow.svg)
+
+<details>
+<summary>Editable Mermaid source</summary>
+
+```text
 sequenceDiagram
     autonumber
     actor User as Authorised operator
@@ -198,6 +217,8 @@ sequenceDiagram
     API->>Files: Resolve report snapshot
     Files-->>UI: Findings, evidence, history and artifacts
 ```
+
+</details>
 
 ## Core Data Contracts
 

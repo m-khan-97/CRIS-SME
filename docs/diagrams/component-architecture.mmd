@@ -1,0 +1,93 @@
+flowchart TB
+    subgraph experience["Experience and integration plane"]
+        ui["Assurance Console<br/>18 focused views"]
+        static["Static demonstration bundle<br/>Vercel or any static host"]
+        cli["CLI and automation scripts"]
+        mcp["Optional MCP tools"]
+    end
+
+    subgraph delivery["Assessment orchestration plane"]
+        localapi["Local API runner<br/>request validation and job orchestration"]
+        processdb[("SQLite run ledger<br/>queued, running, completed, failed")]
+        events["Structured phase events<br/>JSONL progress stream"]
+        runner["AssessmentRunner<br/>five deterministic phases"]
+    end
+
+    subgraph access["Provider access and evidence plane"]
+        azidentity["Azure CLI identity<br/>runner-side az login"]
+        awsidentity["AWS credential chain<br/>optional STS AssumeRole"]
+        azurecollector["Azure collector<br/>live verified"]
+        awscollector["AWS collector<br/>research preview"]
+        mockcollector["Mock collector<br/>reproducible fixtures"]
+        exposure["Public exposure observer<br/>DNS, HTTP, TLS and headers"]
+        contracts["Provider evidence contracts<br/>coverage, permissions and gaps"]
+    end
+
+    subgraph decision["Provider-neutral decision plane"]
+        normalized["Normalized CloudProfile<br/>assets, relationships and evidence"]
+        controls["Versioned control registry<br/>7 domains and policy metadata"]
+        evaluation["Deterministic evaluation<br/>finding trace and evidence refs"]
+        risk["Risk and confidence<br/>scoring, graph context and priority"]
+        governance["Governance and readiness<br/>lifecycle, exceptions and mappings"]
+        sufficiency["Evidence sufficiency<br/>observed, inferred and unresolved"]
+    end
+
+    subgraph assurance["Assurance and output plane"]
+        canonical["Canonical JSON assessment"]
+        history[("File-backed report history<br/>and assessment snapshots")]
+        technical["Technical outputs<br/>HTML, CSV, SARIF and OCSF"]
+        action["Decision outputs<br/>remediation and budget simulation"]
+        compliance["Compliance outputs<br/>Cyber Essentials and mappings"]
+        trust["Trust outputs<br/>RBOM, replay, provenance and claims"]
+        executive["Stakeholder outputs<br/>executive, insurer and disclosure packs"]
+    end
+
+    subgraph future["Planned hosted platform boundary"]
+        auth["Authentication and RBAC"]
+        tenants["Tenant-isolated API and data stores"]
+        schedules["Scheduled assessments and notifications"]
+    end
+
+    ui --> localapi
+    cli --> runner
+    mcp --> runner
+    canonical --> static
+    localapi <--> processdb
+    localapi --> runner
+    runner --> events
+    events --> localapi
+    azidentity --> azurecollector
+    awsidentity --> awscollector
+    azurecollector --> normalized
+    awscollector --> normalized
+    mockcollector --> normalized
+    exposure --> canonical
+    contracts --> azurecollector
+    contracts --> awscollector
+    normalized --> evaluation
+    controls --> evaluation
+    evaluation --> risk
+    evaluation --> sufficiency
+    risk --> governance
+    sufficiency --> governance
+    governance --> canonical
+    canonical --> history
+    canonical --> technical
+    canonical --> action
+    canonical --> compliance
+    canonical --> trust
+    canonical --> executive
+    history --> localapi
+    canonical --> ui
+    localapi -. "future evolution" .-> auth
+    auth -.-> tenants
+    tenants -.-> schedules
+
+    classDef current fill:#eef4ff,stroke:#3457d5,color:#172033
+    classDef evidence fill:#ecf8f1,stroke:#23855b,color:#172033
+    classDef store fill:#fff6df,stroke:#a66b00,color:#172033
+    classDef planned fill:#f5f5f5,stroke:#707070,color:#333,stroke-dasharray:5 5
+    class ui,static,cli,mcp,localapi,events,runner,normalized,controls,evaluation,risk,governance,sufficiency,canonical,technical,action,compliance,trust,executive current
+    class azidentity,awsidentity,azurecollector,awscollector,mockcollector,exposure,contracts evidence
+    class processdb,history store
+    class auth,tenants,schedules planned
