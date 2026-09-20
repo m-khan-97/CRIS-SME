@@ -111,12 +111,28 @@ API runner, keeping credentials out of the browser:
 PYTHONPATH=src python3 -m cris_sme.api.local_runner
 ```
 
+Assessment process state is persisted by default in
+`outputs/reports/.runs/assessment_runs.sqlite3`. Completed and failed run status
+therefore survives a local-runner restart; any run that was still queued or
+running is marked failed with an explicit restart reason. Override the database
+location when needed:
+
+```bash
+PYTHONPATH=src python3 -m cris_sme.api.local_runner \
+  --database-path outputs/cris-sme-run-state.sqlite3
+```
+
+`GET /api/assessment-runs` returns the persisted process ledger. Full report
+snapshots remain file-backed and are exposed separately through
+`GET /api/assessment-history` and `GET /api/assessment-reports/{report_id}`.
+
 The runner exposes `GET /health`, `GET /api/environment/azure`,
 `POST /api/assessments/azure`, `POST /api/public-exposure`,
-`GET /api/assessments/{run_id}`, and `GET /api/artifacts/latest`. It uses the
-local machine's existing `az login` session; the console never asks for Azure
-passwords, client secrets, or refresh tokens, and live collection requires an
-explicit authorisation checkbox before it starts.
+`GET /api/assessment-runs`, `GET /api/assessments/{run_id}`, and
+`GET /api/artifacts/latest`. It uses the local machine's existing `az login`
+session; the console never asks for Azure passwords, client secrets, or refresh
+tokens, and live collection requires an explicit authorisation checkbox before
+it starts.
 
 The "Public Exposure" view runs the same runner against explicitly authorised
 domains, URLs, or public IPs (DNS/HTTP/HTTPS/TLS/header evidence only — no

@@ -16,6 +16,7 @@ from pathlib import Path
 from typing import Any, Callable
 from urllib.parse import parse_qs, unquote, urlparse
 
+from cris_sme.api.run_repository import SqliteAssessmentRunRepository
 from cris_sme.engine.public_exposure import (
     PublicExposureScanner,
     PublicExposureSettings,
@@ -27,6 +28,7 @@ DEFAULT_HOST = "127.0.0.1"
 DEFAULT_PORT = 8787
 DEFAULT_OUTPUT_DIR = Path("outputs/reports")
 DEFAULT_FIGURE_DIR = Path("outputs/figures")
+DEFAULT_DATABASE_NAME = "assessment_runs.sqlite3"
 
 CommandRunner = Callable[..., subprocess.CompletedProcess[str]]
 
@@ -55,6 +57,18 @@ class AssessmentRun:
     stdout_tail: str = ""
     stderr_tail: str = ""
     error: str = ""
+
+    @classmethod
+    def from_persisted(cls, values: dict[str, Any]) -> AssessmentRun:
+        """Restore non-secret run state from the SQLite repository."""
+        fields = cls.__dataclass_fields__
+        return cls(**{key: value for key, value in values.items() if key in fields})
+
+    def to_persisted(self) -> dict[str, Any]:
+        """Return durable run state, deliberately excluding the AWS External ID."""
+        values = vars(self).copy()
+        values.pop("external_id", None)
+        return values
 
     def to_dict(self) -> dict[str, Any]:
         return {
@@ -89,13 +103,17 @@ class LocalAssessmentRunner:
         *,
         output_dir: Path = DEFAULT_OUTPUT_DIR,
         figure_dir: Path = DEFAULT_FIGURE_DIR,
+        database_path: Path | None = None,
         command_runner: CommandRunner = subprocess.run,
     ) -> None:
         self.output_dir = output_dir
         self.figure_dir = figure_dir
         self.command_runner = command_runner
+        self.database_path = database_path or output_dir / ".runs" / DEFAULT_DATABASE_NAME
+        self._repository = SqliteAssessmentRunRepository(self.database_path)
         self._runs: dict[str, AssessmentRun] = {}
         self._lock = threading.Lock()
+        self._restore_persisted_runs()
 
     def azure_environment(self) -> dict[str, Any]:
         """Return Azure CLI posture without requiring frontend secrets."""
@@ -272,6 +290,7 @@ class LocalAssessmentRunner:
         )
         with self._lock:
             self._runs[run.run_id] = run
+            self._repository.save(run.to_persisted())
         thread = threading.Thread(target=self._execute_aws_run, args=(run.run_id,), daemon=True)
         thread.start()
         return run
@@ -295,6 +314,7 @@ class LocalAssessmentRunner:
         )
         with self._lock:
             self._runs[run.run_id] = run
+            self._repository.save(run.to_persisted())
         thread = threading.Thread(target=self._execute_azure_run, args=(run.run_id,), daemon=True)
         thread.start()
         return run
@@ -328,7 +348,22 @@ class LocalAssessmentRunner:
 
     def get_run(self, run_id: str) -> AssessmentRun | None:
         with self._lock:
-            return self._runs.get(run_id)
+            run = self._runs.get(run_id)
+            if run is not None:
+                return run
+            persisted = self._repository.get(run_id)
+            if persisted is None:
+                return None
+            run = AssessmentRun.from_persisted(persisted)
+            self._runs[run_id] = run
+            return run
+
+    def assessment_runs(self, *, limit: int = 100) -> list[dict[str, Any]]:
+        """Return durable process-level assessment runs, newest first."""
+        return [
+            AssessmentRun.from_persisted(values).to_dict()
+            for values in self._repository.list(limit=limit)
+        ]
 
     def assessment_history(self) -> list[dict[str, Any]]:
         """Return persisted report snapshots, newest first."""
@@ -445,6 +480,16 @@ class LocalAssessmentRunner:
                 return
             for key, value in updates.items():
                 setattr(run, key, value)
+            self._repository.save(run.to_persisted())
+
+    def _restore_persisted_runs(self) -> None:
+        """Restore durable state and close runs interrupted by a process restart."""
+        if not self.database_path.is_file():
+            return
+        self._repository.mark_interrupted(completed_at=_utc_now())
+        for values in self._repository.list(limit=1000):
+            run = AssessmentRun.from_persisted(values)
+            self._runs[run.run_id] = run
 
 
 def _aws_login_environment(
@@ -622,6 +667,15 @@ def create_handler(runner: LocalAssessmentRunner) -> type[BaseHTTPRequestHandler
             if request_path == "/api/assessment-history":
                 self._send_json({"assessments": runner.assessment_history()})
                 return
+            if request_path == "/api/assessment-runs":
+                query = parse_qs(parsed_url.query)
+                try:
+                    limit = int(query.get("limit", ["100"])[0])
+                except ValueError:
+                    self._send_error("limit must be an integer", status=400)
+                    return
+                self._send_json({"runs": runner.assessment_runs(limit=limit)})
+                return
             if request_path.startswith("/api/assessment-reports/"):
                 report_id = unquote(request_path.rsplit("/", 1)[-1])
                 report = runner.assessment_report(report_id)
@@ -785,9 +839,14 @@ def run_server(
     port: int = DEFAULT_PORT,
     output_dir: Path = DEFAULT_OUTPUT_DIR,
     figure_dir: Path = DEFAULT_FIGURE_DIR,
+    database_path: Path | None = None,
 ) -> None:
     """Run the local assessment API server."""
-    runner = LocalAssessmentRunner(output_dir=output_dir, figure_dir=figure_dir)
+    runner = LocalAssessmentRunner(
+        output_dir=output_dir,
+        figure_dir=figure_dir,
+        database_path=database_path,
+    )
     server = ThreadingHTTPServer((host, port), create_handler(runner))
     print(f"CRIS-SME local runner listening on http://{host}:{port}")
     server.serve_forever()
@@ -799,12 +858,18 @@ def main() -> int:
     parser.add_argument("--port", type=int, default=DEFAULT_PORT)
     parser.add_argument("--output-dir", default=str(DEFAULT_OUTPUT_DIR))
     parser.add_argument("--figure-dir", default=str(DEFAULT_FIGURE_DIR))
+    parser.add_argument(
+        "--database-path",
+        default="",
+        help="SQLite run-state database (default: <output-dir>/.runs/assessment_runs.sqlite3).",
+    )
     args = parser.parse_args()
     run_server(
         host=args.host,
         port=args.port,
         output_dir=Path(args.output_dir),
         figure_dir=Path(args.figure_dir),
+        database_path=Path(args.database_path) if args.database_path else None,
     )
     return 0
 

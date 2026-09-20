@@ -211,6 +211,75 @@ def test_start_azure_assessment_sets_runner_events_path_and_exposes_events(tmp_p
     ]
 
 
+def test_assessment_run_survives_runner_restart(tmp_path) -> None:
+    def fake_run(cmd, **kwargs) -> subprocess.CompletedProcess[str]:
+        return subprocess.CompletedProcess(cmd, 0, stdout="ok", stderr="")
+
+    output_dir = tmp_path / "reports"
+    first_runner = LocalAssessmentRunner(output_dir=output_dir, command_runner=fake_run)
+    run = first_runner.start_azure_assessment(
+        {
+            "authorization_confirmed": True,
+            "organization_name": "Persistent Example Ltd",
+        }
+    )
+
+    deadline = time.time() + 2
+    while first_runner.get_run(run.run_id).status != "completed" and time.time() < deadline:
+        time.sleep(0.01)
+
+    restarted_runner = LocalAssessmentRunner(output_dir=output_dir, command_runner=fake_run)
+    restored = restarted_runner.get_run(run.run_id)
+
+    assert restored is not None
+    assert restored.status == "completed"
+    assert restored.organization_name == "Persistent Example Ltd"
+    assert restarted_runner.assessment_runs()[0]["run_id"] == run.run_id
+
+
+def test_runner_restart_marks_incomplete_persisted_run_failed(tmp_path) -> None:
+    output_dir = tmp_path / "reports"
+    database_path = output_dir / ".runs" / "assessment_runs.sqlite3"
+
+    from cris_sme.api.run_repository import SqliteAssessmentRunRepository
+
+    repository = SqliteAssessmentRunRepository(database_path)
+    repository.save(
+        {
+            "run_id": "run_interrupted",
+            "collector": "azure",
+            "status": "running",
+            "requested_at": "2026-09-20T10:00:00Z",
+            "started_at": "2026-09-20T10:00:01Z",
+            "completed_at": "",
+            "authorization_confirmed": True,
+            "subscription_id": "sub-123",
+            "tenant_id": "tenant-456",
+            "account_id": "",
+            "organization_name": "Interrupted Ltd",
+            "role_arn": "",
+            "output_dir": str(output_dir),
+            "figure_dir": str(tmp_path / "figures"),
+            "events_path": "",
+            "returncode": None,
+            "stdout_tail": "",
+            "stderr_tail": "",
+            "error": "",
+        }
+    )
+
+    restarted_runner = LocalAssessmentRunner(
+        output_dir=output_dir,
+        database_path=database_path,
+    )
+    restored = restarted_runner.get_run("run_interrupted")
+
+    assert restored is not None
+    assert restored.status == "failed"
+    assert restored.returncode == -1
+    assert "restarted" in restored.error
+
+
 def test_latest_artifacts_reports_known_outputs(tmp_path) -> None:
     report_path = tmp_path / "cris_sme_report.json"
     report_path.write_text("{}", encoding="utf-8")
@@ -273,6 +342,33 @@ def test_assessment_history_and_scoped_artifact_http_endpoints(tmp_path) -> None
         f"/api/report-artifact?path={quote(str(tmp_path / 'secret.txt'))}",
         expected_status=404,
     )
+
+
+def test_assessment_runs_http_endpoint_returns_persisted_runs(tmp_path) -> None:
+    def fake_run(cmd, **kwargs) -> subprocess.CompletedProcess[str]:
+        return subprocess.CompletedProcess(cmd, 0, stdout="ok", stderr="")
+
+    runner = LocalAssessmentRunner(output_dir=tmp_path, command_runner=fake_run)
+    run = runner.start_aws_assessment(
+        {
+            "authorization_confirmed": True,
+            "organization_name": "AWS Persistent Ltd",
+            "external_id": "not-persisted",
+        }
+    )
+    deadline = time.time() + 2
+    while runner.get_run(run.run_id).status != "completed" and time.time() < deadline:
+        time.sleep(0.01)
+
+    payload = _request_json(
+        create_handler(runner),
+        "GET",
+        "/api/assessment-runs?limit=10",
+    )
+
+    assert payload["runs"][0]["run_id"] == run.run_id
+    assert payload["runs"][0]["organization_name"] == "AWS Persistent Ltd"
+    assert "external_id" not in payload["runs"][0]
 
 
 def test_public_exposure_assessment_writes_artifacts(tmp_path, monkeypatch) -> None:
