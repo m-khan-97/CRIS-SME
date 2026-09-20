@@ -34,7 +34,7 @@ The product wedge is:
 
 ## Key Capabilities
 
-- Evidence collection via `mock` and `azure` collectors
+- Evidence collection via `mock`, live-verified `azure`, and research-preview `aws` collectors
 - Provider-normalized posture modeling and adapter strategy
 - Deterministic control evaluation across 6 domains / 26 controls
 - Confidence calibration with explicit rationale metadata
@@ -91,38 +91,36 @@ See [transformation strategy](docs/product-strategy.md), [innovation and UKRI re
 
 ```mermaid
 flowchart LR
-    A[Collectors\nmock / azure] --> B[Normalization\nCloudProfile + adapters]
-    B --> C[Controls + Policy Specs\nDeterministic evaluators]
-    C --> D[Scoring + Confidence + Compliance]
-    D --> E[Lineage + Lifecycle + Exceptions\nGraph Context]
-    E --> F[Reporting Layer\nJSON/HTML/Summary/Figures]
-    F --> G[Dashboard Layer\nPayload + Interactive HTML]
-    G --> H[Static Site Bundler\ndist/site]
-    H --> I[Vercel Hosting\nDirect Git Integration]
+    subgraph evidence["Authorised evidence sources"]
+        AZ["Azure<br/>live verified"]
+        AWS["AWS<br/>research preview"]
+        MOCK["Mock<br/>reproducible CI"]
+    end
+
+    subgraph platform["CRIS-SME"]
+        API["Local assessment API<br/>durable run orchestration"]
+        NORM["Provider-neutral evidence<br/>assets and provenance"]
+        CORE["Deterministic decision engine<br/>controls, risk and sufficiency"]
+        GOV["Governance and assurance<br/>lifecycle, mappings and claims"]
+        OUT["Canonical assessment<br/>reports and evidence packs"]
+        UI["React Assurance Console<br/>technical to executive views"]
+    end
+
+    AZ --> API
+    AWS --> API
+    MOCK --> API
+    API --> NORM --> CORE --> GOV --> OUT --> UI
+    UI -->|"start and inspect runs"| API
 ```
 
-Layer summary:
+Provider credentials stay at the local/self-hosted runner boundary. The console
+never calculates findings or scores: every view is projected from the same
+canonical, provenance-aware assessment. Run process state is stored in SQLite;
+full reports and generated artifacts are currently file-backed.
 
-1. Evidence: collection, provenance, observability boundaries
-2. Asset/context: normalized entities and relationship context
-3. Decision: deterministic controls, scoring, lifecycle, compliance
-4. Experience: reports, dashboard, and artifact exports
-5. Delivery: CI quality gates, release packaging, static-hosting readiness
-
----
-
-## High-Level Implementation Flow
-
-```mermaid
-flowchart TD
-    A[Collect Evidence] --> B[Normalize Profiles and Assets]
-    B --> C[Evaluate Deterministic Controls]
-    C --> D[Score Risk + Calibrate Confidence]
-    D --> E[Apply Lineage + Lifecycle + Exceptions + Graph Context]
-    E --> F[Generate Reports and Dashboard Artifacts]
-    F --> G[Assemble dist/site Bundle]
-    G --> H[Deploy via Vercel Option 1]
-```
+See the [complete architecture](docs/architecture.md) for the component map,
+assessment sequence, data contracts, trust boundaries, deployment modes, and the
+explicit distinction between implemented and planned SaaS capabilities.
 
 ---
 

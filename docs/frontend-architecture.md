@@ -1,39 +1,42 @@
 # Frontend Architecture
 
-CRIS-SME currently ships a generated interactive dashboard HTML, not a separate SPA service.
+The current CRIS-SME frontend is the React Assurance Console in
+`frontend/console/`. It is a presentation and workflow layer over canonical
+assessment reports; it does not calculate findings, scores, priorities, or
+confidence.
 
-## Current Frontend Shape
+## Runtime Modes
 
-- Dashboard payload generated in backend pipeline
-- HTML dashboard generated with embedded payload
-- Client-side filtering and rendering via vanilla JavaScript
-- No API server required for local usage
-- Static site bundling for platform-neutral publication (Vercel-ready)
+### API-backed local or self-hosted mode
 
-## Files
+- React + TypeScript + Vite application
+- local Python API runner at `http://127.0.0.1:8787`
+- live Azure, AWS, and public-exposure assessment workflows
+- run progress, persisted process history, report selection, and artifact access
+- provider credentials remain in the API runner environment, outside the browser
 
-- `src/cris_sme/reporting/dashboard.py`
-  - payload builder
-  - dashboard HTML builder
-  - dashboard writers
-- `scripts/build_pages_site.py`
-  - assembles `dist/site` with landing page, dashboard page, report page, and data assets
+### Static demonstration mode
 
-## Why This Approach
+- prebuilt React assets under `dist/site/console/`
+- generated assessment reports bundled as static data
+- no live collector or API service
+- suitable for Vercel and other static hosts
 
-Benefits for home-lab and research workflows:
+The legacy generated HTML dashboard remains an export artifact, not the primary
+interactive application.
 
-- zero backend deployment overhead
-- deterministic, reproducible report-to-dashboard rendering
-- easy artifact sharing and archiving
-- simple static hosting path for public demo usage
+## Data Direction
 
-## Future Expansion Path
+```mermaid
+flowchart LR
+    REPORT["Canonical assessment JSON"] --> CLIENT["Defensive API client"]
+    API["Local assessment API"] --> CLIENT
+    CLIENT --> CACHE["TanStack Query cache"]
+    CACHE --> ROUTES["Route-split React views"]
+    ROUTES --> USER["Technical, governance and executive users"]
+```
 
-If needed, the current payload contract can back:
-
-- React/TypeScript UI
-- API-backed viewer
-- lightweight hosted dashboard service
-
-without rewriting core scoring/decision logic.
+Missing report fields render as unavailable or not observed. They are never
+inferred in the UI. See [Frontend Console](frontend-console.md) for routes, build
+commands, and endpoint contracts, and [CRIS-SME Architecture](architecture.md)
+for the complete system and trust-boundary view.
