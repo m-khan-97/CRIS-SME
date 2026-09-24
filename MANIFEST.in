@@ -1,0 +1,4 @@
+include README.md
+recursive-include data *.json
+exclude data/finding_exceptions.json
+exclude data/mute_rules.json

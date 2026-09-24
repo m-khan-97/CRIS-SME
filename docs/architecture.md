@@ -298,4 +298,5 @@ Related detail:
 - [Provider evidence contracts](provider-evidence-contracts.md)
 - [Security and trust model](security-trust-model.md)
 - [SaaS and API evolution](saas-api-evolution.md)
-- [2026 H2 roadmap](roadmap-2026-h2.md)
+- [Canonical enterprise and product-family roadmap](roadmap.md)
+- [Prowler and OpenShield reference audit](enterprise-reference-audit.md)

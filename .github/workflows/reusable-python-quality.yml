@@ -28,28 +28,34 @@ jobs:
 
     steps:
       - name: Check out repository
+        id: checkout
         uses: actions/checkout@v4
 
       - name: Set up Python
+        id: python
         uses: actions/setup-python@v5
         with:
           python-version: ${{ inputs.python-version }}
           cache: pip
           cache-dependency-path: |
             requirements.txt
+            requirements/*.txt
             pyproject.toml
 
       - name: Install dependencies and QA tooling
+        id: install
         run: |
-          python -m pip install --upgrade pip
-          pip install -r requirements.txt
-          pip install ruff mypy
+          python scripts/lock_dependencies.py --check
+          python -m pip install --require-hashes -r requirements/dev.txt
+          python -m pip check
 
       - name: Lint (critical rules)
+        id: lint
         run: |
-          ruff check src tests scripts --select F,E9
+          ruff check src tests scripts setup.py --select F,E9
 
       - name: Type check workflow entry scripts
+        id: types
         run: |
           mypy \
             --ignore-missing-imports \
@@ -57,16 +63,37 @@ jobs:
             scripts/run_assessment_snapshot.py \
             scripts/run_azuregoat_assessment.py
 
-      - name: Run unit tests
+      - name: Validate full control metadata pack
+        id: controls
+        run: PYTHONPATH=src python scripts/validate_control_metadata.py
+
+      - name: Run tests with package-wide branch coverage
+        id: tests
         run: |
-          PYTHONPATH=src pytest -q
+          PYTHONPATH=src pytest -q --cov --cov-report=term --cov-report=xml:coverage.xml --cov-report=json:coverage.json
+
+      - name: Preserve coverage evidence
+        if: ${{ always() && hashFiles('coverage.json') != '' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: python-coverage-${{ inputs.python-version }}
+          path: |
+            coverage.json
+            coverage.xml
+          retention-days: 7
+
+      - name: Verify installed sdist and wheel
+        id: package
+        run: python scripts/check_installed_package.py
 
       - name: Run deterministic mock pipeline
+        id: pipeline
         if: ${{ inputs.run-mock-pipeline }}
         run: |
           PYTHONPATH=src python scripts/run_assessment_snapshot.py --collector mock > /tmp/cris_sme_mock_run.json
 
       - name: Verify generated core outputs
+        id: outputs
         if: ${{ inputs.run-mock-pipeline }}
         run: |
           test -f outputs/reports/cris_sme_report.json
@@ -77,27 +104,27 @@ jobs:
           test -f outputs/reports/cris_sme_evidence_snapshot.json
 
       - name: Verify deterministic assessment replay
+        id: replay
         if: ${{ inputs.run-mock-pipeline }}
         run: |
           PYTHONPATH=src python scripts/check_replay_determinism.py --snapshot outputs/reports/cris_sme_evidence_snapshot.json
 
       - name: Docs sanity checks
+        id: docs
         run: |
-          grep -q '```mermaid' README.md
-          test -f docs/architecture.md
-          test -f docs/methodology.md
-          test -f docs/ci-cd-and-vercel.md
-          test -f vercel.json
+          python scripts/check_docs.py
           if rg -n '/Users/|/home/' README.md docs; then
             echo "Found machine-specific absolute links in docs/readme."
             exit 1
           fi
 
       - name: Paper package consistency checks
+        id: paper
         run: |
           PYTHONPATH=src:. python scripts/validate_paper_package.py
 
       - name: Upload generated outputs
+        id: upload
         if: ${{ inputs.upload-generated-artifacts && inputs.run-mock-pipeline }}
         uses: actions/upload-artifact@v4
         with:
@@ -109,18 +136,14 @@ jobs:
 
       - name: Publish workflow summary
         if: ${{ always() }}
+        env:
+          QUALITY_STEPS: ${{ toJSON(steps) }}
+          RUN_MOCK_PIPELINE: ${{ inputs.run-mock-pipeline }}
+          UPLOAD_GENERATED_ARTIFACTS: ${{ inputs.upload-generated-artifacts }}
         run: |
-          {
-            echo "## CRIS-SME Quality Summary"
-            echo ""
-            echo "- Lint: critical static checks passed"
-            echo "- Type check: workflow entry scripts"
-            echo "- Tests: deterministic unit/integration test suite"
-            if [ "${{ inputs.run-mock-pipeline }}" = "true" ]; then
-              echo "- Pipeline run: mock assessment executed"
-              echo "- Output verification: report + dashboard bundle verified"
-              echo "- Replay verification: evidence snapshot replay matched deterministic outputs"
-            else
-              echo "- Pipeline run: skipped for this caller"
-            fi
-          } >> "$GITHUB_STEP_SUMMARY"
+          if [ -f scripts/quality_summary.py ]; then
+            python3 scripts/quality_summary.py
+          else
+            echo "## CRIS-SME Quality Summary" >> "$GITHUB_STEP_SUMMARY"
+            echo "Checks incomplete: summary script unavailable; inspect checkout/setup logs." >> "$GITHUB_STEP_SUMMARY"
+          fi

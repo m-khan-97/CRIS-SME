@@ -5,6 +5,7 @@ import json
 from collections import Counter
 from pathlib import Path
 
+from cris_sme.data_paths import policy_data_path
 from cris_sme.models.compliance_result import (
     ComplianceAssessmentResult,
     ComplianceMappingEntry,
@@ -12,8 +13,7 @@ from cris_sme.models.compliance_result import (
 )
 from cris_sme.models.finding import Finding
 
-
-DEFAULT_COMPLIANCE_MAPPINGS_PATH = Path("data/compliance_mappings.json")
+DEFAULT_COMPLIANCE_MAPPINGS_PATH = policy_data_path("compliance_mappings.json")
 UK_SME_FRAMEWORKS = {
     "Cyber Essentials",
     "Cyber Essentials Plus",

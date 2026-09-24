@@ -1,6 +1,8 @@
 # Prowler Comparison and CRIS-SME Ideas
 
-This note compares the local Prowler repository at `/home/muhammad-ibrahim/Github/prowler` with CRIS-SME. The goal is not to turn CRIS-SME into another scanner. Prowler is strongest as a broad cloud security scanning platform. CRIS-SME is strongest as an evidence-to-decision governance and assurance platform for SMEs.
+> Historical design comparison. For the current source-based review, use the [enterprise reference audit](enterprise-reference-audit.md); for all priorities, use the [canonical roadmap](roadmap.md).
+
+This note compares a local Prowler checkout with CRIS-SME. The goal is not to turn CRIS-SME into another scanner. Prowler is strongest as a broad cloud security scanning platform. CRIS-SME is strongest as an evidence-to-decision governance and assurance platform for SMEs.
 
 The useful path is to borrow Prowler's platform mechanics while preserving CRIS-SME's product identity: deterministic risk governance, evidence honesty, decision provenance, assurance outputs, and SME-specific communication.
 
@@ -257,138 +259,11 @@ Do not add auto-fix as a default behavior. CRIS can generate remediation command
 
 Do not flatten CRIS findings into scanner findings. CRIS finding fields such as confidence, exposure, sensitivity, remediation effort, and decision provenance are central to the project.
 
-## Prioritized Ideas For CRIS-SME
+## Current Audit And Execution Plan
 
-### P0: Highest Leverage
+The previous priority lists and implementation phases have been removed to avoid competing roadmaps. The [September reference audit](enterprise-reference-audit.md) now records the inspected Prowler and OpenShield strengths, CRIS implementation gaps and source evidence. The [canonical roadmap](roadmap.md) owns all delivery priorities and acceptance gates.
 
-1. [DONE] Add `ControlDefinition` metadata v2.
-
-   Include title, category, severity, provider support, resource type, resource group, description, risk, evidence requirements, freshness, confidence penalties, compliance mappings, remediation text, remediation code, related controls, dependencies, and assurance claims.
-
-   Implemented in `data/control_metadata_v2.schema.json`, `data/control_metadata_v2.json`, and `src/cris_sme/controls/definitions.py`, covering `IAM-001`, `NET-001`, `DATA-001`, `MON-001`, `GOV-001` with all listed fields.
-
-2. [DONE] Add a control registry and loader.
-
-   Support filtering controls by ID, domain, severity, provider, framework, resource group, and evidence requirement.
-
-   Implemented in `src/cris_sme/controls/registry.py` (`ControlRegistry.filter`), including dependency expansion and assurance-claim filtering.
-
-3. [PARTIAL] Introduce `AssessmentRunner`.
-
-   Refactor the orchestration in `main.py` into a reusable runner with structured phases, events, progress, and artifact manifests.
-
-   `src/cris_sme/engine/assessment_runner.py` exists and `main.py` now drives the assessment through it, emitting `AssessmentEvent`s for `COLLECT_EVIDENCE`, `EVALUATE_CONTROLS`, `SCORE_FINDINGS`, `MAP_COMPLIANCE`, and now `ASSESS_EVIDENCE_SUFFICIENCY` (run-level rollup of per-finding evidence sufficiency via `AssessmentEvidenceSufficiencyOverview`). `main.py` also now writes runner events as JSONL to `CRIS_SME_RUNNER_EVENTS_PATH` if set, and `local_runner.py` sets this per run and exposes the events via `/api/assessments/<run_id>` as `runner_events`, so the local API surfaces live runner progress without waiting for the full report. Remaining: `normalize_profile`, `update_lifecycle`, `build_decisions`, and `generate_artifacts` are still inline in `main.py` rather than runner phases — these require output-directory/history context that sits outside the runner's evidence-to-risk scope, and `local_runner.py` still spawns a CLI subprocess for full report generation (now with live event tailing alongside it).
-
-4. [DONE] Add normalized asset and evidence records.
-
-   Keep `CloudProfile`, but enrich it with asset-level records. Findings should reference assets and evidence IDs.
-
-   `Asset`, `EvidenceRecord`, and `FindingAssetLink` are implemented in `src/cris_sme/models/platform.py`; `src/cris_sme/engine/assessment_context.py` builds `AssessmentResourceContext` from profiles, and `Finding` now carries `asset_ids`/`evidence_ids`.
-
-5. [DONE] Expand provider contracts.
-
-   Add provider identity, scopes, auth mode, permission checks, evidence capabilities, and collector limitations.
-
-   `src/cris_sme/engine/provider_contracts.py` now models identity, scope, auth, permission, evidence-capability, and limitation contracts; `provider_conformance.py` runs executable conformance checks against them.
-
-### P1: Next Layer
-
-6. [DONE] Add governance-aware mute and exception rules.
-
-   Borrow Prowler's operational simplicity, but keep CRIS approval, expiry, compensating control, and decision ledger semantics.
-
-   `ExceptionRecord` (with `approved_by`, `expires_at`, `compensating_control`, `status`) and `FindingStatus` are in `src/cris_sme/models/platform.py`, and `src/cris_sme/engine/lifecycle.py` matches exceptions to findings and emits `exception_applied`/`exception_expired` decision-ledger events. A new `MuteRule` model (`rule_id`, `name`, `enabled`, `control_id`/`provider`/`scope_pattern`/`finding_id_pattern`, `expires_at`) backs an operational mute-rule registry (`data/mute_rules.json`) managed via `python -m cris_sme.cli.mute_rules` (list/add/enable/disable/remove). `enrich_report_finding_lifecycle` applies enabled, non-expired mute rules to set `lifecycle.status = suppressed`, and `compute_adjusted_risk_scores` recomputes `overall_risk_score`/`category_scores` excluding suppressed, resolved, and actively-accepted-risk findings (written to `output["adjusted_risk_scores"]`) — while expired exceptions keep full score weight until renewed, enforcing expiry back into the headline risk posture.
-
-7. [DONE] Add SARIF and OCSF exports.
-
-   This makes CRIS easier to integrate with existing security tools without changing CRIS's canonical report model.
-
-   Implemented in `src/cris_sme/reporting/sarif_export.py` and `ocsf_export.py` (plus `csv_export.py` for SME/MSP consumption), wired into `main.py` output generation.
-
-8. [DONE] Add schema validation for control and compliance packs.
-
-   Run validation in tests and eventually in CI.
-
-   `data/control_metadata_v2.schema.json` plus Pydantic validators in `controls/definitions.py` and `tests/test_control_metadata_v2_registry.py` cover duplicate IDs, framework mappings, and required fields. Remaining: this validation is only exercised via `pytest`, not a standalone CI lint step.
-
-9. [DONE] Add precomputed assessment summaries.
-
-   Summaries should include severity, category, control, compliance, resource, lifecycle, evidence sufficiency, drift, and claim coverage.
-
-   `src/cris_sme/engine/assessment_summary.py` builds `AssessmentSummary` covering all of these dimensions plus top risks/controls.
-
-10. [DONE] Add least-privilege setup artifacts.
-
-   Ship Azure role definitions or Bicep/Terraform for CRIS evidence collection. Add future AWS/GCP permission templates only when the collectors exist.
-
-   `docs/azure-least-privilege-setup.md` and `infra/azure/role-definitions/cris-sme-assessment-reader.json` cover Azure RBAC + Graph permissions. Now that a research-preview AWS collector exists, `docs/aws-least-privilege-setup.md` and `infra/aws/iam-policies/cris-sme-assessment-reader.json` cover the equivalent read-only IAM policy, contract-tested in `tests/test_aws_least_privilege_setup.py`. GCP templates remain deferred until a GCP collector exists.
-
-11. [DONE] Add a live AWS collector.
-
-   `src/cris_sme/collectors/aws_collector.py` implements `AwsCollector`, a boto3-backed collector at structural parity with `AzureCollector` across all seven domains (IAM, Network, Data, Monitoring, Compute, Governance, IoT), using the standard AWS credential chain and the same dependency-injected client-factory pattern Azure's collector uses for testability. It is wired into `AssessmentRunner`, the local API runner (`/api/environment/aws`, `/api/assessments/aws`), and the React console's New Assessment provider toggle. `provider_support.aws` moved from `planned` to `research_preview` for all affected controls — it has been unit-tested against fake boto3 clients (`tests/test_aws_collector.py`) but **not yet verified against a real AWS account**, so `provider_conformance.ACTIVE_LIVE_COLLECTORS` deliberately still excludes `"aws"`.
-
-### P2: Later Platform Ideas
-
-11. [DONE] Add CRIS MCP tools.
-
-   Tools should query assessments, findings, evidence, claims, exceptions, and action plans. AI should cite deterministic IDs.
-
-   `src/cris_sme/mcp/tools.py` implements standalone query functions (`get_assessment_summary`, `list_findings`, `get_finding`, `list_evidence`, `list_claims`, `list_exceptions`, `list_mute_rules`, `list_action_plan`, `list_assessment_history`) over a loaded report, all keyed on deterministic IDs (`finding_id`, `evidence_id`, `claim_id`, `exception_id`, `rule_id`). `src/cris_sme/mcp/server.py` wraps these as `FastMCP` tools behind a guarded optional `mcp` dependency (`pyproject.toml` `mcp` extra).
-
-12. [DONE] Add optional remediation script packs.
-
-   Generate Azure CLI, Bicep, Terraform, or manual steps. Keep execution out of the default path.
-
-   `ControlDefinition` now carries `RemediationCodeDefinition` entries (e.g. Azure CLI snippets for `IAM-001`) via `definitions.py` and `control_metadata_v2.json`. `src/cris_sme/reporting/remediation_export.py` generates a non-executing reference bundle (`remediation_scripts/cris_sme_remediation_manifest.json` plus one `.sh` per remediation kind, e.g. `cris_sme_remediation_azure_cli.sh`) wired into `output["report_artifacts"]["remediation_script_pack"]`, with the manifest's `execution_policy` explicitly set to `non_executing_reference_only`.
-
-13. [DONE] Add attack-path or relationship views.
-
-   Start with asset relationships and blast-radius context. Avoid bringing in a graph database until the resource model is stable.
-
-   `src/cris_sme/engine/graph_context.py` builds `AssetRelationship` edges, blast-radius estimates, toxic-combination detection, and exposure chains as a lightweight context graph (no graph database, as intended). `frontend/console/src/pages/AttackPaths.tsx` now renders a per-organization layered asset graph (React Flow) with severity-ring highlighting on findings-linked assets and a 2-hop blast-radius drawer.
-
-14. [DONE] Expand UI routes.
-
-   Build from CRIS personas rather than copying Prowler routes directly.
-
-   `frontend/console/src/pages/Personas.tsx` adds a `/personas` route with five persona-specific briefings (SME Owner, Technical Lead, Assessor, MSP, Insurer) built from CRIS report sections (`executive_pack`, `report_trust_badge`, `assessment_assurance`, `cyber_insurance_evidence`, `organizations`), wired into `App.tsx` routing and the `Layout.tsx` nav.
-
-## Suggested Implementation Roadmap
-
-### Phase 1: Metadata and Registry — DONE
-
-- Add `data/control_metadata_v2.schema.json`.
-- Add `src/cris_sme/controls/definitions.py`.
-- Add `src/cris_sme/controls/registry.py`.
-- Convert a small set of controls first: `IAM-001`, `NET-001`, `DATA-001`, `MON-001`, `GOV-001`.
-- Add validation tests for metadata consistency.
-
-### Phase 2: Assessment Runner — PARTIAL
-
-- Add `src/cris_sme/engine/assessment_runner.py`. **(done)**
-- Move orchestration steps out of `main.py`. **(done for collect/evaluate/score/compliance/evidence-sufficiency; normalize, lifecycle, decisions, and artifact generation are still inline in `main.py`)**
-- Add progress events and artifact manifest generation. **(events done, including evidence sufficiency; manifest generation still pending)**
-- Update local API to consume runner events instead of only spawning the CLI. **(done — `local_runner.py` sets `CRIS_SME_RUNNER_EVENTS_PATH` per run and exposes `runner_events` via the run status endpoint while the CLI subprocess generates the full report)**
-
-### Phase 3: Asset and Evidence Model — DONE
-
-- Add `Asset`, `EvidenceRecord`, and `FindingAssetLink` models.
-- Keep aggregate `CloudProfile` for scoring.
-- Enrich Azure live collection with asset IDs and evidence IDs.
-- Add resource drilldown payloads for the dashboard.
-
-### Phase 4: Provider Contract Expansion — DONE
-
-- Expand provider contracts with identity, scopes, permissions, capabilities, evidence freshness, and limitations.
-- Add Azure setup documentation and least-privilege templates.
-- Add provider capability tests.
-
-### Phase 5: SaaS Readiness — PARTIAL
-
-- Translate CRIS SaaS docs into persistence models. **(done — `platform.py` models for exceptions, action items, history, run metadata, decision ledger)**
-- Add summaries and lifecycle event tables. **(summaries done via `assessment_summary.py`; lifecycle event persistence is in-memory/report-scoped, not a durable table)**
-- Add role-specific UI views. **(not started)**
-- Add export APIs for reports, evidence, and insurer packs. **(not started — exports are file-based via the CLI, no API endpoints)**
+Earlier architecture comparisons in this document remain background, not a current support matrix or claim that every metadata entry, provider or SaaS feature is complete.
 
 ## Bottom Line
 

@@ -6,8 +6,9 @@ from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
+from cris_sme.data_paths import policy_data_path
 
-IOMT_MAPPING_PATH = Path("data/iomt_healthcare_control_mapping.json")
+IOMT_MAPPING_PATH = policy_data_path("iomt_healthcare_control_mapping.json")
 
 
 def build_iomt_evidence_pack(

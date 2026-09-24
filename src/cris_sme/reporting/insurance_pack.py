@@ -5,6 +5,8 @@ import json
 from pathlib import Path
 from typing import Any
 
+from cris_sme.data_paths import policy_data_path
+
 
 def build_cyber_insurance_evidence_pack(report: dict[str, Any]) -> dict[str, Any]:
     """Build an insurer-facing evidence summary from the current CRIS-SME report."""
@@ -330,7 +332,7 @@ def _build_recommended_next_step(
 
 def _load_insurance_question_catalog() -> list[dict[str, Any]]:
     """Load the cyber insurance question catalog from the project data directory."""
-    catalog_path = Path(__file__).resolve().parents[3] / "data" / "cyber_insurance_questions.json"
+    catalog_path = policy_data_path("cyber_insurance_questions.json")
     raw_catalog = json.loads(catalog_path.read_text(encoding="utf-8"))
     if not isinstance(raw_catalog, list):
         raise ValueError("Cyber insurance question catalog must be a list.")

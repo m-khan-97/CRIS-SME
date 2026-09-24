@@ -9,9 +9,9 @@ from typing import Any
 from pydantic import BaseModel, Field
 
 from cris_sme.controls.catalog import load_control_catalog
+from cris_sme.data_paths import policy_data_path
 
-
-DEFAULT_CONTROL_SPEC_OVERRIDES_PATH = Path("data/control_spec_overrides.json")
+DEFAULT_CONTROL_SPEC_OVERRIDES_PATH = policy_data_path("control_spec_overrides.json")
 POLICY_PACK_VERSION = "2026.04.0"
 
 

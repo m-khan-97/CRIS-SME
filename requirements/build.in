@@ -1,0 +1,4 @@
+# Build backends are installed before invoking builds with isolation disabled.
+setuptools>=68
+wheel
+build>=1.0,<2.0

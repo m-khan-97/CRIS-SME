@@ -8,7 +8,7 @@ The repository keeps GitHub Actions for engineering quality and artifact generat
 
 | Workflow | Trigger | Purpose |
 | --- | --- | --- |
-| `pr-validation.yml` | `pull_request` | Merge quality gate (lint, type-check, tests, mock pipeline, output checks) |
+| `pr-validation.yml` | `pull_request` | Merge quality gate plus separate non-root private-container smoke test |
 | `build-static-site-artifacts.yml` | `push` to `main`, `workflow_dispatch` | Build deterministic static bundle and upload `dist/` artifact |
 | `release.yml` | tags `v*.*.*`, `workflow_dispatch` | Build release bundle and publish GitHub Release assets |
 | `scheduled-assessment.yml` | `schedule`, `workflow_dispatch` | Run recurring assessments with safe collector fallback |
@@ -16,7 +16,46 @@ The repository keeps GitHub Actions for engineering quality and artifact generat
 | `dependency-review.yml` | `pull_request` | Dependency risk review |
 | `reusable-python-quality.yml` | `workflow_call` | Shared Python quality checks |
 
-## Security and Permissions Model
+## Quality Check Reporting
+
+The shared workflow also builds/installs an sdist and wheel in isolation and runs
+a mock assessment outside the checkout. The PR container job verifies report
+delivery, persistence and service shutdown. See [packaging verification](packaging-and-container.md).
+
+The control-pack gate runs `PYTHONPATH=src python scripts/validate_control_metadata.py`.
+It checks the JSON schema, full catalog/registry/evaluator ID alignment, provider
+status consistency and valid dependency relationships. See
+[control metadata](control-metadata.md) for coverage and validation limits.
+
+The shared quality workflow checks local Markdown links and SVG structure with
+`python scripts/check_docs.py`. It covers README, architecture, methodology,
+delivery and roadmap entry documents, including reference-style Markdown links.
+It also checks the threat model and deployment restrictions.
+Relative targets must exist within the repository; SVG targets must parse as
+namespaced SVG documents. External URLs and fragment anchors are not fetched or
+validated, and fenced examples are not interpreted as links. This is not a visual
+rendering test or a full-site HTML link crawler.
+
+The always-running summary reads actual step `outcome` values through
+`scripts/quality_summary.py`. Failures and cancellations remain visible; missing
+or unexpectedly skipped checks produce an incomplete summary. Caller-disabled
+pipeline/upload steps are explicitly marked skipped. The summary describes checks
+before publication and does not override GitHub's job result. If checkout fails,
+the fallback reports that the summary script is unavailable.
+
+Run the focused regression tests locally:
+
+```bash
+python -m pytest -q tests/test_quality_checks.py
+python scripts/check_docs.py
+```
+
+## Security and Permissions
+
+PR validation also runs a Python 3.11/3.12 matrix and a separate Node 22 console
+test/build job. Package-wide coverage JSON/XML artifacts and a 78% combined
+coverage floor are enabled. See [quality baseline](quality-baseline.md) for measured
+coverage, exact lint/type scope and outstanding frontend/browser gaps.
 
 Workflows use explicit least-privilege permissions:
 

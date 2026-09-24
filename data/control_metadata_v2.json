@@ -1,7 +1,7 @@
 [
   {
     "control_id": "IAM-001",
-    "version": "2.0.0",
+    "version": "2.1.0",
     "title": "Privileged role assignments without MFA enforcement",
     "domain": "IAM",
     "severity": "Critical",
@@ -91,12 +91,326 @@
     ],
     "metadata": {
       "evaluator": "iam_controls",
-      "first_v2_seed": true
+      "first_v2_seed": true,
+      "evaluator_function": "_evaluate_privileged_mfa",
+      "owner": "CRIS maintainers",
+      "mapping_review_status": "inherited_unvalidated",
+      "source_mappings": [
+        "CIS Azure Foundations Benchmark 1.4",
+        "ISO 27001 A.5.17",
+        "NIST PR.AA-02",
+        "Cyber Essentials Access control",
+        "UK GDPR Article 32",
+        "FCA SYSC 3.2.6R"
+      ],
+      "known_limitations": [
+        "tenant-wide identity controls can be partially observable depending on Entra permissions"
+      ],
+      "severity_basis": "existing_registry_nominal_severity",
+      "freshness_basis": "provisional_metadata_review_window_not_a_runtime_enforcement_guarantee",
+      "assurance_claims_basis": "review_objectives_not_automatic_attestations"
+    }
+  },
+  {
+    "control_id": "IAM-002",
+    "version": "2.1.0",
+    "title": "Overprivileged accounts exceed least-privilege expectations",
+    "domain": "IAM",
+    "severity": "High",
+    "provider_support": {
+      "azure": "active",
+      "aws": "research_preview",
+      "gcp": "planned"
+    },
+    "resource_type": "identity/principal",
+    "resource_group": "identity-access",
+    "description": "Evaluates the collected, scoped posture for: Overprivileged accounts exceed least-privilege expectations. Unavailable or inferred inputs require evidence review; this definition does not independently verify provider collection.",
+    "risk": "Excess privileged assignments broaden the impact of compromised credentials.",
+    "evidence_requirements": [
+      "privileged role assignment counts",
+      "overprivileged account inventory"
+    ],
+    "freshness_hours": 24,
+    "confidence_penalties": [
+      "reduce confidence when required evidence fields are unavailable",
+      "reduce confidence when evidence is inferred from partial tenant scope"
+    ],
+    "compliance_mappings": [
+      {
+        "framework": "ISO 27001",
+        "reference_id": "A.8.2",
+        "title": "Overprivileged accounts exceed least-privilege expectations",
+        "relevance": "Inherited catalog association; framework applicability and version require independent review."
+      },
+      {
+        "framework": "NIST",
+        "reference_id": "PR.AA-05",
+        "title": "Overprivileged accounts exceed least-privilege expectations",
+        "relevance": "Inherited catalog association; framework applicability and version require independent review."
+      },
+      {
+        "framework": "Cyber Essentials",
+        "reference_id": "Access control",
+        "title": "Overprivileged accounts exceed least-privilege expectations",
+        "relevance": "Inherited catalog association; framework applicability and version require independent review."
+      },
+      {
+        "framework": "FCA SYSC",
+        "reference_id": "3.2.6R",
+        "title": "Overprivileged accounts exceed least-privilege expectations",
+        "relevance": "Inherited catalog association; framework applicability and version require independent review."
+      }
+    ],
+    "remediation": {
+      "summary": "Review privileged assignments and remove duplicate or unnecessary high-privilege access.",
+      "cost_tier": "free",
+      "manual_steps": [
+        "Confirm scope and review privileged role assignment counts, overprivileged account inventory.",
+        "Review privileged assignments and remove duplicate or unnecessary high-privilege access.",
+        "Obtain owner approval and record exceptions with scope and expiry.",
+        "Recollect evidence after the change and retain the original and follow-up scan IDs."
+      ],
+      "code": []
+    },
+    "related_controls": [],
+    "dependencies": [],
+    "assurance_claims": [
+      "privileged-assignments-have-reviewable-justification"
+    ],
+    "metadata": {
+      "evaluator": "iam_controls",
+      "evaluator_function": "_evaluate_overprivileged_accounts",
+      "owner": "CRIS maintainers",
+      "mapping_review_status": "inherited_unvalidated",
+      "source_mappings": [
+        "ISO 27001 A.8.2",
+        "NIST PR.AA-05",
+        "Cyber Essentials Access control",
+        "FCA SYSC 3.2.6R"
+      ],
+      "known_limitations": [
+        "tenant-wide identity controls can be partially observable depending on Entra permissions"
+      ],
+      "severity_basis": "maximum_evaluator_branch_severity",
+      "freshness_basis": "provisional_metadata_review_window_not_a_runtime_enforcement_guarantee",
+      "assurance_claims_basis": "review_objectives_not_automatic_attestations"
+    }
+  },
+  {
+    "control_id": "IAM-003",
+    "version": "2.1.0",
+    "title": "Stale service principals or credentials require review",
+    "domain": "IAM",
+    "severity": "High",
+    "provider_support": {
+      "azure": "active",
+      "aws": "research_preview",
+      "gcp": "planned"
+    },
+    "resource_type": "identity/credential",
+    "resource_group": "identity-credentials",
+    "description": "Evaluates the collected, scoped posture for: Stale service principals or credentials require review. Unavailable or inferred inputs require evidence review; this definition does not independently verify provider collection.",
+    "risk": "Unused identities and stale credentials can retain access after their operational purpose ends.",
+    "evidence_requirements": [
+      "stale service principal counts",
+      "expired credential counts"
+    ],
+    "freshness_hours": 24,
+    "confidence_penalties": [
+      "reduce confidence when required evidence fields are unavailable",
+      "reduce confidence when evidence is inferred from partial tenant scope"
+    ],
+    "compliance_mappings": [
+      {
+        "framework": "Microsoft Cloud Security Benchmark",
+        "reference_id": "IM-3",
+        "title": "Stale service principals or credentials require review",
+        "relevance": "Inherited catalog association; framework applicability and version require independent review."
+      },
+      {
+        "framework": "NIST",
+        "reference_id": "PR.AA-01",
+        "title": "Stale service principals or credentials require review",
+        "relevance": "Inherited catalog association; framework applicability and version require independent review."
+      }
+    ],
+    "remediation": {
+      "summary": "Rotate or remove stale service principal credentials and disable unused identities.",
+      "cost_tier": "free",
+      "manual_steps": [
+        "Confirm scope and review stale service principal counts, expired credential counts.",
+        "Rotate or remove stale service principal credentials and disable unused identities.",
+        "Obtain owner approval and record exceptions with scope and expiry.",
+        "Recollect evidence after the change and retain the original and follow-up scan IDs."
+      ],
+      "code": []
+    },
+    "related_controls": [],
+    "dependencies": [],
+    "assurance_claims": [
+      "stale-identity-credentials-are-reviewed"
+    ],
+    "metadata": {
+      "evaluator": "iam_controls",
+      "evaluator_function": "_evaluate_stale_service_principals",
+      "owner": "CRIS maintainers",
+      "mapping_review_status": "inherited_unvalidated",
+      "source_mappings": [
+        "Microsoft Cloud Security Benchmark IM-3",
+        "NIST PR.AA-01"
+      ],
+      "known_limitations": [
+        "tenant-wide identity controls can be partially observable depending on Entra permissions"
+      ],
+      "severity_basis": "maximum_evaluator_branch_severity",
+      "freshness_basis": "provisional_metadata_review_window_not_a_runtime_enforcement_guarantee",
+      "assurance_claims_basis": "review_objectives_not_automatic_attestations"
+    }
+  },
+  {
+    "control_id": "IAM-004",
+    "version": "2.1.0",
+    "title": "RBAC review cadence falls outside the expected governance window",
+    "domain": "IAM",
+    "severity": "High",
+    "provider_support": {
+      "azure": "active",
+      "aws": "research_preview",
+      "gcp": "planned"
+    },
+    "resource_type": "identity/access-review",
+    "resource_group": "identity-governance",
+    "description": "Evaluates the collected, scoped posture for: RBAC review cadence falls outside the expected governance window. Unavailable or inferred inputs require evidence review; this definition does not independently verify provider collection.",
+    "risk": "Outdated access reviews can leave inappropriate permissions undiscovered.",
+    "evidence_requirements": [
+      "last RBAC review age",
+      "access review observability and scope"
+    ],
+    "freshness_hours": 24,
+    "confidence_penalties": [
+      "reduce confidence when required evidence fields are unavailable",
+      "reduce confidence when evidence is inferred from partial tenant scope"
+    ],
+    "compliance_mappings": [
+      {
+        "framework": "ISO 27001",
+        "reference_id": "A.5.18",
+        "title": "RBAC review cadence falls outside the expected governance window",
+        "relevance": "Inherited catalog association; framework applicability and version require independent review."
+      },
+      {
+        "framework": "Azure CAF",
+        "reference_id": "Govern - Identity Baseline",
+        "title": "RBAC review cadence falls outside the expected governance window",
+        "relevance": "Inherited catalog association; framework applicability and version require independent review."
+      }
+    ],
+    "remediation": {
+      "summary": "Establish a recurring access review process for privileged role assignments.",
+      "cost_tier": "free",
+      "manual_steps": [
+        "Confirm scope and review last RBAC review age, access review observability and scope.",
+        "Establish a recurring access review process for privileged role assignments.",
+        "Obtain owner approval and record exceptions with scope and expiry.",
+        "Recollect evidence after the change and retain the original and follow-up scan IDs."
+      ],
+      "code": []
+    },
+    "related_controls": [],
+    "dependencies": [],
+    "assurance_claims": [
+      "access-review-cadence-is-evidenced"
+    ],
+    "metadata": {
+      "evaluator": "iam_controls",
+      "evaluator_function": "_evaluate_rbac_review_freshness",
+      "owner": "CRIS maintainers",
+      "mapping_review_status": "inherited_unvalidated",
+      "source_mappings": [
+        "ISO 27001 A.5.18",
+        "Azure CAF Govern - Identity Baseline"
+      ],
+      "known_limitations": [
+        "tenant-wide identity controls can be partially observable depending on Entra permissions"
+      ],
+      "severity_basis": "maximum_evaluator_branch_severity",
+      "freshness_basis": "provisional_metadata_review_window_not_a_runtime_enforcement_guarantee",
+      "assurance_claims_basis": "review_objectives_not_automatic_attestations"
+    }
+  },
+  {
+    "control_id": "IAM-005",
+    "version": "2.1.0",
+    "title": "Identity governance observability is partial for this assessment scope",
+    "domain": "IAM",
+    "severity": "Low",
+    "provider_support": {
+      "azure": "active",
+      "aws": "research_preview",
+      "gcp": "planned"
+    },
+    "resource_type": "identity/visibility",
+    "resource_group": "identity-governance",
+    "description": "Evaluates the collected, scoped posture for: Identity governance observability is partial for this assessment scope. Unavailable or inferred inputs require evidence review; this definition does not independently verify provider collection.",
+    "risk": "Partial tenant visibility can cause decision-makers to overestimate IAM assurance.",
+    "evidence_requirements": [
+      "identity governance visibility context",
+      "unavailable identity evidence fields"
+    ],
+    "freshness_hours": 24,
+    "confidence_penalties": [
+      "apply no penalty when observability finding is itself derived from direct scope signals"
+    ],
+    "compliance_mappings": [
+      {
+        "framework": "ISO 27001",
+        "reference_id": "A.5.15",
+        "title": "Identity governance observability is partial for this assessment scope",
+        "relevance": "Inherited catalog association; framework applicability and version require independent review."
+      },
+      {
+        "framework": "NIST",
+        "reference_id": "GV.RM-01",
+        "title": "Identity governance observability is partial for this assessment scope",
+        "relevance": "Inherited catalog association; framework applicability and version require independent review."
+      }
+    ],
+    "remediation": {
+      "summary": "Broaden tenant-level identity evidence collection before treating IAM coverage as complete.",
+      "cost_tier": "low",
+      "manual_steps": [
+        "Confirm scope and review identity governance visibility context, unavailable identity evidence fields.",
+        "Broaden tenant-level identity evidence collection before treating IAM coverage as complete.",
+        "Obtain owner approval and record exceptions with scope and expiry.",
+        "Recollect evidence after the change and retain the original and follow-up scan IDs."
+      ],
+      "code": []
+    },
+    "related_controls": [],
+    "dependencies": [],
+    "assurance_claims": [
+      "identity-observability-gaps-are-explicit"
+    ],
+    "metadata": {
+      "evaluator": "iam_controls",
+      "evaluator_function": "_evaluate_identity_observability",
+      "owner": "CRIS maintainers",
+      "mapping_review_status": "inherited_unvalidated",
+      "source_mappings": [
+        "ISO 27001 A.5.15",
+        "NIST GV.RM-01"
+      ],
+      "known_limitations": [
+        "tenant-wide Conditional Access evidence remains partially observable in the current Azure collector path"
+      ],
+      "severity_basis": "maximum_evaluator_branch_severity",
+      "freshness_basis": "provisional_metadata_review_window_not_a_runtime_enforcement_guarantee",
+      "assurance_claims_basis": "review_objectives_not_automatic_attestations"
     }
   },
   {
     "control_id": "NET-001",
-    "version": "2.0.0",
+    "version": "2.1.0",
     "title": "Administrative services are exposed to the public internet",
     "domain": "Network",
     "severity": "Critical",
@@ -173,12 +487,247 @@
     ],
     "metadata": {
       "evaluator": "network_controls",
-      "first_v2_seed": true
+      "first_v2_seed": true,
+      "evaluator_function": "_evaluate_remote_admin_exposure",
+      "owner": "CRIS maintainers",
+      "mapping_review_status": "inherited_unvalidated",
+      "source_mappings": [
+        "CIS Azure Foundations Benchmark 6.1",
+        "ISO 27001 A.8.20",
+        "Cyber Essentials Firewalls",
+        "FCA SYSC 3.2.6R"
+      ],
+      "known_limitations": [
+        "network exposure is assessed at visible scope and does not claim full attack-path simulation"
+      ],
+      "severity_basis": "existing_registry_nominal_severity",
+      "freshness_basis": "provisional_metadata_review_window_not_a_runtime_enforcement_guarantee",
+      "assurance_claims_basis": "review_objectives_not_automatic_attestations"
+    }
+  },
+  {
+    "control_id": "NET-002",
+    "version": "2.1.0",
+    "title": "Network security group rules are broader than expected",
+    "domain": "Network",
+    "severity": "High",
+    "provider_support": {
+      "azure": "active",
+      "aws": "research_preview",
+      "gcp": "planned"
+    },
+    "resource_type": "network/security-rule",
+    "resource_group": "network-policy",
+    "description": "Evaluates the collected, scoped posture for: Network security group rules are broader than expected. Unavailable or inferred inputs require evidence review; this definition does not independently verify provider collection.",
+    "risk": "Broad source and port permissions permit unnecessary paths into workloads.",
+    "evidence_requirements": [
+      "permissive network security rule count",
+      "rule source and port scopes"
+    ],
+    "freshness_hours": 24,
+    "confidence_penalties": [
+      "reduce confidence when required evidence fields are unavailable",
+      "reduce confidence when evidence is inferred from partial tenant scope"
+    ],
+    "compliance_mappings": [
+      {
+        "framework": "CIS Azure Foundations Benchmark",
+        "reference_id": "6.1",
+        "title": "Network security group rules are broader than expected",
+        "relevance": "Inherited catalog association; framework applicability and version require independent review."
+      },
+      {
+        "framework": "NIST",
+        "reference_id": "PR.AC-05",
+        "title": "Network security group rules are broader than expected",
+        "relevance": "Inherited catalog association; framework applicability and version require independent review."
+      },
+      {
+        "framework": "Cyber Essentials",
+        "reference_id": "Firewalls",
+        "title": "Network security group rules are broader than expected",
+        "relevance": "Inherited catalog association; framework applicability and version require independent review."
+      }
+    ],
+    "remediation": {
+      "summary": "Tighten overly permissive network rules to least-privilege source and port scopes.",
+      "cost_tier": "free",
+      "manual_steps": [
+        "Confirm scope and review permissive network security rule count, rule source and port scopes.",
+        "Tighten overly permissive network rules to least-privilege source and port scopes.",
+        "Obtain owner approval and record exceptions with scope and expiry.",
+        "Recollect evidence after the change and retain the original and follow-up scan IDs."
+      ],
+      "code": []
+    },
+    "related_controls": [],
+    "dependencies": [],
+    "assurance_claims": [
+      "network-rule-scope-is-reviewed"
+    ],
+    "metadata": {
+      "evaluator": "network_controls",
+      "evaluator_function": "_evaluate_permissive_nsg_rules",
+      "owner": "CRIS maintainers",
+      "mapping_review_status": "inherited_unvalidated",
+      "source_mappings": [
+        "CIS Azure Foundations Benchmark 6.1",
+        "NIST PR.AC-05",
+        "Cyber Essentials Firewalls"
+      ],
+      "known_limitations": [
+        "network exposure is assessed at visible scope and does not claim full attack-path simulation"
+      ],
+      "severity_basis": "maximum_evaluator_branch_severity",
+      "freshness_basis": "provisional_metadata_review_window_not_a_runtime_enforcement_guarantee",
+      "assurance_claims_basis": "review_objectives_not_automatic_attestations"
+    }
+  },
+  {
+    "control_id": "NET-003",
+    "version": "2.1.0",
+    "title": "Publicly reachable storage endpoints increase data exposure risk",
+    "domain": "Network",
+    "severity": "Critical",
+    "provider_support": {
+      "azure": "active",
+      "aws": "research_preview",
+      "gcp": "planned"
+    },
+    "resource_type": "network/storage-endpoint",
+    "resource_group": "storage-network-exposure",
+    "description": "Evaluates the collected, scoped posture for: Publicly reachable storage endpoints increase data exposure risk. Unavailable or inferred inputs require evidence review; this definition does not independently verify provider collection.",
+    "risk": "Public storage routes increase potential exposure; endpoint reachability alone does not establish anonymous data access.",
+    "evidence_requirements": [
+      "public storage endpoint count",
+      "storage network configuration"
+    ],
+    "freshness_hours": 24,
+    "confidence_penalties": [
+      "reduce confidence when required evidence fields are unavailable",
+      "reduce confidence when evidence is inferred from partial tenant scope"
+    ],
+    "compliance_mappings": [
+      {
+        "framework": "GDPR",
+        "reference_id": "Article 32",
+        "title": "Publicly reachable storage endpoints increase data exposure risk",
+        "relevance": "Inherited catalog association; framework applicability and version require independent review."
+      },
+      {
+        "framework": "ISO 27001",
+        "reference_id": "A.8.12",
+        "title": "Publicly reachable storage endpoints increase data exposure risk",
+        "relevance": "Inherited catalog association; framework applicability and version require independent review."
+      }
+    ],
+    "remediation": {
+      "summary": "Disable public storage exposure and route sensitive services through private access patterns.",
+      "cost_tier": "low",
+      "manual_steps": [
+        "Confirm scope and review public storage endpoint count, storage network configuration.",
+        "Disable public storage exposure and route sensitive services through private access patterns.",
+        "Obtain owner approval and record exceptions with scope and expiry.",
+        "Recollect evidence after the change and retain the original and follow-up scan IDs."
+      ],
+      "code": []
+    },
+    "related_controls": [],
+    "dependencies": [],
+    "assurance_claims": [
+      "storage-network-exposure-is-reviewed"
+    ],
+    "metadata": {
+      "evaluator": "network_controls",
+      "evaluator_function": "_evaluate_public_storage_exposure",
+      "owner": "CRIS maintainers",
+      "mapping_review_status": "inherited_unvalidated",
+      "source_mappings": [
+        "GDPR Article 32",
+        "ISO 27001 A.8.12"
+      ],
+      "known_limitations": [
+        "network exposure is assessed at visible scope and does not claim full attack-path simulation"
+      ],
+      "severity_basis": "maximum_evaluator_branch_severity",
+      "freshness_basis": "provisional_metadata_review_window_not_a_runtime_enforcement_guarantee",
+      "assurance_claims_basis": "review_objectives_not_automatic_attestations"
+    }
+  },
+  {
+    "control_id": "NET-004",
+    "version": "2.1.0",
+    "title": "Private endpoint coverage is incomplete for sensitive services",
+    "domain": "Network",
+    "severity": "High",
+    "provider_support": {
+      "azure": "active",
+      "aws": "research_preview",
+      "gcp": "planned"
+    },
+    "resource_type": "network/private-endpoint",
+    "resource_group": "private-connectivity",
+    "description": "Evaluates the collected, scoped posture for: Private endpoint coverage is incomplete for sensitive services. Unavailable or inferred inputs require evidence review; this definition does not independently verify provider collection.",
+    "risk": "Missing required private paths may leave sensitive services reliant on public routing.",
+    "evidence_requirements": [
+      "required and configured private endpoint counts",
+      "private endpoint exemptions and requirement basis"
+    ],
+    "freshness_hours": 24,
+    "confidence_penalties": [
+      "reduce confidence when required evidence fields are unavailable",
+      "reduce confidence when evidence is inferred from partial tenant scope"
+    ],
+    "compliance_mappings": [
+      {
+        "framework": "Microsoft Cloud Security Benchmark",
+        "reference_id": "NS-2",
+        "title": "Private endpoint coverage is incomplete for sensitive services",
+        "relevance": "Inherited catalog association; framework applicability and version require independent review."
+      },
+      {
+        "framework": "NIST",
+        "reference_id": "PR.AC-03",
+        "title": "Private endpoint coverage is incomplete for sensitive services",
+        "relevance": "Inherited catalog association; framework applicability and version require independent review."
+      }
+    ],
+    "remediation": {
+      "summary": "Extend private endpoints to sensitive services that should not rely on public routing.",
+      "cost_tier": "medium",
+      "manual_steps": [
+        "Confirm scope and review required and configured private endpoint counts, private endpoint exemptions and requirement basis.",
+        "Extend private endpoints to sensitive services that should not rely on public routing.",
+        "Obtain owner approval and record exceptions with scope and expiry.",
+        "Recollect evidence after the change and retain the original and follow-up scan IDs."
+      ],
+      "code": []
+    },
+    "related_controls": [],
+    "dependencies": [],
+    "assurance_claims": [
+      "private-connectivity-requirements-are-reviewed"
+    ],
+    "metadata": {
+      "evaluator": "network_controls",
+      "evaluator_function": "_evaluate_private_endpoint_coverage",
+      "owner": "CRIS maintainers",
+      "mapping_review_status": "inherited_unvalidated",
+      "source_mappings": [
+        "Microsoft Cloud Security Benchmark NS-2",
+        "NIST PR.AC-03"
+      ],
+      "known_limitations": [
+        "network exposure is assessed at visible scope and does not claim full attack-path simulation"
+      ],
+      "severity_basis": "maximum_evaluator_branch_severity",
+      "freshness_basis": "provisional_metadata_review_window_not_a_runtime_enforcement_guarantee",
+      "assurance_claims_basis": "review_objectives_not_automatic_attestations"
     }
   },
   {
     "control_id": "DATA-001",
-    "version": "2.0.0",
+    "version": "2.1.0",
     "title": "Public storage access increases data exposure risk",
     "domain": "Data",
     "severity": "High",
@@ -250,12 +799,245 @@
     ],
     "metadata": {
       "evaluator": "data_controls",
-      "first_v2_seed": true
+      "first_v2_seed": true,
+      "evaluator_function": "_evaluate_public_storage_access",
+      "owner": "CRIS maintainers",
+      "mapping_review_status": "inherited_unvalidated",
+      "source_mappings": [
+        "GDPR Article 32",
+        "ISO 27001 A.8.12",
+        "UK GDPR Article 32"
+      ],
+      "known_limitations": [],
+      "severity_basis": "existing_registry_nominal_severity",
+      "freshness_basis": "provisional_metadata_review_window_not_a_runtime_enforcement_guarantee",
+      "assurance_claims_basis": "review_objectives_not_automatic_attestations"
+    }
+  },
+  {
+    "control_id": "DATA-002",
+    "version": "2.1.0",
+    "title": "Data stores lack expected encryption protections",
+    "domain": "Data",
+    "severity": "Critical",
+    "provider_support": {
+      "azure": "active",
+      "aws": "research_preview",
+      "gcp": "planned"
+    },
+    "resource_type": "data/store",
+    "resource_group": "data-encryption",
+    "description": "Evaluates the collected, scoped posture for: Data stores lack expected encryption protections. Unavailable or inferred inputs require evidence review; this definition does not independently verify provider collection.",
+    "risk": "Unencrypted data stores can expose information if storage or infrastructure access is compromised.",
+    "evidence_requirements": [
+      "unencrypted data store count",
+      "encryption configuration and observability"
+    ],
+    "freshness_hours": 24,
+    "confidence_penalties": [
+      "reduce confidence when required evidence fields are unavailable",
+      "reduce confidence when evidence is inferred from partial tenant scope"
+    ],
+    "compliance_mappings": [
+      {
+        "framework": "ISO 27001",
+        "reference_id": "A.8.24",
+        "title": "Data stores lack expected encryption protections",
+        "relevance": "Inherited catalog association; framework applicability and version require independent review."
+      },
+      {
+        "framework": "NIST",
+        "reference_id": "PR.DS-01",
+        "title": "Data stores lack expected encryption protections",
+        "relevance": "Inherited catalog association; framework applicability and version require independent review."
+      },
+      {
+        "framework": "UK GDPR",
+        "reference_id": "Article 32",
+        "title": "Data stores lack expected encryption protections",
+        "relevance": "Inherited catalog association; framework applicability and version require independent review."
+      }
+    ],
+    "remediation": {
+      "summary": "Enable encryption at rest for affected storage and database services.",
+      "cost_tier": "low",
+      "manual_steps": [
+        "Confirm scope and review unencrypted data store count, encryption configuration and observability.",
+        "Enable encryption at rest for affected storage and database services.",
+        "Obtain owner approval and record exceptions with scope and expiry.",
+        "Recollect evidence after the change and retain the original and follow-up scan IDs."
+      ],
+      "code": []
+    },
+    "related_controls": [],
+    "dependencies": [],
+    "assurance_claims": [
+      "data-encryption-posture-is-evidenced"
+    ],
+    "metadata": {
+      "evaluator": "data_controls",
+      "evaluator_function": "_evaluate_encryption_posture",
+      "owner": "CRIS maintainers",
+      "mapping_review_status": "inherited_unvalidated",
+      "source_mappings": [
+        "ISO 27001 A.8.24",
+        "NIST PR.DS-01",
+        "UK GDPR Article 32"
+      ],
+      "known_limitations": [],
+      "severity_basis": "maximum_evaluator_branch_severity",
+      "freshness_basis": "provisional_metadata_review_window_not_a_runtime_enforcement_guarantee",
+      "assurance_claims_basis": "review_objectives_not_automatic_attestations"
+    }
+  },
+  {
+    "control_id": "DATA-003",
+    "version": "2.1.0",
+    "title": "Backup and retention coverage fall below resilience expectations",
+    "domain": "Data",
+    "severity": "High",
+    "provider_support": {
+      "azure": "active",
+      "aws": "research_preview",
+      "gcp": "planned"
+    },
+    "resource_type": "data/backup",
+    "resource_group": "data-resilience",
+    "description": "Evaluates the collected, scoped posture for: Backup and retention coverage fall below resilience expectations. Unavailable or inferred inputs require evidence review; this definition does not independently verify provider collection.",
+    "risk": "Insufficient backup or retention coverage can obstruct recovery and evidence preservation.",
+    "evidence_requirements": [
+      "backup coverage ratio",
+      "retention policy coverage ratio"
+    ],
+    "freshness_hours": 24,
+    "confidence_penalties": [
+      "reduce confidence when required evidence fields are unavailable",
+      "reduce confidence when evidence is inferred from partial tenant scope"
+    ],
+    "compliance_mappings": [
+      {
+        "framework": "ISO 27001",
+        "reference_id": "A.8.13",
+        "title": "Backup and retention coverage fall below resilience expectations",
+        "relevance": "Inherited catalog association; framework applicability and version require independent review."
+      },
+      {
+        "framework": "NIST",
+        "reference_id": "PR.DS-04",
+        "title": "Backup and retention coverage fall below resilience expectations",
+        "relevance": "Inherited catalog association; framework applicability and version require independent review."
+      },
+      {
+        "framework": "DSPT",
+        "reference_id": "NDG Standard 7",
+        "title": "Backup and retention coverage fall below resilience expectations",
+        "relevance": "Inherited catalog association; framework applicability and version require independent review."
+      }
+    ],
+    "remediation": {
+      "summary": "Increase backup and retention coverage for business-critical data stores.",
+      "cost_tier": "medium",
+      "manual_steps": [
+        "Confirm scope and review backup coverage ratio, retention policy coverage ratio.",
+        "Increase backup and retention coverage for business-critical data stores.",
+        "Obtain owner approval and record exceptions with scope and expiry.",
+        "Recollect evidence after the change and retain the original and follow-up scan IDs."
+      ],
+      "code": []
+    },
+    "related_controls": [],
+    "dependencies": [],
+    "assurance_claims": [
+      "data-resilience-coverage-is-reviewed"
+    ],
+    "metadata": {
+      "evaluator": "data_controls",
+      "evaluator_function": "_evaluate_backup_and_retention",
+      "owner": "CRIS maintainers",
+      "mapping_review_status": "inherited_unvalidated",
+      "source_mappings": [
+        "ISO 27001 A.8.13",
+        "NIST PR.DS-04",
+        "DSPT NDG Standard 7"
+      ],
+      "known_limitations": [],
+      "severity_basis": "maximum_evaluator_branch_severity",
+      "freshness_basis": "provisional_metadata_review_window_not_a_runtime_enforcement_guarantee",
+      "assurance_claims_basis": "review_objectives_not_automatic_attestations"
+    }
+  },
+  {
+    "control_id": "DATA-004",
+    "version": "2.1.0",
+    "title": "Key management protections are incomplete for sensitive secrets",
+    "domain": "Data",
+    "severity": "High",
+    "provider_support": {
+      "azure": "active",
+      "aws": "research_preview",
+      "gcp": "planned"
+    },
+    "resource_type": "data/key-management",
+    "resource_group": "key-management",
+    "description": "Evaluates the collected, scoped posture for: Key management protections are incomplete for sensitive secrets. Unavailable or inferred inputs require evidence review; this definition does not independently verify provider collection.",
+    "risk": "Weak secret administration or deletion protections can expose credentials or impair recovery.",
+    "evidence_requirements": [
+      "key-management administrative MFA state",
+      "purge protection counts and observability state"
+    ],
+    "freshness_hours": 24,
+    "confidence_penalties": [
+      "reduce confidence when required evidence fields are unavailable",
+      "reduce confidence when evidence is inferred from partial tenant scope"
+    ],
+    "compliance_mappings": [
+      {
+        "framework": "Microsoft Cloud Security Benchmark",
+        "reference_id": "DP-5",
+        "title": "Key management protections are incomplete for sensitive secrets",
+        "relevance": "Inherited catalog association; framework applicability and version require independent review."
+      },
+      {
+        "framework": "NIST",
+        "reference_id": "PR.DS-05",
+        "title": "Key management protections are incomplete for sensitive secrets",
+        "relevance": "Inherited catalog association; framework applicability and version require independent review."
+      }
+    ],
+    "remediation": {
+      "summary": "Protect key-management services with MFA, purge protection, and stronger secret governance.",
+      "cost_tier": "low",
+      "manual_steps": [
+        "Confirm scope and review key-management administrative MFA state, purge protection counts and observability state.",
+        "Protect key-management services with MFA, purge protection, and stronger secret governance.",
+        "Obtain owner approval and record exceptions with scope and expiry.",
+        "Recollect evidence after the change and retain the original and follow-up scan IDs."
+      ],
+      "code": []
+    },
+    "related_controls": [],
+    "dependencies": [],
+    "assurance_claims": [
+      "key-management-protections-are-reviewed"
+    ],
+    "metadata": {
+      "evaluator": "data_controls",
+      "evaluator_function": "_evaluate_key_vault_protections",
+      "owner": "CRIS maintainers",
+      "mapping_review_status": "inherited_unvalidated",
+      "source_mappings": [
+        "Microsoft Cloud Security Benchmark DP-5",
+        "NIST PR.DS-05"
+      ],
+      "known_limitations": [],
+      "severity_basis": "maximum_evaluator_branch_severity",
+      "freshness_basis": "provisional_metadata_review_window_not_a_runtime_enforcement_guarantee",
+      "assurance_claims_basis": "review_objectives_not_automatic_attestations"
     }
   },
   {
     "control_id": "MON-001",
-    "version": "2.0.0",
+    "version": "2.1.0",
     "title": "Activity log retention is below governance and investigation expectations",
     "domain": "Monitoring/Logging",
     "severity": "Medium",
@@ -327,12 +1109,615 @@
     ],
     "metadata": {
       "evaluator": "monitoring_controls",
-      "first_v2_seed": true
+      "first_v2_seed": true,
+      "evaluator_function": "_evaluate_activity_log_retention",
+      "owner": "CRIS maintainers",
+      "mapping_review_status": "inherited_unvalidated",
+      "source_mappings": [
+        "CIS Azure Foundations Benchmark 5.2",
+        "NIST DE.CM-01",
+        "DSPT NDG Standard 6"
+      ],
+      "known_limitations": [],
+      "severity_basis": "existing_registry_nominal_severity",
+      "freshness_basis": "provisional_metadata_review_window_not_a_runtime_enforcement_guarantee",
+      "assurance_claims_basis": "review_objectives_not_automatic_attestations"
+    }
+  },
+  {
+    "control_id": "MON-002",
+    "version": "2.1.0",
+    "title": "Critical security alert coverage is incomplete",
+    "domain": "Monitoring/Logging",
+    "severity": "High",
+    "provider_support": {
+      "azure": "active",
+      "aws": "research_preview",
+      "gcp": "planned"
+    },
+    "resource_type": "monitoring/alert-rule",
+    "resource_group": "security-alerting",
+    "description": "Evaluates the collected, scoped posture for: Critical security alert coverage is incomplete. Unavailable or inferred inputs require evidence review; this definition does not independently verify provider collection.",
+    "risk": "Missing critical alerts may delay discovery of administrative abuse and exposure changes.",
+    "evidence_requirements": [
+      "critical alert coverage ratio",
+      "alert rule inventory"
+    ],
+    "freshness_hours": 24,
+    "confidence_penalties": [
+      "reduce confidence when required evidence fields are unavailable",
+      "reduce confidence when evidence is inferred from partial tenant scope"
+    ],
+    "compliance_mappings": [
+      {
+        "framework": "NIST",
+        "reference_id": "DE.CM-01",
+        "title": "Critical security alert coverage is incomplete",
+        "relevance": "Inherited catalog association; framework applicability and version require independent review."
+      },
+      {
+        "framework": "ISO 27001",
+        "reference_id": "A.8.16",
+        "title": "Critical security alert coverage is incomplete",
+        "relevance": "Inherited catalog association; framework applicability and version require independent review."
+      }
+    ],
+    "remediation": {
+      "summary": "Add or expand critical alerts for administrative, exposure, and security events.",
+      "cost_tier": "low",
+      "manual_steps": [
+        "Confirm scope and review critical alert coverage ratio, alert rule inventory.",
+        "Add or expand critical alerts for administrative, exposure, and security events.",
+        "Obtain owner approval and record exceptions with scope and expiry.",
+        "Recollect evidence after the change and retain the original and follow-up scan IDs."
+      ],
+      "code": []
+    },
+    "related_controls": [],
+    "dependencies": [],
+    "assurance_claims": [
+      "critical-alert-coverage-is-reviewed"
+    ],
+    "metadata": {
+      "evaluator": "monitoring_controls",
+      "evaluator_function": "_evaluate_alert_coverage",
+      "owner": "CRIS maintainers",
+      "mapping_review_status": "inherited_unvalidated",
+      "source_mappings": [
+        "NIST DE.CM-01",
+        "ISO 27001 A.8.16"
+      ],
+      "known_limitations": [],
+      "severity_basis": "maximum_evaluator_branch_severity",
+      "freshness_basis": "provisional_metadata_review_window_not_a_runtime_enforcement_guarantee",
+      "assurance_claims_basis": "review_objectives_not_automatic_attestations"
+    }
+  },
+  {
+    "control_id": "MON-003",
+    "version": "2.1.0",
+    "title": "Security monitoring coverage is below the expected baseline",
+    "domain": "Monitoring/Logging",
+    "severity": "High",
+    "provider_support": {
+      "azure": "active",
+      "aws": "research_preview",
+      "gcp": "planned"
+    },
+    "resource_type": "monitoring/security-coverage",
+    "resource_group": "security-monitoring",
+    "description": "Evaluates the collected, scoped posture for: Security monitoring coverage is below the expected baseline. Unavailable or inferred inputs require evidence review; this definition does not independently verify provider collection.",
+    "risk": "Unmonitored workloads can leave suspicious activity undetected.",
+    "evidence_requirements": [
+      "security monitoring coverage ratio",
+      "monitored workload inventory"
+    ],
+    "freshness_hours": 24,
+    "confidence_penalties": [
+      "reduce confidence when required evidence fields are unavailable",
+      "reduce confidence when evidence is inferred from partial tenant scope"
+    ],
+    "compliance_mappings": [
+      {
+        "framework": "Microsoft Cloud Security Benchmark",
+        "reference_id": "LT-1",
+        "title": "Security monitoring coverage is below the expected baseline",
+        "relevance": "Inherited catalog association; framework applicability and version require independent review."
+      },
+      {
+        "framework": "NIST",
+        "reference_id": "DE.CM-02",
+        "title": "Security monitoring coverage is below the expected baseline",
+        "relevance": "Inherited catalog association; framework applicability and version require independent review."
+      }
+    ],
+    "remediation": {
+      "summary": "Expand security monitoring coverage across workloads and key cloud services.",
+      "cost_tier": "medium",
+      "manual_steps": [
+        "Confirm scope and review security monitoring coverage ratio, monitored workload inventory.",
+        "Expand security monitoring coverage across workloads and key cloud services.",
+        "Obtain owner approval and record exceptions with scope and expiry.",
+        "Recollect evidence after the change and retain the original and follow-up scan IDs."
+      ],
+      "code": []
+    },
+    "related_controls": [],
+    "dependencies": [],
+    "assurance_claims": [
+      "security-monitoring-coverage-is-reviewed"
+    ],
+    "metadata": {
+      "evaluator": "monitoring_controls",
+      "evaluator_function": "_evaluate_defender_coverage",
+      "owner": "CRIS maintainers",
+      "mapping_review_status": "inherited_unvalidated",
+      "source_mappings": [
+        "Microsoft Cloud Security Benchmark LT-1",
+        "NIST DE.CM-02"
+      ],
+      "known_limitations": [],
+      "severity_basis": "maximum_evaluator_branch_severity",
+      "freshness_basis": "provisional_metadata_review_window_not_a_runtime_enforcement_guarantee",
+      "assurance_claims_basis": "review_objectives_not_automatic_attestations"
+    }
+  },
+  {
+    "control_id": "MON-004",
+    "version": "2.1.0",
+    "title": "Monitoring operations are missing centralized logging or response runbooks",
+    "domain": "Monitoring/Logging",
+    "severity": "High",
+    "provider_support": {
+      "azure": "active",
+      "aws": "research_preview",
+      "gcp": "planned"
+    },
+    "resource_type": "monitoring/operations",
+    "resource_group": "monitoring-operations",
+    "description": "Evaluates the collected, scoped posture for: Monitoring operations are missing centralized logging or response runbooks. Unavailable or inferred inputs require evidence review; this definition does not independently verify provider collection.",
+    "risk": "Fragmented logs or missing runbooks may delay coordinated incident investigation.",
+    "evidence_requirements": [
+      "centralized logging enabled state",
+      "incident response runbook evidence"
+    ],
+    "freshness_hours": 24,
+    "confidence_penalties": [
+      "reduce confidence when required evidence fields are unavailable",
+      "reduce confidence when evidence is inferred from partial tenant scope"
+    ],
+    "compliance_mappings": [
+      {
+        "framework": "ISO 27001",
+        "reference_id": "A.5.24",
+        "title": "Monitoring operations are missing centralized logging or response runbooks",
+        "relevance": "Inherited catalog association; framework applicability and version require independent review."
+      },
+      {
+        "framework": "NIST",
+        "reference_id": "RS.RP-01",
+        "title": "Monitoring operations are missing centralized logging or response runbooks",
+        "relevance": "Inherited catalog association; framework applicability and version require independent review."
+      }
+    ],
+    "remediation": {
+      "summary": "Enable centralized logging and define response playbooks for priority events.",
+      "cost_tier": "medium",
+      "manual_steps": [
+        "Confirm scope and review centralized logging enabled state, incident response runbook evidence.",
+        "Enable centralized logging and define response playbooks for priority events.",
+        "Obtain owner approval and record exceptions with scope and expiry.",
+        "Recollect evidence after the change and retain the original and follow-up scan IDs."
+      ],
+      "code": []
+    },
+    "related_controls": [],
+    "dependencies": [],
+    "assurance_claims": [
+      "monitoring-response-preparation-is-reviewed"
+    ],
+    "metadata": {
+      "evaluator": "monitoring_controls",
+      "evaluator_function": "_evaluate_log_centralization_and_runbooks",
+      "owner": "CRIS maintainers",
+      "mapping_review_status": "inherited_unvalidated",
+      "source_mappings": [
+        "ISO 27001 A.5.24",
+        "NIST RS.RP-01"
+      ],
+      "known_limitations": [],
+      "severity_basis": "maximum_evaluator_branch_severity",
+      "freshness_basis": "provisional_metadata_review_window_not_a_runtime_enforcement_guarantee",
+      "assurance_claims_basis": "review_objectives_not_automatic_attestations"
+    }
+  },
+  {
+    "control_id": "CMP-001",
+    "version": "2.1.0",
+    "title": "Critical workloads remain unpatched beyond acceptable risk tolerance",
+    "domain": "Compute/Workloads",
+    "severity": "Critical",
+    "provider_support": {
+      "azure": "active",
+      "aws": "research_preview",
+      "gcp": "planned"
+    },
+    "resource_type": "compute/workload",
+    "resource_group": "workload-patching",
+    "description": "Evaluates the collected, scoped posture for: Critical workloads remain unpatched beyond acceptable risk tolerance. Unavailable or inferred inputs require evidence review; this definition does not independently verify provider collection.",
+    "risk": "Unpatched critical workloads may remain exposed to known vulnerabilities; proxy evidence does not verify every installed patch.",
+    "evidence_requirements": [
+      "unpatched critical VM count",
+      "patch evidence source and proxy limitations"
+    ],
+    "freshness_hours": 24,
+    "confidence_penalties": [
+      "reduce confidence when required evidence fields are unavailable",
+      "reduce confidence when evidence is inferred from partial tenant scope"
+    ],
+    "compliance_mappings": [
+      {
+        "framework": "Microsoft Cloud Security Benchmark",
+        "reference_id": "PV-6",
+        "title": "Critical workloads remain unpatched beyond acceptable risk tolerance",
+        "relevance": "Inherited catalog association; framework applicability and version require independent review."
+      },
+      {
+        "framework": "NIST",
+        "reference_id": "PR.PS-03",
+        "title": "Critical workloads remain unpatched beyond acceptable risk tolerance",
+        "relevance": "Inherited catalog association; framework applicability and version require independent review."
+      },
+      {
+        "framework": "Cyber Essentials",
+        "reference_id": "Security update management",
+        "title": "Critical workloads remain unpatched beyond acceptable risk tolerance",
+        "relevance": "Inherited catalog association; framework applicability and version require independent review."
+      },
+      {
+        "framework": "DSPT",
+        "reference_id": "NDG Standard 6",
+        "title": "Critical workloads remain unpatched beyond acceptable risk tolerance",
+        "relevance": "Inherited catalog association; framework applicability and version require independent review."
+      }
+    ],
+    "remediation": {
+      "summary": "Patch critical workloads and enforce a stronger recurring patch policy.",
+      "cost_tier": "medium",
+      "manual_steps": [
+        "Confirm scope and review unpatched critical VM count, patch evidence source and proxy limitations.",
+        "Patch critical workloads and enforce a stronger recurring patch policy.",
+        "Obtain owner approval and record exceptions with scope and expiry.",
+        "Recollect evidence after the change and retain the original and follow-up scan IDs."
+      ],
+      "code": []
+    },
+    "related_controls": [],
+    "dependencies": [],
+    "assurance_claims": [
+      "workload-patch-gaps-are-reviewed"
+    ],
+    "metadata": {
+      "evaluator": "compute_controls",
+      "evaluator_function": "_evaluate_patch_management",
+      "owner": "CRIS maintainers",
+      "mapping_review_status": "inherited_unvalidated",
+      "source_mappings": [
+        "Microsoft Cloud Security Benchmark PV-6",
+        "NIST PR.PS-03",
+        "Cyber Essentials Security update management",
+        "DSPT NDG Standard 6"
+      ],
+      "known_limitations": [
+        "patch posture uses a conservative VM configuration proxy and does not claim full patch-state verification"
+      ],
+      "severity_basis": "maximum_evaluator_branch_severity",
+      "freshness_basis": "provisional_metadata_review_window_not_a_runtime_enforcement_guarantee",
+      "assurance_claims_basis": "review_objectives_not_automatic_attestations"
+    }
+  },
+  {
+    "control_id": "CMP-002",
+    "version": "2.1.0",
+    "title": "Endpoint protection coverage is below the expected workload baseline",
+    "domain": "Compute/Workloads",
+    "severity": "High",
+    "provider_support": {
+      "azure": "active",
+      "aws": "research_preview",
+      "gcp": "planned"
+    },
+    "resource_type": "compute/workload",
+    "resource_group": "endpoint-protection",
+    "description": "Evaluates the collected, scoped posture for: Endpoint protection coverage is below the expected workload baseline. Unavailable or inferred inputs require evidence review; this definition does not independently verify provider collection.",
+    "risk": "Workloads without observed endpoint protection can lack expected detection and prevention coverage.",
+    "evidence_requirements": [
+      "endpoint protection coverage ratio",
+      "workload and security-agent inventory"
+    ],
+    "freshness_hours": 24,
+    "confidence_penalties": [
+      "reduce confidence when required evidence fields are unavailable",
+      "reduce confidence when evidence is inferred from partial tenant scope"
+    ],
+    "compliance_mappings": [
+      {
+        "framework": "Microsoft Cloud Security Benchmark",
+        "reference_id": "LT-4",
+        "title": "Endpoint protection coverage is below the expected workload baseline",
+        "relevance": "Inherited catalog association; framework applicability and version require independent review."
+      },
+      {
+        "framework": "NIST",
+        "reference_id": "PR.PS-01",
+        "title": "Endpoint protection coverage is below the expected workload baseline",
+        "relevance": "Inherited catalog association; framework applicability and version require independent review."
+      },
+      {
+        "framework": "Cyber Essentials",
+        "reference_id": "Malware protection",
+        "title": "Endpoint protection coverage is below the expected workload baseline",
+        "relevance": "Inherited catalog association; framework applicability and version require independent review."
+      }
+    ],
+    "remediation": {
+      "summary": "Deploy endpoint protection or security agents to uncovered workloads.",
+      "cost_tier": "medium",
+      "manual_steps": [
+        "Confirm scope and review endpoint protection coverage ratio, workload and security-agent inventory.",
+        "Deploy endpoint protection or security agents to uncovered workloads.",
+        "Obtain owner approval and record exceptions with scope and expiry.",
+        "Recollect evidence after the change and retain the original and follow-up scan IDs."
+      ],
+      "code": []
+    },
+    "related_controls": [],
+    "dependencies": [],
+    "assurance_claims": [
+      "endpoint-protection-coverage-is-reviewed"
+    ],
+    "metadata": {
+      "evaluator": "compute_controls",
+      "evaluator_function": "_evaluate_endpoint_protection",
+      "owner": "CRIS maintainers",
+      "mapping_review_status": "inherited_unvalidated",
+      "source_mappings": [
+        "Microsoft Cloud Security Benchmark LT-4",
+        "NIST PR.PS-01",
+        "Cyber Essentials Malware protection"
+      ],
+      "known_limitations": [],
+      "severity_basis": "maximum_evaluator_branch_severity",
+      "freshness_basis": "provisional_metadata_review_window_not_a_runtime_enforcement_guarantee",
+      "assurance_claims_basis": "review_objectives_not_automatic_attestations"
+    }
+  },
+  {
+    "control_id": "CMP-003",
+    "version": "2.1.0",
+    "title": "Workload hardening baseline coverage is incomplete",
+    "domain": "Compute/Workloads",
+    "severity": "High",
+    "provider_support": {
+      "azure": "active",
+      "aws": "research_preview",
+      "gcp": "planned"
+    },
+    "resource_type": "compute/workload",
+    "resource_group": "workload-hardening",
+    "description": "Evaluates the collected, scoped posture for: Workload hardening baseline coverage is incomplete. Unavailable or inferred inputs require evidence review; this definition does not independently verify provider collection.",
+    "risk": "Inconsistent hardening can retain unnecessary services or insecure administrative settings.",
+    "evidence_requirements": [
+      "hardened baseline coverage ratio",
+      "baseline evidence and proxy limitations"
+    ],
+    "freshness_hours": 24,
+    "confidence_penalties": [
+      "reduce confidence when required evidence fields are unavailable",
+      "reduce confidence when evidence is inferred from partial tenant scope"
+    ],
+    "compliance_mappings": [
+      {
+        "framework": "CIS Controls",
+        "reference_id": "4.1",
+        "title": "Workload hardening baseline coverage is incomplete",
+        "relevance": "Inherited catalog association; framework applicability and version require independent review."
+      },
+      {
+        "framework": "NIST",
+        "reference_id": "PR.IP-01",
+        "title": "Workload hardening baseline coverage is incomplete",
+        "relevance": "Inherited catalog association; framework applicability and version require independent review."
+      }
+    ],
+    "remediation": {
+      "summary": "Apply a hardened workload baseline across compute resources and administrative settings.",
+      "cost_tier": "medium",
+      "manual_steps": [
+        "Confirm scope and review hardened baseline coverage ratio, baseline evidence and proxy limitations.",
+        "Apply a hardened workload baseline across compute resources and administrative settings.",
+        "Obtain owner approval and record exceptions with scope and expiry.",
+        "Recollect evidence after the change and retain the original and follow-up scan IDs."
+      ],
+      "code": []
+    },
+    "related_controls": [],
+    "dependencies": [],
+    "assurance_claims": [
+      "workload-hardening-coverage-is-reviewed"
+    ],
+    "metadata": {
+      "evaluator": "compute_controls",
+      "evaluator_function": "_evaluate_hardening_baseline",
+      "owner": "CRIS maintainers",
+      "mapping_review_status": "inherited_unvalidated",
+      "source_mappings": [
+        "CIS Controls 4.1",
+        "NIST PR.IP-01"
+      ],
+      "known_limitations": [
+        "this control currently relies on conservative proxy or heuristic evidence paths"
+      ],
+      "severity_basis": "maximum_evaluator_branch_severity",
+      "freshness_basis": "provisional_metadata_review_window_not_a_runtime_enforcement_guarantee",
+      "assurance_claims_basis": "review_objectives_not_automatic_attestations"
+    }
+  },
+  {
+    "control_id": "CMP-004",
+    "version": "2.1.0",
+    "title": "Workload backup agent coverage is below resilience expectations",
+    "domain": "Compute/Workloads",
+    "severity": "High",
+    "provider_support": {
+      "azure": "active",
+      "aws": "research_preview",
+      "gcp": "planned"
+    },
+    "resource_type": "compute/workload",
+    "resource_group": "workload-recovery",
+    "description": "Evaluates the collected, scoped posture for: Workload backup agent coverage is below resilience expectations. Unavailable or inferred inputs require evidence review; this definition does not independently verify provider collection.",
+    "risk": "Missing backup agents or equivalent coverage can leave workloads outside recovery processes.",
+    "evidence_requirements": [
+      "workload backup agent coverage ratio",
+      "workload recovery inventory"
+    ],
+    "freshness_hours": 24,
+    "confidence_penalties": [
+      "reduce confidence when required evidence fields are unavailable",
+      "reduce confidence when evidence is inferred from partial tenant scope"
+    ],
+    "compliance_mappings": [
+      {
+        "framework": "ISO 27001",
+        "reference_id": "A.8.13",
+        "title": "Workload backup agent coverage is below resilience expectations",
+        "relevance": "Inherited catalog association; framework applicability and version require independent review."
+      },
+      {
+        "framework": "NIST",
+        "reference_id": "PR.DS-04",
+        "title": "Workload backup agent coverage is below resilience expectations",
+        "relevance": "Inherited catalog association; framework applicability and version require independent review."
+      }
+    ],
+    "remediation": {
+      "summary": "Enable workload backup protections for critical virtual machines and services.",
+      "cost_tier": "medium",
+      "manual_steps": [
+        "Confirm scope and review workload backup agent coverage ratio, workload recovery inventory.",
+        "Enable workload backup protections for critical virtual machines and services.",
+        "Obtain owner approval and record exceptions with scope and expiry.",
+        "Recollect evidence after the change and retain the original and follow-up scan IDs."
+      ],
+      "code": []
+    },
+    "related_controls": [],
+    "dependencies": [],
+    "assurance_claims": [
+      "workload-backup-coverage-is-reviewed"
+    ],
+    "metadata": {
+      "evaluator": "compute_controls",
+      "evaluator_function": "_evaluate_workload_backup_agents",
+      "owner": "CRIS maintainers",
+      "mapping_review_status": "inherited_unvalidated",
+      "source_mappings": [
+        "ISO 27001 A.8.13",
+        "NIST PR.DS-04"
+      ],
+      "known_limitations": [],
+      "severity_basis": "maximum_evaluator_branch_severity",
+      "freshness_basis": "provisional_metadata_review_window_not_a_runtime_enforcement_guarantee",
+      "assurance_claims_basis": "review_objectives_not_automatic_attestations"
+    }
+  },
+  {
+    "control_id": "CMP-005",
+    "version": "2.1.0",
+    "title": "Linux workloads allow password-based authentication over SSH",
+    "domain": "Compute/Workloads",
+    "severity": "High",
+    "provider_support": {
+      "azure": "active",
+      "aws": "research_preview",
+      "gcp": "planned"
+    },
+    "resource_type": "compute/linux-workload",
+    "resource_group": "workload-authentication",
+    "description": "Evaluates the collected, scoped posture for: Linux workloads allow password-based authentication over SSH. Unavailable or inferred inputs require evidence review; this definition does not independently verify provider collection.",
+    "risk": "Password-based SSH permits credential guessing and reuse attacks where administrative paths are reachable.",
+    "evidence_requirements": [
+      "Linux password authentication enabled VM count",
+      "SSH configuration evidence"
+    ],
+    "freshness_hours": 24,
+    "confidence_penalties": [
+      "reduce confidence when required evidence fields are unavailable",
+      "reduce confidence when evidence is inferred from partial tenant scope"
+    ],
+    "compliance_mappings": [
+      {
+        "framework": "CIS Controls",
+        "reference_id": "4.4",
+        "title": "Linux workloads allow password-based authentication over SSH",
+        "relevance": "Inherited catalog association; framework applicability and version require independent review."
+      },
+      {
+        "framework": "NIST",
+        "reference_id": "PR.AC-01",
+        "title": "Linux workloads allow password-based authentication over SSH",
+        "relevance": "Inherited catalog association; framework applicability and version require independent review."
+      },
+      {
+        "framework": "Cyber Essentials",
+        "reference_id": "Access control",
+        "title": "Linux workloads allow password-based authentication over SSH",
+        "relevance": "Inherited catalog association; framework applicability and version require independent review."
+      },
+      {
+        "framework": "Cyber Essentials",
+        "reference_id": "Secure configuration",
+        "title": "Linux workloads allow password-based authentication over SSH",
+        "relevance": "Inherited catalog association; framework applicability and version require independent review."
+      }
+    ],
+    "remediation": {
+      "summary": "Disable password-based SSH authentication and require stronger administrative access controls.",
+      "cost_tier": "free",
+      "manual_steps": [
+        "Confirm scope and review Linux password authentication enabled VM count, SSH configuration evidence.",
+        "Disable password-based SSH authentication and require stronger administrative access controls.",
+        "Obtain owner approval and record exceptions with scope and expiry.",
+        "Recollect evidence after the change and retain the original and follow-up scan IDs."
+      ],
+      "code": []
+    },
+    "related_controls": [],
+    "dependencies": [],
+    "assurance_claims": [
+      "linux-administrative-authentication-is-reviewed"
+    ],
+    "metadata": {
+      "evaluator": "compute_controls",
+      "evaluator_function": "_evaluate_linux_password_authentication",
+      "owner": "CRIS maintainers",
+      "mapping_review_status": "inherited_unvalidated",
+      "source_mappings": [
+        "CIS Controls 4.4",
+        "NIST PR.AC-01",
+        "Cyber Essentials Access control",
+        "Cyber Essentials Secure configuration"
+      ],
+      "known_limitations": [],
+      "severity_basis": "maximum_evaluator_branch_severity",
+      "freshness_basis": "provisional_metadata_review_window_not_a_runtime_enforcement_guarantee",
+      "assurance_claims_basis": "review_objectives_not_automatic_attestations"
     }
   },
   {
     "control_id": "GOV-001",
-    "version": "2.0.0",
+    "version": "2.1.0",
     "title": "Resource tagging coverage falls below governance expectations",
     "domain": "Cost/Governance Hygiene",
     "severity": "Low",
@@ -397,7 +1782,1001 @@
     ],
     "metadata": {
       "evaluator": "governance_controls",
-      "first_v2_seed": true
+      "first_v2_seed": true,
+      "evaluator_function": "_evaluate_tagging_coverage",
+      "owner": "CRIS maintainers",
+      "mapping_review_status": "inherited_unvalidated",
+      "source_mappings": [
+        "Azure CAF Governance Discipline",
+        "ISO 27001 A.5.9"
+      ],
+      "known_limitations": [],
+      "severity_basis": "existing_registry_nominal_severity",
+      "freshness_basis": "provisional_metadata_review_window_not_a_runtime_enforcement_guarantee",
+      "assurance_claims_basis": "review_objectives_not_automatic_attestations"
+    }
+  },
+  {
+    "control_id": "GOV-002",
+    "version": "2.1.0",
+    "title": "Budget alerting is not enabled for cloud cost governance",
+    "domain": "Cost/Governance Hygiene",
+    "severity": "Medium",
+    "provider_support": {
+      "azure": "active",
+      "aws": "research_preview",
+      "gcp": "planned"
+    },
+    "resource_type": "governance/budget",
+    "resource_group": "cost-governance",
+    "description": "Evaluates the collected, scoped posture for: Budget alerting is not enabled for cloud cost governance. Unavailable or inferred inputs require evidence review; this definition does not independently verify provider collection.",
+    "risk": "Absent budget alerts can delay detection of unexpected consumption and overspend.",
+    "evidence_requirements": [
+      "budget alerting enabled state",
+      "budget evidence observability"
+    ],
+    "freshness_hours": 168,
+    "confidence_penalties": [
+      "reduce confidence when required evidence fields are unavailable",
+      "reduce confidence when evidence is inferred from partial tenant scope"
+    ],
+    "compliance_mappings": [
+      {
+        "framework": "FinOps",
+        "reference_id": "Cost Governance",
+        "title": "Budget alerting is not enabled for cloud cost governance",
+        "relevance": "Inherited catalog association; framework applicability and version require independent review."
+      },
+      {
+        "framework": "ISO 27001",
+        "reference_id": "A.5.36",
+        "title": "Budget alerting is not enabled for cloud cost governance",
+        "relevance": "Inherited catalog association; framework applicability and version require independent review."
+      }
+    ],
+    "remediation": {
+      "summary": "Configure budget thresholds and spend alerts for cost oversight.",
+      "cost_tier": "free",
+      "manual_steps": [
+        "Confirm scope and review budget alerting enabled state, budget evidence observability.",
+        "Configure budget thresholds and spend alerts for cost oversight.",
+        "Obtain owner approval and record exceptions with scope and expiry.",
+        "Recollect evidence after the change and retain the original and follow-up scan IDs."
+      ],
+      "code": []
+    },
+    "related_controls": [],
+    "dependencies": [],
+    "assurance_claims": [
+      "budget-alerting-is-evidenced"
+    ],
+    "metadata": {
+      "evaluator": "governance_controls",
+      "evaluator_function": "_evaluate_budget_alerting",
+      "owner": "CRIS maintainers",
+      "mapping_review_status": "inherited_unvalidated",
+      "source_mappings": [
+        "FinOps Cost Governance",
+        "ISO 27001 A.5.36"
+      ],
+      "known_limitations": [
+        "live budget-alert evidence is currently conservative in some collection contexts"
+      ],
+      "severity_basis": "maximum_evaluator_branch_severity",
+      "freshness_basis": "provisional_metadata_review_window_not_a_runtime_enforcement_guarantee",
+      "assurance_claims_basis": "review_objectives_not_automatic_attestations"
+    }
+  },
+  {
+    "control_id": "GOV-003",
+    "version": "2.1.0",
+    "title": "Policy assignment coverage is below the baseline governance threshold",
+    "domain": "Cost/Governance Hygiene",
+    "severity": "High",
+    "provider_support": {
+      "azure": "active",
+      "aws": "research_preview",
+      "gcp": "planned"
+    },
+    "resource_type": "governance/policy",
+    "resource_group": "policy-governance",
+    "description": "Evaluates the collected, scoped posture for: Policy assignment coverage is below the baseline governance threshold. Unavailable or inferred inputs require evidence review; this definition does not independently verify provider collection.",
+    "risk": "Incomplete baseline policy coverage can leave resources outside expected governance controls.",
+    "evidence_requirements": [
+      "policy assignment coverage ratio",
+      "baseline policy assignment scope"
+    ],
+    "freshness_hours": 168,
+    "confidence_penalties": [
+      "reduce confidence when required evidence fields are unavailable",
+      "reduce confidence when evidence is inferred from partial tenant scope"
+    ],
+    "compliance_mappings": [
+      {
+        "framework": "Azure Policy",
+        "reference_id": "Baseline",
+        "title": "Policy assignment coverage is below the baseline governance threshold",
+        "relevance": "Inherited catalog association; framework applicability and version require independent review."
+      },
+      {
+        "framework": "NIST",
+        "reference_id": "GV.PO-01",
+        "title": "Policy assignment coverage is below the baseline governance threshold",
+        "relevance": "Inherited catalog association; framework applicability and version require independent review."
+      }
+    ],
+    "remediation": {
+      "summary": "Increase baseline policy assignment coverage for governance and compliance controls.",
+      "cost_tier": "free",
+      "manual_steps": [
+        "Confirm scope and review policy assignment coverage ratio, baseline policy assignment scope.",
+        "Increase baseline policy assignment coverage for governance and compliance controls.",
+        "Obtain owner approval and record exceptions with scope and expiry.",
+        "Recollect evidence after the change and retain the original and follow-up scan IDs."
+      ],
+      "code": []
+    },
+    "related_controls": [],
+    "dependencies": [],
+    "assurance_claims": [
+      "policy-assignment-coverage-is-reviewed"
+    ],
+    "metadata": {
+      "evaluator": "governance_controls",
+      "evaluator_function": "_evaluate_policy_assignment_coverage",
+      "owner": "CRIS maintainers",
+      "mapping_review_status": "inherited_unvalidated",
+      "source_mappings": [
+        "Azure Policy Baseline",
+        "NIST GV.PO-01"
+      ],
+      "known_limitations": [],
+      "severity_basis": "maximum_evaluator_branch_severity",
+      "freshness_basis": "provisional_metadata_review_window_not_a_runtime_enforcement_guarantee",
+      "assurance_claims_basis": "review_objectives_not_automatic_attestations"
+    }
+  },
+  {
+    "control_id": "GOV-004",
+    "version": "2.1.0",
+    "title": "Orphaned resources increase governance and cost hygiene risk",
+    "domain": "Cost/Governance Hygiene",
+    "severity": "High",
+    "provider_support": {
+      "azure": "active",
+      "aws": "research_preview",
+      "gcp": "planned"
+    },
+    "resource_type": "governance/resource",
+    "resource_group": "asset-governance",
+    "description": "Evaluates the collected, scoped posture for: Orphaned resources increase governance and cost hygiene risk. Unavailable or inferred inputs require evidence review; this definition does not independently verify provider collection.",
+    "risk": "Orphaned resources can retain unmanaged exposure and recurring cost.",
+    "evidence_requirements": [
+      "orphaned resource count",
+      "resource ownership and heuristic classification"
+    ],
+    "freshness_hours": 168,
+    "confidence_penalties": [
+      "reduce confidence when required evidence fields are unavailable",
+      "reduce confidence when evidence is inferred from partial tenant scope"
+    ],
+    "compliance_mappings": [
+      {
+        "framework": "Azure CAF",
+        "reference_id": "Governance Discipline",
+        "title": "Orphaned resources increase governance and cost hygiene risk",
+        "relevance": "Inherited catalog association; framework applicability and version require independent review."
+      },
+      {
+        "framework": "FinOps",
+        "reference_id": "Asset Hygiene",
+        "title": "Orphaned resources increase governance and cost hygiene risk",
+        "relevance": "Inherited catalog association; framework applicability and version require independent review."
+      }
+    ],
+    "remediation": {
+      "summary": "Review and remove unused or orphaned resources to reduce cost and governance noise.",
+      "cost_tier": "free",
+      "manual_steps": [
+        "Confirm scope and review orphaned resource count, resource ownership and heuristic classification.",
+        "Review and remove unused or orphaned resources to reduce cost and governance noise.",
+        "Obtain owner approval and record exceptions with scope and expiry.",
+        "Recollect evidence after the change and retain the original and follow-up scan IDs."
+      ],
+      "code": []
+    },
+    "related_controls": [],
+    "dependencies": [],
+    "assurance_claims": [
+      "orphaned-resource-review-is-supported"
+    ],
+    "metadata": {
+      "evaluator": "governance_controls",
+      "evaluator_function": "_evaluate_orphaned_resources",
+      "owner": "CRIS maintainers",
+      "mapping_review_status": "inherited_unvalidated",
+      "source_mappings": [
+        "Azure CAF Governance Discipline",
+        "FinOps Asset Hygiene"
+      ],
+      "known_limitations": [
+        "this control currently relies on conservative proxy or heuristic evidence paths"
+      ],
+      "severity_basis": "maximum_evaluator_branch_severity",
+      "freshness_basis": "provisional_metadata_review_window_not_a_runtime_enforcement_guarantee",
+      "assurance_claims_basis": "review_objectives_not_automatic_attestations"
+    }
+  },
+  {
+    "control_id": "IOT-001",
+    "version": "2.1.0",
+    "title": "Cloud device-identity registration posture is weak or unobservable",
+    "domain": "Healthcare IoT",
+    "severity": "High",
+    "provider_support": {
+      "azure": "research_preview",
+      "aws": "research_preview",
+      "gcp": "planned"
+    },
+    "resource_type": "iot/device-identity",
+    "resource_group": "iot-identity",
+    "description": "Evaluates the collected, scoped posture for: Cloud device-identity registration posture is weak or unobservable. Unavailable or inferred inputs require evidence review; this definition does not independently verify provider collection.",
+    "risk": "Unobservable device registration or missing certificate authentication evidence limits assurance over clinical telemetry identities.",
+    "evidence_requirements": [
+      "IoT hub and device identity counts",
+      "device identity observability",
+      "certificate authority configured state"
+    ],
+    "freshness_hours": 24,
+    "confidence_penalties": [
+      "reduce confidence when required evidence fields are unavailable",
+      "reduce confidence when evidence is inferred from partial tenant scope"
+    ],
+    "compliance_mappings": [
+      {
+        "framework": "NCSC CAF",
+        "reference_id": "B2 Identity and access control",
+        "title": "Cloud device-identity registration posture is weak or unobservable",
+        "relevance": "Inherited catalog association; framework applicability and version require independent review."
+      },
+      {
+        "framework": "NHS DSPT",
+        "reference_id": "Access control",
+        "title": "Cloud device-identity registration posture is weak or unobservable",
+        "relevance": "Inherited catalog association; framework applicability and version require independent review."
+      },
+      {
+        "framework": "IEC 80001-1",
+        "reference_id": "risk management",
+        "title": "Cloud device-identity registration posture is weak or unobservable",
+        "relevance": "Inherited catalog association; framework applicability and version require independent review."
+      }
+    ],
+    "remediation": {
+      "summary": "Inventory cloud-registered IoMT device identities and prefer certificate-based authentication for clinical device connections while validating device-side credential storage separately.",
+      "cost_tier": "medium",
+      "manual_steps": [
+        "Confirm scope and review IoT hub and device identity counts, device identity observability, certificate authority configured state.",
+        "Inventory cloud-registered IoMT device identities and prefer certificate-based authentication for clinical device connections while validating device-side credential storage separately.",
+        "Obtain clinical and operational approval for changes; collect separate device evidence where needed.",
+        "Recollect evidence after the change and retain the original and follow-up scan IDs."
+      ],
+      "code": []
+    },
+    "related_controls": [],
+    "dependencies": [],
+    "assurance_claims": [
+      "iot-identity-evidence-boundary-is-explicit"
+    ],
+    "metadata": {
+      "evaluator": "iot_controls",
+      "evaluator_function": "_evaluate_device_identity",
+      "owner": "CRIS maintainers",
+      "mapping_review_status": "inherited_unvalidated",
+      "source_mappings": [
+        "NCSC CAF B2 Identity and access control",
+        "NHS DSPT Access control",
+        "IEC 80001-1 risk management"
+      ],
+      "known_limitations": [
+        "device-level certificate posture may require IoT Hub registry permissions or device-management integration"
+      ],
+      "severity_basis": "maximum_evaluator_branch_severity",
+      "freshness_basis": "provisional_metadata_review_window_not_a_runtime_enforcement_guarantee",
+      "assurance_claims_basis": "review_objectives_not_automatic_attestations"
+    }
+  },
+  {
+    "control_id": "IOT-002",
+    "version": "2.1.0",
+    "title": "IoT shared access policies exceed least-privilege expectations",
+    "domain": "Healthcare IoT",
+    "severity": "High",
+    "provider_support": {
+      "azure": "research_preview",
+      "aws": "research_preview",
+      "gcp": "planned"
+    },
+    "resource_type": "iot/access-policy",
+    "resource_group": "iot-identity",
+    "description": "Evaluates the collected, scoped posture for: IoT shared access policies exceed least-privilege expectations. Unavailable or inferred inputs require evidence review; this definition does not independently verify provider collection.",
+    "risk": "Broad shared policies can grant unnecessary access to device messages or administration.",
+    "evidence_requirements": [
+      "shared access policy count",
+      "overbroad shared access policy count"
+    ],
+    "freshness_hours": 24,
+    "confidence_penalties": [
+      "reduce confidence when required evidence fields are unavailable",
+      "reduce confidence when evidence is inferred from partial tenant scope"
+    ],
+    "compliance_mappings": [
+      {
+        "framework": "NCSC CAF",
+        "reference_id": "B2 Identity and access control",
+        "title": "IoT shared access policies exceed least-privilege expectations",
+        "relevance": "Inherited catalog association; framework applicability and version require independent review."
+      },
+      {
+        "framework": "NHS DSPT",
+        "reference_id": "Security management",
+        "title": "IoT shared access policies exceed least-privilege expectations",
+        "relevance": "Inherited catalog association; framework applicability and version require independent review."
+      },
+      {
+        "framework": "IEC 62443",
+        "reference_id": "account management",
+        "title": "IoT shared access policies exceed least-privilege expectations",
+        "relevance": "Inherited catalog association; framework applicability and version require independent review."
+      }
+    ],
+    "remediation": {
+      "summary": "Reduce IoT shared access policies, remove overbroad permissions, and rotate keys through governed operations.",
+      "cost_tier": "free",
+      "manual_steps": [
+        "Confirm scope and review shared access policy count, overbroad shared access policy count.",
+        "Reduce IoT shared access policies, remove overbroad permissions, and rotate keys through governed operations.",
+        "Obtain clinical and operational approval for changes; collect separate device evidence where needed.",
+        "Recollect evidence after the change and retain the original and follow-up scan IDs."
+      ],
+      "code": []
+    },
+    "related_controls": [],
+    "dependencies": [],
+    "assurance_claims": [
+      "iot-access-policy-scope-is-reviewed"
+    ],
+    "metadata": {
+      "evaluator": "iot_controls",
+      "evaluator_function": "_evaluate_shared_access_policy",
+      "owner": "CRIS maintainers",
+      "mapping_review_status": "inherited_unvalidated",
+      "source_mappings": [
+        "NCSC CAF B2 Identity and access control",
+        "NHS DSPT Security management",
+        "IEC 62443 account management"
+      ],
+      "known_limitations": [],
+      "severity_basis": "maximum_evaluator_branch_severity",
+      "freshness_basis": "provisional_metadata_review_window_not_a_runtime_enforcement_guarantee",
+      "assurance_claims_basis": "review_objectives_not_automatic_attestations"
+    }
+  },
+  {
+    "control_id": "IOT-003",
+    "version": "2.1.0",
+    "title": "IoT diagnostic logging is incomplete for clinical telemetry investigation",
+    "domain": "Healthcare IoT",
+    "severity": "Medium",
+    "provider_support": {
+      "azure": "research_preview",
+      "aws": "research_preview",
+      "gcp": "planned"
+    },
+    "resource_type": "iot/diagnostics",
+    "resource_group": "iot-monitoring",
+    "description": "Evaluates the collected, scoped posture for: IoT diagnostic logging is incomplete for clinical telemetry investigation. Unavailable or inferred inputs require evidence review; this definition does not independently verify provider collection.",
+    "risk": "Incomplete diagnostics can obstruct investigation of clinical telemetry events.",
+    "evidence_requirements": [
+      "diagnostic settings enabled state",
+      "diagnostic destination count",
+      "diagnostic category coverage ratio"
+    ],
+    "freshness_hours": 24,
+    "confidence_penalties": [
+      "reduce confidence when required evidence fields are unavailable",
+      "reduce confidence when evidence is inferred from partial tenant scope"
+    ],
+    "compliance_mappings": [
+      {
+        "framework": "NCSC CAF",
+        "reference_id": "C1 Security monitoring",
+        "title": "IoT diagnostic logging is incomplete for clinical telemetry investigation",
+        "relevance": "Inherited catalog association; framework applicability and version require independent review."
+      },
+      {
+        "framework": "NHS DSPT",
+        "reference_id": "Logging and monitoring",
+        "title": "IoT diagnostic logging is incomplete for clinical telemetry investigation",
+        "relevance": "Inherited catalog association; framework applicability and version require independent review."
+      },
+      {
+        "framework": "ISO 27001",
+        "reference_id": "A.8.15",
+        "title": "IoT diagnostic logging is incomplete for clinical telemetry investigation",
+        "relevance": "Inherited catalog association; framework applicability and version require independent review."
+      }
+    ],
+    "remediation": {
+      "summary": "Enable IoT Hub diagnostic settings and route core diagnostic categories to a monitored destination.",
+      "cost_tier": "low",
+      "manual_steps": [
+        "Confirm scope and review diagnostic settings enabled state, diagnostic destination count, diagnostic category coverage ratio.",
+        "Enable IoT Hub diagnostic settings and route core diagnostic categories to a monitored destination.",
+        "Obtain clinical and operational approval for changes; collect separate device evidence where needed.",
+        "Recollect evidence after the change and retain the original and follow-up scan IDs."
+      ],
+      "code": []
+    },
+    "related_controls": [],
+    "dependencies": [],
+    "assurance_claims": [
+      "iot-diagnostic-coverage-is-reviewed"
+    ],
+    "metadata": {
+      "evaluator": "iot_controls",
+      "evaluator_function": "_evaluate_diagnostic_logging",
+      "owner": "CRIS maintainers",
+      "mapping_review_status": "inherited_unvalidated",
+      "source_mappings": [
+        "NCSC CAF C1 Security monitoring",
+        "NHS DSPT Logging and monitoring",
+        "ISO 27001 A.8.15"
+      ],
+      "known_limitations": [],
+      "severity_basis": "maximum_evaluator_branch_severity",
+      "freshness_basis": "provisional_metadata_review_window_not_a_runtime_enforcement_guarantee",
+      "assurance_claims_basis": "review_objectives_not_automatic_attestations"
+    }
+  },
+  {
+    "control_id": "IOT-004",
+    "version": "2.1.0",
+    "title": "Defender for IoT or equivalent security monitoring is not evidenced",
+    "domain": "Healthcare IoT",
+    "severity": "Medium",
+    "provider_support": {
+      "azure": "research_preview",
+      "aws": "research_preview",
+      "gcp": "planned"
+    },
+    "resource_type": "iot/security-monitoring",
+    "resource_group": "iot-monitoring",
+    "description": "Evaluates the collected, scoped posture for: Defender for IoT or equivalent security monitoring is not evidenced. Unavailable or inferred inputs require evidence review; this definition does not independently verify provider collection.",
+    "risk": "Missing monitoring evidence limits assurance over threat detection without establishing device-level sensor coverage.",
+    "evidence_requirements": [
+      "IoT security monitoring observability",
+      "Defender for IoT or normalized equivalent enabled state"
+    ],
+    "freshness_hours": 24,
+    "confidence_penalties": [
+      "reduce confidence when required evidence fields are unavailable",
+      "reduce confidence when evidence is inferred from partial tenant scope"
+    ],
+    "compliance_mappings": [
+      {
+        "framework": "NCSC CAF",
+        "reference_id": "C1 Security monitoring",
+        "title": "Defender for IoT or equivalent security monitoring is not evidenced",
+        "relevance": "Inherited catalog association; framework applicability and version require independent review."
+      },
+      {
+        "framework": "NHS DSPT",
+        "reference_id": "Security operations",
+        "title": "Defender for IoT or equivalent security monitoring is not evidenced",
+        "relevance": "Inherited catalog association; framework applicability and version require independent review."
+      },
+      {
+        "framework": "IEC 62443",
+        "reference_id": "security monitoring",
+        "title": "Defender for IoT or equivalent security monitoring is not evidenced",
+        "relevance": "Inherited catalog association; framework applicability and version require independent review."
+      }
+    ],
+    "remediation": {
+      "summary": "Enable Defender for IoT or document an equivalent monitoring path for clinical IoT assets.",
+      "cost_tier": "medium",
+      "manual_steps": [
+        "Confirm scope and review IoT security monitoring observability, Defender for IoT or normalized equivalent enabled state.",
+        "Enable Defender for IoT or document an equivalent monitoring path for clinical IoT assets.",
+        "Obtain clinical and operational approval for changes; collect separate device evidence where needed.",
+        "Recollect evidence after the change and retain the original and follow-up scan IDs."
+      ],
+      "code": []
+    },
+    "related_controls": [],
+    "dependencies": [],
+    "assurance_claims": [
+      "iot-monitoring-evidence-boundary-is-explicit"
+    ],
+    "metadata": {
+      "evaluator": "iot_controls",
+      "evaluator_function": "_evaluate_defender_iot",
+      "owner": "CRIS maintainers",
+      "mapping_review_status": "inherited_unvalidated",
+      "source_mappings": [
+        "NCSC CAF C1 Security monitoring",
+        "NHS DSPT Security operations",
+        "IEC 62443 security monitoring"
+      ],
+      "known_limitations": [
+        "Defender for IoT state is a control-plane signal and does not prove complete medical-device sensor coverage"
+      ],
+      "severity_basis": "maximum_evaluator_branch_severity",
+      "freshness_basis": "provisional_metadata_review_window_not_a_runtime_enforcement_guarantee",
+      "assurance_claims_basis": "review_objectives_not_automatic_attestations"
+    }
+  },
+  {
+    "control_id": "IOT-005",
+    "version": "2.1.0",
+    "title": "IoT Hub public network access is not sufficiently constrained",
+    "domain": "Healthcare IoT",
+    "severity": "High",
+    "provider_support": {
+      "azure": "research_preview",
+      "aws": "research_preview",
+      "gcp": "planned"
+    },
+    "resource_type": "iot/network-policy",
+    "resource_group": "iot-network",
+    "description": "Evaluates the collected, scoped posture for: IoT Hub public network access is not sufficiently constrained. Unavailable or inferred inputs require evidence review; this definition does not independently verify provider collection.",
+    "risk": "Unrestricted public ingestion paths increase exposure of clinical telemetry services.",
+    "evidence_requirements": [
+      "public network access enabled state",
+      "allowed IP rule count",
+      "private endpoint count"
+    ],
+    "freshness_hours": 24,
+    "confidence_penalties": [
+      "reduce confidence when required evidence fields are unavailable",
+      "reduce confidence when evidence is inferred from partial tenant scope"
+    ],
+    "compliance_mappings": [
+      {
+        "framework": "NCSC CAF",
+        "reference_id": "B4 System security",
+        "title": "IoT Hub public network access is not sufficiently constrained",
+        "relevance": "Inherited catalog association; framework applicability and version require independent review."
+      },
+      {
+        "framework": "NHS DSPT",
+        "reference_id": "Network security",
+        "title": "IoT Hub public network access is not sufficiently constrained",
+        "relevance": "Inherited catalog association; framework applicability and version require independent review."
+      },
+      {
+        "framework": "Cyber Essentials",
+        "reference_id": "Firewalls",
+        "title": "IoT Hub public network access is not sufficiently constrained",
+        "relevance": "Inherited catalog association; framework applicability and version require independent review."
+      }
+    ],
+    "remediation": {
+      "summary": "Restrict IoT Hub public access using IP filters, private endpoints, or documented clinical network boundaries.",
+      "cost_tier": "low",
+      "manual_steps": [
+        "Confirm scope and review public network access enabled state, allowed IP rule count, private endpoint count.",
+        "Restrict IoT Hub public access using IP filters, private endpoints, or documented clinical network boundaries.",
+        "Obtain clinical and operational approval for changes; collect separate device evidence where needed.",
+        "Recollect evidence after the change and retain the original and follow-up scan IDs."
+      ],
+      "code": []
+    },
+    "related_controls": [],
+    "dependencies": [],
+    "assurance_claims": [
+      "iot-public-network-restrictions-are-reviewed"
+    ],
+    "metadata": {
+      "evaluator": "iot_controls",
+      "evaluator_function": "_evaluate_public_access",
+      "owner": "CRIS maintainers",
+      "mapping_review_status": "inherited_unvalidated",
+      "source_mappings": [
+        "NCSC CAF B4 System security",
+        "NHS DSPT Network security",
+        "Cyber Essentials Firewalls"
+      ],
+      "known_limitations": [],
+      "severity_basis": "maximum_evaluator_branch_severity",
+      "freshness_basis": "provisional_metadata_review_window_not_a_runtime_enforcement_guarantee",
+      "assurance_claims_basis": "review_objectives_not_automatic_attestations"
+    }
+  },
+  {
+    "control_id": "IOT-006",
+    "version": "2.1.0",
+    "title": "Conditional private endpoint and network isolation posture is weak",
+    "domain": "Healthcare IoT",
+    "severity": "Medium",
+    "provider_support": {
+      "azure": "research_preview",
+      "aws": "research_preview",
+      "gcp": "planned"
+    },
+    "resource_type": "iot/private-endpoint",
+    "resource_group": "iot-network",
+    "description": "Evaluates the collected, scoped posture for: Conditional private endpoint and network isolation posture is weak. Unavailable or inferred inputs require evidence review; this definition does not independently verify provider collection.",
+    "risk": "Required private isolation may be absent where public ingestion lacks observed compensating controls.",
+    "evidence_requirements": [
+      "private endpoint requirement and count",
+      "public network access and allowed IP rules",
+      "certificate authority configured state"
+    ],
+    "freshness_hours": 24,
+    "confidence_penalties": [
+      "reduce confidence when required evidence fields are unavailable",
+      "reduce confidence when evidence is inferred from partial tenant scope"
+    ],
+    "compliance_mappings": [
+      {
+        "framework": "NCSC CAF",
+        "reference_id": "B4 System security",
+        "title": "Conditional private endpoint and network isolation posture is weak",
+        "relevance": "Inherited catalog association; framework applicability and version require independent review."
+      },
+      {
+        "framework": "NHS DSPT",
+        "reference_id": "Network security",
+        "title": "Conditional private endpoint and network isolation posture is weak",
+        "relevance": "Inherited catalog association; framework applicability and version require independent review."
+      },
+      {
+        "framework": "UK GDPR",
+        "reference_id": "Article 32",
+        "title": "Conditional private endpoint and network isolation posture is weak",
+        "relevance": "Inherited catalog association; framework applicability and version require independent review."
+      }
+    ],
+    "remediation": {
+      "summary": "Deploy private endpoints for sensitive IoMT telemetry services where public routing lacks documented and observable compensating controls.",
+      "cost_tier": "medium",
+      "manual_steps": [
+        "Confirm scope and review private endpoint requirement and count, public network access and allowed IP rules, certificate authority configured state.",
+        "Deploy private endpoints for sensitive IoMT telemetry services where public routing lacks documented and observable compensating controls.",
+        "Obtain clinical and operational approval for changes; collect separate device evidence where needed.",
+        "Recollect evidence after the change and retain the original and follow-up scan IDs."
+      ],
+      "code": []
+    },
+    "related_controls": [],
+    "dependencies": [],
+    "assurance_claims": [
+      "iot-private-isolation-conditions-are-reviewed"
+    ],
+    "metadata": {
+      "evaluator": "iot_controls",
+      "evaluator_function": "_evaluate_private_endpoint",
+      "owner": "CRIS maintainers",
+      "mapping_review_status": "inherited_unvalidated",
+      "source_mappings": [
+        "NCSC CAF B4 System security",
+        "NHS DSPT Network security",
+        "UK GDPR Article 32"
+      ],
+      "known_limitations": [],
+      "severity_basis": "maximum_evaluator_branch_severity",
+      "freshness_basis": "provisional_metadata_review_window_not_a_runtime_enforcement_guarantee",
+      "assurance_claims_basis": "review_objectives_not_automatic_attestations"
+    }
+  },
+  {
+    "control_id": "IOT-007",
+    "version": "2.1.0",
+    "title": "IoMT telemetry routing and retention are below clinical evidence expectations",
+    "domain": "Healthcare IoT",
+    "severity": "Medium",
+    "provider_support": {
+      "azure": "research_preview",
+      "aws": "research_preview",
+      "gcp": "planned"
+    },
+    "resource_type": "iot/telemetry-route",
+    "resource_group": "iot-telemetry",
+    "description": "Evaluates the collected, scoped posture for: IoMT telemetry routing and retention are below clinical evidence expectations. Unavailable or inferred inputs require evidence review; this definition does not independently verify provider collection.",
+    "risk": "Insufficient routing, retention or governed storage can limit investigation and clinical evidence preservation.",
+    "evidence_requirements": [
+      "message route count",
+      "telemetry retention days",
+      "telemetry storage governed state"
+    ],
+    "freshness_hours": 24,
+    "confidence_penalties": [
+      "reduce confidence when required evidence fields are unavailable",
+      "reduce confidence when evidence is inferred from partial tenant scope"
+    ],
+    "compliance_mappings": [
+      {
+        "framework": "NCSC CAF",
+        "reference_id": "C1 Security monitoring",
+        "title": "IoMT telemetry routing and retention are below clinical evidence expectations",
+        "relevance": "Inherited catalog association; framework applicability and version require independent review."
+      },
+      {
+        "framework": "NHS DSPT",
+        "reference_id": "Records management",
+        "title": "IoMT telemetry routing and retention are below clinical evidence expectations",
+        "relevance": "Inherited catalog association; framework applicability and version require independent review."
+      },
+      {
+        "framework": "ISO 27001",
+        "reference_id": "A.8.15",
+        "title": "IoMT telemetry routing and retention are below clinical evidence expectations",
+        "relevance": "Inherited catalog association; framework applicability and version require independent review."
+      }
+    ],
+    "remediation": {
+      "summary": "Route IoMT telemetry to governed storage and retain sufficient logs for investigation and clinical safety review.",
+      "cost_tier": "low",
+      "manual_steps": [
+        "Confirm scope and review message route count, telemetry retention days, telemetry storage governed state.",
+        "Route IoMT telemetry to governed storage and retain sufficient logs for investigation and clinical safety review.",
+        "Obtain clinical and operational approval for changes; collect separate device evidence where needed.",
+        "Recollect evidence after the change and retain the original and follow-up scan IDs."
+      ],
+      "code": []
+    },
+    "related_controls": [],
+    "dependencies": [],
+    "assurance_claims": [
+      "iot-telemetry-governance-is-reviewed"
+    ],
+    "metadata": {
+      "evaluator": "iot_controls",
+      "evaluator_function": "_evaluate_telemetry_governance",
+      "owner": "CRIS maintainers",
+      "mapping_review_status": "inherited_unvalidated",
+      "source_mappings": [
+        "NCSC CAF C1 Security monitoring",
+        "NHS DSPT Records management",
+        "ISO 27001 A.8.15"
+      ],
+      "known_limitations": [],
+      "severity_basis": "maximum_evaluator_branch_severity",
+      "freshness_basis": "provisional_metadata_review_window_not_a_runtime_enforcement_guarantee",
+      "assurance_claims_basis": "review_objectives_not_automatic_attestations"
+    }
+  },
+  {
+    "control_id": "IOT-008",
+    "version": "2.1.0",
+    "title": "IoT credential governance is not linked to managed secret controls",
+    "domain": "Healthcare IoT",
+    "severity": "Medium",
+    "provider_support": {
+      "azure": "research_preview",
+      "aws": "research_preview",
+      "gcp": "planned"
+    },
+    "resource_type": "iot/credential",
+    "resource_group": "iot-secrets",
+    "description": "Evaluates the collected, scoped posture for: IoT credential governance is not linked to managed secret controls. Unavailable or inferred inputs require evidence review; this definition does not independently verify provider collection.",
+    "risk": "Unmanaged credentials or unobservable rotation can prolong unauthorized access to telemetry systems.",
+    "evidence_requirements": [
+      "IoT key vault linkage",
+      "IoT secret rotation observability"
+    ],
+    "freshness_hours": 24,
+    "confidence_penalties": [
+      "reduce confidence when required evidence fields are unavailable",
+      "reduce confidence when evidence is inferred from partial tenant scope"
+    ],
+    "compliance_mappings": [
+      {
+        "framework": "NCSC CAF",
+        "reference_id": "B2 Identity and access control",
+        "title": "IoT credential governance is not linked to managed secret controls",
+        "relevance": "Inherited catalog association; framework applicability and version require independent review."
+      },
+      {
+        "framework": "NHS DSPT",
+        "reference_id": "Access control",
+        "title": "IoT credential governance is not linked to managed secret controls",
+        "relevance": "Inherited catalog association; framework applicability and version require independent review."
+      },
+      {
+        "framework": "ISO 27001",
+        "reference_id": "A.8.24",
+        "title": "IoT credential governance is not linked to managed secret controls",
+        "relevance": "Inherited catalog association; framework applicability and version require independent review."
+      }
+    ],
+    "remediation": {
+      "summary": "Store and rotate IoT credentials through governed key-management services with owner accountability.",
+      "cost_tier": "low",
+      "manual_steps": [
+        "Confirm scope and review IoT key vault linkage, IoT secret rotation observability.",
+        "Store and rotate IoT credentials through governed key-management services with owner accountability.",
+        "Obtain clinical and operational approval for changes; collect separate device evidence where needed.",
+        "Recollect evidence after the change and retain the original and follow-up scan IDs."
+      ],
+      "code": []
+    },
+    "related_controls": [],
+    "dependencies": [],
+    "assurance_claims": [
+      "iot-credential-governance-is-reviewed"
+    ],
+    "metadata": {
+      "evaluator": "iot_controls",
+      "evaluator_function": "_evaluate_secret_governance",
+      "owner": "CRIS maintainers",
+      "mapping_review_status": "inherited_unvalidated",
+      "source_mappings": [
+        "NCSC CAF B2 Identity and access control",
+        "NHS DSPT Access control",
+        "ISO 27001 A.8.24"
+      ],
+      "known_limitations": [],
+      "severity_basis": "maximum_evaluator_branch_severity",
+      "freshness_basis": "provisional_metadata_review_window_not_a_runtime_enforcement_guarantee",
+      "assurance_claims_basis": "review_objectives_not_automatic_attestations"
+    }
+  },
+  {
+    "control_id": "IOT-009",
+    "version": "2.1.0",
+    "title": "Clinical IoT alert routing is not operationally evidenced",
+    "domain": "Healthcare IoT",
+    "severity": "Medium",
+    "provider_support": {
+      "azure": "research_preview",
+      "aws": "research_preview",
+      "gcp": "planned"
+    },
+    "resource_type": "iot/alert-routing",
+    "resource_group": "iot-monitoring",
+    "description": "Evaluates the collected, scoped posture for: Clinical IoT alert routing is not operationally evidenced. Unavailable or inferred inputs require evidence review; this definition does not independently verify provider collection.",
+    "risk": "Alerts without accountable destinations may not reach operational responders.",
+    "evidence_requirements": [
+      "IoT alert rule count",
+      "IoT action group count"
+    ],
+    "freshness_hours": 24,
+    "confidence_penalties": [
+      "reduce confidence when required evidence fields are unavailable",
+      "reduce confidence when evidence is inferred from partial tenant scope"
+    ],
+    "compliance_mappings": [
+      {
+        "framework": "NCSC CAF",
+        "reference_id": "C2 Proactive security event discovery",
+        "title": "Clinical IoT alert routing is not operationally evidenced",
+        "relevance": "Inherited catalog association; framework applicability and version require independent review."
+      },
+      {
+        "framework": "NHS DSPT",
+        "reference_id": "Incident management",
+        "title": "Clinical IoT alert routing is not operationally evidenced",
+        "relevance": "Inherited catalog association; framework applicability and version require independent review."
+      },
+      {
+        "framework": "IEC 80001-1",
+        "reference_id": "operational risk",
+        "title": "Clinical IoT alert routing is not operationally evidenced",
+        "relevance": "Inherited catalog association; framework applicability and version require independent review."
+      }
+    ],
+    "remediation": {
+      "summary": "Create IoT-specific alert rules and route them to accountable clinical or operational responders.",
+      "cost_tier": "low",
+      "manual_steps": [
+        "Confirm scope and review IoT alert rule count, IoT action group count.",
+        "Create IoT-specific alert rules and route them to accountable clinical or operational responders.",
+        "Obtain clinical and operational approval for changes; collect separate device evidence where needed.",
+        "Recollect evidence after the change and retain the original and follow-up scan IDs."
+      ],
+      "code": []
+    },
+    "related_controls": [],
+    "dependencies": [],
+    "assurance_claims": [
+      "iot-alert-routing-is-reviewed"
+    ],
+    "metadata": {
+      "evaluator": "iot_controls",
+      "evaluator_function": "_evaluate_clinical_alerting",
+      "owner": "CRIS maintainers",
+      "mapping_review_status": "inherited_unvalidated",
+      "source_mappings": [
+        "NCSC CAF C2 Proactive security event discovery",
+        "NHS DSPT Incident management",
+        "IEC 80001-1 operational risk"
+      ],
+      "known_limitations": [],
+      "severity_basis": "maximum_evaluator_branch_severity",
+      "freshness_basis": "provisional_metadata_review_window_not_a_runtime_enforcement_guarantee",
+      "assurance_claims_basis": "review_objectives_not_automatic_attestations"
+    }
+  },
+  {
+    "control_id": "IOT-010",
+    "version": "2.1.0",
+    "title": "Clinical-operational ownership boundaries require human validation",
+    "domain": "Healthcare IoT",
+    "severity": "Low",
+    "provider_support": {
+      "azure": "research_preview",
+      "aws": "research_preview",
+      "gcp": "planned"
+    },
+    "resource_type": "iot/ownership-boundary",
+    "resource_group": "iot-governance",
+    "description": "Evaluates the collected, scoped posture for: Clinical-operational ownership boundaries require human validation. Unavailable or inferred inputs require evidence review; this definition does not independently verify provider collection.",
+    "risk": "Undocumented clinical, operational and supplier responsibilities can leave assurance gaps that cloud telemetry cannot resolve.",
+    "evidence_requirements": [
+      "clinical operational boundary documented state",
+      "device-level evidence required count",
+      "clinical operational evidence required count"
+    ],
+    "freshness_hours": 24,
+    "confidence_penalties": [
+      "reduce confidence when required evidence fields are unavailable",
+      "reduce confidence when evidence is inferred from partial tenant scope"
+    ],
+    "compliance_mappings": [
+      {
+        "framework": "NCSC CAF",
+        "reference_id": "A1 Governance",
+        "title": "Clinical-operational ownership boundaries require human validation",
+        "relevance": "Inherited catalog association; framework applicability and version require independent review."
+      },
+      {
+        "framework": "NHS DSPT",
+        "reference_id": "Leadership and governance",
+        "title": "Clinical-operational ownership boundaries require human validation",
+        "relevance": "Inherited catalog association; framework applicability and version require independent review."
+      },
+      {
+        "framework": "IEC 80001-1",
+        "reference_id": "responsibility agreements",
+        "title": "Clinical-operational ownership boundaries require human validation",
+        "relevance": "Inherited catalog association; framework applicability and version require independent review."
+      }
+    ],
+    "remediation": {
+      "summary": "Document clinical, operational, and supplier ownership boundaries for IoMT assets and validate device-level evidence manually.",
+      "cost_tier": "free",
+      "manual_steps": [
+        "Confirm scope and review clinical operational boundary documented state, device-level evidence required count, clinical operational evidence required count.",
+        "Document clinical, operational, and supplier ownership boundaries for IoMT assets and validate device-level evidence manually.",
+        "Obtain clinical and operational approval for changes; collect separate device evidence where needed.",
+        "Recollect evidence after the change and retain the original and follow-up scan IDs."
+      ],
+      "code": []
+    },
+    "related_controls": [],
+    "dependencies": [],
+    "assurance_claims": [
+      "clinical-ownership-requires-human-validation"
+    ],
+    "metadata": {
+      "evaluator": "iot_controls",
+      "evaluator_function": "_evaluate_clinical_boundary",
+      "owner": "CRIS maintainers",
+      "mapping_review_status": "inherited_unvalidated",
+      "source_mappings": [
+        "NCSC CAF A1 Governance",
+        "NHS DSPT Leadership and governance",
+        "IEC 80001-1 responsibility agreements"
+      ],
+      "known_limitations": [
+        "clinical ownership, supplier accountability, and patient-safety workflow evidence require human validation"
+      ],
+      "severity_basis": "maximum_evaluator_branch_severity",
+      "freshness_basis": "provisional_metadata_review_window_not_a_runtime_enforcement_guarantee",
+      "assurance_claims_basis": "review_objectives_not_automatic_attestations"
     }
   }
 ]

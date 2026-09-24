@@ -8,8 +8,9 @@ from typing import Any
 
 from pydantic import BaseModel, Field
 
+from cris_sme.data_paths import policy_data_path
 
-DEFAULT_BENCHMARK_DATASET_PATH = Path("data/benchmark_dataset.json")
+DEFAULT_BENCHMARK_DATASET_PATH = policy_data_path("benchmark_dataset.json")
 
 
 class BenchmarkObservation(BaseModel):

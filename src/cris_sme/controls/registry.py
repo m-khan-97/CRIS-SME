@@ -9,6 +9,7 @@ from pydantic import BaseModel, Field
 from cris_sme.controls.definitions import (
     ControlDefinition,
     load_control_definitions,
+    validate_control_links,
 )
 from cris_sme.models.finding import FindingCategory, FindingSeverity
 
@@ -32,6 +33,7 @@ class ControlRegistry:
     """In-memory registry for metadata-rich CRIS-SME controls."""
 
     def __init__(self, definitions: dict[str, ControlDefinition]) -> None:
+        validate_control_links(definitions)
         self._definitions = dict(sorted(definitions.items()))
 
     @classmethod
@@ -42,6 +44,10 @@ class ControlRegistry:
             if path is None
             else load_control_definitions(str(path))
         )
+        if path is None:
+            from cris_sme.controls.validation import validate_control_pack
+
+            validate_control_pack(definitions)
         return cls(definitions)
 
     def all(self) -> list[ControlDefinition]:
@@ -150,9 +156,7 @@ class ControlRegistry:
             for dependency_id in definition.dependencies:
                 if dependency_id in selected:
                     continue
-                dependency = self._definitions.get(dependency_id)
-                if dependency is None:
-                    continue
+                dependency = self._definitions[dependency_id]
                 selected[dependency.control_id] = dependency
                 queue.append(dependency)
         return [selected[control_id] for control_id in sorted(selected)]

@@ -2,15 +2,14 @@
 from __future__ import annotations
 
 import json
-from pathlib import Path
 from typing import Any
 
 from pydantic import BaseModel, Field
 
+from cris_sme.data_paths import policy_data_path
 from cris_sme.models.finding import Finding
 
-
-DEFAULT_CYBER_ESSENTIALS_CONTROLS_PATH = Path("data/cyber_essentials_controls.json")
+DEFAULT_CYBER_ESSENTIALS_CONTROLS_PATH = policy_data_path("cyber_essentials_controls.json")
 
 
 class ReadinessPillar(BaseModel):

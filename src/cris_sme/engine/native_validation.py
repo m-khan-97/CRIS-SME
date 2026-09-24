@@ -8,11 +8,11 @@ from typing import Any
 
 from pydantic import BaseModel, Field
 
+from cris_sme.data_paths import policy_data_path
 from cris_sme.engine.scoring import ScoredFinding
 from cris_sme.models.cloud_profile import CloudProfile
 
-
-DEFAULT_NATIVE_RECOMMENDATION_MAPPING_PATH = Path("data/native_recommendation_mapping.json")
+DEFAULT_NATIVE_RECOMMENDATION_MAPPING_PATH = policy_data_path("native_recommendation_mapping.json")
 
 
 class NativeRecommendationMappingEntry(BaseModel):

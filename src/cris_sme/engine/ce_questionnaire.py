@@ -6,8 +6,9 @@ from collections import Counter, defaultdict
 from pathlib import Path
 from typing import Any
 
+from cris_sme.data_paths import policy_data_path
 
-DEFAULT_CE_QUESTION_MAPPING_PATH = Path("data/ce_question_mapping.json")
+DEFAULT_CE_QUESTION_MAPPING_PATH = policy_data_path("ce_question_mapping.json")
 
 TERMINAL_STATUSES = {
     "endpoint_required",

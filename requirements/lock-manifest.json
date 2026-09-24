@@ -1,0 +1,13 @@
+{
+  "generator": "uv 0.11.21 (x86_64-unknown-linux-gnu)",
+  "sha256": {
+    "pyproject.toml": "e05c76190cfaa66c48b67bfa7fbff4bcb21676d5cab3580d38370bea41aa698d",
+    "requirements/build.in": "1c63a5e9e8f4e9a95face0adcb4535ecadc7981b0f9b6d2f1c7f7aefd701b8d2",
+    "scripts/lock_dependencies.py": "654d6511c06fd439a7f5fac0f24a484a595e1095f1682e4ae8eb66023709dff0",
+    "requirements/runtime.txt": "154bafa68575d9c3f000e7c8afaf56b16c57395971b37d892af4cacbcd71ff9c",
+    "requirements/cloud.txt": "63c382621a039f7a486bf8b106a5bc76c68ea7921650dc9ed65135ab314c8975",
+    "requirements/mcp.txt": "097c21f6e4a7fa17dc8f9fc7123aa61aa7ed3888d8679a06999f84c90c2b62ee",
+    "requirements/build.txt": "f7276d45a86bfcb0143691777aed43f7321e8aa8da7cbed2b7a7f3127fac204a",
+    "requirements/dev.txt": "765718b893b1a1b2f1e27fd52c1f7edc70d97224b1faeb279fc0deecc476e90b"
+  }
+}

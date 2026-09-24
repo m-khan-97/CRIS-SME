@@ -1,5 +1,7 @@
 # Innovation and UKRI Readiness
 
+> Research background and hypotheses. The [canonical roadmap](roadmap.md) replaces delivery priorities and supplies a dated funding-opportunity register. Themes below do not establish novelty, eligibility or an open funding call.
+
 CRIS-SME's immediate priority is technical transformation: making the system novel, defensible, and research-grade before optimizing for customers, investors, or sales packaging.
 
 This document frames CRIS-SME as an innovation project that could later support UKRI-style funding, especially where the work advances cloud governance for SMEs beyond generic scanning.
@@ -187,13 +189,6 @@ Deliverables:
 - ethics and security considerations
 - exploitation path after R&D
 
-## Immediate Build Priority
+## Execution Reference
 
-The strongest next implementation step is the evidence sufficiency model because it strengthens nearly every other CRIS-SME claim:
-
-- scoring becomes more defensible
-- reports become more honest
-- AI narration has safer source boundaries
-- UKRI novelty becomes clearer
-- provider expansion becomes less risky
-- insurance readiness becomes more credible
+Use the [canonical roadmap](roadmap.md) for current work packages, comparative evaluation, partner requirements and funding preparation. Evidence sufficiency already has an implementation; the next work is completion, independent validation and secure delivery, not rebuilding it as a new feature.

@@ -1,5 +1,7 @@
 # SaaS and API Evolution
 
+> API design background, not a separate delivery plan. Use the [canonical roadmap](roadmap.md) for authentication, tenancy, persistence and release sequencing. Objects and endpoints below are design concepts unless independently implemented and tested.
+
 CRIS-SME currently runs as a deterministic CLI/reporting pipeline with static dashboard outputs. The next product step is to preserve that local-first strength while adding a SaaS/API plane.
 
 ## Principles
@@ -77,35 +79,9 @@ CRIS-SME currently runs as a deterministic CLI/reporting pipeline with static da
 - `GET /policy-packs/{policy_pack_id}/controls`
 - `GET /policy-packs/{policy_pack_id}/provider-support`
 
-## Deployment Stages
+## Delivery Reference
 
-### Stage 1: API Wrapper
-
-Expose the existing pipeline behind an API without changing the engine.
-
-Recommended first endpoints:
-
-- create assessment
-- fetch report
-- list findings
-- fetch finding trace
-
-### Stage 2: Persistent Runs
-
-Persist report outputs and lifecycle events in a database-ready structure.
-
-Recommended store:
-
-- PostgreSQL for tenant, run, finding, lifecycle, and exception objects
-- object storage for full reports and generated artifacts
-
-### Stage 3: Multi-Tenant Product
-
-Add tenant isolation, user roles, API keys, audit logs, and scheduled assessments.
-
-### Stage 4: MSP Console
-
-Add portfolio risk, client comparison, recurring regression, exception expiry, and white-label reporting.
+The [canonical roadmap](roadmap.md) replaces the former staged plan. Hosted deployment requires authenticated tenant isolation and recovery testing before exposure, not as an optional later stage. PostgreSQL metadata and tenant-scoped artifact storage are the proposed target.
 
 ## Local-First Bridge
 

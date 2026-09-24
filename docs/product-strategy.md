@@ -1,5 +1,7 @@
 # Transformation Strategy
 
+> Background product rationale. Current scope, priorities, packaging decisions and delivery gates are maintained only in the [canonical roadmap](roadmap.md). Earlier commercial hypotheses below are not validated market outcomes.
+
 ## North Star
 
 CRIS-SME should become a state-of-the-art evidence-driven cloud risk decision methodology for SMEs.
@@ -164,44 +166,6 @@ CRIS-SME solves the proof gap: it turns cloud evidence into defensible decisions
 
 The long-term system can expand from Azure-first assessment into a multi-cloud risk decision API, MSP console, insurance evidence gateway, and control-pack marketplace. That commercial direction is secondary to the current R&D priority: proving the methodology is novel, useful, and technically credible.
 
-## 30/60/90-Day Execution Plan
+## Execution
 
-### First 30 Days
-
-- upgrade public positioning and product docs
-- produce polished sample dashboard and report bundle
-- add evidence sufficiency states to findings
-- implement signed report manifest
-- improve Azure IAM/governance coverage notes and least-privilege setup docs
-- create remediation simulator design and MVP schema
-
-### First 60 Days
-
-- add API service around assessments, findings, exceptions, and reports
-- persist assessment runs in a database-ready model
-- add exception ownership and approval workflow
-- create insurer questionnaire export with confidence labels
-- define provider evidence contracts for Azure, AWS, and GCP
-- convert static dashboard payload into a reusable frontend contract
-
-### First 90 Days
-
-- run 3-5 SME/MSP pilots
-- build a customer-ready demo tenant and sample assurance pack
-- add AWS/GCP mock conformance tests
-- implement report signing and verification
-- publish comparison matrix and pricing page
-- produce a before/after case study using drift history
-
-## Top 10 Next Actions
-
-1. Add evidence sufficiency states to finding lineage and dashboard payloads.
-2. Add a Decision Ledger schema for run, finding, exception, and approval history.
-3. Implement a deterministic remediation simulator.
-4. Add signed report manifest and Risk Bill of Materials.
-5. Expand Azure identity and governance evidence collection.
-6. Build insurer questionnaire answer export with proof links.
-7. Define provider evidence contracts and conformance tests.
-8. Add SaaS/API skeleton with assessment and report endpoints.
-9. Upgrade dashboard into role-based owner, engineer, board, insurer, and MSP views.
-10. Create a polished demo bundle for customers and investors.
+The former dated execution plan and next-action list have been replaced by the [canonical roadmap](roadmap.md), which distinguishes existing foundations from unfinished enterprise work.

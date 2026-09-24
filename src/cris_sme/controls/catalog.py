@@ -7,10 +7,10 @@ from pathlib import Path
 
 from pydantic import BaseModel, Field
 
+from cris_sme.data_paths import policy_data_path
 from cris_sme.models.finding import FindingCategory, RemediationCostTier
 
-
-DEFAULT_CONTROL_CATALOG_PATH = Path("data/control_catalog.json")
+DEFAULT_CONTROL_CATALOG_PATH = policy_data_path("control_catalog.json")
 
 
 class ControlCatalogEntry(BaseModel):
@@ -32,6 +32,8 @@ def load_control_catalog(
     catalog_path = Path(path)
     raw_entries = json.loads(catalog_path.read_text(encoding="utf-8"))
     entries = [ControlCatalogEntry.model_validate(item) for item in raw_entries]
+    if len({entry.control_id for entry in entries}) != len(entries):
+        raise ValueError("Duplicate control IDs in control catalog")
     return {entry.control_id: entry for entry in entries}
 
 

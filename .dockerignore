@@ -1,4 +1,21 @@
 .git
+.env
+.env.*
+*.pem
+*.key
+.aws
+.azure
+.codex
+.claude
+.agents
+paper
+*.zip
+CRIS-SME Command Center (standalone).html
+build
+dist
+*.egg-info
+data/finding_exceptions.json
+data/mute_rules.json
 .github
 node_modules
 frontend/console/node_modules

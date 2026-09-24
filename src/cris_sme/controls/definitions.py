@@ -8,14 +8,14 @@ from typing import Any
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 
+from cris_sme.data_paths import policy_data_path
 from cris_sme.models.finding import (
     FindingCategory,
     FindingSeverity,
     RemediationCostTier,
 )
 
-
-DEFAULT_CONTROL_METADATA_V2_PATH = Path("data/control_metadata_v2.json")
+DEFAULT_CONTROL_METADATA_V2_PATH = policy_data_path("control_metadata_v2.json")
 SUPPORTED_PROVIDER_STATUSES = {
     "active",
     "planned",
@@ -27,7 +27,7 @@ SUPPORTED_PROVIDER_STATUSES = {
 class ComplianceMappingDefinition(BaseModel):
     """Structured framework mapping for a v2 control definition."""
 
-    model_config = ConfigDict(extra="forbid")
+    model_config = ConfigDict(extra="forbid", str_strip_whitespace=True)
 
     framework: str = Field(..., min_length=2)
     reference_id: str = Field(..., min_length=1)
@@ -44,7 +44,7 @@ class ComplianceMappingDefinition(BaseModel):
 class RemediationCodeDefinition(BaseModel):
     """Non-executing remediation snippet for a control definition."""
 
-    model_config = ConfigDict(extra="forbid")
+    model_config = ConfigDict(extra="forbid", str_strip_whitespace=True)
 
     kind: str = Field(..., min_length=2)
     label: str = Field(..., min_length=3)
@@ -60,7 +60,7 @@ class RemediationCodeDefinition(BaseModel):
 class RemediationDefinition(BaseModel):
     """Human and machine-oriented remediation guidance for a control."""
 
-    model_config = ConfigDict(extra="forbid")
+    model_config = ConfigDict(extra="forbid", str_strip_whitespace=True)
 
     summary: str = Field(..., min_length=8)
     cost_tier: RemediationCostTier
@@ -70,14 +70,17 @@ class RemediationDefinition(BaseModel):
     @field_validator("manual_steps")
     @classmethod
     def strip_manual_steps(cls, values: list[str]) -> list[str]:
-        """Trim empty manual steps."""
-        return [value.strip() for value in values if value.strip()]
+        """Normalize manual steps without silently accepting empty instructions."""
+        normalized = [value.strip() for value in values]
+        if not normalized or any(len(value) < 3 for value in normalized):
+            raise ValueError("manual_steps must contain nonblank instructions of at least three characters.")
+        return normalized
 
 
 class ControlDefinition(BaseModel):
     """Metadata-rich, filterable CRIS-SME control definition."""
 
-    model_config = ConfigDict(extra="forbid")
+    model_config = ConfigDict(extra="forbid", str_strip_whitespace=True)
 
     control_id: str = Field(..., min_length=3)
     version: str = Field(..., min_length=3)
@@ -108,8 +111,11 @@ class ControlDefinition(BaseModel):
     )
     @classmethod
     def strip_string_lists(cls, values: list[str]) -> list[str]:
-        """Normalize list fields by trimming whitespace and dropping empty items."""
-        return [value.strip() for value in values if value.strip()]
+        """Normalize list fields and reject blank entries."""
+        normalized = [value.strip() for value in values]
+        if any(len(value) < 3 for value in normalized):
+            raise ValueError("List entries must contain at least three nonblank characters.")
+        return normalized
 
     @field_validator("provider_support")
     @classmethod
@@ -123,8 +129,9 @@ class ControlDefinition(BaseModel):
                 raise ValueError(
                     f"Unsupported provider support status '{status}' for '{provider}'."
                 )
-            if provider_key:
-                normalized[provider_key] = status_value
+            if not provider_key or provider_key in normalized:
+                raise ValueError("Provider keys must be nonblank and unique after normalization.")
+            normalized[provider_key] = status_value
         if not normalized:
             raise ValueError("At least one provider support entry is required.")
         return normalized
@@ -142,6 +149,10 @@ class ControlDefinition(BaseModel):
             values = getattr(self, field_name)
             if len(values) != len(set(values)):
                 raise ValueError(f"{field_name} contains duplicate entries.")
+        mappings = [(entry.framework.casefold(), entry.reference_id.casefold())
+                    for entry in self.compliance_mappings]
+        if len(mappings) != len(set(mappings)):
+            raise ValueError("compliance_mappings contains duplicate framework references.")
         return self
 
     @property
@@ -198,3 +209,30 @@ def _validate_unique_control_ids(definitions: list[ControlDefinition]) -> None:
     if duplicates:
         duplicate_list = ", ".join(sorted(duplicates))
         raise ValueError(f"Duplicate control metadata v2 IDs: {duplicate_list}")
+
+
+def validate_control_links(definitions: dict[str, ControlDefinition]) -> None:
+    """Reject dangling relationships and cyclic evaluation prerequisites."""
+    for key, definition in definitions.items():
+        if key != definition.control_id:
+            raise ValueError(f"Registry key {key} does not match {definition.control_id}")
+        for relation in ("related_controls", "dependencies"):
+            for target in getattr(definition, relation):
+                if target == key or target not in definitions:
+                    raise ValueError(f"{key}: invalid {relation} reference {target}")
+    visited: set[str] = set()
+    active: set[str] = set()
+
+    def visit(key: str) -> None:
+        if key in active:
+            raise ValueError(f"Control dependency cycle includes {key}")
+        if key in visited:
+            return
+        active.add(key)
+        for target in definitions[key].dependencies:
+            visit(target)
+        active.remove(key)
+        visited.add(key)
+
+    for key in sorted(definitions):
+        visit(key)

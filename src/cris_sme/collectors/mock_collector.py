@@ -6,12 +6,13 @@ from pathlib import Path
 from typing import Any
 
 from cris_sme.collectors.providers import get_profile_adapter
+from cris_sme.data_paths import policy_data_path
 from cris_sme.models.cloud_profile import CloudProfile
 from cris_sme.models.finding import Finding
 
 
 class MockCollector:
-    """Load validated mock inputs from the repository data directory."""
+    """Load bundled mock inputs, or explicitly supplied fixture files."""
 
     def __init__(
         self,
@@ -19,12 +20,12 @@ class MockCollector:
         profiles_path: str | Path | None = None,
     ) -> None:
         self.findings_path = (
-            Path(findings_path) if findings_path else Path("data/sample_findings.json")
+            Path(findings_path) if findings_path else policy_data_path("sample_findings.json")
         )
         self.profiles_path = (
             Path(profiles_path)
             if profiles_path
-            else Path("data/synthetic_sme_profiles.json")
+            else policy_data_path("synthetic_sme_profiles.json")
         )
 
     def collect_findings(self) -> list[Finding]:

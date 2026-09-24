@@ -15,6 +15,11 @@ Recent live validation: CRIS-SME has been run against an authorized Azure subscr
 
 ## Why CRIS-SME
 
+**Deployment boundary:** the live runner is unauthenticated and restricted to
+isolated, single-operator use. Do not expose it publicly or share it across tenants.
+Read the [deployment restrictions](docs/deployment-security.md) and
+[threat model](docs/threat-model.md) before connecting cloud credentials.
+
 SME cloud teams are often forced between two poor options:
 
 - enterprise platforms that are too expensive or operationally heavy
@@ -83,7 +88,7 @@ CRIS-SME is evolving toward a state-of-the-art cloud risk decision methodology:
 - **SaaS/API Plane**: assessment, finding, exception, report, and policy-pack APIs
 - **AI Risk Narrator**: optional plain-language translation that never changes deterministic scores
 
-See [transformation strategy](docs/product-strategy.md), [innovation and UKRI readiness](docs/innovation-and-ukri-readiness.md), [frontend console](docs/frontend-console.md), [assessment replay](docs/assessment-replay.md), [assessment assurance](docs/assessment-assurance.md), [evidence gap backlog](docs/evidence-gap-backlog.md), [control drift attribution](docs/control-drift-attribution.md), [policy pack changelog](docs/policy-pack-changelog.md), [report trust badge](docs/report-trust-badge.md), [decision review queue](docs/decision-review-queue.md), [decision provenance graph](docs/decision-provenance-graph.md), [claim verification pack](docs/claim-verification-pack.md), [assurance case](docs/assurance-case.md), [claim-bound narrative](docs/claim-bound-narrative.md), [assurance portal](docs/assurance-portal.md), [selective disclosure evidence room](docs/selective-disclosure-evidence-room.md), [provider evidence contracts](docs/provider-evidence-contracts.md), [remediation simulator](docs/remediation-simulator.md), [SaaS and API evolution](docs/saas-api-evolution.md), and [security and trust model](docs/security-trust-model.md) for the professional roadmap.
+The [CRIS enterprise roadmap](docs/roadmap.md) is the single execution plan for the shared platform, CRIS-SME, CRIS-IoMT and proposed CRIS-PQC module. Its phases cover secure multi-tenant operation, scanner validation, enterprise delivery, OWASP/OpenSSF pathways and commercialization. The [Prowler and OpenShield audit](docs/enterprise-reference-audit.md) explains the source-based findings behind those priorities.
 
 ---
 
@@ -181,6 +186,9 @@ CRIS-SME/
 ## Quickstart
 
 ### 1. Environment setup
+
+Python 3.11 or newer is required. For an installed-package check or a private
+Docker trial, see [packaging and container instructions](docs/packaging-and-container.md).
 
 ```bash
 git clone https://github.com/m-khan-97/CRIS-SME.git
@@ -353,6 +361,7 @@ Core platform docs:
 Data/decision docs:
 
 - [Data Model](docs/data-model.md)
+- [Control Metadata](docs/control-metadata.md)
 - [Evidence Lineage](docs/evidence-lineage.md)
 - [Frontend Console](docs/frontend-console.md)
 - [Assessment Replay](docs/assessment-replay.md)
@@ -379,16 +388,13 @@ Delivery docs:
 - [CI/CD and Vercel Delivery](docs/ci-cd-and-vercel.md)
 - [Multi-cloud Expansion Strategy](docs/multi-cloud-expansion.md)
 - [Roadmap](docs/roadmap.md)
+- [Enterprise Reference Repository Audit](docs/enterprise-reference-audit.md)
 
 ---
 
-## Roadmap (Practical)
+## Enterprise Roadmap
 
-1. Expand active provider coverage beyond Azure while keeping evidence parity standards.
-2. Add richer exception governance workflows and audit trails.
-3. Deepen graph context with higher-fidelity relationship evidence.
-4. Add optional API delivery mode while preserving static artifact mode.
-5. Improve provenance and signed artifact attestations for audit-heavy use cases.
+Follow the [canonical phased roadmap](docs/roadmap.md). The immediate priorities are reproducible packaging and CI, complete control metadata, isolated scan artifacts, authenticated workspaces and durable execution. PQC discovery and broader enterprise capabilities follow explicit evidence and release gates, rather than being presented as already available.
 
 ---
 

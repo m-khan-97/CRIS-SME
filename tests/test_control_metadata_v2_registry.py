@@ -1,7 +1,7 @@
 # Unit tests for CRIS-SME control metadata v2 loading and registry filtering.
 import json
 
-from cris_sme.controls.catalog import get_control_entry
+from cris_sme.controls.catalog import get_control_entry, load_control_catalog
 from cris_sme.controls.definitions import (
     DEFAULT_CONTROL_METADATA_V2_PATH,
     get_control_definition,
@@ -12,13 +12,11 @@ from cris_sme.models.finding import FindingSeverity
 from cris_sme.policies import get_control_spec
 
 
-PHASE_1_CONTROL_IDS = {"IAM-001", "NET-001", "DATA-001", "MON-001", "GOV-001"}
-
-
-def test_control_metadata_v2_loads_phase_1_seed_controls() -> None:
+def test_control_metadata_v2_loads_all_catalog_controls() -> None:
     definitions = load_control_definitions()
 
-    assert set(definitions) == PHASE_1_CONTROL_IDS
+    assert set(definitions) == set(load_control_catalog())
+    assert len(definitions) == 36
 
     iam = get_control_definition("IAM-001")
     assert iam.severity == FindingSeverity.CRITICAL
@@ -47,7 +45,7 @@ def test_control_metadata_v2_stays_aligned_with_existing_catalog_and_specs() -> 
         assert definition.assurance_claims
 
 
-def test_control_metadata_v2_schema_file_matches_seed_shape() -> None:
+def test_control_metadata_v2_schema_file_matches_full_catalog() -> None:
     schema = json.loads(
         DEFAULT_CONTROL_METADATA_V2_PATH.with_suffix(".schema.json").read_text(
             encoding="utf-8"
@@ -59,7 +57,7 @@ def test_control_metadata_v2_schema_file_matches_seed_shape() -> None:
 
     assert schema["title"] == "CRIS-SME Control Metadata v2"
     assert schema["type"] == "array"
-    assert {item["control_id"] for item in raw_metadata} == PHASE_1_CONTROL_IDS
+    assert {item["control_id"] for item in raw_metadata} == set(load_control_catalog())
 
 
 def test_control_registry_filters_by_provider_framework_and_domain() -> None:
@@ -72,7 +70,7 @@ def test_control_registry_filters_by_provider_framework_and_domain() -> None:
         domains=["Network"],
     )
 
-    assert [control.control_id for control in controls] == ["NET-001"]
+    assert [control.control_id for control in controls] == ["NET-001", "NET-002"]
 
 
 def test_control_registry_filters_by_resource_evidence_and_claims() -> None:

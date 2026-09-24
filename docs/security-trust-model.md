@@ -1,6 +1,13 @@
 # Security and Trust Model
 
+> Design principles, not a certification or implementation checklist. The [canonical roadmap](roadmap.md) owns delivery gates and current gaps; a listed security property is not proof of implementation.
+
 CRIS-SME should earn trust by being explicit about what it collects, what it stores, what it can prove, and where its visibility ends.
+
+For the current implementation, use the [source-based threat model](threat-model.md)
+and mandatory [deployment restrictions](deployment-security.md). The runner is
+unauthenticated and is not approved for public or multi-tenant hosting. The
+principles below describe intended properties, not completed security controls.
 
 ## Trust Principles
 
@@ -94,7 +101,7 @@ AI output should cite deterministic fields such as:
 - observation class
 - confidence label
 
-## SaaS Security Roadmap
+## Hosted Security Requirements
 
 ### Minimum Production Baseline
 
@@ -108,7 +115,7 @@ AI output should cite deterministic fields such as:
 - signed reports
 - secrets management
 
-### Customer Trust Roadmap
+### Customer Trust Requirements
 
 - public security page
 - subprocessors and data retention policy

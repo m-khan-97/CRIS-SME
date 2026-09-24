@@ -5,14 +5,14 @@ import json
 from functools import lru_cache
 from pathlib import Path
 
+from cris_sme.data_paths import policy_data_path
 from cris_sme.models.platform import (
     PolicyPackChangelog,
     PolicyPackChangelogEntry,
 )
 from cris_sme.policies import POLICY_PACK_VERSION
 
-
-DEFAULT_POLICY_CHANGELOG_PATH = Path("data/policy_pack_changelog.json")
+DEFAULT_POLICY_CHANGELOG_PATH = policy_data_path("policy_pack_changelog.json")
 
 
 @lru_cache(maxsize=1)

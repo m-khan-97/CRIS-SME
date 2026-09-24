@@ -7,10 +7,10 @@ from pathlib import Path
 
 from pydantic import BaseModel, Field
 
+from cris_sme.data_paths import policy_data_path
 from cris_sme.models.finding import Finding
 
-
-DEFAULT_CONFIDENCE_CALIBRATION_PATH = Path("data/confidence_calibration.json")
+DEFAULT_CONFIDENCE_CALIBRATION_PATH = policy_data_path("confidence_calibration.json")
 
 
 class ConfidenceCalibrationEntry(BaseModel):
