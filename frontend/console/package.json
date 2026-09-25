@@ -9,6 +9,7 @@
     "build:demo": "tsc -b && vite build --mode demo --outDir dist/demo",
     "build:selfhost": "tsc -b && vite build --mode selfhost --outDir dist/selfhost",
     "lint": "eslint .",
+    "lint:core": "eslint src/components src/hooks src/api src/context src/test src/pages/AttackPaths.tsx src/pages/PublicExposure.tsx --max-warnings 0",
     "test": "vitest run",
     "preview": "vite preview",
     "preview:demo": "vite preview --outDir dist/demo"

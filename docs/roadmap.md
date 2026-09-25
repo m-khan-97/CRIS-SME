@@ -159,6 +159,11 @@ and hosted matrix verification remain open. See [quality baseline](quality-basel
 
 Next implementation priority: finish P0-06's frontend lint and browser gates.
 
+25 September progress: baseline commit `7d54a5b` is published. The first frontend
+cleanup adds a required, zero-warning lint gate for shared code and two migrated
+pages. Console tests increase to 43; the self-host build passes. Full lint still
+has 95 errors and 13 warnings, so P0-06 remains in progress.
+
 | ID | Owner | Work and acceptance evidence |
 | --- | --- | --- |
 | P0-01 | RE | Repair stale Mermaid-only README assertion after SVG migration. Check linked diagrams and documents. CI summaries must reflect failed/cancelled jobs instead of always printing success. |

@@ -10,9 +10,9 @@ import {
   Meter,
   Panel,
   SeverityTag,
-  normalizeSeverity,
   type DataTableColumn,
 } from "../components/clarion";
+import { normalizeSeverity } from "../components/severity";
 import {
   IOMT_CONTROL_MAPPING,
   IOMT_EVIDENCE_CLASS_LABEL,

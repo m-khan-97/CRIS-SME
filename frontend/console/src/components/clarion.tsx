@@ -1,5 +1,6 @@
 import type { ButtonHTMLAttributes, ComponentType, ReactNode } from "react";
 import { useCountUp } from "../hooks/useCountUp";
+import type { SeverityLevel } from "./severity";
 
 /**
  * "Clarion" design system components — ported from the design handoff
@@ -91,8 +92,6 @@ export function KpiCard({
 
 // -- SeverityTag ------------------------------------------------------------
 
-export type SeverityLevel = "critical" | "high" | "medium" | "low";
-
 const SEVERITY_LABEL: Record<SeverityLevel, string> = {
   critical: "CRIT",
   high: "HIGH",
@@ -106,14 +105,6 @@ const SEVERITY_CLASSES: Record<SeverityLevel, string> = {
   medium: "text-sev-medium-text bg-sev-medium-bg",
   low: "text-sev-low-text bg-sev-low-bg",
 };
-
-export function normalizeSeverity(value: string): SeverityLevel {
-  const normalized = value.trim().toLowerCase();
-  if (normalized === "critical" || normalized === "high" || normalized === "medium" || normalized === "low") {
-    return normalized;
-  }
-  return "low";
-}
 
 export function SeverityTag({ level }: { level: SeverityLevel }) {
   return (

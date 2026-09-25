@@ -3,7 +3,8 @@ import { useState } from "react";
 import { RefreshCw } from "lucide-react";
 import { runPublicExposureAssessment } from "../api/client";
 import { EmptyState, Spinner } from "../components/ui";
-import { DataTable, KpiCard, Panel, SeverityTag, normalizeSeverity, type DataTableColumn } from "../components/clarion";
+import { DataTable, KpiCard, Panel, SeverityTag, type DataTableColumn } from "../components/clarion";
+import { normalizeSeverity } from "../components/severity";
 
 interface ExposureFindingRow {
   id: string;
@@ -137,10 +138,10 @@ export function PublicExposure() {
             <KpiCard
               label="Findings"
               value={report.summary?.finding_count ?? 0}
-              accent={(report.summary as Record<string, any>)?.high_finding_count > 0 ? "critical" : undefined}
+              accent={(report.summary?.high_finding_count ?? 0) > 0 ? "critical" : undefined}
             />
-            <KpiCard label="HTTPS available" value={(report.summary as Record<string, any>)?.https_available_count ?? "—"} />
-            <KpiCard label="Resolved targets" value={(report.summary as Record<string, any>)?.resolved_target_count ?? "—"} />
+            <KpiCard label="HTTPS available" value={report.summary?.https_available_count ?? "—"} />
+            <KpiCard label="Resolved targets" value={report.summary?.resolved_target_count ?? "—"} />
           </div>
 
           <Panel title="Exposure findings" meta={report.message}>

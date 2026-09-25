@@ -13,13 +13,13 @@ const PREFERS_REDUCED_MOTION =
  * report reload. Respects prefers-reduced-motion.
  */
 export function useCountUp(target: number, durationMs = 700): number {
+  const immediate = PREFERS_REDUCED_MOTION || !Number.isFinite(target) || !Number.isFinite(durationMs) || durationMs <= 0;
   const [value, setValue] = useState(PREFERS_REDUCED_MOTION ? target : 0);
   const fromRef = useRef(PREFERS_REDUCED_MOTION ? target : 0);
 
   useEffect(() => {
-    if (PREFERS_REDUCED_MOTION || !Number.isFinite(target)) {
-      fromRef.current = target;
-      setValue(target);
+    if (immediate) {
+      fromRef.current = Number.isFinite(target) ? target : 0;
       return;
     }
 
@@ -40,7 +40,7 @@ export function useCountUp(target: number, durationMs = 700): number {
 
     frame = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(frame);
-  }, [target, durationMs]);
+  }, [target, durationMs, immediate]);
 
-  return value;
+  return immediate ? target : value;
 }

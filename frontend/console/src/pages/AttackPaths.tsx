@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { createElement, useMemo, useState } from "react";
 import {
   Background,
   Handle,
@@ -82,7 +82,6 @@ function layoutAssets(assets: CrisAsset[], relationships: AssetRelationship[]) {
 function AssetNode({ data }: NodeProps) {
   const asset = data.asset as CrisAsset;
   const severity = data.severity as string | undefined;
-  const Icon = iconForAssetType(asset.asset_type);
   const ringClass = severity ? SEVERITY_RING[severity] ?? "" : "";
 
   return (
@@ -91,7 +90,7 @@ function AssetNode({ data }: NodeProps) {
     >
       <Handle type="target" position={Position.Left} className="!bg-text-faint" />
       <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md bg-surface-rail text-text-body">
-        <Icon className="h-4 w-4" />
+        {createElement(iconForAssetType(asset.asset_type), { className: "h-4 w-4" })}
       </div>
       <div className="min-w-0">
         <div className="truncate text-xs font-medium text-text-strong">{asset.name}</div>
@@ -112,9 +111,9 @@ export function AttackPaths() {
 
   const [selectedAssetId, setSelectedAssetId] = useState<string | null>(null);
 
-  const allAssets = report?.resource_context?.assets ?? [];
-  const allRelationships = report?.resource_context?.relationships ?? [];
-  const risks = report?.prioritized_risks ?? [];
+  const allAssets = useMemo(() => report?.resource_context?.assets ?? [], [report]);
+  const allRelationships = useMemo(() => report?.resource_context?.relationships ?? [], [report]);
+  const risks = useMemo(() => report?.prioritized_risks ?? [], [report]);
 
   const organizations = useMemo(() => {
     const ids = new Set(allAssets.map((asset) => organizationOf(asset.asset_id)));

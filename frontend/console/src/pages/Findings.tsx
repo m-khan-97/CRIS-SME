@@ -9,9 +9,9 @@ import {
   DataTable,
   LifecycleBadge,
   SeverityTag,
-  normalizeSeverity,
   type DataTableColumn,
 } from "../components/clarion";
+import { normalizeSeverity } from "../components/severity";
 
 type SortKey = "score" | "title" | "category" | "severity" | "control_id";
 

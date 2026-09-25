@@ -6,8 +6,8 @@ import {
   Meter,
   Panel,
   ScoreRing,
-  normalizeSeverity,
 } from "../components/clarion";
+import { normalizeSeverity } from "../components/severity";
 import type { PrioritizedRisk } from "../api/types";
 
 const RISK_BAND_TONE: Record<string, { bg: string; border: string; dot: string; text: string }> = {

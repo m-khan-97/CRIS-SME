@@ -193,7 +193,13 @@ export interface PublicExposureReport {
   assessment_type: string;
   generated_at: string;
   scope_note: string;
-  summary: { target_count: number; finding_count: number };
+  summary: {
+    target_count: number;
+    finding_count: number;
+    high_finding_count?: number;
+    https_available_count?: number;
+    resolved_target_count?: number;
+  };
   targets: unknown[];
   findings: unknown[];
   status?: string;

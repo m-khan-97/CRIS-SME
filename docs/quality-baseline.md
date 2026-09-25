@@ -64,6 +64,16 @@ security. Do not run blind `npm audit fix --force` upgrades.
 
 ## Remaining P0-06 Work
 
+Progress, 25 September: shared components/hooks/API/context/tests plus Attack Paths
+and Public Exposure now pass `npm run lint:core` with zero warnings; PR CI requires
+that scoped gate. No existing lint rules were disabled. The full-console backlog
+is now 95 errors and 13 warnings. Severity normalization moved out of the component
+module, attack-path memo dependencies are stable, and public-exposure counters have
+explicit types. Animation handles invalid durations and recovers from nonfinite
+targets; seven regression cases bring the console suite to 43 passing tests.
+The self-host TypeScript/build check also passes locally. Browser workflows remain
+pending, and the scoped gate must not be presented as whole-console lint success.
+
 1. Resolve console lint findings and enable a required full lint gate.
 2. Add Playwright browser workflows: report selection, findings navigation,
    artifact retrieval, missing backend and mocked scan lifecycle. Use generated
