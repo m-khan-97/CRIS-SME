@@ -44,7 +44,7 @@ export function Findings() {
   const [sortDir, setSortDir] = useState<"asc" | "desc">("desc");
   const [selectedId, setSelectedId] = useState<string | null>(null);
 
-  const risks = report?.prioritized_risks ?? [];
+  const risks = useMemo(() => report?.prioritized_risks ?? [], [report]);
 
   const categories = useMemo(
     () => [...new Set(risks.map((risk) => risk.category))].sort(),
@@ -137,8 +137,7 @@ export function Findings() {
     );
   }
 
-  const findingsCsv = (report as Record<string, any>).report_artifacts?.csv_exports
-    ?.findings_csv as string | undefined;
+  const findingsCsv = report.report_artifacts?.csv_exports?.findings_csv;
 
   const columns: DataTableColumn<FindingRow>[] = [
     {
@@ -356,10 +355,10 @@ function FindingDetail({
   }
 
   const level = normalizeSeverity(risk.severity);
-  const breakdown = (risk as Record<string, any>).score_breakdown as Record<string, any> | undefined;
-  const confidence = (risk as Record<string, any>).confidence_calibration as Record<string, any> | undefined;
-  const lifecycle = (risk as Record<string, any>).lifecycle as Record<string, any> | undefined;
-  const evidenceIds = (risk as Record<string, any>).evidence_ids as string[] | undefined;
+  const breakdown = risk.score_breakdown;
+  const confidence = risk.confidence_calibration;
+  const lifecycle = risk.lifecycle;
+  const evidenceIds = risk.evidence_ids;
 
   return (
     <aside className="flex flex-col rounded-2xl border border-border-card bg-surface-card p-[20px_22px]">

@@ -4,7 +4,7 @@ import { describe, expect, it, vi, beforeEach } from "vitest";
 import { render, screen, waitFor } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { AssessmentProvider } from "../context/AssessmentContext";
+import { AssessmentProvider, useAssessmentReport } from "../context/AssessmentContext";
 
 import { AttackPaths } from "../pages/AttackPaths";
 import { Compliance } from "../pages/Compliance";
@@ -86,17 +86,23 @@ function jsonResponse(body: unknown) {
 
 function renderRoute(path: string, Component: React.ComponentType) {
   const queryClient = new QueryClient({
-    defaultOptions: { queries: { retry: false } },
+    defaultOptions: { queries: { retry: false, retryDelay: 0 } },
   });
   return render(
     <QueryClientProvider client={queryClient}>
       <MemoryRouter initialEntries={[path]}>
         <AssessmentProvider>
           <Component />
+          <ReportState />
         </AssessmentProvider>
       </MemoryRouter>
     </QueryClientProvider>
   );
+}
+
+function ReportState() {
+  const { data, isLoading, error } = useAssessmentReport();
+  return <output data-testid="report-state" hidden>{isLoading ? "loading" : error ? "error" : data ? "ready" : "missing"}</output>;
 }
 
 describe("console routes render without throwing", () => {
@@ -110,7 +116,7 @@ describe("console routes render without throwing", () => {
         mockFetchWith(demoReport);
         renderRoute(path, Component);
         await waitFor(() => {
-          expect(document.body.textContent).not.toBe("");
+          expect(screen.getByTestId("report-state")).toHaveTextContent("ready");
         });
       });
     }
@@ -125,7 +131,7 @@ describe("console routes render without throwing", () => {
         mockFetchWith(null);
         renderRoute(path, Component);
         await waitFor(() => {
-          expect(document.body.textContent).not.toBe("");
+          expect(screen.getByTestId("report-state")).toHaveTextContent("missing");
         });
         expect(screen.queryByText(/unexpected application error/i)).not.toBeInTheDocument();
       });

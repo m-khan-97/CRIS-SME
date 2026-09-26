@@ -150,19 +150,33 @@ documented runtime defaults; both documents are included in CI link validation.
 Local verification: 384 tests passed, critical-rule lint passed, and all seven
 documentation entrypoints passed link/SVG checks. Hosted CI remains pending.
 
-P0-06 is in progress: PR jobs now configure Python 3.11/3.12, package-wide branch
-coverage with a 78% combined floor, and console tests/type-checks/builds on Node 22.
-The local baseline is 384 backend tests and 79.38% combined coverage; console
-component tests pass (36). Full console lint currently fails (101 errors,
-17 warnings); browser workflows, frontend coverage, wider Python type checking
-and hosted matrix verification remain open. See [quality baseline](quality-baseline.md).
+P0-06 implementation is locally verified as of 26 September. Full-console
+ESLint passes with zero warnings; 52 component tests and four fixture-backed
+Chromium workflows pass on Node 22. Production, demo and self-host builds pass,
+including type checks for test configuration. Frontend coverage floors are now
+required in PR CI. Python 3.11/3.12 each pass 406 tests after the P0-07 additions,
+with 79.38% package-wide combined coverage; the installed-package smoke also
+passes. Mypy covers eight selected entry/runtime modules. Compatible frontend
+dependency updates leave zero npm advisories at this measurement date.
+See [quality baseline](quality-baseline.md) for exact denominators and exclusions.
 
-Next implementation priority: finish P0-06's frontend lint and browser gates.
+P0-07 now has a schema-backed [capability evidence register](capability-evidence.md):
+13 scoped entries distinguish implemented/planned delivery, fixture tests,
+live observations and independent reviews. CI checks local references, evidence
+digests, dates and independence declarations; 22 new regression tests cover the
+register. Live and independent evidence admission remains pending review, not
+a claim that historical customer scans or practitioner feedback never happened.
+Original customer and research artifacts have not been changed by this work.
 
-25 September progress: baseline commit `7d54a5b` is published. The first frontend
-cleanup adds a required, zero-warning lint gate for shared code and two migrated
-pages. Console tests increase to 43; the self-host build passes. Full lint still
-has 95 errors and 13 warnings, so P0-06 remains in progress.
+Remaining P0 gates: run this revision in hosted PR CI, independently reverify
+container execution, configure required merge checks, and admit reviewed
+historical evidence into P0-07. GitHub currently reports no classic main-branch
+protection and no repository rulesets; those settings were not changed.
+Runtime JSON validation and richer frontend interaction coverage remain follow-up
+work, not guarantees supplied by compile-time interfaces.
+
+Next implementation priority: P0-08 governance and OpenSSF evidence inventory,
+alongside closure of the hosted and evidence-admission gates above.
 
 | ID | Owner | Work and acceptance evidence |
 | --- | --- | --- |

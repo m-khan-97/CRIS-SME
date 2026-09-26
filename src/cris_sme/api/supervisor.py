@@ -31,10 +31,10 @@ def supervise(commands: list[list[str]], shutdown_timeout: float = 10.0) -> int:
                 return 0
             processes.append(subprocess.Popen(command, start_new_session=True))
         while not stopping:
-            for process in processes:
+            for index, process in enumerate(processes):
                 result = process.poll()
                 if result is not None:
-                    print(f"Service {process.args[0]} exited: {result}", file=sys.stderr)
+                    print(f"Service {commands[index][0]} exited: {result}", file=sys.stderr)
                     return result if result > 0 else 1
             time.sleep(0.1)
         return 0

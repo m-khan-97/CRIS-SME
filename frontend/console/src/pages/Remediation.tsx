@@ -18,13 +18,10 @@ export function Remediation() {
 
   const [tab, setTab] = useState<TabId>("budget");
 
-  const data = (report ?? {}) as Record<string, any>;
-  const budgetProfiles: Record<string, any>[] = data.budget_aware_remediation?.budget_profiles ?? [];
-  const phases: Record<string, any>[] = data.action_plan_30_day?.phases ?? [];
-  const scenarios: Record<string, any>[] = data.remediation_simulation?.scenarios ?? [];
-  const scriptPack = data.report_artifacts?.remediation_script_pack as
-    | Record<string, string>
-    | undefined;
+  const budgetProfiles = report?.budget_aware_remediation?.budget_profiles ?? [];
+  const phases = report?.action_plan_30_day?.phases ?? [];
+  const scenarios = report?.remediation_simulation?.scenarios ?? [];
+  const scriptPack = report?.report_artifacts?.remediation_script_pack;
 
   const [selectedProfile, setSelectedProfile] = useState<string | null>(null);
 
@@ -129,7 +126,7 @@ export function Remediation() {
                 <Card title={`Recommended actions — ${activeProfile.label}`}>
                   <div className="flex flex-col gap-2">
                     {(activeProfile.recommended_actions ?? []).map(
-                      (action: Record<string, any>, index: number) => (
+                      (action, index: number) => (
                         <div
                           key={`${action.control_id}-${index}`}
                           className="flex items-center justify-between gap-3 rounded-md border border-border-card px-3 py-2"
@@ -147,7 +144,7 @@ export function Remediation() {
                           </div>
                           <div className="flex flex-col items-end gap-1 text-xs">
                             <span className="rounded-full border border-border-strong px-2 py-0.5 text-text-body">
-                              {COST_TIER_LABELS[action.remediation_cost_tier] ??
+                              {COST_TIER_LABELS[action.remediation_cost_tier ?? ""] ??
                                 action.remediation_cost_tier ??
                                 "unknown cost"}
                             </span>
@@ -175,7 +172,7 @@ export function Remediation() {
               {phases.map((phase) => (
                 <Card key={phase.phase_id} title={`${phase.label} (${phase.time_window})`}>
                   <div className="flex flex-col gap-2">
-                    {(phase.actions ?? []).map((action: Record<string, any>, index: number) => (
+                    {(phase.actions ?? []).map((action, index: number) => (
                       <div
                         key={`${action.control_id}-${index}`}
                         className="flex items-center justify-between gap-3 rounded-md border border-border-card px-3 py-2"
@@ -192,7 +189,7 @@ export function Remediation() {
                         <div className="flex flex-col items-end gap-1 text-xs">
                           <SeverityBadge severity={action.priority} />
                           <span className="text-text-muted">
-                            {COST_TIER_LABELS[action.remediation_cost_tier] ??
+                            {COST_TIER_LABELS[action.remediation_cost_tier ?? ""] ??
                               action.remediation_cost_tier ??
                               "unknown cost"}
                           </span>

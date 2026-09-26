@@ -9,6 +9,9 @@ venv/
 .coverage
 coverage.json
 coverage.xml
+frontend/console/coverage/
+frontend/console/playwright-report/
+frontend/console/test-results/
 htmlcov/
 
 # Local environment files.

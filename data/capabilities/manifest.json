@@ -1,0 +1,239 @@
+{
+  "schema_version": "1.0",
+  "reviewed_on": "2026-09-26",
+  "capabilities": [
+    {
+      "id": "azure_collection",
+      "title": "Azure control-plane collection",
+      "owner": "DE",
+      "delivery": "implemented",
+      "scope": "Subscription-first collector, subject to Azure RBAC and Graph permissions.",
+      "implementation": [
+        "src/cris_sme/collectors/azure_collector.py"
+      ],
+      "fixture_tests": [
+        "tests/test_azure_collector.py"
+      ],
+      "live_observations": [],
+      "independent_reviews": [],
+      "limitations": [
+        "Does not inventory all Azure services or establish endpoint compliance.",
+        "Historical live assessments need scoped provenance review before admission to this register."
+      ]
+    },
+    {
+      "id": "aws_collection",
+      "title": "AWS control-plane collection",
+      "owner": "DE",
+      "delivery": "implemented",
+      "scope": "Account-scoped research-preview boto3 collector.",
+      "implementation": [
+        "src/cris_sme/collectors/aws_collector.py"
+      ],
+      "fixture_tests": [
+        "tests/test_aws_collector.py"
+      ],
+      "live_observations": [],
+      "independent_reviews": [],
+      "limitations": [
+        "Provider metadata remains research_preview; fake-client tests do not promote it to active.",
+        "SIGI historical assessments are not reclassified here; their original evidence needs separate admission review."
+      ]
+    },
+    {
+      "id": "provider_contracts",
+      "title": "Provider evidence contracts",
+      "owner": "DE",
+      "delivery": "implemented",
+      "scope": "Per-control support, permissions, freshness and sufficiency declarations.",
+      "implementation": [
+        "src/cris_sme/engine/provider_contracts.py",
+        "src/cris_sme/engine/provider_conformance.py"
+      ],
+      "fixture_tests": [
+        "tests/test_provider_contract_conformance.py"
+      ],
+      "live_observations": [],
+      "independent_reviews": [],
+      "limitations": [
+        "Declared contracts are not proof that every permission or provider API has been exercised."
+      ]
+    },
+    {
+      "id": "control_metadata",
+      "title": "Validated control metadata",
+      "owner": "DE",
+      "delivery": "implemented",
+      "scope": "Schema, registry and evaluator alignment for the baseline control pack.",
+      "implementation": [
+        "src/cris_sme/controls/validation.py"
+      ],
+      "fixture_tests": [
+        "tests/test_control_pack_validation.py"
+      ],
+      "live_observations": [],
+      "independent_reviews": [],
+      "limitations": [
+        "Structural checks do not establish rule correctness or assessor approval."
+      ]
+    },
+    {
+      "id": "decision_provenance",
+      "title": "Decision provenance",
+      "owner": "BE",
+      "delivery": "implemented",
+      "scope": "Inspectable links between assessment decisions and their recorded evidence.",
+      "implementation": [
+        "src/cris_sme/engine/decision_provenance.py"
+      ],
+      "fixture_tests": [
+        "tests/test_decision_provenance.py"
+      ],
+      "live_observations": [],
+      "independent_reviews": [],
+      "limitations": [
+        "Traceability does not independently establish the truth or sufficiency of source evidence."
+      ]
+    },
+    {
+      "id": "budget_planning",
+      "title": "Budget-aware remediation planning",
+      "owner": "BE",
+      "delivery": "implemented",
+      "scope": "Heuristic prioritization and budget-constrained remediation scenarios.",
+      "implementation": [
+        "src/cris_sme/engine/remediation.py",
+        "src/cris_sme/engine/remediation_simulator.py"
+      ],
+      "fixture_tests": [
+        "tests/test_remediation_planner.py"
+      ],
+      "live_observations": [],
+      "independent_reviews": [],
+      "limitations": [
+        "Estimated effort and simulated benefits are not measured customer savings or incident-risk reduction."
+      ]
+    },
+    {
+      "id": "ce_prepopulation",
+      "title": "Cyber Essentials pre-population",
+      "owner": "VR",
+      "delivery": "implemented",
+      "scope": "Draft questionnaire evidence with explicit unresolved/manual-evidence requirements.",
+      "implementation": [
+        "src/cris_sme/engine/ce_questionnaire.py",
+        "src/cris_sme/engine/ce_review_draft.py"
+      ],
+      "fixture_tests": [
+        "tests/test_ce_question_mapping.py",
+        "tests/test_ce_review_draft.py"
+      ],
+      "live_observations": [],
+      "independent_reviews": [],
+      "limitations": [
+        "Does not certify Cyber Essentials or replace an assessor.",
+        "Practitioner feedback is distinct from an independently adjudicated answer-pack evaluation."
+      ]
+    },
+    {
+      "id": "iomt_evidence",
+      "title": "Healthcare and IoMT evidence pack",
+      "owner": "VR",
+      "delivery": "implemented",
+      "scope": "Cloud-side healthcare/IoMT mappings and evidence pack.",
+      "implementation": [
+        "src/cris_sme/reporting/iomt_evidence_pack.py"
+      ],
+      "fixture_tests": [
+        "tests/test_iomt_evidence_pack.py"
+      ],
+      "live_observations": [],
+      "independent_reviews": [],
+      "limitations": [
+        "Not medical-device inspection, clinical safety validation or a certification."
+      ]
+    },
+    {
+      "id": "console_workflows",
+      "title": "Local console assessment workflows",
+      "owner": "FE",
+      "delivery": "implemented",
+      "scope": "Report selection, findings, artifacts and mocked scan lifecycle in desktop Chromium.",
+      "implementation": [
+        "frontend/console/src/context/AssessmentContext.tsx",
+        "frontend/console/src/pages/NewAssessment.tsx"
+      ],
+      "fixture_tests": [
+        "frontend/console/e2e/console.spec.ts",
+        "frontend/console/src/test/reportViews.test.tsx"
+      ],
+      "live_observations": [],
+      "independent_reviews": [],
+      "limitations": [
+        "Fixture-backed browser tests are not live-provider or multi-tenant security tests.",
+        "Mobile and other browser engines are not covered by this browser gate."
+      ]
+    },
+    {
+      "id": "local_packaging",
+      "title": "Installed local runtime",
+      "owner": "RE",
+      "delivery": "implemented",
+      "scope": "Installed sdist/wheel and supervised private single-operator runtime.",
+      "implementation": [
+        "src/cris_sme/api/supervisor.py",
+        "scripts/check_installed_package.py"
+      ],
+      "fixture_tests": [
+        "tests/test_packaging_runtime.py"
+      ],
+      "live_observations": [],
+      "independent_reviews": [],
+      "limitations": [
+        "Not approved for unauthenticated shared or public deployment."
+      ]
+    },
+    {
+      "id": "gcp_collection",
+      "title": "GCP collection",
+      "owner": "DE",
+      "delivery": "planned",
+      "scope": "Planned active GCP collector; existing placeholder is not an active provider path.",
+      "implementation": [],
+      "fixture_tests": [],
+      "live_observations": [],
+      "independent_reviews": [],
+      "limitations": [
+        "No active GCP collection claim."
+      ]
+    },
+    {
+      "id": "hosted_tenancy",
+      "title": "Hosted tenant isolation",
+      "owner": "SE",
+      "delivery": "planned",
+      "scope": "Planned authenticated, tenant-isolated hosted deployment.",
+      "implementation": [],
+      "fixture_tests": [],
+      "live_observations": [],
+      "independent_reviews": [],
+      "limitations": [
+        "Current local runner is not suitable for shared multi-organization hosting."
+      ]
+    },
+    {
+      "id": "pqc_discovery",
+      "title": "Post-quantum cryptography discovery",
+      "owner": "PL",
+      "delivery": "planned",
+      "scope": "Planned CRIS-PQC discovery and migration evidence.",
+      "implementation": [],
+      "fixture_tests": [],
+      "live_observations": [],
+      "independent_reviews": [],
+      "limitations": [
+        "No released PQC discovery or quantum-safety assurance claim."
+      ]
+    }
+  ]
+}

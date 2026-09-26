@@ -9,7 +9,7 @@ import {
 import { Link } from "react-router-dom";
 import { useAssessmentReport } from "../context/AssessmentContext";
 import { Card, EmptyState, ProgressRing, SeverityBadge, Spinner } from "../components/ui";
-import type { PrioritizedRisk } from "../api/types";
+import type { CrisReport, PrioritizedRisk } from "../api/types";
 
 type PersonaId = "owner" | "technical" | "assessor" | "msp" | "insurer";
 
@@ -118,12 +118,12 @@ export function Personas() {
   );
 }
 
-function OwnerBriefing({ report }: { report: Record<string, unknown> & { overall_risk_score: number; prioritized_risks: PrioritizedRisk[] } }) {
-  const executivePack = (report.executive_pack ?? {}) as Record<string, any>;
-  const topRisks = (executivePack.top_risks ?? []) as Array<Record<string, any>>;
-  const quickWins = (executivePack.quick_wins ?? {}) as Record<string, any>;
-  const ceReadiness = (executivePack.cyber_essentials_readiness ?? {}) as Record<string, any>;
-  const insuranceReadiness = (executivePack.insurance_readiness ?? {}) as Record<string, any>;
+function OwnerBriefing({ report }: { report: CrisReport }) {
+  const executivePack = report.executive_pack ?? {};
+  const topRisks = executivePack.top_risks ?? [];
+  const quickWins = executivePack.quick_wins ?? {};
+  const ceReadiness = executivePack.cyber_essentials_readiness ?? {};
+  const insuranceReadiness = executivePack.insurance_readiness ?? {};
 
   return (
     <div className="flex flex-col gap-4">
@@ -204,7 +204,7 @@ function OwnerBriefing({ report }: { report: Record<string, unknown> & { overall
   );
 }
 
-function TechnicalBriefing({ report }: { report: Record<string, unknown> & { prioritized_risks: PrioritizedRisk[] } }) {
+function TechnicalBriefing({ report }: { report: CrisReport }) {
   const activeRisks = report.prioritized_risks.filter((risk) => {
     const status = (risk.lifecycle as { status?: string } | undefined)?.status;
     return status === undefined || !["suppressed", "resolved"].includes(status);
@@ -276,13 +276,11 @@ function TechnicalBriefing({ report }: { report: Record<string, unknown> & { pri
   );
 }
 
-function AssessorBriefing({ report }: { report: Record<string, unknown> }) {
-  const trustBadge = (report.report_trust_badge ?? {}) as Record<string, any>;
-  const assurance = (report.assessment_assurance ?? {}) as Record<string, any>;
-  const evidenceSufficiency = (
-    (report.assessment_runner as Record<string, any> | undefined)?.evidence_sufficiency ?? {}
-  ) as Record<string, any>;
-  const signals = (assurance.signals ?? []) as Array<Record<string, any>>;
+function AssessorBriefing({ report }: { report: CrisReport }) {
+  const trustBadge = report.report_trust_badge ?? {};
+  const assurance = report.assessment_assurance;
+  const evidenceSufficiency = report.assessment_runner?.evidence_sufficiency;
+  const signals = assurance?.signals ?? [];
 
   return (
     <div className="flex flex-col gap-4">
@@ -307,13 +305,13 @@ function AssessorBriefing({ report }: { report: Record<string, unknown> }) {
         </Card>
         <Card title="Assessment assurance">
           <div className="flex items-center gap-4">
-            <ProgressRing value={assurance.assurance_score ?? 0} />
+            <ProgressRing value={assurance?.assurance_score ?? 0} />
             <div className="text-sm text-text-body capitalize">
-              {assurance.assurance_level ?? "unknown"} assurance
+              {assurance?.assurance_level ?? "unknown"} assurance
             </div>
           </div>
-          {assurance.risk_score_impact && (
-            <p className="mt-3 text-xs text-text-muted">{assurance.risk_score_impact}</p>
+          {assurance?.risk_score_impact && (
+            <p className="mt-3 text-xs text-text-muted">{assurance?.risk_score_impact}</p>
           )}
         </Card>
       </div>
@@ -347,13 +345,13 @@ function AssessorBriefing({ report }: { report: Record<string, unknown> }) {
         <div className="flex flex-col gap-2 text-sm text-text-body">
           <div>
             Sufficient evidence ratio:{" "}
-            {evidenceSufficiency.sufficient_ratio !== undefined
-              ? `${Math.round(evidenceSufficiency.sufficient_ratio * 100)}%`
+            {evidenceSufficiency?.sufficient_ratio !== undefined
+              ? `${Math.round(evidenceSufficiency?.sufficient_ratio * 100)}%`
               : "—"}
           </div>
-          {evidenceSufficiency.sufficiency_counts && (
+          {evidenceSufficiency?.sufficiency_counts && (
             <div className="flex flex-wrap gap-3 text-xs text-text-muted">
-              {Object.entries(evidenceSufficiency.sufficiency_counts as Record<string, number>).map(
+              {Object.entries(evidenceSufficiency?.sufficiency_counts as Record<string, number>).map(
                 ([key, value]) => (
                   <span key={key} className="rounded-full border border-border-strong px-2 py-0.5">
                     {key}: {value}
@@ -374,8 +372,8 @@ function AssessorBriefing({ report }: { report: Record<string, unknown> }) {
   );
 }
 
-function MspBriefing({ report }: { report: Record<string, unknown> & { prioritized_risks: PrioritizedRisk[] } }) {
-  const organizations = (report.organizations ?? []) as Array<Record<string, any>>;
+function MspBriefing({ report }: { report: CrisReport }) {
+  const organizations = report.organizations ?? [];
 
   const findingsByOrg = report.prioritized_risks.reduce<Record<string, PrioritizedRisk[]>>(
     (acc, risk) => {
@@ -448,10 +446,10 @@ function MspBriefing({ report }: { report: Record<string, unknown> & { prioritiz
   );
 }
 
-function InsurerBriefing({ report }: { report: Record<string, unknown> }) {
-  const insuranceEvidence = (report.cyber_insurance_evidence ?? {}) as Record<string, any>;
-  const readiness = (insuranceEvidence.readiness_summary ?? {}) as Record<string, any>;
-  const questions = (insuranceEvidence.questions ?? []) as Array<Record<string, any>>;
+function InsurerBriefing({ report }: { report: CrisReport }) {
+  const insuranceEvidence = report.cyber_insurance_evidence ?? {};
+  const readiness = insuranceEvidence.readiness_summary ?? {};
+  const questions = insuranceEvidence.questions ?? [];
 
   return (
     <div className="flex flex-col gap-4">

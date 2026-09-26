@@ -1,3 +1,4 @@
+import type { CeReviewEntry } from "../api/reportSections";
 import { useEffect, useMemo, useState } from "react";
 import { ClipboardCheck, Download, ShieldCheck } from "lucide-react";
 import { useAssessmentReport } from "../context/AssessmentContext";
@@ -64,19 +65,18 @@ export function CyberEssentials() {
   const [sectionFilter, setSectionFilter] = useState("all");
   const [stateFilter, setStateFilter] = useState("all");
   const [page, setPage] = useState(1);
-  const [activeEntry, setActiveEntry] = useState<Record<string, any> | null>(null);
+  const [activeEntry, setActiveEntry] = useState<CeReviewEntry | null>(null);
 
   useEffect(() => {
     localStorage.setItem(LEDGER_STORAGE_KEY, JSON.stringify(ledger));
   }, [ledger]);
 
-  const data = (report ?? {}) as Record<string, any>;
-  const readiness = data.cyber_essentials_readiness as Record<string, any> | undefined;
-  const selfAssessment = data.cyber_essentials_self_assessment as Record<string, any> | undefined;
-  const evaluation = data.cyber_essentials_evaluation_metrics as Record<string, any> | undefined;
-  const reviewConsole = data.cyber_essentials_review_console as Record<string, any> | undefined;
+  const readiness = report?.cyber_essentials_readiness;
+  const selfAssessment = report?.cyber_essentials_self_assessment;
+  const evaluation = report?.cyber_essentials_evaluation_metrics;
+  const reviewConsole = report?.cyber_essentials_review_console;
 
-  const entries: Record<string, any>[] = reviewConsole?.entries ?? [];
+  const entries = useMemo(() => reviewConsole?.entries ?? [], [reviewConsole]);
   const allowedStates: string[] = reviewConsole?.review_policy?.allowed_review_states ?? [
     "pending",
     "accepted",
@@ -97,10 +97,10 @@ export function CyberEssentials() {
     () =>
       entries.filter((entry) => {
         if (sectionFilter !== "all" && entry.section !== sectionFilter) return false;
-        if (stateFilter !== "all" && decisionFor(entry.question_id) !== stateFilter) return false;
+        if (stateFilter !== "all" && (ledger[entry.question_id]?.state ?? defaultState) !== stateFilter) return false;
         return true;
       }),
-    [entries, sectionFilter, stateFilter, ledger]
+    [entries, sectionFilter, stateFilter, ledger, defaultState]
   );
 
   const totalPages = Math.max(1, Math.ceil(filteredEntries.length / PAGE_SIZE));
@@ -247,7 +247,7 @@ export function CyberEssentials() {
 
           <Card title="Pillars">
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
-              {(readiness.pillars ?? []).map((pillar: Record<string, any>) => (
+              {(readiness.pillars ?? []).map((pillar) => (
                 <div key={pillar.pillar_id} className="rounded-md border border-border-card p-3">
                   <div className="flex items-center gap-3">
                     <ProgressRing value={pillar.readiness_score ?? 0} size={48} />
@@ -470,7 +470,7 @@ function CeReviewDetail({
   allowedStates,
   onChange,
 }: {
-  entry: Record<string, any>;
+  entry: CeReviewEntry;
   decision: LedgerEntry | undefined;
   allowedStates: string[];
   onChange: (patch: Partial<LedgerEntry>) => void;

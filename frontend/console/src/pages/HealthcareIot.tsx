@@ -97,7 +97,7 @@ export function HealthcareIot() {
     ["critical", "high"].includes(risk.severity.toLowerCase())
   ).length;
   const evidenceSufficientCount = iotRisks.filter((risk) => {
-    const sufficiency = (risk as Record<string, any>).evidence_sufficiency?.sufficiency;
+    const sufficiency = risk.evidence_sufficiency?.sufficiency;
     return typeof sufficiency === "string" && sufficiency !== "unsupported";
   }).length;
 
@@ -112,11 +112,9 @@ export function HealthcareIot() {
   }
   const evidenceClassTotal = iotRisks.length || 1;
 
-  const organizations = (report as Record<string, any>).organizations as
-    | Record<string, any>[]
-    | undefined;
+  const organizations = report.organizations;
   const organization = organizations?.[0];
-  const collectionDetails = organization?.collection_details as Record<string, any> | undefined;
+  const collectionDetails = organization?.collection_details;
   const inventoryEntries = collectionDetails
     ? INVENTORY_FIELDS.filter(
         (field) =>
@@ -292,10 +290,8 @@ function IotFindingDetail({ risk }: { risk: IotFindingRow | undefined }) {
   }
 
   const level = normalizeSeverity(risk.severity);
-  const mapping = (risk as Record<string, any>).mapping as string[] | undefined;
-  const sufficiency = (risk as Record<string, any>).evidence_sufficiency as
-    | Record<string, any>
-    | undefined;
+  const mapping = risk.mapping;
+  const sufficiency = risk.evidence_sufficiency;
   const research = IOMT_CONTROL_MAPPING[risk.control_id];
 
   return (

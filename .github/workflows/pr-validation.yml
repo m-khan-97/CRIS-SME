@@ -26,15 +26,29 @@ jobs:
           cache: npm
           cache-dependency-path: frontend/console/package-lock.json
       - run: npm ci
-      - name: Lint shared console code and migrated pages
-        run: npm run lint:core
-      - name: Component route smoke tests
-        run: npm test
+      - name: Lint the complete console
+        run: npm run lint
+      - name: Component tests and coverage
+        run: npm run test:coverage
       - name: Type check and build all deployment modes
         run: |
           npm run build
           npm run build:demo
           npm run build:selfhost
+      - name: Install Chromium
+        run: npx playwright install --with-deps chromium
+      - name: Mocked browser workflows
+        run: npm run test:e2e
+      - name: Preserve console quality evidence
+        if: ${{ always() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: console-quality
+          path: |
+            frontend/console/coverage
+            frontend/console/playwright-report
+            frontend/console/test-results
+          retention-days: 7
 
   container:
     name: Private Container Smoke Test

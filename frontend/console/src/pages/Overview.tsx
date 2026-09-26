@@ -54,13 +54,12 @@ function formatRelativeTime(isoTimestamp: string | undefined): string | undefine
 export function Overview() {
   const { data: report, isLoading, error } = useAssessmentReport();
 
-  const data = (report ?? {}) as Record<string, any>;
-  const assessmentSummary = data.assessment_summary as Record<string, any> | undefined;
-  const drift = data.risk_drift_analysis as Record<string, any> | undefined;
-  const historyComparison = data.history_comparison as Record<string, any> | undefined;
-  const ceReadiness = data.cyber_essentials_readiness as Record<string, any> | undefined;
-  const runMetadata = data.run_metadata as Record<string, any> | undefined;
-  const trustBadge = data.report_trust_badge as Record<string, any> | undefined;
+  const assessmentSummary = report?.assessment_summary;
+  const drift = report?.risk_drift_analysis;
+  const historyComparison = report?.history_comparison;
+  const ceReadiness = report?.cyber_essentials_readiness;
+  const runMetadata = report?.run_metadata;
+  const trustBadge = report?.report_trust_badge;
 
   const topRisks = useMemo(() => {
     if (!report) return [] as PrioritizedRisk[];
@@ -292,7 +291,7 @@ export function Overview() {
       {(ceReadiness?.pillars?.length ?? 0) > 0 && (
         <Panel title="Cyber Essentials readiness" meta="By control pillar">
           <div className="grid grid-cols-2 gap-4 md:grid-cols-5">
-            {(ceReadiness?.pillars as Record<string, any>[]).map((pillar) => (
+            {(ceReadiness?.pillars ?? []).map((pillar) => (
               <div key={pillar.pillar_id}>
                 <div className="mb-2 truncate text-[11.5px] font-semibold text-text-body">
                   {pillar.pillar_name}

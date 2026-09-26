@@ -42,16 +42,15 @@ export function TrustCenter() {
 
   const [claimFilter, setClaimFilter] = useState("all");
 
-  const data = (report ?? {}) as Record<string, any>;
-  const badge = data.report_trust_badge as Record<string, any> | undefined;
-  const assuranceCase = data.assurance_case as Record<string, any> | undefined;
-  const assessmentAssurance = data.assessment_assurance as Record<string, any> | undefined;
-  const narrative = data.claim_bound_narrative as Record<string, any> | undefined;
-  const claimPack = data.claim_verification_pack as Record<string, any> | undefined;
-  const rbom = data.risk_bill_of_materials as Record<string, any> | undefined;
-  const ledger = data.decision_ledger as Record<string, any> | undefined;
+  const badge = report?.report_trust_badge;
+  const assuranceCase = report?.assurance_case;
+  const assessmentAssurance = report?.assessment_assurance;
+  const narrative = report?.claim_bound_narrative;
+  const claimPack = report?.claim_verification_pack;
+  const rbom = report?.risk_bill_of_materials;
+  const ledger = report?.decision_ledger;
 
-  const claims: Record<string, any>[] = claimPack?.claims ?? [];
+  const claims = useMemo(() => claimPack?.claims ?? [], [claimPack]);
   const claimStatuses = useMemo(
     () => [...new Set(claims.map((claim) => String(claim.verification_status)))].sort(),
     [claims]
@@ -158,7 +157,7 @@ export function TrustCenter() {
         {assessmentAssurance && (
           <Card title="Assessment assurance signals">
             <div className="flex flex-col gap-2 text-sm">
-              {(assessmentAssurance.signals ?? []).map((signal: Record<string, any>) => (
+              {(assessmentAssurance.signals ?? []).map((signal) => (
                 <div
                   key={signal.signal_id}
                   className="flex items-center justify-between gap-2 rounded-md border border-border-card px-3 py-2"
@@ -209,7 +208,7 @@ export function TrustCenter() {
             arguments
           </p>
           <div className="flex flex-col gap-3">
-            {(assuranceCase.arguments ?? []).map((argument: Record<string, any>) => (
+            {(assuranceCase.arguments ?? []).map((argument) => (
               <div key={argument.argument_id} className="rounded-md border border-border-card p-3">
                 <div className="flex items-center justify-between gap-2">
                   <div className="text-sm text-text-strong">{argument.top_claim}</div>
@@ -235,7 +234,7 @@ export function TrustCenter() {
       {narrative && (
         <Card title="Claim-bound narrative">
           <div className="flex flex-col gap-4">
-            {(narrative.sections ?? []).map((section: Record<string, any>) => (
+            {(narrative.sections ?? []).map((section) => (
               <div key={section.section_id}>
                 <div className="text-sm font-medium text-text-strong">{section.heading}</div>
                 <p className="mt-1 text-sm text-text-muted">{section.text}</p>

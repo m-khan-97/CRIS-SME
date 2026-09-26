@@ -20,9 +20,8 @@ function ActiveFlag({ value }: { value: boolean }) {
 export function NativeValidation() {
   const { data: report, isLoading, error } = useAssessmentReport();
 
-  const data = (report ?? {}) as Record<string, any>;
-  const validation = data.native_validation as Record<string, any> | undefined;
-  const comparisons: Record<string, any>[] = validation?.control_comparisons ?? [];
+  const validation = report?.native_validation;
+  const comparisons = validation?.control_comparisons ?? [];
 
   if (isLoading) {
     return (

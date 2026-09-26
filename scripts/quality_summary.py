@@ -14,6 +14,7 @@ CHECKS = (
     ("lint", "Lint"),
     ("types", "Type check"),
     ("controls", "Control metadata"),
+    ("capabilities", "Capability evidence register"),
     ("tests", "Tests"),
     ("package", "Installed package"),
     ("pipeline", "Mock pipeline"),

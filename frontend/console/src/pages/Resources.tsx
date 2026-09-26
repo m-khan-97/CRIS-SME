@@ -16,8 +16,8 @@ export function Resources() {
 
   const [typeFilter, setTypeFilter] = useState("all");
 
-  const assets = report?.resource_context?.assets ?? [];
-  const relationships = report?.resource_context?.relationships ?? [];
+  const assets = useMemo(() => report?.resource_context?.assets ?? [], [report]);
+  const relationships = useMemo(() => report?.resource_context?.relationships ?? [], [report]);
 
   const relationshipCounts = useMemo(() => {
     const counts: Record<string, number> = {};

@@ -36,17 +36,16 @@ export function EvidenceProvenance() {
   const [queuePriority, setQueuePriority] = useState("all");
   const [gapDomain, setGapDomain] = useState("all");
 
-  const data = (report ?? {}) as Record<string, any>;
-  const graph = data.decision_provenance_graph as Record<string, any> | undefined;
-  const reviewQueue = data.decision_review_queue as Record<string, any> | undefined;
-  const drift = data.control_drift_attribution as Record<string, any> | undefined;
-  const gapBacklog = data.evidence_gap_backlog as Record<string, any> | undefined;
-  const calibration = data.confidence_calibration as Record<string, any> | undefined;
-  const coverage: Record<string, any>[] = data.collector_coverage ?? [];
-  const contracts = data.provider_evidence_contracts as Record<string, any> | undefined;
+  const graph = report?.decision_provenance_graph;
+  const reviewQueue = report?.decision_review_queue;
+  const drift = report?.control_drift_attribution;
+  const gapBacklog = report?.evidence_gap_backlog;
+  const calibration = report?.confidence_calibration;
+  const coverage = report?.collector_coverage ?? [];
+  const contracts = report?.provider_evidence_contracts;
 
-  const queueItems: Record<string, any>[] = reviewQueue?.items ?? [];
-  const gapItems: Record<string, any>[] = gapBacklog?.items ?? [];
+  const queueItems = useMemo(() => reviewQueue?.items ?? [], [reviewQueue]);
+  const gapItems = useMemo(() => gapBacklog?.items ?? [], [gapBacklog]);
 
   const gapDomains = useMemo(
     () => [...new Set(gapItems.map((item) => String(item.domain)))].sort(),

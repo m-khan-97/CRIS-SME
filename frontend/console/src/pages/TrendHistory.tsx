@@ -36,9 +36,8 @@ function DeltaValue({ value }: { value: number }) {
 export function TrendHistory() {
   const { data: report, isLoading, error } = useAssessmentReport();
 
-  const data = (report ?? {}) as Record<string, any>;
-  const drift = data.risk_drift_analysis as Record<string, any> | undefined;
-  const history = data.history_comparison as Record<string, any> | undefined;
+  const drift = report?.risk_drift_analysis;
+  const history = report?.history_comparison;
 
   if (isLoading) {
     return (
@@ -57,8 +56,8 @@ export function TrendHistory() {
   }
 
   const overall = drift?.overall_risk;
-  const categoryDrift: Record<string, Record<string, any>> = drift?.category_drift ?? {};
-  const controlDeltas: Record<string, any>[] = history?.control_score_deltas ?? [];
+  const categoryDrift = drift?.category_drift ?? {};
+  const controlDeltas = history?.control_score_deltas ?? [];
   const changedControls = controlDeltas.filter((entry) => (entry.delta ?? 0) !== 0);
 
   return (

@@ -27,6 +27,11 @@ It checks the JSON schema, full catalog/registry/evaluator ID alignment, provide
 status consistency and valid dependency relationships. See
 [control metadata](control-metadata.md) for coverage and validation limits.
 
+The capability gate runs `python scripts/validate_capabilities.py` against the
+schema-backed [capability evidence register](capability-evidence.md). It checks
+claim structure, repository references and admitted evidence digests, without
+promoting fixture tests to live or independent validation.
+
 The shared quality workflow checks local Markdown links and SVG structure with
 `python scripts/check_docs.py`. It covers README, architecture, methodology,
 delivery and roadmap entry documents, including reference-style Markdown links.
@@ -54,8 +59,13 @@ python scripts/check_docs.py
 
 PR validation also runs a Python 3.11/3.12 matrix and a separate Node 22 console
 test/build job. Package-wide coverage JSON/XML artifacts and a 78% combined
-coverage floor are enabled. See [quality baseline](quality-baseline.md) for measured
-coverage, exact lint/type scope and outstanding frontend/browser gaps.
+coverage floor are enabled. Console CI runs full zero-warning lint, Vitest with
+measured coverage floors, all three build modes, and four fixture-backed Chromium
+workflows. Coverage and browser reports are retained for seven days, including
+on failure when generated. No live cloud scan is needed for browser checks.
+See [quality baseline](quality-baseline.md) for measured coverage, exact type
+scope and remaining limits. Required status checks must also be configured in
+repository branch protection or rulesets; YAML does not itself prevent merging.
 
 Workflows use explicit least-privilege permissions:
 

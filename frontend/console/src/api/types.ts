@@ -1,3 +1,5 @@
+import type { ReportSections } from "./reportSections";
+
 export interface ArtifactInfo {
   path: string;
   exists: boolean;
@@ -96,6 +98,11 @@ export interface ScoreBreakdown {
 }
 
 export interface PrioritizedRisk {
+  score_breakdown?: { base_severity?: number; confidence_factor?: number };
+  confidence_calibration?: { calibrated_confidence?: number };
+  mapping?: string[];
+  evidence_sufficiency?: { sufficiency?: string; missing_requirements: string[]; limitation_notes: string[] };
+  lifecycle?: FindingLifecycle | null;
   finding_id: string;
   control_id: string;
   title: string;
@@ -174,7 +181,79 @@ export interface ComplianceResult {
   uk_sme_profile?: Record<string, unknown> | null;
 }
 
-export interface CrisReport {
+export interface FindingLifecycle {
+  status: string;
+  status_reason?: string;
+  first_seen?: string;
+  last_seen?: string;
+  is_new?: boolean;
+  recurrence_count?: number;
+}
+
+export interface FindingLifecycleSummary {
+  new_findings?: number;
+  existing_findings?: number;
+  exception_applied_count?: number;
+  exception_registry_count?: number;
+  status_counts?: Record<string, number>;
+}
+
+export interface NativeValidationReport {
+  framework: string;
+  controls_mapped?: number;
+  agreement_count?: number;
+  cris_only_count?: number;
+  native_only_count?: number;
+  native_unhealthy_recommendation_count?: number;
+  coverage_note?: string;
+  control_comparisons?: {
+    control_id: string;
+    comparison_status: string;
+    cris_active: boolean;
+    native_active: boolean;
+    cris_score: number | null;
+    native_recommendation_count?: number;
+    notes?: string;
+  }[];
+}
+
+export interface RiskDriftEntry {
+  first_score?: number;
+  latest_score?: number;
+  change_total?: number;
+  velocity_per_week?: number;
+  direction?: string;
+  direction_note?: string;
+}
+
+export interface RiskDriftAnalysis {
+  run_count?: number;
+  first_run_at?: string;
+  overall_risk?: RiskDriftEntry;
+  category_drift?: Record<string, RiskDriftEntry>;
+}
+
+export interface HistoryComparison {
+  overall_risk_delta?: number;
+  non_compliant_findings_delta?: number;
+  previous_generated_at?: string;
+  previous_collector_mode?: string;
+  control_score_deltas?: {
+    control_id: string;
+    title: string;
+    previous_score: number;
+    current_score: number;
+    delta: number;
+    previous_priority: string | null;
+    current_priority: string;
+  }[];
+}
+
+export interface CrisReport extends ReportSections {
+  native_validation?: NativeValidationReport | null;
+  finding_lifecycle_summary?: FindingLifecycleSummary | null;
+  risk_drift_analysis?: RiskDriftAnalysis | null;
+  history_comparison?: HistoryComparison | null;
   report_schema_version: string;
   generated_at: string;
   collector_mode: string;

@@ -19,6 +19,7 @@ ENTRYPOINTS = (
     "docs/threat-model.md",
     "docs/deployment-security.md",
     "docs/quality-baseline.md",
+    "docs/capability-evidence.md",
 )
 
 

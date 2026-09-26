@@ -94,7 +94,7 @@ const SUB_LABEL_FOR_PARENT: Record<string, Record<string, string>> = {
   cyber_essentials_evaluation_metrics: { json: "CE evaluation metrics (JSON)", html: "CE evaluation metrics (HTML)" },
 };
 
-function flattenArtifacts(reportArtifacts: Record<string, any>): ArtifactGroup[] {
+function flattenArtifacts(reportArtifacts: Record<string, unknown>): ArtifactGroup[] {
   const groups = new Map<string, ArtifactEntry[]>();
 
   for (const [key, value] of Object.entries(reportArtifacts)) {
@@ -124,8 +124,7 @@ function flattenArtifacts(reportArtifacts: Record<string, any>): ArtifactGroup[]
 export function ReportsArtifacts() {
   const { data: report, isLoading, error } = useAssessmentReport();
 
-  const data = (report ?? {}) as Record<string, any>;
-  const reportArtifacts = data.report_artifacts as Record<string, any> | undefined;
+  const reportArtifacts = report?.report_artifacts;
 
   if (isLoading) {
     return (

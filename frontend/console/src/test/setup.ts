@@ -1,4 +1,8 @@
 import "@testing-library/jest-dom/vitest";
+import { cleanup } from "@testing-library/react";
+import { afterEach } from "vitest";
+
+afterEach(cleanup);
 
 // jsdom doesn't implement these; @xyflow/react (Attack Paths) and recharts
 // (donut/ring charts) both call them during layout.

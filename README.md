@@ -388,6 +388,7 @@ Delivery docs:
 - [CI/CD and Vercel Delivery](docs/ci-cd-and-vercel.md)
 - [Multi-cloud Expansion Strategy](docs/multi-cloud-expansion.md)
 - [Roadmap](docs/roadmap.md)
+- [Capability evidence register](docs/capability-evidence.md)
 - [Enterprise Reference Repository Audit](docs/enterprise-reference-audit.md)
 
 ---

@@ -8,8 +8,10 @@
     "build": "tsc -b && vite build",
     "build:demo": "tsc -b && vite build --mode demo --outDir dist/demo",
     "build:selfhost": "tsc -b && vite build --mode selfhost --outDir dist/selfhost",
-    "lint": "eslint .",
-    "lint:core": "eslint src/components src/hooks src/api src/context src/test src/pages/AttackPaths.tsx src/pages/PublicExposure.tsx --max-warnings 0",
+    "lint": "eslint . --max-warnings 0",
+    "lint:core": "npm run lint",
+    "test:coverage": "vitest run --coverage",
+    "test:e2e": "playwright test",
     "test": "vitest run",
     "preview": "vite preview",
     "preview:demo": "vite preview --outDir dist/demo"
@@ -27,6 +29,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
+    "@playwright/test": "^1.63.0",
     "@tailwindcss/vite": "^4.3.1",
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.2",
@@ -34,6 +37,7 @@
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-react": "^6.0.1",
+    "@vitest/coverage-v8": "^4.1.11",
     "eslint": "^10.3.0",
     "eslint-plugin-react-hooks": "^7.1.1",
     "eslint-plugin-react-refresh": "^0.5.2",
@@ -43,6 +47,6 @@
     "typescript": "~6.0.2",
     "typescript-eslint": "^8.59.2",
     "vite": "^8.0.12",
-    "vitest": "^4.1.10"
+    "vitest": "^4.1.11"
   }
 }

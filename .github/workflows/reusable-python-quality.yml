@@ -54,18 +54,28 @@ jobs:
         run: |
           ruff check src tests scripts setup.py --select F,E9
 
-      - name: Type check workflow entry scripts
+      - name: Type check entry scripts and baseline runtime modules
         id: types
         run: |
           mypy \
             --ignore-missing-imports \
             --follow-imports=silent \
             scripts/run_assessment_snapshot.py \
-            scripts/run_azuregoat_assessment.py
+            scripts/run_azuregoat_assessment.py \
+            src/cris_sme/api/run_repository.py \
+            src/cris_sme/api/supervisor.py \
+            src/cris_sme/data_paths.py \
+            src/cris_sme/controls/definitions.py \
+            src/cris_sme/controls/registry.py \
+            src/cris_sme/controls/validation.py
 
       - name: Validate full control metadata pack
         id: controls
         run: PYTHONPATH=src python scripts/validate_control_metadata.py
+
+      - name: Validate capability evidence register
+        id: capabilities
+        run: python scripts/validate_capabilities.py
 
       - name: Run tests with package-wide branch coverage
         id: tests

@@ -1,7 +1,6 @@
 import { useMemo, useState } from "react";
 import { CheckCircle2, FileClock, History, ShieldOff, Sparkles } from "lucide-react";
 import { useAssessmentReport } from "../context/AssessmentContext";
-import type { PrioritizedRisk } from "../api/types";
 import { Card, EmptyState, SeverityBadge, Spinner, StatCard } from "../components/ui";
 
 const STATUS_COLORS: Record<string, string> = {
@@ -15,16 +14,13 @@ export function Governance() {
 
   const [statusFilter, setStatusFilter] = useState("all");
 
-  const data = (report ?? {}) as Record<string, any>;
-  const lifecycleSummary = data.finding_lifecycle_summary as Record<string, any> | undefined;
-  const risks: PrioritizedRisk[] = data.prioritized_risks ?? [];
+  const lifecycleSummary = report?.finding_lifecycle_summary;
 
   const lifecycleEntries = useMemo(
     () =>
-      risks
-        .map((risk) => ({ risk, lifecycle: (risk as Record<string, any>).lifecycle }))
-        .filter((entry) => !!entry.lifecycle),
-    [risks]
+      (report?.prioritized_risks ?? [])
+        .flatMap((risk) => risk.lifecycle ? [{ risk, lifecycle: risk.lifecycle }] : []),
+    [report]
   );
 
   const statuses = useMemo(
@@ -102,7 +98,7 @@ export function Governance() {
                 key={status}
                 className={`rounded-full border px-3 py-1 text-sm capitalize ${classes}`}
               >
-                {status}: {count as number}
+                {status}: {count}
               </span>
             );
           })}
@@ -118,6 +114,7 @@ export function Governance() {
       <Card title={`Finding lifecycle (${filteredEntries.length})`}>
         <div className="mb-3 flex flex-wrap gap-2">
           <select
+            aria-label="Lifecycle status"
             className="rounded-md border border-border-strong bg-surface-card px-3 py-2 text-sm text-text-strong"
             value={statusFilter}
             onChange={(event) => setStatusFilter(event.target.value)}

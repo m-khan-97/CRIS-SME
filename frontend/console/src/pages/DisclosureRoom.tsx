@@ -19,12 +19,8 @@ const PROOF_COLORS: Record<string, string> = {
 export function DisclosureRoom() {
   const { data: report, isLoading, error } = useAssessmentReport();
 
-  const data = (report ?? {}) as Record<string, any>;
-  const disclosure = data.selective_disclosure as Record<string, any> | undefined;
-  const rooms: Record<string, any>[] = disclosure?.rooms ?? [];
-  const evidenceRoomHtml = data.report_artifacts?.selective_disclosure?.evidence_room_html as
-    | string
-    | undefined;
+  const rooms = report?.selective_disclosure?.rooms ?? [];
+  const evidenceRoomHtml = report?.report_artifacts?.selective_disclosure?.evidence_room_html;
 
   const [profileId, setProfileId] = useState<string | null>(null);
 
@@ -156,7 +152,7 @@ export function DisclosureRoom() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-border-row">
-                {activeRoom.claims.slice(0, 50).map((claim: Record<string, any>) => {
+                {activeRoom.claims.slice(0, 50).map((claim) => {
                   const classes =
                     VERIFICATION_COLORS[claim.verification_status] ??
                     "bg-surface-rail text-text-body border-border-strong";
@@ -189,7 +185,7 @@ export function DisclosureRoom() {
       {(activeRoom.shared_evidence ?? []).length > 0 && (
         <Card title={`Shared evidence (${activeRoom.shared_evidence.length})`}>
           <div className="flex flex-col gap-2">
-            {activeRoom.shared_evidence.slice(0, 30).map((item: Record<string, any>) => {
+            {activeRoom.shared_evidence.slice(0, 30).map((item) => {
               const classes =
                 PROOF_COLORS[item.proof_strength] ?? "bg-surface-rail text-text-body border-border-strong";
               return (
@@ -232,7 +228,7 @@ export function DisclosureRoom() {
         {(activeRoom.redactions ?? []).length > 0 && (
           <Card title={`Redactions (${activeRoom.redactions.length})`}>
             <div className="flex flex-col gap-2">
-              {activeRoom.redactions.slice(0, 20).map((item: Record<string, any>) => (
+              {activeRoom.redactions.slice(0, 20).map((item) => (
                 <div key={item.redaction_id} className="rounded-md border border-border-card p-3 text-xs">
                   <div className="font-mono text-text-muted">{item.field_path}</div>
                   <div className="mt-1 text-text-body">{item.reason}</div>
@@ -253,7 +249,7 @@ export function DisclosureRoom() {
         {(activeRoom.withheld_items ?? []).length > 0 && (
           <Card title={`Withheld items (${activeRoom.withheld_items.length})`}>
             <div className="flex flex-col gap-2">
-              {activeRoom.withheld_items.slice(0, 20).map((item: Record<string, any>) => (
+              {activeRoom.withheld_items.slice(0, 20).map((item) => (
                 <div key={item.item_id} className="rounded-md border border-border-card p-3 text-xs">
                   <div className="text-text-muted">{item.source_section}</div>
                   <div className="mt-1 text-text-body">{item.reason}</div>

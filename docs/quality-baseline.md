@@ -1,21 +1,19 @@
 # Quality Baseline
 
-Measured 24 September 2026. P0-06 is in progress, not complete. This records
-reproducible local evidence and configured CI gates, not hosted CI success or
-independent security validation.
+Measured 26 September 2026. These are local results and configured CI gates,
+not hosted CI success, independent security validation or enterprise readiness.
 
 ## Runtime Matrix
 
-PR backend jobs now target Python 3.11 and 3.12 on Ubuntu. Local measurements
-below used Python 3.12.3; the 3.11 hosted result remains pending. Package metadata
-allows Python >=3.11, but newer interpreters and other operating systems are not
-yet qualified by this matrix. The existing package smoke check builds an sdist,
-builds its wheel and runs the installed wheel outside the checkout.
+Backend checks target Python 3.11 and 3.12 on Ubuntu. Local runs used Python
+3.11.15 and 3.12.3 with hash-locked development dependencies. Package metadata
+allows Python >=3.11; newer interpreters and other operating systems are not
+qualified by this matrix. The sdist-to-wheel smoke test passed on Python 3.12,
+including an installed mock assessment outside the source checkout.
 
-PR console and static-site CI use Node 22, matching the container frontend builder.
-Local console checks used Node 20.20.2; a passing local run is not evidence for
-the Node 22 hosted job. Dependencies install through `npm ci` and hash-locked pip
-profiles; upgrading them is a separate reviewed change.
+Console checks used Node 22.23.3, matching the Node 22 CI major. A clean
+`npm ci`, full zero-warning ESLint, TypeScript project builds and production,
+demo and self-host bundles passed. Test/browser configuration is also type-checked.
 
 ## Python Coverage
 
@@ -24,10 +22,11 @@ python -m pip install --require-hashes -r requirements/dev.txt
 python -m pytest -q --cov --cov-report=term --cov-report=json:coverage.json --cov-report=xml:coverage.xml
 ```
 
-Baseline: 384 tests passed. Measurement covers the whole `cris_sme` package,
-including unimported modules, with branches enabled and no module omit list.
-Scripts, frontend code and child-process execution are outside this measurement.
-Coverage.py's standard exclusions still apply (24 excluded lines in this run).
+The P0-06 baseline was 384 passing tests on each interpreter. With 22 P0-07
+capability-register tests, the current total is 406 passing on each. Coverage
+measures the whole `cris_sme` package, including unimported modules, with branches
+enabled and no module omit list. Scripts, frontend and child-process execution
+are outside this measurement. Coverage.py standard exclusions apply (24 lines).
 
 | Measure | Executed / total | Percentage |
 | --- | --- | --- |
@@ -35,53 +34,74 @@ Coverage.py's standard exclusions still apply (24 excluded lines in this run).
 | Branches | 2,362 / 3,586 | 65.87% |
 | Combined coverage.py metric | 11,954 / 15,059 | 79.38% |
 
-The initial CI floor is 78% **combined**, allowing modest interpreter variance.
-It is not a 78% branch threshold, a per-module guarantee or a security score.
-CI retains JSON/XML reports for seven days, including when tests fail after
-producing a report. The tests step fails when the combined floor is missed.
-Subprocess-only supervisor checks can pass while its in-process measured coverage
-is zero; improve measurement before treating that as missing behavioral tests.
+Both interpreters produced this result. CI requires 78% **combined** coverage,
+not 78% branches or a per-module guarantee. JSON/XML evidence is retained for
+seven days. Supervisor behavior tested in subprocesses does not contribute to
+its in-process coverage. Azure SQL SDK imports emitted three escape-sequence
+warnings on the first clean run; they did not fail tests.
 
-## Frontend And Static Checks
+Ruff F/E9 checks cover `src`, `tests`, `scripts` and `setup.py`. Mypy checks
+eight entry/runtime modules: the assessment and AzureGoat entry scripts,
+run repository, supervisor, data paths, and control definitions/registry/validation.
+Imported modules use silent checking and missing-import tolerance; this is not a
+whole-backend strict type gate.
 
-PR CI installs the console lockfile, runs its 36 jsdom route/component smoke tests,
-and type-checks/builds production, demo and self-host modes. These checks do not
-launch a browser, validate actual navigation or prove scan/report workflows.
-The current route tests can pass on nonempty loading states; stronger settled-data
-assertions and real browser interaction tests remain required.
+## Frontend Coverage
 
-Backend lint covers `src`, `tests`, `scripts` and `setup.py` with Ruff F/E9 rules.
-Mypy covers only the two workflow entry scripts with silent imported-module
-checking; it is not a whole-backend strict type gate. Console builds run `tsc -b`.
+All 52 Vitest component/unit tests passed. Route smoke tests now wait for settled
+report or missing-data states, rather than passing on loading text. Dedicated
+fixtures cover populated governance, native-validation and trend views, including
+nullable scores, filtering, missing sections and errors. Explicit test cleanup
+prevents DOM state leaking between cases.
 
-Full console ESLint currently reports 101 errors and 17 warnings, including
-explicit `any`, React effect/static-component rules and fast-refresh boundaries.
-`npm run lint` is not yet a required PR gate; no rules were disabled or errors
-suppressed to create a passing result. `npm ci` reported 10 dependency advisories
-(4 moderate, 6 high); severity totals alone do not establish exploitability.
-Triage affected dependency paths and fixes separately before asserting release
-security. Do not run blind `npm audit fix --force` upgrades.
+| Measure | Executed / total | Percentage | CI floor |
+| --- | --- | --- | --- |
+| Statements | 686 / 1,151 | 59.60% | 58% |
+| Branches | 640 / 1,422 | 45.00% | 44% |
+| Functions | 185 / 427 | 43.32% | 42% |
+| Lines | 643 / 1,043 | 61.64% | 60% |
 
-## Remaining P0-06 Work
+V8 coverage includes runtime source files, even unimported ones. Tests, ambient
+Vite declarations and the two type-only API contract files are excluded. Browser
+test execution is not included in these figures. These are initial regression
+floors, not adequate coverage of every interaction; several assurance pages
+still need richer populated fixtures and negative-path tests.
 
-Progress, 25 September: shared components/hooks/API/context/tests plus Attack Paths
-and Public Exposure now pass `npm run lint:core` with zero warnings; PR CI requires
-that scoped gate. No existing lint rules were disabled. The full-console backlog
-is now 95 errors and 13 warnings. Severity normalization moved out of the component
-module, attack-path memo dependencies are stable, and public-exposure counters have
-explicit types. Animation handles invalid durations and recovers from nonfinite
-targets; seven regression cases bring the console suite to 43 passing tests.
-The self-host TypeScript/build check also passes locally. Browser workflows remain
-pending, and the scoped gate must not be presented as whole-console lint success.
+Report interfaces replace untyped page access. They are compile-time contracts,
+**not runtime validation of imported JSON**. Full ESLint has zero errors and
+warnings; `lint:core` now aliases the full gate. Generated coverage/browser output
+is ignored by lint, but no source rules were disabled for this migration.
 
-1. Resolve console lint findings and enable a required full lint gate.
-2. Add Playwright browser workflows: report selection, findings navigation,
-   artifact retrieval, missing backend and mocked scan lifecycle. Use generated
-   fixtures, not customer credentials or automatic live cloud scans.
-3. Measure frontend coverage and improve async component assertions.
-4. Expand Python type checking in reviewed module groups; document remaining scope.
-5. Triage dependency advisories and obtain passing hosted matrix/container jobs.
-6. Configure required branch checks in repository settings; workflow YAML alone
-   does not enforce merge protection.
+## Browser Workflows
 
-See [CI documentation](ci-cd-and-vercel.md) and the [roadmap](roadmap.md).
+Four desktop Chromium Playwright tests passed against the self-host build:
+
+1. Switch report, retain selection across reload, navigate to artifacts, and
+   retrieve the artifact belonging to the selected report.
+2. Handle an unavailable backend with explicit missing-report/disconnected states.
+3. Submit an authorized mock scan, observe completion, and select its new report.
+4. Display a failed mock scan without replacing the previously selected report.
+
+Network interception supplies synthetic fixtures and rejects external requests.
+No cloud credentials or customer scans are involved. CI retains screenshots,
+failure traces and HTML reports for seven days. Mobile and other browser engines
+are not part of this gate. The test preview server shuts down after completion.
+
+## Dependency And Delivery Limits
+
+Targeted compatible frontend dependency updates reduced the clean-install npm
+audit result from ten advisories to zero on 26 September. This is an advisory
+snapshot, not proof that all dependencies are secure. No forced major upgrade was
+used. Python lock fingerprints and the 36-control metadata gate passed.
+
+The PR workflow now configures these checks, but **this revision has not yet run
+in hosted PR CI**. Older successful static-site/scheduled jobs do not
+verify this revision. Container execution has not been independently reverified
+during this increment.
+
+A read-only GitHub settings check found no classic protection for `main` and no
+repository rulesets. Required merge checks still need administrator configuration;
+workflow YAML alone does not enforce them. No repository settings were changed.
+
+See [CI documentation](ci-cd-and-vercel.md), the
+[capability register](capability-evidence.md) and the [roadmap](roadmap.md).
