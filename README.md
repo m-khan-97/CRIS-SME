@@ -389,6 +389,10 @@ Delivery docs:
 - [Multi-cloud Expansion Strategy](docs/multi-cloud-expansion.md)
 - [Roadmap](docs/roadmap.md)
 - [Capability evidence register](docs/capability-evidence.md)
+- [Contributing](CONTRIBUTING.md), [governance](GOVERNANCE.md) and [support](SUPPORT.md)
+- [Security reporting](SECURITY.md)
+- [OpenSSF evidence register](docs/openssf-evidence.md)
+- [Dependency license inventory](docs/dependency-licenses.md)
 - [Enterprise Reference Repository Audit](docs/enterprise-reference-audit.md)
 
 ---

@@ -8,13 +8,22 @@ The repository keeps GitHub Actions for engineering quality and artifact generat
 
 | Workflow | Trigger | Purpose |
 | --- | --- | --- |
-| `pr-validation.yml` | `pull_request` | Merge quality gate plus separate non-root private-container smoke test |
+| `pr-validation.yml` | `pull_request`, `workflow_dispatch`, `workflow_call` | Full quality matrix and private-container smoke; reused by release validation |
 | `build-static-site-artifacts.yml` | `push` to `main`, `workflow_dispatch` | Build deterministic static bundle and upload `dist/` artifact |
 | `release.yml` | tags `v*.*.*`, `workflow_dispatch` | Build release bundle and publish GitHub Release assets |
 | `scheduled-assessment.yml` | `schedule`, `workflow_dispatch` | Run recurring assessments with safe collector fallback |
 | `codeql.yml` | `push`, `pull_request`, `schedule` | CodeQL security analysis |
 | `dependency-review.yml` | `pull_request` | Dependency risk review |
 | `reusable-python-quality.yml` | `workflow_call` | Shared Python quality checks |
+
+Release preflight requires an existing tag at the checked-out commit, matching
+Python project version and authored tracked notes. Manual dispatch cannot attach
+an arbitrary branch build to a different tag. The workflow creates a draft for
+maintainer review, not an automatically published latest release. See
+[release preparation](releases/README.md) for requirements and remaining gates.
+Release builds depend on the full reusable validation suite, not only the Python
+job. Draft assets include license inventories and an exact-set SHA-256 checksum
+list. Checksums provide integrity comparison, not signing or license clearance.
 
 ## Quality Check Reporting
 
@@ -31,6 +40,11 @@ The capability gate runs `python scripts/validate_capabilities.py` against the
 schema-backed [capability evidence register](capability-evidence.md). It checks
 claim structure, repository references and admitted evidence digests, without
 promoting fixture tests to live or independent validation.
+
+Python and console jobs also generate offline dependency-license inventories.
+Python records the installed environment; npm records all lockfile packages.
+Artifacts are retained for seven days. These are declared-metadata inventories,
+not automated compatibility approval; see [license scope](dependency-licenses.md).
 
 The shared quality workflow checks local Markdown links and SVG structure with
 `python scripts/check_docs.py`. It covers README, architecture, methodology,

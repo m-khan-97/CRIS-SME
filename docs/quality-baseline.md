@@ -22,8 +22,10 @@ python -m pip install --require-hashes -r requirements/dev.txt
 python -m pytest -q --cov --cov-report=term --cov-report=json:coverage.json --cov-report=xml:coverage.xml
 ```
 
-The P0-06 baseline was 384 passing tests on each interpreter. With 22 P0-07
-capability-register tests, the current total is 406 passing on each. Coverage
+The P0-06 baseline was 384 passing tests on each interpreter. P0-07 added 22
+capability-register tests; P0-08 added 16 inventory/governance checks and 22 release
+preflight cases, followed by 12 release-checksum cases. The current total is 456
+passing on each. Coverage
 measures the whole `cris_sme` package, including unimported modules, with branches
 enabled and no module omit list. Scripts, frontend and child-process execution
 are outside this measurement. Coverage.py standard exclusions apply (24 lines).
@@ -94,10 +96,12 @@ audit result from ten advisories to zero on 26 September. This is an advisory
 snapshot, not proof that all dependencies are secure. No forced major upgrade was
 used. Python lock fingerprints and the 36-control metadata gate passed.
 
-The PR workflow now configures these checks, but **this revision has not yet run
-in hosted PR CI**. Older successful static-site/scheduled jobs do not
-verify this revision. Container execution has not been independently reverified
-during this increment.
+Commit `8eb0595` was pushed to main. Its
+[hosted static-site run](https://github.com/m-khan-97/CRIS-SME/actions/runs/36265166338)
+passed the reusable Python 3.11 quality job and static build. This does not run
+the full PR matrix, console browser gate or container job; those hosted gates
+remain open. Container execution has not been independently reverified during
+this increment. The subsequent P0-08 additions are locally verified separately.
 
 A read-only GitHub settings check found no classic protection for `main` and no
 repository rulesets. Required merge checks still need administrator configuration;

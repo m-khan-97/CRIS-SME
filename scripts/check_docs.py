@@ -20,6 +20,13 @@ ENTRYPOINTS = (
     "docs/deployment-security.md",
     "docs/quality-baseline.md",
     "docs/capability-evidence.md",
+    "CONTRIBUTING.md",
+    "GOVERNANCE.md",
+    "SECURITY.md",
+    "SUPPORT.md",
+    "docs/openssf-evidence.md",
+    "docs/dependency-licenses.md",
+    "docs/releases/README.md",
 )
 
 

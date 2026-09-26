@@ -77,6 +77,18 @@ jobs:
         id: capabilities
         run: python scripts/validate_capabilities.py
 
+      - name: Inventory installed dependency license declarations
+        id: licenses
+        run: python scripts/dependency_license_inventory.py --ecosystem python --lock requirements/dev.txt --output quality-artifacts/python-licenses.json
+
+      - name: Preserve Python license inventory
+        if: ${{ always() && hashFiles('quality-artifacts/python-licenses.json') != '' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: python-licenses-${{ inputs.python-version }}
+          path: quality-artifacts/python-licenses.json
+          retention-days: 7
+
       - name: Run tests with package-wide branch coverage
         id: tests
         run: |

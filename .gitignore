@@ -13,6 +13,7 @@ frontend/console/coverage/
 frontend/console/playwright-report/
 frontend/console/test-results/
 htmlcov/
+quality-artifacts/
 
 # Local environment files.
 .env

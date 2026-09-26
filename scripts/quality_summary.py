@@ -15,6 +15,7 @@ CHECKS = (
     ("types", "Type check"),
     ("controls", "Control metadata"),
     ("capabilities", "Capability evidence register"),
+    ("licenses", "Dependency license inventory"),
     ("tests", "Tests"),
     ("package", "Installed package"),
     ("pipeline", "Mock pipeline"),

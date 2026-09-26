@@ -175,8 +175,40 @@ protection and no repository rulesets; those settings were not changed.
 Runtime JSON validation and richer frontend interaction coverage remain follow-up
 work, not guarantees supplied by compile-time interfaces.
 
-Next implementation priority: P0-08 governance and OpenSSF evidence inventory,
-alongside closure of the hosted and evidence-admission gates above.
+Commit `8eb0595` is published. Its hosted static-site workflow, including the
+reusable Python 3.11 quality job, passed; this is not the full PR/browser/container
+matrix. See the [dated quality record](quality-baseline.md).
+
+P0-08 is in progress: contribution, governance, support and security-reporting
+policies now define the current single-maintainer, pre-1.0 boundary. The
+[OpenSSF register](openssf-evidence.md) maps all 67 Passing identifiers without
+claiming a badge or substituting policies for operational evidence. Offline
+[dependency-license inventories](dependency-licenses.md) are generated for the
+installed Python environment and npm lock, with CI artifact retention. Local
+verification now passes 456 tests on both Python 3.11 and 3.12, plus Ruff and
+16 documentation entrypoint checks; package coverage remains 79.38% combined.
+
+Release preparation now has a fail-closed preflight: existing tag and checkout
+identity, package version, clean source and authored tracked notes must agree.
+Twenty-two regression cases exercise this gate. Manual tag input is passed as
+environment data; Node setup and console dependency installation are explicit.
+The workflow creates drafts, not automatically published latest releases. See
+[release preparation](releases/README.md). This workflow change is locally
+validated; no tag or release was created and no hosted release run is claimed.
+
+The full PR quality suite is now reusable and manually dispatchable. Release
+validation calls the same Python matrix, console/browser and container gates
+before building a draft. Release assets now include both license inventories,
+authored notes and a checked exact-set SHA-256 list, with 12 checksum regression
+cases. These hashes are not signatures. Hosted execution of this revision and
+independent release approval remain pending.
+
+Next implementation priority: finish P0-08 operational gates (working private
+security intake, repository protections, backup maintainer and release/license
+review) alongside full hosted validation and historical evidence admission.
+Private reporting and secret-scanning protections were disabled when checked;
+no setting has been changed by these documentation/tooling additions. No badge
+application or external project affiliation has been submitted.
 
 | ID | Owner | Work and acceptance evidence |
 | --- | --- | --- |

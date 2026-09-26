@@ -2,6 +2,8 @@ name: PR Validation
 
 on:
   pull_request:
+  workflow_dispatch:
+  workflow_call:
 
 permissions:
   contents: read
@@ -30,6 +32,8 @@ jobs:
         run: npm run lint
       - name: Component tests and coverage
         run: npm run test:coverage
+      - name: Inventory locked dependency license declarations
+        run: python3 ../../scripts/dependency_license_inventory.py --ecosystem npm --lock package-lock.json --output quality-artifacts/npm-licenses.json
       - name: Type check and build all deployment modes
         run: |
           npm run build
@@ -48,6 +52,7 @@ jobs:
             frontend/console/coverage
             frontend/console/playwright-report
             frontend/console/test-results
+            frontend/console/quality-artifacts
           retention-days: 7
 
   container:
