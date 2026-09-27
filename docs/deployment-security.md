@@ -34,6 +34,13 @@ and authorization risks. These are operating requirements, not enforced policies
 
 ## Imports And Exports
 
+Local API POST routes require one decimal `Content-Length`, a single
+`Content-Type: application/json` header (parameters allowed), and at most 65,536
+body bytes. Missing length returns 411, oversized bodies 413, and unsupported
+media types 415. Transfer encoding, duplicate lengths, malformed UTF-8/JSON and
+non-object payloads are rejected with 400. This narrows request parsing, but
+does not add authentication, request-read deadlines or global concurrency quotas.
+
 Accept snapshots, reports, review CSV/JSON and RBOM manifests only from trusted
 sources. Inspect file size and referenced paths first; use an isolated environment
 for unfamiliar input. Do not wrap these local parsers in a public upload endpoint.

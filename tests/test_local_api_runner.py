@@ -15,6 +15,7 @@ from cris_sme.api.local_runner import (
     _aws_login_environment,
     create_handler,
     latest_artifacts,
+    MAX_REQUEST_BODY_BYTES,
 )
 
 
@@ -633,3 +634,55 @@ class _FakeSocket:
 
     def sendall(self, data: bytes) -> None:
         self.output.write(data)
+
+
+@pytest.mark.parametrize("route", [
+    "/api/assessments/azure", "/api/assessments/aws",
+    "/api/environment/aws/validate-role", "/api/public-exposure",
+])
+@pytest.mark.parametrize("headers,body,status", [
+    ("Content-Type: application/json\r\n", b"{}", 411),
+    ("Content-Length: -1\r\n", b"{}", 400),
+    ("Content-Length: +2\r\n", b"{}", 400),
+    ("Content-Length: 2\r\nContent-Length: 2\r\n", b"{}", 400),
+    ("Content-Length: 2, 2\r\n", b"{}", 400),
+    ("Content-Length: 65537\r\n", b"", 413),
+    ("Content-Length: 999999999999999999999\r\n", b"", 413),
+    ("Transfer-Encoding: chunked\r\nContent-Length: 2\r\n", b"{}", 400),
+    ("Content-Length: 2\r\nContent-Type: text/plain\r\n", b"{}", 415),
+    ("Content-Length: 2\r\n", b"{}", 415),
+    ("Content-Length: 5\r\nContent-Type: application/json\r\n", b"{}", 400),
+    ("Content-Length: 2\r\nContent-Type: application/json\r\n", b"\xff\xfe", 400),
+    ("Content-Length: 9\r\nContent-Type: application/json\r\n", b'{"x":NaN}', 400),
+    ("Content-Length: 2\r\nContent-Type: application/json\r\n", b"[]", 400),
+])
+def test_post_rejects_invalid_body_before_cloud_work(tmp_path, monkeypatch, route, headers, body, status):
+    runner = LocalAssessmentRunner(output_dir=tmp_path)
+
+    def unexpected(*args, **kwargs):
+        pytest.fail("Rejected input must not invoke cloud or probe work")
+
+    for name in ("start_azure_assessment", "start_aws_assessment", "validate_aws_role", "assess_public_exposure"):
+        monkeypatch.setattr(runner, name, unexpected)
+    request = f"POST {route} HTTP/1.1\r\nHost: 127.0.0.1\r\n{headers}\r\n".encode() + body
+    socket = _FakeSocket(request)
+    create_handler(runner)(socket, ("127.0.0.1", 12345), object())
+    response_headers, payload = socket.output.getvalue().split(b"\r\n\r\n", 1)
+    assert f" {status} ".encode() in response_headers.splitlines()[0]
+    assert json.loads(payload)["status"] == "failed"
+
+
+@pytest.mark.parametrize("length", [0, 2, MAX_REQUEST_BODY_BYTES])
+def test_post_accepts_json_at_body_limit(tmp_path, monkeypatch, length):
+    runner = LocalAssessmentRunner(output_dir=tmp_path)
+    monkeypatch.setattr(runner, "validate_aws_role", lambda payload: {"received": payload})
+    body = b"{}" + b" " * (length - 2) if length else b""
+    request = (
+        "POST /api/environment/aws/validate-role HTTP/1.1\r\nHost: 127.0.0.1\r\n"
+        f"Content-Length: {length}\r\nContent-Type: application/json; charset=utf-8\r\n\r\n"
+    ).encode() + body
+    socket = _FakeSocket(request)
+    create_handler(runner)(socket, ("127.0.0.1", 12345), object())
+    header, payload = socket.output.getvalue().split(b"\r\n\r\n", 1)
+    assert b" 200 " in header.splitlines()[0]
+    assert json.loads(payload) == {"received": {}}

@@ -210,6 +210,19 @@ Private reporting and secret-scanning protections were disabled when checked;
 no setting has been changed by these documentation/tooling additions. No badge
 application or external project affiliation has been submitted.
 
+27 September: `5fb89ce` is published. The first full hosted run passed the console
+and container jobs, but both Python jobs failed the production-snapshot replay
+check after their test/package stages passed. Local reproduction found that
+replay omitted deterministic resource links attached by the assessment runner.
+Replay now regenerates those links for linked snapshots and checks the captured
+finding contents against their stored hash as well. Historical artifacts remain
+unchanged; a subsequent hosted run is required to close this gate.
+
+P1-09 preparatory hardening adds a 64 KiB POST body cap, unambiguous length/media
+type checks and strict UTF-8/object JSON parsing across all four local API POST
+routes. This does not complete P1-01 or make the runner safe for shared hosting;
+read deadlines, authorization, quotas and tenant isolation remain open.
+
 | ID | Owner | Work and acceptance evidence |
 | --- | --- | --- |
 | P0-01 | RE | Repair stale Mermaid-only README assertion after SVG migration. Check linked diagrams and documents. CI summaries must reflect failed/cancelled jobs instead of always printing success. |

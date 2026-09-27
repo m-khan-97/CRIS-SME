@@ -29,8 +29,17 @@ DEFAULT_PORT = 8787
 DEFAULT_OUTPUT_DIR = Path("outputs/reports")
 DEFAULT_FIGURE_DIR = Path("outputs/figures")
 DEFAULT_DATABASE_NAME = "assessment_runs.sqlite3"
+MAX_REQUEST_BODY_BYTES = 64 * 1024
 
 CommandRunner = Callable[..., subprocess.CompletedProcess[str]]
+
+
+class RequestBodyError(ValueError):
+    """A request rejected before invoking a collector or probe."""
+
+    def __init__(self, message: str, status: int = 400) -> None:
+        super().__init__(message)
+        self.status = status
 
 
 @dataclass
@@ -762,7 +771,7 @@ def create_handler(runner: LocalAssessmentRunner) -> type[BaseHTTPRequestHandler
                     payload = self._read_json()
                     result = runner.validate_aws_role(payload)
                 except ValueError as exc:
-                    self._send_error(str(exc), status=400)
+                    self._send_error(str(exc), status=getattr(exc, "status", 400))
                     return
                 except Exception as exc:  # pragma: no cover - defensive runtime guard
                     self._send_error(str(exc), status=500)
@@ -774,7 +783,7 @@ def create_handler(runner: LocalAssessmentRunner) -> type[BaseHTTPRequestHandler
                     payload = self._read_json()
                     report = runner.assess_public_exposure(payload)
                 except ValueError as exc:
-                    self._send_error(str(exc), status=400)
+                    self._send_error(str(exc), status=getattr(exc, "status", 400))
                     return
                 except Exception as exc:  # pragma: no cover - defensive runtime guard
                     self._send_error(str(exc), status=500)
@@ -791,7 +800,7 @@ def create_handler(runner: LocalAssessmentRunner) -> type[BaseHTTPRequestHandler
                 payload = self._read_json()
                 run = start_fn(payload)
             except ValueError as exc:
-                self._send_error(str(exc), status=400)
+                self._send_error(str(exc), status=getattr(exc, "status", 400))
                 return
             except Exception as exc:  # pragma: no cover - defensive runtime guard
                 self._send_error(str(exc), status=500)
@@ -802,11 +811,36 @@ def create_handler(runner: LocalAssessmentRunner) -> type[BaseHTTPRequestHandler
             return
 
         def _read_json(self) -> dict[str, Any]:
-            length = int(self.headers.get("Content-Length", "0"))
-            raw = self.rfile.read(length).decode("utf-8") if length else "{}"
-            payload = json.loads(raw or "{}")
+            # Reject ambiguous framing before reading bytes or starting work.
+            if self.headers.get_all("Transfer-Encoding"):
+                raise RequestBodyError("transfer encoding is not supported")
+            lengths = self.headers.get_all("Content-Length", [])
+            if not lengths:
+                raise RequestBodyError("Content-Length is required", status=411)
+            if len(lengths) != 1:
+                raise RequestBodyError("exactly one Content-Length is required")
+            value = lengths[0].strip()
+            if not value.isascii() or not value.isdecimal():
+                raise RequestBodyError("Content-Length must be a nonnegative decimal integer")
+            if len(value) > 16 or int(value) > MAX_REQUEST_BODY_BYTES:
+                raise RequestBodyError("request body exceeds 65536 bytes", status=413)
+            length = int(value)
+            types = self.headers.get_all("Content-Type", [])
+            if len(types) != 1 or types[0].split(";", 1)[0].strip().lower() != "application/json":
+                raise RequestBodyError("Content-Type must be application/json", status=415)
+            raw = self.rfile.read(length) if length else b"{}"
+            if length and len(raw) != length:
+                raise RequestBodyError("request body is incomplete")
+
+            def reject_constant(value: str) -> None:
+                raise ValueError("non-standard JSON constant")
+
+            try:
+                payload = json.loads(raw.decode("utf-8"), parse_constant=reject_constant)
+            except (ValueError, RecursionError):
+                raise RequestBodyError("request body must be valid UTF-8 JSON") from None
             if not isinstance(payload, dict):
-                raise ValueError("request body must be a JSON object")
+                raise RequestBodyError("request body must be a JSON object")
             return payload
 
         def _send_json(self, payload: dict[str, Any], *, status: int = 200) -> None:

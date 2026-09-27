@@ -8,6 +8,31 @@ from cris_sme.engine.assessment_replay import (
     replay_evidence_snapshot,
 )
 from cris_sme.policies import POLICY_PACK_VERSION
+from cris_sme.engine.assessment_runner import AssessmentRunner
+
+
+def test_runner_snapshot_replays_with_resource_links() -> None:
+    result = AssessmentRunner(collector_mode="mock").run()
+    assert any(finding.evidence_ids for finding in result.findings)
+    snapshot = build_evidence_snapshot(
+        profiles=result.profiles, findings=result.findings,
+        collector_mode="mock", generated_at="2026-09-27T00:00:00Z",
+    )
+    assert replay_evidence_snapshot(snapshot.model_dump(mode="json")).deterministic_match
+    snapshot.findings[0]["metadata"]["unexpected"] = "tampered"
+    replay = replay_evidence_snapshot(snapshot)
+    assert not replay.finding_hash_verified
+    assert not replay.deterministic_match
+
+
+def test_raw_snapshot_metadata_tampering_is_detected() -> None:
+    profiles = MockCollector().collect_profiles()
+    snapshot = build_evidence_snapshot(
+        profiles=profiles, findings=evaluate_profiles(profiles),
+        collector_mode="mock", generated_at="2026-09-27T00:00:00Z",
+    )
+    snapshot.findings[0]["metadata"]["unexpected"] = "tampered"
+    assert not replay_evidence_snapshot(snapshot).finding_hash_verified
 
 
 def test_evidence_snapshot_replays_deterministically() -> None:

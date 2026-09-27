@@ -16,6 +16,7 @@ from cris_sme.controls import (
     evaluate_network_controls,
 )
 from cris_sme.engine.scoring import ScoringResult, score_findings
+from cris_sme.engine.assessment_context import build_assessment_resource_context
 from cris_sme.models.cloud_profile import CloudProfile
 from cris_sme.models.finding import Finding
 from cris_sme.models.platform import (
@@ -89,6 +90,9 @@ def replay_evidence_snapshot(
         profiles = [CloudProfile.model_validate(item) for item in parsed.profiles]
         original_findings = [Finding.model_validate(item) for item in parsed.findings]
         replayed_findings = evaluate_profiles(profiles)
+        # Runner snapshots include resource links; older evaluator-only snapshots do not.
+        if any(finding.asset_ids or finding.evidence_ids for finding in original_findings):
+            build_assessment_resource_context(profiles, replayed_findings)
         original_score = score_findings(original_findings)
         replayed_score = score_findings(replayed_findings)
     except Exception as exc:  # pragma: no cover - defensive API boundary
@@ -100,7 +104,12 @@ def replay_evidence_snapshot(
         [_canonical_finding(item) for item in replayed_findings]
     )
     profile_hash_verified = replay_profile_sha256 == parsed.profile_sha256
-    finding_hash_verified = replay_finding_sha256 == parsed.finding_sha256
+    captured_finding_sha256 = _sha256_json(
+        [_canonical_finding(item) for item in original_findings]
+    )
+    finding_hash_verified = (
+        replay_finding_sha256 == parsed.finding_sha256 == captured_finding_sha256
+    )
     category_deltas = _category_score_deltas(original_score, replayed_score)
     overall_delta = round(
         replayed_score.overall_risk_score - original_score.overall_risk_score,
