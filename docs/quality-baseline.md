@@ -1,7 +1,8 @@
 # Quality Baseline
 
-Measured 26 September 2026. These are local results and configured CI gates,
-not hosted CI success, independent security validation or enterprise readiness.
+Updated 27 September 2026. Local measurements and commit-specific hosted results
+are distinguished below. Neither establishes independent security validation or
+enterprise readiness.
 
 ## Runtime Matrix
 
@@ -24,17 +25,17 @@ python -m pytest -q --cov --cov-report=term --cov-report=json:coverage.json --co
 
 The P0-06 baseline was 384 passing tests on each interpreter. P0-07 added 22
 capability-register tests; P0-08 added 16 inventory/governance checks and 22 release
-preflight cases, followed by 12 release-checksum cases. The current total is 456
-passing on each. Coverage
+preflight cases, followed by 12 release-checksum cases. Replay and request-body
+regressions add another 61 cases: the current total is 517 passing on each. Coverage
 measures the whole `cris_sme` package, including unimported modules, with branches
 enabled and no module omit list. Scripts, frontend and child-process execution
 are outside this measurement. Coverage.py standard exclusions apply (24 lines).
 
 | Measure | Executed / total | Percentage |
 | --- | --- | --- |
-| Statements | 9,592 / 11,473 | 83.60% |
-| Branches | 2,362 / 3,586 | 65.87% |
-| Combined coverage.py metric | 11,954 / 15,059 | 79.38% |
+| Statements | 9,638 / 11,504 | 83.78% |
+| Branches | 2,383 / 3,602 | 66.16% |
+| Combined coverage.py metric | 12,021 / 15,106 | 79.58% |
 
 Both interpreters produced this result. CI requires 78% **combined** coverage,
 not 78% branches or a per-module guarantee. JSON/XML evidence is retained for
@@ -100,8 +101,19 @@ Commit `8eb0595` was pushed to main. Its
 [hosted static-site run](https://github.com/m-khan-97/CRIS-SME/actions/runs/36265166338)
 passed the reusable Python 3.11 quality job and static build. This does not run
 the full PR matrix, console browser gate or container job; those hosted gates
-remain open. Container execution has not been independently reverified during
-this increment. The subsequent P0-08 additions are locally verified separately.
+were initially open. The subsequent full
+[run on 5fb89ce](https://github.com/m-khan-97/CRIS-SME/actions/runs/36267721918)
+passed the console/browser and container jobs. Both Python jobs passed tests,
+package installation and mock assessment, but failed the replay gate: replay
+omitted resource links included in runner-produced snapshots. Commit `8c99b8a`
+fixes this and checks captured finding contents against their stored hash.
+Local replay of the failing snapshot now passes. The full
+[hosted rerun on 8c99b8a](https://github.com/m-khan-97/CRIS-SME/actions/runs/36281224558)
+also passed: both Python versions, installed packages, mock assessment/replay,
+console/browser and container jobs. This establishes execution of the configured
+gates for that commit, not independent rule correctness or tenant isolation.
+GitHub reported action-runtime and upcoming runner-image migration warnings;
+review those upgrades separately rather than treating a passing run as permanence.
 
 A read-only GitHub settings check found no classic protection for `main` and no
 repository rulesets. Required merge checks still need administrator configuration;

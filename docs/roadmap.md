@@ -216,7 +216,12 @@ check after their test/package stages passed. Local reproduction found that
 replay omitted deterministic resource links attached by the assessment runner.
 Replay now regenerates those links for linked snapshots and checks the captured
 finding contents against their stored hash as well. Historical artifacts remain
-unchanged; a subsequent hosted run is required to close this gate.
+unchanged. Commit `8c99b8a` fixes this; the
+[full hosted rerun](https://github.com/m-khan-97/CRIS-SME/actions/runs/36281224558)
+passed all four jobs, including Python 3.11/3.12 replay, console/browser and
+container verification. The current local suites pass 517 tests on each Python
+version, with 79.58% combined package coverage. This closes the hosted-execution
+gap for that commit, not the independent validation or repository-protection gates.
 
 P1-09 preparatory hardening adds a 64 KiB POST body cap, unambiguous length/media
 type checks and strict UTF-8/object JSON parsing across all four local API POST
