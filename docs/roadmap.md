@@ -417,6 +417,26 @@ identity and legacy access. Python 3.11/3.12 each pass 921 tests, with 81.29%/81
 combined coverage respectively. Lint, the 13-module type gate, documentation and
 installed-package checks pass. Changes remain local and unpushed.
 
+2 October publication: commit `5ce5d3a` publishes the preceding local API hardening
+and cloud/public run-storage increments. The
+[full hosted quality run](https://github.com/m-khan-97/CRIS-SME/actions/runs/36995365921)
+passed both Python jobs, console/browser checks and Docker smoke. Customer and
+research edits were excluded from that commit.
+
+2 October, P1-08 public-history increment: a dedicated completed-public-run index
+and selected-report API support a browser selector with date, targets and run ID.
+Explicit selections persist across reloads; new successful scans select their
+result. JSON/Markdown links retain the selected run's paths. Missing selected
+results show errors without another run's findings. Small-screen navigation and
+header wrapping make the view usable on mobile, and the public page omits cloud
+assessment context. This completes the local public-history selector follow-up;
+authenticated tenant context, connection ownership and broader P1 gates remain.
+Local verification passes 926 tests on each Python version (81.33% combined
+coverage), 56 console tests and six browser workflows. Desktop/mobile screenshots
+were reviewed, including a page-overflow check and a missing-selected-report case.
+Lint, types, package installation and deployment-mode builds provide the remaining
+local gates for this increment.
+
 | ID | Owner | Work and acceptance evidence |
 | --- | --- | --- |
 | P0-01 | RE | Repair stale Mermaid-only README assertion after SVG migration. Check linked diagrams and documents. CI summaries must reflect failed/cancelled jobs instead of always printing success. |

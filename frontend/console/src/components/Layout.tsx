@@ -110,13 +110,14 @@ export function Layout() {
     historyLoading,
   } = useAssessment();
   const connected = health.data?.status === "ok";
-  const subtitle = selectedAssessment
+  const isPublicExposure = location.pathname.startsWith("/public-exposure");
+  const subtitle = selectedAssessment && !isPublicExposure
     ? `${selectedAssessment.organization_name} · ${selectedAssessment.provider.toUpperCase()} · ${new Date(selectedAssessment.generated_at).toLocaleString()}`
     : undefined;
 
   return (
     <div className="flex min-h-screen bg-surface-app font-ui text-text-body">
-      <aside className="flex w-[236px] shrink-0 flex-col bg-[linear-gradient(190deg,var(--color-sidebar-bg-top),var(--color-sidebar-bg-bottom))]">
+      <aside className="hidden w-[236px] shrink-0 flex-col bg-[linear-gradient(190deg,var(--color-sidebar-bg-top),var(--color-sidebar-bg-bottom))] md:flex">
         <div className="flex items-center gap-2.5 border-b border-white/[0.06] px-[18px] py-[18px] pt-5">
           <div className="grid h-[34px] w-[34px] shrink-0 place-items-center rounded-md bg-gradient-to-br from-indigo-500 to-primary shadow-brandmark">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
@@ -215,9 +216,15 @@ export function Layout() {
         )}
       </aside>
 
-      <div className="flex flex-1 flex-col">
-        <header className="flex h-[60px] shrink-0 items-center justify-between gap-[18px] border-b border-border-card bg-surface-card px-[26px]">
-          <div>
+      <div className="flex min-w-0 flex-1 flex-col">
+        <header className="flex min-h-[60px] shrink-0 flex-wrap items-center justify-between gap-3 border-b border-border-card bg-surface-card px-4 py-3 xl:flex-nowrap xl:px-[26px] xl:py-0">
+          <select aria-label="Navigation" value={activeItem.to} onChange={(event) => navigate(event.target.value)}
+            className="h-9 w-full min-w-0 rounded-md border border-border-strong bg-surface-subtle px-2 text-[12px] font-semibold text-text-strong md:hidden">
+            {NAV_GROUPS.map((group) => <optgroup key={group.label} label={group.label}>
+              {group.items.map((item) => <option key={item.to} value={item.to}>{item.label}</option>)}
+            </optgroup>)}
+          </select>
+          <div className="min-w-0">
             <div className="text-[15px] font-bold tracking-tight text-text-strong">
               {activeItem.label}
             </div>
@@ -225,14 +232,14 @@ export function Layout() {
               <div className="text-[11.5px] font-medium text-text-muted">{subtitle}</div>
             )}
           </div>
-          <div className="flex items-center gap-2.5">
-            {IS_DEMO ? (
+          <div className="flex min-w-0 flex-wrap items-center gap-2.5">
+            {!isPublicExposure && (IS_DEMO ? (
               <span className="flex h-7 items-center gap-1.5 rounded-full border border-amber-400/30 bg-amber-400/10 px-3 text-[11.5px] font-semibold text-amber-500 dark:text-amber-300">
                 <FlaskConical className="h-3.5 w-3.5" strokeWidth={1.8} />
                 Demo · Contoso Healthcare Ltd
               </span>
             ) : selectedAssessment ? (
-              <label className="flex h-10 min-w-[320px] max-w-[440px] items-center gap-2 rounded-md border border-border-strong bg-surface-subtle px-2.5">
+              <label className="flex h-10 w-full min-w-0 items-center gap-2 rounded-md border border-border-strong bg-surface-subtle px-2.5 sm:w-[320px]">
                 <History className="h-4 w-4 shrink-0 text-primary" strokeWidth={1.8} />
                 <span className="sr-only">Active assessment</span>
                 <select
@@ -255,7 +262,7 @@ export function Layout() {
               <div className="text-[12px] font-medium text-text-muted">
                 {historyLoading ? "Loading assessments…" : "No assessments available"}
               </div>
-            )}
+            ))}
             {!IS_DEMO && (
               <button
                 type="button"

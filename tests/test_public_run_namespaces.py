@@ -100,6 +100,7 @@ def test_invalid_latest_falls_back_to_previous(runner, damage):
         target.write_text({"invalid": "not json", "array": "[]", "mismatch": '{"run_id":"wrong"}'}[damage])
     assert runner.latest_artifact_listing()["public_exposure"]["path"] == first["artifacts"]["json"]
     download(runner, target, 404)
+    assert runner.public_assessment_report(second["run_id"]) is None
 
 
 def test_legacy_result_is_unchanged_and_available(runner):
@@ -139,6 +140,32 @@ def test_namespace_collision_cannot_change_existing_run(runner, monkeypatch):
             scan(runner)
     assert runner.get_run(first["run_id"]).status == "completed"
     assert scan(runner)["status"] == "completed"
+
+
+def test_public_history_and_selected_report_endpoints(runner):
+    first, second = scan(runner), scan(runner)
+    handler = create_handler(runner)
+    history = json.loads(_request_raw(handler, "GET", "/api/public-exposure-history"))["assessments"]
+    assert [entry["run_id"] for entry in history] == [second["run_id"], first["run_id"]]
+    assert history[0]["targets"] == ["example.com"]
+    assert history[0]["finding_count"] == 0
+    selected = json.loads(_request_raw(handler, "GET", f"/api/public-exposure-reports/{first['run_id']}"))
+    assert selected["run_id"] == first["run_id"]
+    assert selected["artifacts"] == first["artifacts"]
+    assert selected["status"] == "completed"
+
+
+@pytest.mark.parametrize("status", ["queued", "running", "failed"])
+def test_history_and_selected_endpoint_exclude_incomplete_runs(runner, status):
+    report = scan(runner)
+    runner._update_run(report["run_id"], status=status)
+    handler = create_handler(runner)
+    assert json.loads(_request_raw(handler, "GET", "/api/public-exposure-history")) == {"assessments": []}
+    _request_raw(handler, "GET", f"/api/public-exposure-reports/{report['run_id']}", expected_status=404)
+
+
+def test_unknown_selected_public_report_is_not_found(runner):
+    _request_raw(create_handler(runner), "GET", "/api/public-exposure-reports/run_1111111111111111", expected_status=404)
 
 
 def test_interrupted_public_scan_is_failed_after_restart(runner):

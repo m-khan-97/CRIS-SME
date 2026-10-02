@@ -483,21 +483,57 @@ class LocalAssessmentRunner:
 
     def public_output_dirs(self) -> list[Path]:
         """Publish only readable completed public-exposure reports."""
-        directories = []
-        root = self.output_dir.absolute()
-        for directory in self.completed_output_dirs(collector="public_exposure"):
-            try:
-                relative = (directory / "cris_sme_public_exposure.json").absolute().relative_to(root)
-                report = json.loads(read_regular_file(root, relative, max_bytes=MAX_REPORT_BYTES))
-                if isinstance(report, dict) and report.get("run_id") == directory.parent.name:
-                    directories.append(directory)
-            except (OSError, ValueError, UnicodeError, RecursionError):
-                continue
-        return directories
+        return [directory for directory in self.completed_output_dirs(collector="public_exposure")
+                if self._read_public_report(directory) is not None]
+
+    def _read_public_report(self, directory: Path) -> dict[str, Any] | None:
+        try:
+            root = self.output_dir.absolute()
+            relative = (directory / "cris_sme_public_exposure.json").absolute().relative_to(root)
+            report = json.loads(read_regular_file(root, relative, max_bytes=MAX_REPORT_BYTES))
+            if isinstance(report, dict) and report.get("run_id") == directory.parent.name:
+                return report
+        except (OSError, ValueError, UnicodeError, RecursionError):
+            pass
+        return None
 
     def latest_public_output_dir(self) -> Path:
         directories = self.public_output_dirs()
         return directories[0] if directories else self.output_dir
+
+    def public_assessment_report(self, run_id: str) -> dict[str, Any] | None:
+        """Return a completed public report by its API run ID."""
+        for directory in self.completed_output_dirs(collector="public_exposure"):
+            if directory.parent.name != run_id:
+                continue
+            report = self._read_public_report(directory)
+            if report is None:
+                return None
+            return {**report, "status": "completed", "artifacts": {
+                "json": str(directory / "cris_sme_public_exposure.json"),
+                "markdown": str(directory / "cris_sme_public_exposure.md"),
+            }}
+        return None
+
+    def public_assessment_history(self) -> list[dict[str, Any]]:
+        """List completed public scans without mixing cloud report schemas."""
+        entries = []
+        for directory in self.completed_output_dirs(collector="public_exposure"):
+            run_id = directory.parent.name
+            report = self._read_public_report(directory)
+            if report is None:
+                continue
+            targets = report.get("targets", [])
+            findings = report.get("findings", [])
+            entries.append({
+                "run_id": run_id,
+                "generated_at": str(report.get("generated_at") or ""),
+                "targets": [target if isinstance(target, str) else str(target.get("host", ""))
+                            for target in targets if isinstance(target, (str, dict))]
+                           if isinstance(targets, list) else [],
+                "finding_count": len(findings) if isinstance(findings, list) else 0,
+            })
+        return entries
 
     def assessment_report(self, report_id: str) -> dict[str, Any] | None:
         """Return one persisted report selected by its stable report identifier."""
@@ -837,6 +873,17 @@ def create_handler(
                 return
             if request_path == "/api/assessment-history":
                 self._send_json({"assessments": runner.assessment_history()})
+                return
+            if request_path == "/api/public-exposure-history":
+                self._send_json({"assessments": runner.public_assessment_history()})
+                return
+            if request_path.startswith("/api/public-exposure-reports/"):
+                run_id = unquote(request_path.rsplit("/", 1)[-1])
+                report = runner.public_assessment_report(run_id)
+                if report is None:
+                    self._send_error("public exposure report not found", status=404)
+                    return
+                self._send_json(report)
                 return
             if request_path == "/api/assessment-runs":
                 query = parse_qs(parsed_url.query)

@@ -34,7 +34,8 @@ Error-disclosure checks add 26 cases, public run projections add 31, request
 validation adds 65, worker environments add 15, and state ownership/startup
 recovery adds 24. Cloud run namespaces add 17 checks, including a real mock-mode
 child assessment and artifact retrieval. Public run storage adds 19 checks for
-retention, restart, failures and publication boundaries. The current total is 921 passing
+retention, restart, failures and publication boundaries. Five public-history and
+selected-report API cases bring the current total to 926 passing
 on each. Coverage
 measures the whole `cris_sme` package, including unimported modules, with branches
 enabled and no module omit list. Scripts, frontend and child-process execution
@@ -42,13 +43,12 @@ are outside this measurement. Coverage.py standard exclusions apply (9 lines).
 
 | Measure | Executed / total | Percentage |
 | --- | --- | --- |
-| Statements | 10,292 / 12,061 | 85.33% |
-| Branches | 2,595 / 3,790 | 68.47% |
-| Combined coverage.py metric | 12,887 / 15,851 | 81.30% |
+| Statements | 10,320 / 12,092 | 85.35% |
+| Branches | 2,608 / 3,804 | 68.56% |
+| Combined coverage.py metric | 12,928 / 15,896 | 81.33% |
 
-The table records Python 3.12. Python 3.11 executed 10,290 statements and the same
-2,595 branches: 85.32% statements and 81.29% combined coverage. Both suites passed
-all 921 tests. CI requires 78% **combined** coverage,
+Both Python versions produced these measurements and passed all 926 tests.
+CI requires 78% **combined** coverage,
 not 78% branches or a per-module guarantee. JSON/XML evidence is retained for
 seven days. Supervisor behavior tested in subprocesses does not contribute to
 its in-process coverage. Azure SQL SDK imports emitted three escape-sequence
@@ -63,7 +63,8 @@ whole-backend strict type gate.
 
 ## Frontend Coverage
 
-All 52 Vitest component/unit tests passed. Route smoke tests now wait for settled
+All 56 Vitest component/unit tests passed. Four public-history tests cover saved
+selection, exact exports, missing results and new completed scans. Route smoke tests wait for settled
 report or missing-data states, rather than passing on loading text. Dedicated
 fixtures cover populated governance, native-validation and trend views, including
 nullable scores, filtering, missing sections and errors. Explicit test cleanup
@@ -71,10 +72,10 @@ prevents DOM state leaking between cases.
 
 | Measure | Executed / total | Percentage | CI floor |
 | --- | --- | --- | --- |
-| Statements | 686 / 1,151 | 59.60% | 58% |
-| Branches | 640 / 1,422 | 45.00% | 44% |
-| Functions | 185 / 427 | 43.32% | 42% |
-| Lines | 643 / 1,043 | 61.64% | 60% |
+| Statements | 727 / 1,183 | 61.45% | 58% |
+| Branches | 695 / 1,469 | 47.31% | 44% |
+| Functions | 207 / 443 | 46.72% | 42% |
+| Lines | 684 / 1,075 | 63.62% | 60% |
 
 V8 coverage includes runtime source files, even unimported ones. Tests, ambient
 Vite declarations and the two type-only API contract files are excluded. Browser
@@ -89,18 +90,23 @@ is ignored by lint, but no source rules were disabled for this migration.
 
 ## Browser Workflows
 
-Four desktop Chromium Playwright tests passed against the self-host build:
+Six Chromium Playwright tests passed against the self-host build:
 
 1. Switch report, retain selection across reload, navigate to artifacts, and
    retrieve the artifact belonging to the selected report.
 2. Handle an unavailable backend with explicit missing-report/disconnected states.
 3. Submit an authorized mock scan, observe completion, and select its new report.
 4. Display a failed mock scan without replacing the previously selected report.
+5. Select a saved public scan, retain selection across reload, retrieve its export,
+   and select a newly completed authorized scan.
+6. On a 390px mobile viewport, select public history, show missing-result errors
+   without stale findings and navigate to another view. Check page overflow.
 
 Network interception supplies synthetic fixtures and rejects external requests.
 No cloud credentials or customer scans are involved. CI retains screenshots,
-failure traces and HTML reports for seven days. Mobile and other browser engines
-are not part of this gate. The test preview server shuts down after completion.
+failure traces and HTML reports for seven days. Desktop/mobile screenshots were
+inspected locally. Other browser engines remain outside this gate. The test
+preview server shuts down after completion.
 
 ## Dependency And Delivery Limits
 
@@ -126,8 +132,11 @@ console/browser and container jobs. This establishes execution of the configured
 gates for that commit, not independent rule correctness or tenant isolation.
 GitHub reported action-runtime and upcoming runner-image migration warnings;
 review those upgrades separately rather than treating a passing run as permanence.
-The subsequent browser-policy revision is locally verified only. Its installed
-sdist/wheel smoke passes; its new checks do not constitute identity authentication
+Commit `5ce5d3a` publishes the subsequent API hardening and run-storage changes.
+The [full hosted run](https://github.com/m-khan-97/CRIS-SME/actions/runs/36995365921)
+passed both Python versions, console/browser and Docker checks. The public-history
+browser follow-up has local measurements recorded above; hosted results always
+apply to the recorded commit. These gates do not constitute identity authentication
 or a browser-engine/proxy penetration test.
 
 A read-only GitHub settings check found no classic protection for `main` and no

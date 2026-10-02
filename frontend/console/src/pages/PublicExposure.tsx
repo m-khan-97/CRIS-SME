@@ -1,7 +1,7 @@
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
-import { RefreshCw } from "lucide-react";
-import { runPublicExposureAssessment } from "../api/client";
+import { FileDown, RefreshCw } from "lucide-react";
+import { artifactUrl, getPublicExposureHistory, getPublicExposureReport, runPublicExposureAssessment } from "../api/client";
 import { EmptyState, Spinner } from "../components/ui";
 import { DataTable, KpiCard, Panel, SeverityTag, type DataTableColumn } from "../components/clarion";
 import { normalizeSeverity } from "../components/severity";
@@ -15,13 +15,56 @@ interface ExposureFindingRow {
   recommendation?: string;
 }
 
+const SELECTION_KEY = "cris-public-exposure-run";
+
+function savedSelection(): string {
+  try {
+    return localStorage.getItem(SELECTION_KEY) ?? "";
+  } catch {
+    return "";
+  }
+}
+
+function scanDate(value: string): string {
+  const date = new Date(value);
+  return Number.isNaN(date.getTime()) ? "Date unavailable" : date.toLocaleString();
+}
+
 export function PublicExposure() {
+  const queryClient = useQueryClient();
+  const [selectedRunId, setSelectedRunId] = useState(savedSelection);
   const [targets, setTargets] = useState("");
   const [authorizationConfirmed, setAuthorizationConfirmed] = useState(false);
   const [scanCommonPorts, setScanCommonPorts] = useState(false);
 
+  const history = useQuery({ queryKey: ["public-exposure-history"], queryFn: getPublicExposureHistory, retry: false });
+  const entries = history.data?.assessments ?? [];
+  const activeRunId = selectedRunId || entries[0]?.run_id || "";
+  const savedReport = useQuery({
+    queryKey: ["public-exposure-report", activeRunId],
+    queryFn: () => getPublicExposureReport(activeRunId),
+    enabled: !!activeRunId,
+    retry: false,
+  });
+
+  function selectRun(runId: string) {
+    setSelectedRunId(runId);
+    try {
+      localStorage.setItem(SELECTION_KEY, runId);
+    } catch {
+      // The selected run remains usable when browser storage is unavailable.
+    }
+  }
+
   const assessment = useMutation({
     mutationFn: runPublicExposureAssessment,
+    onSuccess: (report) => {
+      if (report.run_id) {
+        queryClient.setQueryData(["public-exposure-report", report.run_id], report);
+        selectRun(report.run_id);
+      }
+      void queryClient.invalidateQueries({ queryKey: ["public-exposure-history"] });
+    },
   });
 
   const onSubmit = (event: React.FormEvent) => {
@@ -33,7 +76,7 @@ export function PublicExposure() {
     });
   };
 
-  const report = assessment.data;
+  const report = activeRunId ? (savedReport.isError ? undefined : savedReport.data) : assessment.data;
   const findings = (report?.findings ?? []) as ExposureFindingRow[];
 
   const columns: DataTableColumn<ExposureFindingRow>[] = [
@@ -64,7 +107,7 @@ export function PublicExposure() {
   ];
 
   return (
-    <div className="flex flex-col gap-[18px] p-[24px_26px_28px]">
+    <div className="flex min-w-0 flex-col gap-[18px] p-4 sm:p-[24px_26px_28px]">
       <div className="flex items-center justify-between">
         <div>
           <h1 className="m-0 text-[15px] font-bold text-text-strong">Public Exposure</h1>
@@ -72,6 +115,33 @@ export function PublicExposure() {
             Internet-facing attack surface · DNS/HTTP/HTTPS/TLS evidence only
           </p>
         </div>
+      </div>
+
+      <div className="flex min-w-0 flex-col gap-2 border-b border-border-strong pb-4">
+        <label htmlFor="public-scan-selection" className="text-[12.5px] font-semibold text-text-body">Saved assessment</label>
+        <div className="flex min-w-0 items-center gap-2">
+          <select
+            id="public-scan-selection"
+            aria-label="Public exposure assessment"
+            className="h-9 min-w-0 flex-1 rounded-md border border-border-strong bg-surface-card px-3 text-[12.5px] text-text-body"
+            value={activeRunId}
+            onChange={(event) => selectRun(event.target.value)}
+            disabled={!entries.length && !activeRunId}
+          >
+            {!activeRunId && <option value="">{history.isPending ? "Loading saved scans…" : "No saved scans"}</option>}
+            {activeRunId && !entries.some((entry) => entry.run_id === activeRunId) &&
+              <option value={activeRunId}>{activeRunId}</option>}
+            {entries.map((entry) => <option key={entry.run_id} value={entry.run_id}>
+              {scanDate(entry.generated_at)} · {entry.targets.join(", ") || "Targets unavailable"} · {entry.run_id}
+            </option>)}
+          </select>
+          <button type="button" title="Refresh saved scans" aria-label="Refresh saved scans"
+            className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md border border-border-strong text-text-body"
+            disabled={history.isFetching} onClick={() => { void history.refetch(); }}>
+            <RefreshCw className={`h-4 w-4 ${history.isFetching ? "animate-spin" : ""}`} />
+          </button>
+        </div>
+        {history.isError && <p role="alert" className="m-0 text-[12px] text-sev-critical-text">Saved scans are unavailable. {(history.error as Error).message}</p>}
       </div>
 
       <Panel title="Targets">
@@ -91,7 +161,7 @@ export function PublicExposure() {
               type="checkbox"
               checked={authorizationConfirmed}
               onChange={(event) => setAuthorizationConfirmed(event.target.checked)}
-              className="h-4 w-4 rounded border-border-strong text-primary"
+              className="h-4 w-4 shrink-0 rounded border-border-strong text-primary"
             />
             I confirm I am authorized to run external reconnaissance against these targets.
           </label>
@@ -101,7 +171,7 @@ export function PublicExposure() {
               type="checkbox"
               checked={scanCommonPorts}
               onChange={(event) => setScanCommonPorts(event.target.checked)}
-              className="h-4 w-4 rounded border-border-strong text-primary"
+              className="h-4 w-4 shrink-0 rounded border-border-strong text-primary"
             />
             Also scan common administrative/database ports (21/22/23/25/445/3306/3389/5432/6379/9200/27017)
           </label>
@@ -131,8 +201,24 @@ export function PublicExposure() {
         </form>
       </Panel>
 
+      {activeRunId && savedReport.isPending && <p className="text-[12.5px] text-text-muted">Loading selected assessment…</p>}
+      {savedReport.isError && <p role="alert" className="text-[12.5px] text-sev-critical-text">
+        Selected assessment is unavailable. {(savedReport.error as Error).message}
+      </p>}
       {report && (
         <>
+          <div className="flex min-w-0 flex-wrap items-center justify-between gap-3 border-b border-border-strong pb-3">
+            <div className="min-w-0 text-[12px] text-text-muted">
+              <time dateTime={report.generated_at}>{scanDate(report.generated_at)}</time>
+              {report.run_id && <div className="break-all font-mono text-text-body">{report.run_id}</div>}
+            </div>
+            <div className="flex flex-wrap gap-3 text-[12px] font-semibold text-text-body">
+              {Object.entries(report.artifacts ?? {}).filter(([kind]) => kind === "json" || kind === "markdown").map(([kind, path]) =>
+                <a key={kind} href={artifactUrl(path)} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1.5">
+                  <FileDown className="h-4 w-4" />{kind === "json" ? "JSON" : "Markdown"}
+                </a>)}
+            </div>
+          </div>
           <div className="grid grid-cols-2 gap-3.5 lg:grid-cols-4">
             <KpiCard label="Targets scanned" value={report.summary?.target_count ?? 0} accent={undefined} />
             <KpiCard

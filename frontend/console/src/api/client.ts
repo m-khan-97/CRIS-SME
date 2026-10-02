@@ -6,6 +6,7 @@ import type {
   AzureEnvironment,
   CrisReport,
   PublicExposureReport,
+  PublicExposureHistoryEntry,
 } from "./types";
 
 // Empty by default so requests stay relative and rely on the Vite dev proxy
@@ -90,6 +91,14 @@ export function runPublicExposureAssessment(payload: {
   scan_common_ports?: boolean;
 }) {
   return apiPost<PublicExposureReport>("/api/public-exposure", payload);
+}
+
+export function getPublicExposureHistory() {
+  return apiGet<{ assessments: PublicExposureHistoryEntry[] }>("/api/public-exposure-history");
+}
+
+export function getPublicExposureReport(runId: string) {
+  return apiGet<PublicExposureReport>(`/api/public-exposure-reports/${encodeURIComponent(runId)}`);
 }
 
 export async function getLatestReport(): Promise<CrisReport | null> {

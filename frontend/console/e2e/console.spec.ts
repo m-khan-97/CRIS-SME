@@ -14,7 +14,7 @@ function report(id: string): CrisReport {
 }
 
 async function mockApi(page: Page, options: { unavailable?: boolean; failedScan?: boolean } = {}) {
-  const state = { polls: 0, submissions: [] as Record<string, unknown>[], completed: false };
+  const state = { polls: 0, submissions: [] as Record<string, unknown>[], completed: false, publicCompleted: false };
   const errors: string[] = [];
   page.on("pageerror", (error) => errors.push(error.message));
   // Fail closed: no test may call a real backend or an external service.
@@ -32,6 +32,17 @@ async function mockApi(page: Page, options: { unavailable?: boolean; failedScan?
     if (path === "/api/environment/azure") return route.fulfill({ json: {
       status: "authenticated", authenticated: true, azure_cli_available: true, account: null, message: "Fixture credentials",
     } });
+    if (path === "/api/public-exposure-history") return route.fulfill({ json: {
+      assessments: (state.publicCompleted ? ["public-scan", "public-alpha", "public-beta"] : ["public-alpha", "public-beta"]).map((run_id) => ({
+        run_id, generated_at: "2026-10-02T12:00:00Z", targets: ["example.com"], finding_count: 1,
+      })),
+    } });
+    if (path.startsWith("/api/public-exposure-reports/")) return route.fulfill({ json: publicReport(path.split("/").at(-1)!) });
+    if (path === "/api/public-exposure" && route.request().method() === "POST") {
+      state.submissions.push(route.request().postDataJSON() as Record<string, unknown>);
+      state.publicCompleted = true;
+      return route.fulfill({ json: publicReport("public-scan") });
+    }
     const run: AssessmentRun = {
       run_id: "scan", collector: "azure", status: "queued", requested_at: baseReport.generated_at,
       started_at: "", completed_at: "", authorization_confirmed: true, subscription_id: "", tenant_id: "",
@@ -53,6 +64,59 @@ async function mockApi(page: Page, options: { unavailable?: boolean; failedScan?
   });
   return { state, errors };
 }
+
+function publicReport(run_id: string) {
+  return { run_id, assessment_type: "public_exposure", generated_at: "2026-10-02T12:00:00Z",
+    summary: { target_count: 1, finding_count: 1 }, targets: [{ host: "example.com" }],
+    findings: [{ id: "PE-001", title: `Public finding ${run_id}`, severity: "medium", target: "example.com" }],
+    artifacts: { json: `outputs/assessments/${run_id}/reports/cris_sme_public_exposure.json`,
+      markdown: `outputs/assessments/${run_id}/reports/cris_sme_public_exposure.md` } };
+}
+
+test("public scan selection survives reload, exports its report and selects a new authorized scan", async ({ page }) => {
+  const { state, errors } = await mockApi(page);
+  await page.goto("/public-exposure");
+  const selection = page.getByRole("combobox", { name: "Public exposure assessment" });
+  await expect(page.getByRole("combobox", { name: "Active assessment" })).toHaveCount(0);
+  await expect(page.getByText("Public finding public-alpha", { exact: true })).toBeVisible();
+  await selection.selectOption("public-beta");
+  await expect(page.getByText("Public finding public-beta", { exact: true })).toBeVisible();
+  await page.reload();
+  await expect(selection).toHaveValue("public-beta");
+  await expect(page.getByText("Public finding public-beta", { exact: true })).toBeVisible();
+  const exportLink = page.getByRole("link", { name: "JSON", exact: true });
+  await expect(exportLink).toHaveAttribute("href", /public-beta/);
+  const popupPromise = page.waitForEvent("popup");
+  await exportLink.click();
+  const popup = await popupPromise;
+  await expect(popup.locator("body")).toContainText("public-beta");
+  await popup.close();
+  await page.getByRole("textbox", { name: /Targets/ }).fill("example.com");
+  await page.getByRole("checkbox", { name: /I confirm I am authorized/ }).check();
+  await page.getByRole("button", { name: "Run assessment", exact: true }).click();
+  await expect(selection).toHaveValue("public-scan");
+  await expect(page.getByText("Public finding public-scan", { exact: true })).toBeVisible();
+  await page.screenshot({ path: test.info().outputPath("public-history-desktop.png"), fullPage: true });
+  expect(state.submissions).toEqual([{ targets: "example.com", authorization_confirmed: true, scan_common_ports: false }]);
+  expect(errors).toEqual([]);
+});
+
+test("mobile public history shows a missing selected report without stale findings", async ({ page }) => {
+  const { errors } = await mockApi(page);
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.route("**/api/public-exposure-reports/public-beta", (route) => route.fulfill({ status: 404, json: { message: "Missing report" } }));
+  await page.goto("/public-exposure");
+  await expect(page.getByText("Public finding public-alpha", { exact: true })).toBeVisible();
+  await page.screenshot({ path: test.info().outputPath("public-history-mobile.png"), fullPage: true });
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth + 1)).toBe(true);
+  await page.getByRole("combobox", { name: "Public exposure assessment" }).selectOption("public-beta");
+  await expect(page.getByText(/Selected assessment is unavailable/)).toBeVisible();
+  await expect(page.getByText("Public finding public-alpha", { exact: true })).toHaveCount(0);
+  await expect(page.getByRole("link", { name: "JSON", exact: true })).toHaveCount(0);
+  await page.getByRole("combobox", { name: "Navigation" }).selectOption("/findings");
+  await expect(page.getByRole("heading", { name: "Finding alpha", exact: true })).toBeVisible();
+  expect(errors).toEqual([]);
+});
 
 test("switches report, persists selection and retrieves its artifact", async ({ page }) => {
   const { errors } = await mockApi(page);

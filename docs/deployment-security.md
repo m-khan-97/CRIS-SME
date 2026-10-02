@@ -183,6 +183,9 @@ response includes the server-generated `run_id`; JSON/Markdown artifact paths
 identify that exact run. `/api/assessment-runs` includes these records, and
 `/api/assessments/<run-id>` returns their persisted status and artifact listing.
 The cloud report history retains its cloud report schema and excludes public runs.
+`/api/public-exposure-history` lists completed readable public reports with their
+run IDs, dates and targets. `/api/public-exposure-reports/<run-id>` retrieves a
+selected result and its exact JSON/Markdown export paths.
 
 Public exports become downloadable after completion and when the JSON report's
 run ID matches its directory. Failed or interrupted scans cannot replace the
@@ -193,8 +196,12 @@ Existing root public results remain readable as legacy exports. Missing exports
 in a selected run return 404 rather than an export from a different run.
 
 Publication still depends on local SQLite state and trusted filesystem access.
-The scan remains synchronous with one assessment admitted at a time; cancellation,
-durable worker leases and a dedicated public-history browser selector are pending.
+The Public Exposure browser view now selects saved public runs, retains explicit
+selection across reloads and links their JSON/Markdown exports. A new successful
+scan becomes selected. Missing selected reports produce an error without showing
+another run's findings. Public run context is separate from the cloud header.
+The scan remains synchronous with one assessment admitted at a time; cancellation
+and durable worker leases are pending.
 
 Accept snapshots, reports, review CSV/JSON and RBOM manifests only from trusted
 sources. Inspect file size and referenced paths first; use an isolated environment

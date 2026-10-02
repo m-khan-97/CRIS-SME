@@ -269,6 +269,7 @@ export interface CrisReport extends ReportSections {
 }
 
 export interface PublicExposureReport {
+  run_id?: string;
   assessment_type: string;
   generated_at: string;
   scope_note: string;
@@ -283,5 +284,12 @@ export interface PublicExposureReport {
   findings: unknown[];
   status?: string;
   message?: string;
-  artifacts?: ArtifactMap;
+  artifacts?: Record<string, string>;
+}
+
+export interface PublicExposureHistoryEntry {
+  run_id: string;
+  generated_at: string;
+  targets: string[];
+  finding_count: number;
 }
