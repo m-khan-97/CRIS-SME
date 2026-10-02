@@ -226,7 +226,196 @@ gap for that commit, not the independent validation or repository-protection gat
 P1-09 preparatory hardening adds a 64 KiB POST body cap, unambiguous length/media
 type checks and strict UTF-8/object JSON parsing across all four local API POST
 routes. This does not complete P1-01 or make the runner safe for shared hosting;
-read deadlines, authorization, quotas and tenant isolation remain open.
+authorization, quotas and tenant isolation remain open. Request-read deadlines
+were added in the subsequent local increment below.
+
+The next local security increment replaces wildcard CORS with exact approved
+origins and validates Host before dispatch on every API/artifact route. Defaults
+cover the standard loopback Vite/Docker workflows; explicit startup allowlists
+support deliberate alternatives. Fifty-six new tests cover rejected origins,
+Host confusion, preflight, artifact responses and a real loopback connection.
+Both Python versions pass 573 tests and the installed-package smoke passes.
+This revision is locally verified, not yet pushed or hosted-validated. These
+are browser request restrictions, not OIDC, user identity or tenant authorization.
+
+The subsequent local increment adds a configurable 10-second socket idle timeout
+and absolute POST-body read deadline. Thirteen new tests include stalled headers,
+partial bodies and slow trickles; both Python versions passed 586 tests. This does
+not impose a total header deadline, connection quota or scan execution deadline.
+
+P1-09 outbound-scope hardening now records HTTP redirects without following them
+and disables inherited proxy configuration for HTTP probes. Failed initial DNS
+resolution stops all target probes; non-global and invalid addresses are excluded
+by default. A redirected security.txt is no longer treated as a retrieved file.
+Twenty new regression cases cover first-response handling, proxy bypass, unsupported
+schemes, excluded addresses and failed DNS. At that increment address pinning
+against DNS rebinding was still pending; the subsequent change below implements
+it. Network-enforced egress restrictions remain required. These changes are local,
+not yet pushed or hosted-validated.
+Both Python versions pass 606 tests with 79.83% combined package coverage;
+critical-rule lint and all 16 documentation entrypoint checks pass.
+
+The next P1-09 increment pins all native HTTP(S), TLS metadata, legacy TLS and
+optional port connections to the initial validated IPv4/IPv6 snapshot. Numeric
+sockets avoid a second DNS lookup, and failed connections can fall back only
+within that snapshot. HTTP Host, TLS SNI and normal certificate verification use
+the original hostname. Direct probe calls apply the same default public-only
+validation; trusted lab mode is explicit. Tests include simulated rebinding,
+mixed public/private answers, metadata addresses, socket cleanup and a real local
+HTTPS server proving hostname preservation and rejection of mismatched certificates.
+This is local regression evidence, not independent review or hosted target
+authorization. T04 retains those deployment and review requirements.
+Thirty-six new tests bring the local total to 642 on both Python 3.11 and 3.12,
+with 80.23% combined package coverage. Critical-rule lint and the 16 documentation
+entrypoint checks and the installed sdist/wheel smoke test pass. This increment
+is not yet pushed or hosted-validated.
+
+P1-05 preparatory artifact hardening restricts both download routes to recognized
+report exports. Internal state and arbitrary sibling files are excluded; sibling
+exports require an indexed report. Descriptor-relative no-follow reads reject
+symlinks and special files, including a link substituted at open time. The same
+read boundary protects report indexing and selected-report retrieval. Named
+figures, dated history and remediation reference downloads remain supported.
+This does not implement immutable run namespaces, artifact identity or tenant
+authorization; T03 remains open for those platform requirements. POSIX support
+is required, and static hosting does not inherit the API policy.
+Twenty-eight new regressions bring both Python suites to 670 passing tests with
+80.33% combined package coverage. Lint, documentation and the installed-package
+smoke test pass. These changes remain local, not pushed or hosted-validated.
+
+28 September: P1-09 request admission now bounds the local server to 16 concurrent
+connections by default, configurable with `--max-connections`. Saturation closes
+excess sockets before worker creation; normal completion and failure return
+capacity. The existing configurable read timeout now also supplies one fixed
+request-line/header deadline, preventing trickled header bytes from renewing the
+budget. Header buffering preserves prefetched body bytes. Real-socket tests cover
+slow request lines, slow headers, saturation and recovery; failure-path tests
+cover slot release and CLI wiring. This is not a scan-job quota, per-user rate
+limit or completion of the P1 hosting gate.
+Seventeen new tests bring the local total to 687 passing on Python 3.11/3.12,
+with 80.55% combined package coverage. Lint, documentation and installed-package
+checks pass. This increment remains local, not pushed or hosted-validated.
+
+The next P1-09 increment bounds API artifact reads at 32 MiB and report-index /
+selected-report JSON reads at 16 MiB. Open-file size checks reject oversized data
+before reading, while a cap-plus-one-byte read detects growth after the check.
+Oversized downloads return 413; invalid, oversized or excessively nested reports
+are omitted from history without changing disk artifacts. Metadata-container
+validation prevents malformed history entries from crashing the API. These are
+per-file limits, not total JSON-memory budgets or bounds on other import paths;
+report-index counts, scan quotas and rate limits remain pending.
+Twenty-one regressions cover exact limits, pre-read rejection, growth after stat,
+HTTP 413, malformed/deeply nested metadata and surviving valid history entries.
+Both Python versions pass 708 tests with 80.61% combined coverage; lint, docs and
+installed-package checks pass. This revision remains local and unpublished.
+
+P1-04/09 preparatory scan admission adds one shared in-process assessment slot
+across AWS, Azure and public exposure, protecting the current shared output
+namespace from overlapping API scans. Busy requests return 409 before another
+run is saved or worker created. The slot lasts through public report publication;
+startup, persistence, worker and publishing failures release it. There is no
+queue, cross-process coordination or immutable run storage. Multiple API/CLI
+writers against the same directories remain unsupported. Durable leases,
+isolated run storage and per-tenant admission remain required for P1 completion.
+Sixteen new regressions cover simultaneous admission, cross-provider conflicts,
+HTTP 409 and capacity recovery after failures. Both Python versions pass 724
+tests with 80.67% combined coverage. Lint, documentation and installed-package
+checks pass; these changes remain local, not pushed or hosted-validated.
+
+P1-09 error-disclosure hardening replaces raw credential-check/role SDK errors
+and Azure CLI stderr with fixed messages. GET/POST dispatch returns generic 500
+responses for unexpected exceptions, including arbitrary ValueError instances;
+only explicit public-validation errors retain their authored client messages.
+Malformed Azure account output no longer claims authentication, and user metadata
+is allowlisted. Public-exposure validation does not echo submitted targets.
+Stored run tails, worker errors and evidence diagnostics remain outside this
+scope: T06 is not closed and no comprehensive secret-redaction claim is made.
+Twenty-six regressions inject synthetic credentials/paths into provider, CLI and
+dispatch failures, verify safe messages and preserve actionable validation.
+Both Python versions pass 750 tests with 80.82% combined coverage; lint, docs and
+installed-package checks pass. Changes remain local, not pushed or hosted-validated.
+
+The next P1-09 increment separates public run status from private diagnostics.
+Run creation/status/list responses retain empty stdout/stderr compatibility fields,
+a fixed failure message and `diagnostics_withheld: true`. Historical SQLite rows
+use the same projection without rewriting original records. Progress is rebuilt
+from approved phase/status fields, numeric sequences and validated timestamps;
+free-form messages/details are withheld. Event files have a 1 MiB read cap and
+200-event output cap, with symlink rejection. Full reports, evidence, raw local
+logs and environment inheritance still require separate T06 work.
+That increment passed 781 tests on both Python versions, with 80.94% combined
+coverage, plus lint, docs and installed-package checks. Original private records
+were not modified.
+
+30 September: three related P1-09 input/worker-scope increments are implemented:
+
+1. Assessment consent and the port-scan option require actual JSON booleans.
+   Public targets are strings with explicit count/length limits, not silently
+   coerced values or truncated lists. Invalid requests stop before admission.
+2. AWS account IDs, IAM role/external-ID inputs and Azure subscription/tenant UUIDs
+   receive syntax/type checks. Explicit AWS account/role mismatch is rejected;
+   organization labels are bounded and control-character-free. Role verification
+   shares the checks. This does not establish ownership, permissions or IAM trust.
+3. Scan subprocesses and CLI credential helpers receive provider-specific
+   environment allowlists. Unrelated secrets, other-provider credentials and stale
+   browser-request target/organization/output settings are dropped. Supported
+   profiles, runtime/network settings and selected operator controls remain.
+   The narrator key follows explicit enablement. This is not OS isolation or
+   tenant credential custody; same-user filesystem/SDK access remains.
+
+Blank IDs still support configured-credential discovery. Direct CLI behavior and
+original customer/research artifacts are unchanged. No new hosted-tenant claim
+or completion of P1 is implied by these increments.
+The batch adds 80 regressions (65 request-validation and 15 environment checks).
+Both Python versions pass 861 tests with 81.10% combined coverage. Critical-rule
+lint, the expanded 12-module type gate, documentation checks and installed-package
+smoke pass. The changes remain local: no push or hosted validation is claimed.
+
+30 September, local-state follow-up: three preparatory P1-03/04 increments add
+cooperative POSIX ownership locks for API report/figure/database paths, validate
+startup limits before opening state, and exercise contention/release/restart
+boundaries in regression tests. Locks precede persisted-run recovery, so a second
+API cannot mark the first API's active runs interrupted. Persistent lock files
+are never unlinked by shutdown. These are not distributed worker leases: direct
+CLI/library writers and orphan scan children remain outside the contract. See
+[deployment restrictions](deployment-security.md#local-api-state-ownership).
+No cloud resources or original assessment evidence are changed.
+This follow-up adds 24 tests: both Python versions pass all 885 tests with 81.15%
+combined coverage. Critical-rule lint, the 13-module type gate and documentation
+checks pass locally. These changes have not been pushed or validated in hosted CI.
+
+30 September, P1-05 local run-storage increment: new cloud API assessments reserve
+unique report/figure namespaces keyed by server-generated API run IDs. Worker
+environments and persisted run records use these paths. Completed-run discovery
+feeds history, explicit artifact downloads and latest compatibility aliases;
+failed, running and untracked namespaces remain unpublished. Legacy evidence is
+not moved or rewritten. Known generated SVG charts now join PNG chart exports.
+This is not completion of P1-05: tenant ownership, immutable/transactional storage,
+standalone public-exposure run storage and scope-matched historical comparison
+remain outstanding. One-scan admission remains enforced. See
+[cloud run namespaces](deployment-security.md#cloud-run-namespaces).
+Seventeen regressions cover repeat labels, restart persistence, publication state,
+failed children, ID collisions, legacy compatibility, invalid reports, standalone
+public-exposure compatibility and real mock-mode report/chart generation. Both
+Python versions pass 902 tests with 81.24% combined coverage. Lint, the 13-module
+type gate, documentation checks and installed-package smoke pass. No live cloud
+scan was needed; this increment remains local and unpushed.
+
+2 October, P1-04/05 follow-up: public-exposure scans now reserve individual run
+directories and persist queued/running/completed/failed states. Responses contain
+the server-assigned run ID, retained artifact paths and the existing scan result.
+Run-list/status APIs recover those records after restart. Public latest aliases
+remain independent of cloud latest; completed publication requires a matching
+report run ID. Legacy public results stay readable. Partial writes and interrupted
+scans remain excluded from downloads. This closes the local public-output overwrite
+gap from the preceding increment. Worker leases, cancellation, tenant ownership
+and a browser public-history selector remain pending. See
+[public run storage](deployment-security.md#public-exposure-run-storage).
+Nineteen new regressions cover retained exports, separate cloud/public latest
+results, failure and persistence errors, ID collisions, restart recovery, report
+identity and legacy access. Python 3.11/3.12 each pass 921 tests, with 81.29%/81.30%
+combined coverage respectively. Lint, the 13-module type gate, documentation and
+installed-package checks pass. Changes remain local and unpushed.
 
 | ID | Owner | Work and acceptance evidence |
 | --- | --- | --- |

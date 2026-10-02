@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import sqlite3
+import builtins
 from pathlib import Path
 from typing import Any
 
@@ -83,6 +84,22 @@ class SqliteAssessmentRunRepository:
                 (safe_limit,),
             ).fetchall()
         return [_row_to_dict(row) for row in rows]
+
+    def completed_outputs(self, *, collector: str | None = None) -> builtins.list[dict[str, Any]]:
+        """Index completed output locations without the UI list's row limit."""
+        if not self.database_path.is_file():
+            return []
+        self._ensure_schema()
+        collectors = (collector,) if collector is not None else ("aws", "azure")
+        placeholders = ", ".join("?" for _ in collectors)
+        with self._connect() as connection:
+            rows = connection.execute(
+                "SELECT run_id, output_dir FROM assessment_runs "
+                f"WHERE status = 'completed' AND collector IN ({placeholders}) "
+                "ORDER BY requested_at DESC, run_id DESC",
+                collectors,
+            ).fetchall()
+        return [dict(row) for row in rows]
 
     def mark_interrupted(self, *, completed_at: str) -> int:
         """Fail runs that cannot still be executing after a runner restart."""

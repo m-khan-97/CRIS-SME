@@ -2,17 +2,19 @@
 from __future__ import annotations
 
 import ipaddress
+import http.client
 import json
 import shutil
 import socket
 import ssl
 import subprocess
+import time
 from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass, field
 from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any, Callable
-from urllib import error, parse, request
+from urllib import parse
 
 
 Resolver = Callable[[str], list[str]]
@@ -103,6 +105,21 @@ class PublicExposureScanner:
         dns = self._resolve(host)
         private_addresses = [address for address in dns["addresses"] if is_private_address(address)]
         findings: list[dict[str, Any]] = []
+        if not dns["addresses"]:
+            return {
+                **target,
+                "dns": dns,
+                "https": {"reachable": False, "skipped": True},
+                "http": {"reachable": False, "skipped": True},
+                "tls": {"available": False, "skipped": True},
+                "ports": {"scanned": False, "skipped": True},
+                "findings": [build_finding(
+                    "PE-001", "Target did not resolve", "medium", host,
+                    "No DNS A or AAAA records were resolved from this environment.",
+                    "Confirm DNS publication and whether this target should be reachable publicly.",
+                    evidence={"dns_error": dns.get("error", "")},
+                )],
+            }
         if private_addresses and not self.settings.allow_private_targets:
             findings.append(
                 build_finding(
@@ -125,30 +142,20 @@ class PublicExposureScanner:
                 "findings": findings,
             }
 
-        https_url = f"https://{host}"
-        http_url = f"http://{host}"
-        https = self._http(https_url)
-        http = self._http(http_url)
-        tls = self._tls(host, 443)
+        addresses = tuple(dns["addresses"])
+        authority = f"[{host}]" if ":" in host else host
+        https_url = f"https://{authority}"
+        http_url = f"http://{authority}"
+        https = self._http(https_url, addresses)
+        http = self._http(http_url, addresses)
+        tls = self._tls(host, 443, addresses)
         dns_records = self._dns_records(host)
-        security_txt = self._http(f"https://{host}/.well-known/security.txt")
+        security_txt = self._http(f"{https_url}/.well-known/security.txt", addresses)
 
         ports: dict[str, Any] = {"scanned": False}
         if self.settings.scan_common_ports:
-            ports = self._ports(host)
+            ports = self._ports(host, addresses)
 
-        if not dns["addresses"]:
-            findings.append(
-                build_finding(
-                    "PE-001",
-                    "Target did not resolve",
-                    "medium",
-                    host,
-                    "No DNS A or AAAA records were resolved from this environment.",
-                    "Confirm DNS publication and whether this target should be reachable publicly.",
-                    evidence={"dns_error": dns.get("error", "")},
-                )
-            )
         if http.get("reachable") and not https.get("reachable"):
             findings.append(
                 build_finding(
@@ -239,7 +246,7 @@ class PublicExposureScanner:
                     evidence=dns_records["caa"],
                 )
             )
-        if not security_txt.get("reachable") or int(security_txt.get("status") or 0) >= 400:
+        if not security_txt.get("reachable") or not 200 <= int(security_txt.get("status") or 0) < 300:
             findings.append(
                 build_finding(
                     "PE-009",
@@ -299,24 +306,33 @@ class PublicExposureScanner:
         except Exception as exc:
             return {"addresses": [], "error": str(exc)}
 
-    def _http(self, url: str) -> dict[str, Any]:
-        probe = self.http_probe or probe_http
+    def _http(self, url: str, addresses: tuple[str, ...]) -> dict[str, Any]:
         try:
-            return probe(url, self.settings.timeout_seconds)
+            if self.http_probe:
+                return self.http_probe(url, self.settings.timeout_seconds)
+            return probe_http(url, self.settings.timeout_seconds, addresses=addresses,
+                              allow_private_targets=self.settings.allow_private_targets)
         except Exception as exc:
             return {"url": url, "reachable": False, "error": str(exc), "headers": {}}
 
-    def _tls(self, host: str, port: int) -> dict[str, Any]:
-        probe = self.tls_probe or probe_tls
+    def _tls(self, host: str, port: int, addresses: tuple[str, ...]) -> dict[str, Any]:
         try:
-            return probe(host, port, self.settings.timeout_seconds)
+            if self.tls_probe:
+                return self.tls_probe(host, port, self.settings.timeout_seconds)
+            return probe_tls(host, port, self.settings.timeout_seconds, addresses=addresses,
+                             allow_private_targets=self.settings.allow_private_targets)
         except Exception as exc:
             return {"host": host, "port": port, "available": False, "error": str(exc)}
 
-    def _ports(self, host: str) -> dict[str, Any]:
-        probe = self.port_probe or probe_common_ports
+    def _ports(self, host: str, addresses: tuple[str, ...]) -> dict[str, Any]:
         try:
-            result = probe(host, COMMON_PORTS, self.settings.timeout_seconds)
+            if self.port_probe:
+                result = self.port_probe(host, COMMON_PORTS, self.settings.timeout_seconds)
+            else:
+                result = probe_common_ports(
+                    host, COMMON_PORTS, self.settings.timeout_seconds, addresses=addresses,
+                    allow_private_targets=self.settings.allow_private_targets,
+                )
             return {"scanned": True, **result}
         except Exception as exc:
             return {"scanned": True, "checked_ports": COMMON_PORTS, "open_ports": [], "error": str(exc)}
@@ -374,37 +390,102 @@ def resolve_host(host: str) -> list[str]:
     return [record[4][0] for record in records]
 
 
-def probe_http(url: str, timeout_seconds: float) -> dict[str, Any]:
-    """Probe an HTTP(S) endpoint with a lightweight GET request."""
-    req = request.Request(url, method="GET", headers={"User-Agent": "CRIS-SME-PublicExposure/0.1"})
+def _approved_addresses(
+    host: str, addresses: tuple[str, ...] | None, allow_private_targets: bool,
+) -> tuple[str, ...]:
+    values = tuple(resolve_host(host)) if addresses is None else addresses
+    if not values:
+        raise ValueError("Target did not resolve")
+    # Validate the entire set before opening any socket, including lab-mode input.
+    for address in values:
+        ipaddress.ip_address(address)
+        if "%" in address or (not allow_private_targets and is_private_address(address)):
+            raise ValueError("Target address is outside permitted scope")
+    return values
+
+
+def _connect_addresses(addresses: tuple[str, ...], port: int, timeout: float) -> socket.socket:
+    """Connect numeric addresses directly, with no hostname resolver fallback."""
+    deadline = time.monotonic() + timeout
+    last_error: OSError = OSError("No approved address available")
+    for address in addresses:
+        ip = ipaddress.ip_address(address)
+        family = socket.AF_INET6 if ip.version == 6 else socket.AF_INET
+        remaining = deadline - time.monotonic()
+        if remaining <= 0:
+            raise TimeoutError("Approved-address connection deadline exceeded")
+        sock = socket.socket(family, socket.SOCK_STREAM)
+        try:
+            sock.settimeout(remaining)
+            destination = (str(ip), port, 0, 0) if ip.version == 6 else (str(ip), port)
+            sock.connect(destination)
+            sock.settimeout(timeout)
+            return sock
+        except OSError as exc:
+            last_error = exc
+            sock.close()
+    raise last_error
+
+
+class _PinnedHTTPConnection(http.client.HTTPConnection):
+    def __init__(self, host: str, port: int, timeout: float,
+                 addresses: tuple[str, ...], secure: bool):
+        super().__init__(host, port=port, timeout=timeout)
+        self.addresses = addresses
+        self.secure = secure
+
+    def connect(self) -> None:
+        sock = _connect_addresses(self.addresses, self.port, self.timeout)
+        try:
+            if self.secure:
+                context = ssl.create_default_context()
+                context.set_alpn_protocols(["http/1.1"])
+                sock = context.wrap_socket(sock, server_hostname=self.host)
+            self.sock = sock
+        except Exception:
+            sock.close()
+            raise
+
+
+def probe_http(url: str, timeout_seconds: float, *, addresses: tuple[str, ...] | None = None,
+               allow_private_targets: bool = False) -> dict[str, Any]:
+    """Record the first HTTP(S) response, without proxies or redirect traversal."""
+    parsed = parse.urlsplit(url)
+    if parsed.scheme not in {"http", "https"}:
+        raise ValueError("Only HTTP(S) probe URLs are supported")
+    if not parsed.hostname or parsed.username is not None or parsed.password is not None:
+        raise ValueError("Probe URL requires a host and must not contain credentials")
+    approved = _approved_addresses(parsed.hostname, addresses, allow_private_targets)
+    secure = parsed.scheme == "https"
+    connection = _PinnedHTTPConnection(
+        parsed.hostname, parsed.port or (443 if secure else 80), timeout_seconds, approved, secure,
+    )
     try:
-        with request.urlopen(req, timeout=timeout_seconds) as response:  # noqa: S310 - explicit user-authorised URL probe
+        path = parse.urlunsplit(("", "", parsed.path or "/", parsed.query, ""))
+        connection.request("GET", path, headers={"User-Agent": "CRIS-SME-PublicExposure/0.1"})
+        with connection.getresponse() as response:
             headers = {key.lower(): value for key, value in response.headers.items()}
             return {
                 "url": url,
                 "reachable": True,
                 "status": int(response.status),
-                "final_url": response.geturl(),
+                "final_url": url,
                 "location": headers.get("location", ""),
                 "headers": headers,
+                **({"http_error": f"HTTP Error {response.status}: {response.reason}"}
+                   if response.status >= 300 else {}),
             }
-    except error.HTTPError as exc:
-        headers = {key.lower(): value for key, value in exc.headers.items()}
-        return {
-            "url": url,
-            "reachable": True,
-            "status": int(exc.code),
-            "final_url": url,
-            "location": headers.get("location", ""),
-            "headers": headers,
-            "http_error": str(exc),
-        }
+    finally:
+        connection.close()
 
 
-def probe_tls(host: str, port: int, timeout_seconds: float) -> dict[str, Any]:
+def probe_tls(host: str, port: int, timeout_seconds: float, *,
+              addresses: tuple[str, ...] | None = None,
+              allow_private_targets: bool = False) -> dict[str, Any]:
     """Collect public TLS certificate metadata without sending application payloads."""
     context = ssl.create_default_context()
-    with socket.create_connection((host, port), timeout=timeout_seconds) as sock:
+    approved = _approved_addresses(host, addresses, allow_private_targets)
+    with _connect_addresses(approved, port, timeout_seconds) as sock:
         with context.wrap_socket(sock, server_hostname=host) as tls_sock:
             cert = tls_sock.getpeercert()
             not_after = str(cert.get("notAfter", ""))
@@ -413,7 +494,7 @@ def probe_tls(host: str, port: int, timeout_seconds: float) -> dict[str, Any]:
                 expires = datetime.strptime(not_after, "%b %d %H:%M:%S %Y %Z").replace(tzinfo=UTC)
                 days_until_expiry = (expires - datetime.now(UTC)).days
             negotiated_protocol = tls_sock.version()
-            deprecated_probe_state = _probe_deprecated_tls_versions(host, port, timeout_seconds)
+            deprecated_probe_state = _probe_deprecated_tls_versions(host, port, timeout_seconds, approved)
             deprecated_supported = [
                 version
                 for version, state in deprecated_probe_state.items()
@@ -435,7 +516,8 @@ def probe_tls(host: str, port: int, timeout_seconds: float) -> dict[str, Any]:
             }
 
 
-def _probe_deprecated_tls_versions(host: str, port: int, timeout_seconds: float) -> dict[str, str]:
+def _probe_deprecated_tls_versions(host: str, port: int, timeout_seconds: float,
+                                   addresses: tuple[str, ...]) -> dict[str, str]:
     """Return, per deprecated TLS version, one of "supported"/"rejected"/"probe_unavailable".
 
     A handshake failure has two very different causes that must not be
@@ -458,7 +540,7 @@ def _probe_deprecated_tls_versions(host: str, port: int, timeout_seconds: float)
             continue
 
         try:
-            with socket.create_connection((host, port), timeout=timeout_seconds) as sock:
+            with _connect_addresses(addresses, port, timeout_seconds) as sock:
                 with context.wrap_socket(sock, server_hostname=host):
                     states[label] = "supported"
         except ssl.SSLError:
@@ -469,7 +551,9 @@ def _probe_deprecated_tls_versions(host: str, port: int, timeout_seconds: float)
     return states
 
 
-def probe_common_ports(host: str, ports: list[int], timeout_seconds: float) -> dict[str, Any]:
+def probe_common_ports(host: str, ports: list[int], timeout_seconds: float, *,
+                       addresses: tuple[str, ...] | None = None,
+                       allow_private_targets: bool = False) -> dict[str, Any]:
     """Return which of the supplied ports accept a TCP connection.
 
     Connect-or-fail only: no banner is read and no payload is sent on any
@@ -482,9 +566,11 @@ def probe_common_ports(host: str, ports: list[int], timeout_seconds: float) -> d
     of seconds added to every assessed target.
     """
 
+    approved = _approved_addresses(host, addresses, allow_private_targets)
+
     def _check(port: int) -> int | None:
         try:
-            with socket.create_connection((host, port), timeout=timeout_seconds):
+            with _connect_addresses(approved, port, timeout_seconds):
                 return port
         except OSError:
             return None
@@ -597,9 +683,9 @@ def is_private_address(address: str) -> bool:
     try:
         ip = ipaddress.ip_address(address)
     except ValueError:
-        return False
+        return True
     return (
-        ip.is_private
+        not ip.is_global
         or ip.is_loopback
         or ip.is_link_local
         or ip.is_reserved

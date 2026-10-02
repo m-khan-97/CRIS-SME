@@ -106,8 +106,8 @@ def test_start_azure_assessment_runs_collector_with_expected_env(tmp_path) -> No
         {
             "authorization_confirmed": True,
             "organization_name": "Example Azure Ltd",
-            "subscription_id": "sub-123",
-            "tenant_id": "tenant-456",
+            "subscription_id": "11111111-1111-1111-1111-111111111111",
+            "tenant_id": "22222222-2222-2222-2222-222222222222",
         }
     )
 
@@ -123,8 +123,8 @@ def test_start_azure_assessment_runs_collector_with_expected_env(tmp_path) -> No
     env = calls[0]["env"]
     assert env["CRIS_SME_COLLECTOR"] == "azure"
     assert env["CRIS_SME_AZURE_ORGANIZATION_NAME"] == "Example Azure Ltd"
-    assert env["AZURE_SUBSCRIPTION_ID"] == "sub-123"
-    assert env["CRIS_SME_AZURE_TENANT_SCOPE"] == "tenant-456"
+    assert env["AZURE_SUBSCRIPTION_ID"] == "11111111-1111-1111-1111-111111111111"
+    assert env["CRIS_SME_AZURE_TENANT_SCOPE"] == "22222222-2222-2222-2222-222222222222"
     assert env["CRIS_SME_AUTHORIZATION_BASIS"] == "frontend_confirmed_local_authorized_access"
 
 
@@ -354,6 +354,7 @@ def test_assessment_runs_http_endpoint_returns_persisted_runs(tmp_path) -> None:
         {
             "authorization_confirmed": True,
             "organization_name": "AWS Persistent Ltd",
+            "role_arn": "arn:aws:iam::111111111111:role/test",
             "external_id": "not-persisted",
         }
     )
@@ -401,7 +402,8 @@ def test_public_exposure_assessment_writes_artifacts(tmp_path, monkeypatch) -> N
 
     assert report["status"] == "completed"
     assert report["summary"]["target_count"] == 1
-    assert (tmp_path / "cris_sme_public_exposure.json").exists()
+    assert Path(report["artifacts"]["json"]).exists()
+    assert Path(report["artifacts"]["json"]).parent == tmp_path / "assessments" / report["run_id"] / "reports"
     assert report["artifacts"]["json"].endswith("cris_sme_public_exposure.json")
 
 
@@ -520,7 +522,7 @@ def test_local_api_http_endpoints_return_structured_responses(tmp_path, monkeypa
         handler,
         "POST",
         "/api/assessments/azure",
-        {"authorization_confirmed": True, "subscription_id": "sub-123"},
+        {"authorization_confirmed": True, "subscription_id": "11111111-1111-1111-1111-111111111111"},
         expected_status=202,
     )
     assert azure_run["status"] in {"queued", "running", "completed"}
@@ -626,6 +628,13 @@ class _FakeSocket:
     def __init__(self, request_bytes: bytes) -> None:
         self.input = BytesIO(request_bytes)
         self.output = BytesIO()
+        self.timeout = None
+
+    def settimeout(self, timeout):
+        self.timeout = timeout
+
+    def gettimeout(self):
+        return self.timeout
 
     def makefile(self, mode: str, *args, **kwargs):
         if "r" in mode:

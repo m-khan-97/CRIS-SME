@@ -64,6 +64,11 @@ jobs:
             scripts/run_azuregoat_assessment.py \
             src/cris_sme/api/run_repository.py \
             src/cris_sme/api/supervisor.py \
+            src/cris_sme/api/browser_policy.py \
+            src/cris_sme/api/public_progress.py \
+            src/cris_sme/api/request_validation.py \
+            src/cris_sme/api/worker_environment.py \
+            src/cris_sme/api/state_ownership.py \
             src/cris_sme/data_paths.py \
             src/cris_sme/controls/definitions.py \
             src/cris_sme/controls/registry.py \

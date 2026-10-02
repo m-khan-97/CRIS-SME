@@ -1,6 +1,6 @@
 # Quality Baseline
 
-Updated 27 September 2026. Local measurements and commit-specific hosted results
+Updated 2 October 2026. Local measurements and commit-specific hosted results
 are distinguished below. Neither establishes independent security validation or
 enterprise readiness.
 
@@ -26,26 +26,38 @@ python -m pytest -q --cov --cov-report=term --cov-report=json:coverage.json --co
 The P0-06 baseline was 384 passing tests on each interpreter. P0-07 added 22
 capability-register tests; P0-08 added 16 inventory/governance checks and 22 release
 preflight cases, followed by 12 release-checksum cases. Replay and request-body
-regressions add another 61 cases: the current total is 517 passing on each. Coverage
+regressions added 61 cases; browser-policy tests add 56 more, request-deadline
+tests add 13, outbound-probe boundaries add 20, and pinned-transport tests add
+36. Artifact access adds 28 cases; header deadlines and connection admission add
+17. Bounded artifact/report reads add 21 cases and scan admission adds 16.
+Error-disclosure checks add 26 cases, public run projections add 31, request
+validation adds 65, worker environments add 15, and state ownership/startup
+recovery adds 24. Cloud run namespaces add 17 checks, including a real mock-mode
+child assessment and artifact retrieval. Public run storage adds 19 checks for
+retention, restart, failures and publication boundaries. The current total is 921 passing
+on each. Coverage
 measures the whole `cris_sme` package, including unimported modules, with branches
 enabled and no module omit list. Scripts, frontend and child-process execution
-are outside this measurement. Coverage.py standard exclusions apply (24 lines).
+are outside this measurement. Coverage.py standard exclusions apply (9 lines).
 
 | Measure | Executed / total | Percentage |
 | --- | --- | --- |
-| Statements | 9,638 / 11,504 | 83.78% |
-| Branches | 2,383 / 3,602 | 66.16% |
-| Combined coverage.py metric | 12,021 / 15,106 | 79.58% |
+| Statements | 10,292 / 12,061 | 85.33% |
+| Branches | 2,595 / 3,790 | 68.47% |
+| Combined coverage.py metric | 12,887 / 15,851 | 81.30% |
 
-Both interpreters produced this result. CI requires 78% **combined** coverage,
+The table records Python 3.12. Python 3.11 executed 10,290 statements and the same
+2,595 branches: 85.32% statements and 81.29% combined coverage. Both suites passed
+all 921 tests. CI requires 78% **combined** coverage,
 not 78% branches or a per-module guarantee. JSON/XML evidence is retained for
 seven days. Supervisor behavior tested in subprocesses does not contribute to
 its in-process coverage. Azure SQL SDK imports emitted three escape-sequence
 warnings on the first clean run; they did not fail tests.
 
 Ruff F/E9 checks cover `src`, `tests`, `scripts` and `setup.py`. Mypy checks
-eight entry/runtime modules: the assessment and AzureGoat entry scripts,
-run repository, supervisor, data paths, and control definitions/registry/validation.
+thirteen entry/runtime modules: the assessment and AzureGoat entry scripts,
+run repository, supervisor, browser policy, public progress, request validation,
+worker environment, state ownership, data paths, and control definitions/registry/validation.
 Imported modules use silent checking and missing-import tolerance; this is not a
 whole-backend strict type gate.
 
@@ -114,6 +126,9 @@ console/browser and container jobs. This establishes execution of the configured
 gates for that commit, not independent rule correctness or tenant isolation.
 GitHub reported action-runtime and upcoming runner-image migration warnings;
 review those upgrades separately rather than treating a passing run as permanence.
+The subsequent browser-policy revision is locally verified only. Its installed
+sdist/wheel smoke passes; its new checks do not constitute identity authentication
+or a browser-engine/proxy penetration test.
 
 A read-only GitHub settings check found no classic protection for `main` and no
 repository rulesets. Required merge checks still need administrator configuration;

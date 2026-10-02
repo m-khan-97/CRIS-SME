@@ -292,7 +292,8 @@ def test_probe_common_ports_detects_real_open_and_closed_ports() -> None:
     closed_socket.close()  # frees the port without anything listening on it
 
     try:
-        result = probe_common_ports("127.0.0.1", [open_port, closed_port], 1.0)
+        result = probe_common_ports("127.0.0.1", [open_port, closed_port], 1.0,
+                                    allow_private_targets=True)
     finally:
         listener.close()
 
