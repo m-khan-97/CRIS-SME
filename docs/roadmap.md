@@ -564,6 +564,13 @@ coverage), 56 console tests and seven browser workflows. Ruff, the expanded
 documentation, and fresh installed-wheel migration/bootstrap/readiness pass.
 The 74 enterprise cases use real PostgreSQL and generated fixture identities.
 No customer reports, papers or provenance edits are included in this batch.
+Publication `fc79156` passed the full hosted matrix, including PostgreSQL on both
+Python versions and enterprise image build/non-root import checks. The contract
+follow-up gives the protected JSON routes explicit response models and common
+error schemas, filters connection outputs, and ensures AWS negative trust probes
+differ only in ExternalId. Local follow-up verification remains 1,084 tests per
+interpreter with 82.07% combined coverage. These results do not close the external
+qualification or console-migration gates above.
 
 | ID | Owner | Work and acceptance evidence |
 | --- | --- | --- |

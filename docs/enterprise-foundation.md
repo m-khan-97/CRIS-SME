@@ -8,7 +8,8 @@ browser/API integration surface. This is not a production-readiness certificatio
 
 ## Implemented Boundary
 
-- FastAPI `/api/v1` contracts and an authorization-code/PKCE Swagger interface.
+- FastAPI `/api/v1` request/response contracts and an authorization-code/PKCE
+  Swagger interface. Connection response models exclude credential fields.
 - RS256 access-token validation against an operator-configured HTTPS issuer,
   audience and JWKS URL. Required claims, expiry, issued-at and one-hour maximum
   lifetime are enforced. Tokens require `cris.api` scope (`scope` or Entra `scp`); ID tokens without that

@@ -24,6 +24,9 @@ def test_aws_verification_assumes_role_and_checks_target(monkeypatch):
     monkeypatch.setattr(boto3, "client", lambda *args, **kwargs: SimpleNamespace(get_caller_identity=lambda: {"Account": "123456789012"}))
     verify_connection(connection())
     assert calls[0]["ExternalId"] == "fixture-external" and calls[0]["DurationSeconds"] == 900
+    for negative in calls[1:3]:
+        assert {key: value for key, value in negative.items() if key != "ExternalId"} == {
+            key: value for key, value in calls[0].items() if key != "ExternalId"}
     monkeypatch.setattr(boto3, "client", lambda *args, **kwargs: SimpleNamespace(get_caller_identity=lambda: {"Account": "999999999999"}))
     with pytest.raises(ValueError, match="mismatch"):
         verify_connection(connection())

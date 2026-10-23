@@ -55,9 +55,9 @@ are outside this measurement. Coverage.py standard exclusions apply (9 lines).
 
 | Measure | Executed / total | Percentage |
 | --- | --- | --- |
-| Statements | 11,143 / 12,974 | 85.89% |
+| Statements | 11,215 / 13,046 | 85.97% |
 | Branches | 2,824 / 4,060 | 69.56% |
-| Combined coverage.py metric | 13,967 / 17,034 | 81.99% |
+| Combined coverage.py metric | 14,039 / 17,106 | 82.07% |
 
 Both Python versions passed all 1,084 tests and produced these measurements.
 Enterprise integration tests used PostgreSQL 16.15 with disposable, random
@@ -184,9 +184,13 @@ profile is constrained to the tested development lock. All 72 installed package
 dependencies are compatible; the license inventory records 30 metadata items
 requiring review, not blanket approval. Starlette emits a TestClient/httpx
 deprecation warning; no warning suppression or coverage omission was added.
-Enterprise Docker build/import checks are configured in CI, but Docker daemon
-access is unavailable locally. Hosted results for the new batch must be recorded
-separately from the prior readiness run. Real IdP/cloud onboarding, enterprise
+Docker daemon access is unavailable locally. The
+[full hosted enterprise run on fc79156](https://github.com/m-khan-97/CRIS-SME/actions/runs/39932817204)
+passed both PostgreSQL/Python jobs, console/browser and container checks,
+including enterprise image build/import and its non-root user. Explicit response
+contracts and equivalent-parameter AWS negative trust checks were subsequently
+revalidated locally (1,084 tests on each interpreter; 82.07% combined coverage).
+Their hosted follow-up is separate from that passing run. Real IdP/cloud onboarding, enterprise
 console migration, managed object storage and production release gates remain.
 
 See [CI documentation](ci-cd-and-vercel.md), the

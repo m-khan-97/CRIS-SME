@@ -17,6 +17,8 @@ def test_openapi_and_bearer_boundary(context):
     spec = client.get("/api/v1/openapi.json").json()
     assert spec["info"]["version"] == "1.0.0"
     assert "authorizationCode" in str(spec["components"]["securitySchemes"])
+    assert "secret" not in spec["components"]["schemas"]["ConnectionView"]["properties"]
+    assert "cancelling" in spec["components"]["schemas"]["JobView"]["properties"]["status"]["enum"]
     assert client.get("/api/v1/docs").status_code == 200
     assert client.get("/ready").json() == {"status": "ready"}
     assert client.get("/api/v1/tenants").json()["tenants"][0]["id"] == context["tenant"]

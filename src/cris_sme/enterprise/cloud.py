@@ -21,7 +21,7 @@ def verify_connection(connection):
             DurationSeconds=900)["Credentials"]
         from botocore.exceptions import ClientError
         for external in (None, "cris-invalid-" + connection["secret"]["external_id"]):
-            negative = {"RoleArn": connection["config"]["role_arn"], "RoleSessionName": "cris-trust-verification",
+            negative = {"RoleArn": connection["config"]["role_arn"], "RoleSessionName": "cris-connection-verification",
                         "DurationSeconds": 900}
             if external is not None:
                 negative["ExternalId"] = external

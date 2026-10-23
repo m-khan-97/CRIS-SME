@@ -6,6 +6,7 @@ from pathlib import Path
 import re
 import secrets
 from urllib.parse import urlsplit
+from typing import Literal
 from uuid import UUID
 
 from fastapi import Depends, FastAPI, Header, HTTPException, Request
@@ -53,6 +54,115 @@ class ScanInput(BaseModel):
     model_config = ConfigDict(extra="forbid")
     connection_id: UUID
     authorization_confirmed: StrictBool
+
+
+class TenantView(BaseModel):
+    id: UUID
+    name: str
+    role: Literal["owner", "admin", "operator", "analyst", "auditor"]
+
+
+class TenantList(BaseModel):
+    tenants: list[TenantView]
+
+
+class MemberView(BaseModel):
+    tenant_id: UUID
+    issuer: str
+    subject: str
+    role: Literal["owner", "admin", "operator", "analyst", "auditor"]
+
+
+class MemberList(BaseModel):
+    members: list[MemberView]
+
+
+class ConnectionSummary(BaseModel):
+    id: UUID
+    name: str
+    provider: Literal["aws", "azure"]
+    scope_id: str
+    enabled: bool
+    verified_until: int
+
+
+class ConnectionView(ConnectionSummary):
+    tenant_id: UUID
+    config: dict[str, str]
+
+
+class ConnectionList(BaseModel):
+    connections: list[ConnectionSummary]
+
+
+class JobView(BaseModel):
+    id: UUID
+    tenant_id: UUID
+    connection_id: UUID
+    status: Literal["queued", "running", "cancelling", "cancelled", "completed", "failed"]
+    requested_at: int
+    attempt: int
+    error_code: str
+
+
+class ArtifactView(BaseModel):
+    id: UUID
+    name: str
+    sha256: str
+    size: int
+
+
+class JobDetail(JobView):
+    artifacts: list[ArtifactView]
+
+
+class JobList(BaseModel):
+    assessments: list[JobView]
+
+
+class AuditView(BaseModel):
+    id: UUID
+    tenant_id: UUID
+    subject: str
+    action: str
+    resource_id: UUID
+    created_at: int
+
+
+class AuditList(BaseModel):
+    events: list[AuditView]
+
+
+class ErrorView(BaseModel):
+    detail: str
+
+
+class IdentityView(BaseModel):
+    issuer: str
+    subject: str
+
+
+class StatusView(BaseModel):
+    status: str
+
+
+class VerifiedView(StatusView):
+    connection_id: UUID
+
+
+class AwsOnboardingView(BaseModel):
+    role_arn: str
+    external_id: str
+    trust_policy: dict
+    permission_note: str
+
+
+class AzureOnboardingView(BaseModel):
+    tenant_id: UUID
+    subscription_id: UUID
+    client_id: UUID
+    credential_stored: bool
+    permission_note: str
 
 
 class BodyLimit:
@@ -103,6 +213,7 @@ def create_app(settings: Settings, store: Store, *, verifier=None, cloud_verify=
         tokenUrl=settings.token_url, scopes={"openid": "Sign in", "cris.api": "CRIS API"}, auto_error=False)
     app = FastAPI(title="CRIS Enterprise API", version="1.0.0", openapi_url="/api/v1/openapi.json",
                   docs_url="/api/v1/docs", redoc_url=None,
+                  responses={code: {"model": ErrorView} for code in (400, 401, 403, 404, 409, 413, 422, 429, 503)},
                   swagger_ui_init_oauth={"clientId": settings.client_id, "usePkceWithAuthorizationCodeGrant": True,
                                          "scopes": "openid cris.api"})
     app.add_middleware(BodyLimit)
@@ -149,31 +260,31 @@ def create_app(settings: Settings, store: Store, *, verifier=None, cloud_verify=
             return JSONResponse({"status": "not_ready"}, status_code=503)
         return {"status": "ready"}
 
-    @app.get("/api/v1/me")
+    @app.get("/api/v1/me", response_model=IdentityView)
     def me(actor=Depends(principal)):
         return {"issuer": actor.issuer, "subject": actor.subject}
 
-    @app.get("/api/v1/tenants")
+    @app.get("/api/v1/tenants", response_model=TenantList)
     def tenants(actor=Depends(principal)):
         return {"tenants": store.tenants(actor)}
 
-    @app.get("/api/v1/tenants/{tenant}/members")
+    @app.get("/api/v1/tenants/{tenant}/members", response_model=MemberList)
     def members(tenant: UUID, actor=Depends(principal)):
         return {"members": store.members(str(tenant), actor)}
 
-    @app.put("/api/v1/tenants/{tenant}/members/{subject}")
+    @app.put("/api/v1/tenants/{tenant}/members/{subject}", response_model=StatusView)
     def set_member(tenant: UUID, subject: str, body: MemberInput, actor=Depends(principal)):
         if not 1 <= len(subject) <= 255:
             raise HTTPException(422, "Invalid subject")
         store.member(str(tenant), actor, subject, body.role)
         return {"status": "updated"}
 
-    @app.delete("/api/v1/tenants/{tenant}/members/{subject}")
+    @app.delete("/api/v1/tenants/{tenant}/members/{subject}", response_model=StatusView)
     def remove_member(tenant: UUID, subject: str, actor=Depends(principal)):
         store.member(str(tenant), actor, subject, None)
         return {"status": "removed"}
 
-    @app.post("/api/v1/tenants/{tenant}/connections", status_code=201)
+    @app.post("/api/v1/tenants/{tenant}/connections", status_code=201, response_model=ConnectionView)
     def create_connection(tenant: UUID, body: ConnectionInput, actor=Depends(principal)):
         config, secret = {}, {}
         if body.provider == "aws":
@@ -194,11 +305,11 @@ def create_app(settings: Settings, store: Store, *, verifier=None, cloud_verify=
         connection_id = store.add_connection(str(tenant), actor, body.name, body.provider, body.scope_id, config, secret)
         return store.connection(str(tenant), actor, connection_id)
 
-    @app.get("/api/v1/tenants/{tenant}/connections")
+    @app.get("/api/v1/tenants/{tenant}/connections", response_model=ConnectionList)
     def connections(tenant: UUID, actor=Depends(principal)):
         return {"connections": store.connection_list(str(tenant), actor)}
 
-    @app.get("/api/v1/tenants/{tenant}/connections/{connection}/onboarding")
+    @app.get("/api/v1/tenants/{tenant}/connections/{connection}/onboarding", response_model=AwsOnboardingView | AzureOnboardingView)
     def onboarding(tenant: UUID, connection: UUID, actor=Depends(principal)):
         row = store.connection(str(tenant), actor, str(connection), secrets=True)
         if row["provider"] == "aws":
@@ -210,7 +321,7 @@ def create_app(settings: Settings, store: Store, *, verifier=None, cloud_verify=
                 "client_id": row["config"]["client_id"], "credential_stored": True,
                 "permission_note": "Grant only the documented Azure Reader permissions; Graph access is separate."}
 
-    @app.post("/api/v1/tenants/{tenant}/connections/{connection}/verify")
+    @app.post("/api/v1/tenants/{tenant}/connections/{connection}/verify", response_model=VerifiedView)
     def verify(tenant: UUID, connection: UUID, actor=Depends(principal)):
         row = store.connection(str(tenant), actor, str(connection), secrets=True)
         if not row["enabled"]:
@@ -222,26 +333,26 @@ def create_app(settings: Settings, store: Store, *, verifier=None, cloud_verify=
         store.verified(str(tenant), actor, str(connection))
         return {"status": "verified", "connection_id": str(connection)}
 
-    @app.post("/api/v1/tenants/{tenant}/connections/{connection}/disconnect")
+    @app.post("/api/v1/tenants/{tenant}/connections/{connection}/disconnect", response_model=StatusView)
     def disconnect(tenant: UUID, connection: UUID, actor=Depends(principal)):
         store.disconnect(str(tenant), actor, str(connection))
         return {"status": "disconnected"}
 
-    @app.post("/api/v1/tenants/{tenant}/assessments", status_code=202)
+    @app.post("/api/v1/tenants/{tenant}/assessments", status_code=202, response_model=JobView)
     def assess(tenant: UUID, body: ScanInput, actor=Depends(principal), idempotency_key: str = Header()):
         if not body.authorization_confirmed or not re.fullmatch(r"[A-Za-z0-9_.:-]{1,128}", idempotency_key):
             raise HTTPException(422, "Explicit authorization and a valid idempotency key are required")
         return store.submit(str(tenant), actor, str(body.connection_id), idempotency_key)
 
-    @app.get("/api/v1/tenants/{tenant}/assessments")
+    @app.get("/api/v1/tenants/{tenant}/assessments", response_model=JobList)
     def assessment_list(tenant: UUID, actor=Depends(principal)):
         return {"assessments": store.job_list(str(tenant), actor)}
 
-    @app.get("/api/v1/tenants/{tenant}/assessments/{assessment}")
+    @app.get("/api/v1/tenants/{tenant}/assessments/{assessment}", response_model=JobDetail)
     def assessment(tenant: UUID, assessment: UUID, actor=Depends(principal)):
         return store.job(str(tenant), actor, str(assessment))
 
-    @app.post("/api/v1/tenants/{tenant}/assessments/{assessment}/cancel")
+    @app.post("/api/v1/tenants/{tenant}/assessments/{assessment}/cancel", response_model=JobDetail)
     def cancel(tenant: UUID, assessment: UUID, actor=Depends(principal)):
         store.cancel(str(tenant), actor, str(assessment))
         return store.job(str(tenant), actor, str(assessment))
@@ -255,7 +366,7 @@ def create_app(settings: Settings, store: Store, *, verifier=None, cloud_verify=
         return Response(data, media_type="application/octet-stream",
                         headers={"Content-Disposition": 'attachment; filename="' + record["name"] + '"'})
 
-    @app.get("/api/v1/tenants/{tenant}/audit")
+    @app.get("/api/v1/tenants/{tenant}/audit", response_model=AuditList)
     def audit(tenant: UUID, actor=Depends(principal)):
         return {"events": store.audit_list(str(tenant), actor)}
 
