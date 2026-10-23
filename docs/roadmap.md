@@ -571,6 +571,10 @@ error schemas, filters connection outputs, and ensures AWS negative trust probes
 differ only in ExternalId. Local follow-up verification remains 1,084 tests per
 interpreter with 82.07% combined coverage. These results do not close the external
 qualification or console-migration gates above.
+Publication `385e855` passed the [full hosted follow-up](https://github.com/m-khan-97/CRIS-SME/actions/runs/39933622781):
+both PostgreSQL/Python gates, console/browser and container jobs, including the
+enterprise image. The connected backend batch is implemented and tested; the P1
+shared-hosting release gate remains open for the explicitly listed qualifications.
 
 | ID | Owner | Work and acceptance evidence |
 | --- | --- | --- |

@@ -193,5 +193,13 @@ revalidated locally (1,084 tests on each interpreter; 82.07% combined coverage).
 Their hosted follow-up is separate from that passing run. Real IdP/cloud onboarding, enterprise
 console migration, managed object storage and production release gates remain.
 
+The [full hosted contract/trust follow-up on 385e855](https://github.com/m-khan-97/CRIS-SME/actions/runs/39933622781)
+also passed all four jobs: both PostgreSQL/Python gates, console/browser and private
+container smoke, including the enterprise image build/import/non-root checks.
+Package installation, mock assessment/replay and document checks passed in the
+hosted Python jobs. GitHub still reports action-runtime/runner-image migration
+warnings. These are commit-specific technical results, not live IdP/customer
+cloud validation or independent assurance.
+
 See [CI documentation](ci-cd-and-vercel.md), the
 [capability register](capability-evidence.md) and the [roadmap](roadmap.md).
