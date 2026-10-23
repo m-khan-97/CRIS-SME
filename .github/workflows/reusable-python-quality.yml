@@ -25,6 +25,20 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: cris_test
+          POSTGRES_PASSWORD: cris_ci_test_only
+          POSTGRES_DB: cris_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U cris_test -d cris_test"
+          --health-interval 5s --health-timeout 5s --health-retries 10
+    env:
+      CRIS_TEST_DATABASE_URL: postgresql+psycopg://cris_test:cris_ci_test_only@127.0.0.1:5432/cris_test
 
     steps:
       - name: Check out repository
@@ -70,6 +84,7 @@ jobs:
             src/cris_sme/api/worker_environment.py \
             src/cris_sme/api/state_ownership.py \
             src/cris_sme/api/managed_worker.py \
+            src/cris_sme/enterprise \
             src/cris_sme/data_paths.py \
             src/cris_sme/controls/definitions.py \
             src/cris_sme/controls/registry.py \

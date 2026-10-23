@@ -1,6 +1,6 @@
 {
   "schema_version": "1.0",
-  "reviewed_on": "2026-09-26",
+  "reviewed_on": "2026-10-23",
   "capabilities": [
     {
       "id": "azure_collection",
@@ -205,6 +205,33 @@
       "independent_reviews": [],
       "limitations": [
         "No active GCP collection claim."
+      ]
+    },
+    {
+      "id": "enterprise_backend_foundation",
+      "title": "Opt-in authenticated enterprise backend",
+      "owner": "BE",
+      "delivery": "implemented",
+      "scope": "Versioned bearer-token API, PostgreSQL memberships and fenced jobs, connection onboarding and tenant-scoped artifact downloads.",
+      "implementation": [
+        "src/cris_sme/enterprise/api.py",
+        "src/cris_sme/enterprise/auth.py",
+        "src/cris_sme/enterprise/store.py",
+        "src/cris_sme/enterprise/worker.py",
+        "src/cris_sme/enterprise/cloud.py"
+      ],
+      "fixture_tests": [
+        "tests/enterprise/test_auth.py",
+        "tests/enterprise/test_api.py",
+        "tests/enterprise/test_worker.py",
+        "tests/enterprise/test_cloud.py"
+      ],
+      "live_observations": [],
+      "independent_reviews": [],
+      "limitations": [
+        "Signed fixture tokens, disposable PostgreSQL schemas and mocked cloud SDK calls are not live OIDC or customer-cloud qualification.",
+        "The existing console and local runner remain outside this authenticated API; shared hosting is not approved by this implementation claim.",
+        "Managed blob storage, customer consent UX, independent security review and production release gates remain open."
       ]
     },
     {

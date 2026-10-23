@@ -16,7 +16,9 @@ PROFILES = {
     "mcp": ["pyproject.toml", "--extra", "mcp"],
     "build": ["requirements/build.in"],
     "dev": ["pyproject.toml", "requirements/build.in", "--extra", "dev",
-            "--extra", "azure", "--extra", "aws"],
+            "--extra", "azure", "--extra", "aws", "--extra", "enterprise"],
+    "enterprise": ["pyproject.toml", "--extra", "enterprise", "--extra", "azure", "--extra", "aws",
+                   "--constraint", "requirements/dev.txt"],
 }
 INPUTS = ("pyproject.toml", "requirements/build.in", "scripts/lock_dependencies.py")
 

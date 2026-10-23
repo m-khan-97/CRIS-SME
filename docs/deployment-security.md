@@ -1,5 +1,10 @@
 # Deployment Security Restrictions
 
+The restrictions below describe the legacy local runner. The opt-in
+[enterprise backend](enterprise-foundation.md) has its own authentication,
+PostgreSQL and worker boundary. It does not secure an exposed legacy runner or
+automatically migrate existing console sessions and customer outputs.
+
 ## Local API State Ownership
 
 The local API takes nonblocking POSIX advisory locks for its report directory,

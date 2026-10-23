@@ -63,6 +63,13 @@ jobs:
       - uses: actions/checkout@v4
       - name: Build private trial image
         run: docker build -t cris-sme:ci .
+      - name: Build opt-in enterprise image
+        run: docker build -f Dockerfile.enterprise -t cris-enterprise:ci .
+      - name: Verify enterprise image imports and non-root user
+        run: >-
+          docker run --rm --entrypoint python cris-enterprise:ci -c
+          "import os; from cris_sme.enterprise.api import create_app;
+          from cris_sme.enterprise.worker import execute_once; assert os.getuid() != 0"
       - name: Verify runtime and shutdown
         run: python3 scripts/check_container.py --image cris-sme:ci
 

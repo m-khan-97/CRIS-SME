@@ -16,7 +16,8 @@ review. These are separate dimensions, not a maturity score or certification.
 | `independent_reviews` | Admitted reviews by someone independent of implementation, with identity or a stable reviewer reference. |
 | `limitations` | Explicit restrictions that must accompany capability claims. |
 
-The initial register contains 13 entries. Live-observation and independent-review
+The register contains 14 entries, including the opt-in enterprise backend.
+Live-observation and independent-review
 lists are deliberately empty **pending evidence admission**, not a statement that
 no live assessment or practitioner engagement has ever occurred. In particular,
 historical SIGI engagements and reported practitioner feedback are not erased or
@@ -57,7 +58,9 @@ of a record and its digest. Git review and protected branches remain necessary.
 Provider status remains governed by the control metadata and
 [provider capability matrix](provider-capability-matrix.md). This register does
 not promote AWS research-preview controls to active or activate GCP. PQC discovery
-and hosted tenant isolation are explicitly planned. It is a repository assurance
+and production hosted tenant isolation are explicitly planned. The separate
+enterprise backend is implemented with fixture/integration tests, not promoted
+to live hosted qualification. It is a repository assurance
 register, not yet a runtime API or an embedded signed release attestation.
 
 See the [quality baseline](quality-baseline.md),

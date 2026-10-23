@@ -8,6 +8,25 @@ security contact and disclosure process remain P0-08 work.
 
 ## Deployment Boundary
 
+### Enterprise Addendum (23 October)
+
+The separate [enterprise backend](enterprise-foundation.md) is an opt-in
+development foundation, not an approval of shared production hosting. It never
+mounts the unauthenticated local runner. Its additional boundaries are:
+
+| Risk | Implemented control | Remaining limit |
+| --- | --- | --- |
+| Token/key/ID-token confusion | Fixed HTTPS issuer/JWKS, RS256, API audience/scope, required times and bounded key cache | Live IdP browser flow, session policy and independent review are not qualified |
+| Cross-tenant access or role escalation | Database memberships keyed by issuer/subject; scoped object queries, composite foreign keys and last-owner guard | No PostgreSQL row-level security, hostile-host isolation or migrated enterprise console |
+| Stale workers publish after revocation | Random attempt lease, expiry, heartbeat, connection/job cancellation and fenced publication | Old cloud execution can overlap; orphan cleanup and quotas need operational controls |
+| Evidence disclosure/tampering | Private per-tenant/job/attempt paths, allowlisted IDs, bounded no-follow reads, size/hash verification and attachment-only downloads | Local privileged writers, volume encryption, retention and managed blob storage remain operator/release work |
+| Credential/confused-deputy abuse | Encrypted connection secrets; AWS external-ID trust verification; explicit Azure app scope; provider-isolated worker environments | Backend identities, secret delivery/rotation, least-privilege cloud grants and live SDK qualification are external gates |
+| Service exhaustion/unsafe deployment | Bounded request body/receive time, API connection admission, worker time/output budgets and database timeouts | Distributed rate limits, OS quotas, hardened TLS/proxies, restore exercises and security review remain open |
+
+The PostgreSQL and SDK tests use generated fixture identities and disposable
+schemas. Passing them is not evidence of production customer isolation under
+all attacks. The baseline local-runner boundary below is unchanged.
+
 The supported baseline is one trusted operator on an isolated workstation or
 private single-operator host. The runner has no application authentication or
 tenant authorization. A private network alone does not establish user trust.

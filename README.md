@@ -399,6 +399,12 @@ Delivery docs:
 
 ## Enterprise Roadmap
 
+An opt-in [enterprise backend foundation](docs/enterprise-foundation.md) now adds
+versioned authenticated APIs, PostgreSQL memberships and leased jobs, scoped
+artifacts, and AWS/Azure connection onboarding. It is separate from the local
+runner and current console. Live OIDC/cloud qualification, console migration and
+production release gates remain required; this is not a hosted-enterprise claim.
+
 Follow the [canonical phased roadmap](docs/roadmap.md). The immediate priorities are reproducible packaging and CI, complete control metadata, isolated scan artifacts, authenticated workspaces and durable execution. PQC discovery and broader enterprise capabilities follow explicit evidence and release gates, rather than being presented as already available.
 
 ---

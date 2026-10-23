@@ -1,0 +1,52 @@
+services:
+  postgres:
+    image: postgres:16
+    environment:
+      POSTGRES_DB: cris
+      POSTGRES_USER: cris
+      POSTGRES_PASSWORD: ${CRIS_ENTERPRISE_POSTGRES_PASSWORD:?Set a dedicated PostgreSQL password}
+    volumes:
+      - enterprise-database:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U cris -d cris"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+  migrate:
+    image: cris-enterprise:local
+    build:
+      context: .
+      dockerfile: Dockerfile.enterprise
+    command: ["migrate"]
+    env_file: ${CRIS_ENTERPRISE_ENV_FILE:?Set the path to a private enterprise environment file}
+    depends_on:
+      postgres:
+        condition: service_healthy
+  api:
+    image: cris-enterprise:local
+    init: true
+    env_file: ${CRIS_ENTERPRISE_ENV_FILE:?Set the path to a private enterprise environment file}
+    ports:
+      - "127.0.0.1:8788:8788"
+    volumes:
+      - enterprise-artifacts:/data
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+    stop_grace_period: 30s
+  worker:
+    image: cris-enterprise:local
+    init: true
+    command: ["worker"]
+    env_file: ${CRIS_ENTERPRISE_ENV_FILE:?Set the path to a private enterprise environment file}
+    volumes:
+      - enterprise-artifacts:/data
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+    healthcheck:
+      disable: true
+    stop_grace_period: 30s
+volumes:
+  enterprise-database:
+  enterprise-artifacts:

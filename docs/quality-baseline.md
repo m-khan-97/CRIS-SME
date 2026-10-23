@@ -40,7 +40,9 @@ worker/cancellation cases brought the preceding total to 948. Fifteen streaming
 output-budget cases brought the preceding total to 963. Nineteen state-commit
 failure-injection cases brought the preceding total to 982. Fifteen SQLite lock
 retry cases brought the preceding total to 997. Eleven readiness cases and two
-process-disappearance checks bring the current total to 1,010. These include native
+process-disappearance checks brought the preceding total to 1,010. Seventy-four
+enterprise authentication, API, cloud-adapter, CLI and PostgreSQL worker tests
+bring the current total to 1,084. These include native
 process-group cleanup, queued/active cancellation, publication exclusion,
 shutdown admission, signal handling, persisted recovery, pipe backpressure,
 exact/over-budget output, text compatibility, unpublished noisy-worker results,
@@ -53,11 +55,16 @@ are outside this measurement. Coverage.py standard exclusions apply (9 lines).
 
 | Measure | Executed / total | Percentage |
 | --- | --- | --- |
-| Statements | 10,516 / 12,290 | 85.57% |
-| Branches | 2,672 / 3,872 | 69.01% |
-| Combined coverage.py metric | 13,188 / 16,162 | 81.60% |
+| Statements | 11,143 / 12,974 | 85.89% |
+| Branches | 2,824 / 4,060 | 69.56% |
+| Combined coverage.py metric | 13,967 / 17,034 | 81.99% |
 
-Both Python versions passed all 1,010 tests and produced these measurements.
+Both Python versions passed all 1,084 tests and produced these measurements.
+Enterprise integration tests used PostgreSQL 16.15 with disposable, random
+schemas, signed fixture tokens and mocked cloud SDK calls. Set
+`CRIS_TEST_DATABASE_URL` to a dedicated test database to run them; without it,
+database-dependent enterprise cases skip. CI configures PostgreSQL for both
+interpreters. These measurements are not live OIDC or cloud qualification.
 CI requires 78% **combined** coverage,
 not 78% branches or a per-module guarantee. JSON/XML evidence is retained for
 seven days. Supervisor behavior tested in subprocesses does not contribute to
@@ -65,9 +72,11 @@ its in-process coverage. Azure SQL SDK imports emitted three escape-sequence
 warnings on the first clean run; they did not fail tests.
 
 Ruff F/E9 checks cover `src`, `tests`, `scripts` and `setup.py`. Mypy checks
-fourteen entry/runtime modules: the assessment and AzureGoat entry scripts,
+twenty-two entry/runtime modules: the assessment and AzureGoat entry scripts,
 run repository, supervisor, browser policy, public progress, request validation,
 worker environment, state ownership, managed worker, data paths, and control definitions/registry/validation.
+The eight new enterprise modules are included. Untyped function bodies are not
+made strict by this gate; boundary behaviour is covered by the integration tests.
 Imported modules use silent checking and missing-import tolerance; this is not a
 whole-backend strict type gate.
 
@@ -165,6 +174,20 @@ fix passed 1,010 tests locally on each interpreter. Frontend revalidation passed
 A read-only GitHub settings check found no classic protection for `main` and no
 repository rulesets. Required merge checks still need administrator configuration;
 workflow YAML alone does not enforce them. No repository settings were changed.
+
+The [full hosted readiness run on 86bfbe0](https://github.com/m-khan-97/CRIS-SME/actions/runs/39926874830)
+subsequently passed both Python versions, console/browser and container jobs.
+The enterprise backend batch adds the 74 tests and PostgreSQL matrix described
+above; local installed-wheel imports, migration, bootstrap and readiness also
+passed in a fresh environment outside the checkout. The deployment dependency
+profile is constrained to the tested development lock. All 72 installed package
+dependencies are compatible; the license inventory records 30 metadata items
+requiring review, not blanket approval. Starlette emits a TestClient/httpx
+deprecation warning; no warning suppression or coverage omission was added.
+Enterprise Docker build/import checks are configured in CI, but Docker daemon
+access is unavailable locally. Hosted results for the new batch must be recorded
+separately from the prior readiness run. Real IdP/cloud onboarding, enterprise
+console migration, managed object storage and production release gates remain.
 
 See [CI documentation](ci-cd-and-vercel.md), the
 [capability register](capability-evidence.md) and the [roadmap](roadmap.md).

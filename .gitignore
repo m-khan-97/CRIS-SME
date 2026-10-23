@@ -18,6 +18,7 @@ quality-artifacts/
 # Local environment files.
 .env
 .env.*
+*.env
 .codex
 
 # Build and packaging artifacts.

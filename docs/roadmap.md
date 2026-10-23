@@ -537,6 +537,34 @@ readiness response and running console were checked locally without a cloud scan
 
 ## 6. P1: Identity, Isolation And Reliable Runs
 
+23 October integrated backend batch: a separate opt-in FastAPI service now
+implements the connected backend foundation across P1-01/02/03/04/05/06/07/09.
+It has versioned OpenAPI and authorization-code/PKCE tooling, validated OIDC API
+tokens, issuer/subject memberships, five roles, owner safeguards, PostgreSQL v1
+migration/bootstrap, encrypted cloud connections, identity verification,
+idempotent scan admission and private audit events. Queue workers use PostgreSQL
+row claims, expiring leases, heartbeats, bounded crash attempts and fenced
+publication. Role revocation, cancellation and connection disconnection stop
+queued work and signal active workers. Namespaced, bounded, hash-checked artifact
+downloads require the correct tenant and completed job. Organization names come
+from the selected tenant, not a hard-coded customer or connection label.
+
+This implements a connected **backend** path, not the P1 release gate. P1-08
+console session/tenant migration, managed blob storage and historical import,
+live IdP/cloud qualification, Azure federation/consent UX, production database
+roles, backups, deployment hardening and independent security review remain open.
+The legacy runner is neither exposed through nor secured by the new service.
+See [operator setup and explicit limits](enterprise-foundation.md). Docker image
+and Compose definitions are included; local Docker execution is unavailable in
+this shell, so container verification is assigned to the hosted matrix. Provider
+verification is fixture-tested without touching live customer accounts.
+Local verification passes 1,084 tests on Python 3.11/3.12 (81.99% combined
+coverage), 56 console tests and seven browser workflows. Ruff, the expanded
+22-module type gate, dependency fingerprints/compatibility, capability validation,
+documentation, and fresh installed-wheel migration/bootstrap/readiness pass.
+The 74 enterprise cases use real PostgreSQL and generated fixture identities.
+No customer reports, papers or provenance edits are included in this batch.
+
 | ID | Owner | Work and acceptance evidence |
 | --- | --- | --- |
 | P1-01 | BE/SE | Maintained API framework, versioned OpenAPI and OIDC. Validate issuer, audience, signatures, expiry and algorithms; fail closed. Add session/CSRF protections appropriate to the flow. |
