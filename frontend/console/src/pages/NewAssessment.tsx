@@ -1,8 +1,9 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
-import { FlaskConical } from "lucide-react";
+import { FlaskConical, Square } from "lucide-react";
 import {
   getAssessmentRun,
+  cancelAssessment,
   getAwsEnvironment,
   getAzureEnvironment,
   startAwsAssessment,
@@ -85,7 +86,7 @@ function NewAssessmentLive() {
     enabled: !!runId,
     refetchInterval: (query) => {
       const status = query.state.data?.status;
-      if (status === "completed" || status === "failed") {
+      if (status === "completed" || status === "failed" || status === "cancelled") {
         return false;
       }
       return 1_500;
@@ -118,10 +119,19 @@ function NewAssessmentLive() {
     mutationFn: validateAwsRole,
   });
 
+  const cancelRun = useMutation({
+    mutationFn: cancelAssessment,
+    onSuccess: (data) => {
+      queryClient.setQueryData(["assessment-run", data.run_id], data);
+      void queryClient.invalidateQueries({ queryKey: ["assessment-run", data.run_id] });
+    },
+  });
+
   const startAssessment = provider === "azure" ? startAzure : startAws;
 
   const onSubmit = (event: React.FormEvent) => {
     event.preventDefault();
+    cancelRun.reset();
     if (provider === "azure") {
       startAzure.mutate({
         authorization_confirmed: authorizationConfirmed,
@@ -368,7 +378,8 @@ function NewAssessmentLive() {
 
           <button
             type="submit"
-            disabled={!authorizationConfirmed || !organizationName.trim() || startAssessment.isPending}
+            disabled={!authorizationConfirmed || !organizationName.trim() || startAssessment.isPending ||
+              (!!runId && (!run.data || ["queued", "running", "cancelling"].includes(run.data.status)))}
             className="w-fit rounded-md bg-primary px-4 py-2 text-sm font-medium text-text-strong transition-colors hover:bg-primary-hover disabled:cursor-not-allowed disabled:opacity-50"
           >
             {startAssessment.isPending ? "Starting…" : "Start assessment"}
@@ -385,18 +396,27 @@ function NewAssessmentLive() {
           )}
           {run.data && (
             <div className="flex flex-col gap-4">
-              <div className="flex items-center gap-3">
+              <div className="flex flex-wrap items-center gap-3">
                 <StatusBadge status={run.data.status} />
-                <span className="text-sm text-text-body">
+                <span className="min-w-0 break-all text-sm text-text-body">
                   Run {run.data.run_id}
                 </span>
+                {["queued", "running", "cancelling"].includes(run.data.status) &&
+                  <button type="button" onClick={() => cancelRun.mutate(run.data!.run_id)}
+                    disabled={cancelRun.isPending || run.data.status === "cancelling"}
+                    className="flex items-center gap-2 rounded-md border border-border-strong px-3 py-2 text-sm text-text-body disabled:opacity-50">
+                    <Square className="h-4 w-4" />{run.data.status === "cancelling" ? "Cancelling…" : "Cancel scan"}
+                  </button>}
               </div>
+              {cancelRun.isError && <p role="alert" className="text-sm text-sev-critical-text">{cancelRun.error.message}</p>}
+              {run.data.status === "cancelled" && <p className="text-sm text-text-muted">Assessment cancelled. Partial results were not published.</p>}
 
               {run.data.error && (
                 <p className="text-sm text-sev-critical-text">{run.data.error}</p>
               )}
 
-              <RunnerTimeline events={run.data.runner_events} />
+              {(run.data.status !== "cancelled" || run.data.runner_events.length > 0) &&
+                <RunnerTimeline events={run.data.runner_events} />}
 
               {run.data.status === "completed" && (
                 <p className="text-sm text-status-good-text">

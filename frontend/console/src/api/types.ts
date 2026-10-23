@@ -59,7 +59,7 @@ export interface RunnerEvent {
 export interface AssessmentRun {
   run_id: string;
   collector: string;
-  status: "queued" | "running" | "completed" | "failed";
+  status: "queued" | "running" | "cancelling" | "cancelled" | "completed" | "failed";
   requested_at: string;
   started_at: string;
   completed_at: string;

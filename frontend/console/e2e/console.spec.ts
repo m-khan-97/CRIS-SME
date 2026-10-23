@@ -13,8 +13,8 @@ function report(id: string): CrisReport {
     report_artifacts: { json_report: `outputs/${id}/report.json` } };
 }
 
-async function mockApi(page: Page, options: { unavailable?: boolean; failedScan?: boolean } = {}) {
-  const state = { polls: 0, submissions: [] as Record<string, unknown>[], completed: false, publicCompleted: false };
+async function mockApi(page: Page, options: { unavailable?: boolean; failedScan?: boolean; cancellable?: boolean } = {}) {
+  const state = { polls: 0, submissions: [] as Record<string, unknown>[], completed: false, publicCompleted: false, cancelled: false };
   const errors: string[] = [];
   page.on("pageerror", (error) => errors.push(error.message));
   // Fail closed: no test may call a real backend or an external service.
@@ -53,9 +53,14 @@ async function mockApi(page: Page, options: { unavailable?: boolean; failedScan?
       state.submissions.push(route.request().postDataJSON() as Record<string, unknown>);
       return route.fulfill({ status: 202, json: run });
     }
+    if (path === "/api/assessments/scan/cancel" && route.request().method() === "POST") {
+      state.cancelled = true;
+      return route.fulfill({ status: 202, json: { ...run, status: "cancelling" } });
+    }
     if (path === "/api/assessments/scan") {
       state.polls++;
-      const finished = state.polls >= 2;
+      if (state.cancelled) return route.fulfill({ json: { ...run, status: "cancelled" } });
+      const finished = state.polls >= 2 && !options.cancellable;
       state.completed = finished && !options.failedScan;
       return route.fulfill({ json: { ...run, status: !finished ? "running" : options.failedScan ? "failed" : "completed",
         error: finished && options.failedScan ? "Fixture permission denied" : "" } });
@@ -64,6 +69,31 @@ async function mockApi(page: Page, options: { unavailable?: boolean; failedScan?
   });
   return { state, errors };
 }
+
+test("cancelled scan retains the selected report and permits another submission", async ({ page }) => {
+  const { state, errors } = await mockApi(page, { cancellable: true });
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto("/assessment");
+  await page.getByRole("textbox", { name: /Organization name/ }).fill("Fixture scan");
+  await page.getByRole("checkbox", { name: /I confirm I am authorized/ }).check();
+  const start = page.getByRole("button", { name: "Start assessment", exact: true });
+  await start.click();
+  const cancel = page.getByRole("button", { name: "Cancel scan", exact: true });
+  await expect(cancel).toBeVisible();
+  await expect(start).toBeDisabled();
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth + 1)).toBe(true);
+  await page.screenshot({ path: test.info().outputPath("cancel-control-mobile.png"), fullPage: true });
+  await cancel.click();
+  await expect(page.getByText("Assessment cancelled. Partial results were not published.", { exact: true })).toBeVisible();
+  await expect(start).toBeEnabled();
+  await expect(cancel).toHaveCount(0);
+  await expect(page.getByRole("combobox", { name: "Active assessment" })).toHaveValue("alpha");
+  await page.setViewportSize({ width: 1280, height: 844 });
+  await page.screenshot({ path: test.info().outputPath("cancelled-scan.png"), fullPage: true });
+  expect(state.cancelled).toBe(true);
+  expect(state.completed).toBe(false);
+  expect(errors).toEqual([]);
+});
 
 function publicReport(run_id: string) {
   return { run_id, assessment_type: "public_exposure", generated_at: "2026-10-02T12:00:00Z",

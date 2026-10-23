@@ -77,6 +77,10 @@ export function getAssessmentRun(runId: string) {
   return apiGet<AssessmentRun>(`/api/assessments/${encodeURIComponent(runId)}`);
 }
 
+export function cancelAssessment(runId: string) {
+  return apiPost<AssessmentRun>(`/api/assessments/${encodeURIComponent(runId)}/cancel`, {});
+}
+
 export function getAssessmentHistory() {
   return apiGet<{ assessments: AssessmentHistoryEntry[] }>("/api/assessment-history");
 }
