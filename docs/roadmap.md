@@ -437,6 +437,77 @@ were reviewed, including a page-overflow check and a missing-selected-report cas
 Lint, types, package installation and deployment-mode builds provide the remaining
 local gates for this increment.
 
+5 October, P1-04 cloud-worker lifecycle increment: AWS/Azure scans now support
+persisted cancellation and a browser Cancel control. Queued work can be skipped;
+active native workers and AWS credential helpers run in managed POSIX process
+groups with timeout/cancellation termination and direct-child reaping. Admission
+is retained through worker cleanup, cancelled partial reports stay unpublished,
+and normal SIGINT/SIGTERM API shutdown rejects new workers and joins active ones
+before releasing state ownership. Cancellation never changes the selected
+completed report. Real subprocess tests cover cancellation, timeout, background
+children and signal shutdown; a browser fixture covers the cancellation workflow.
+See [cancellation scope](deployment-security.md#cloud-scan-cancellation).
+Forced crashes, escaped descendants, trusted custom command runners, public-scan
+cancellation, durable leases, heartbeats and distributed recovery remain separate
+work. This is a local P1-04 increment, not completion of the worker platform.
+Local checks pass 948 tests on each Python version (81.51%/81.52% combined
+coverage), 56 console tests and seven Chromium workflows. Desktop/mobile
+screenshots, lint, the 14-module type gate, documentation, installed-package
+smoke and all three console build modes were checked. Changes remain local and
+unpushed; no cloud resources were provisioned or scanned for these tests.
+
+5 October, P1-04/09 captured-output increment: managed cloud workers now drain
+stdout/stderr concurrently under an 8 MiB combined raw-byte budget per command.
+Over-budget output stops the process group and fails the scan without publishing
+partial reports or returning captured private text. Cleanup no longer accumulates
+shutdown output with `communicate()`. Exact-limit output, interleaved streams,
+split multibyte text, newline normalization, closed-pipe cancellation and spawn
+failure cleanup have regression coverage. AWS/Azure API tests check terminal
+persistence, unpublished artifacts and scan-slot recovery. This is a local worker
+memory safeguard, not OS resource isolation, file quotas or distributed recovery.
+See [output budget and limits](deployment-security.md#cloud-worker-output-budget).
+Local verification passes 963 tests on each supported Python version, with
+81.56%/81.55% combined coverage. Ruff, the 14-module type gate, documentation and
+installed-package checks pass. Console source is unchanged in this increment;
+its preceding 56 unit tests and seven browser workflows remain the latest local
+frontend measurements. Changes remain local and unpushed.
+
+5 October, P1-04/05 run-state commit increment: lifecycle changes now persist a
+candidate state before updating the cached run. Database write failure leaves
+the cached status and metadata unchanged, preventing premature success responses.
+Successful commits preserve run-reference identity and exclude AWS External IDs.
+Nineteen failure-injection checks cover AWS/Azure/public transitions, save ordering,
+cancellation signals, completion failure and unpublished partial artifacts. This
+is a local commit-ordering correction; database retry/backoff, transactional
+file publication, durable leases and outage recovery remain pending. See
+[commit ordering and limits](deployment-security.md#run-state-commit-ordering).
+Local verification passes 982 tests on both Python versions (81.57%/81.55%
+combined coverage), Ruff, the 14-module type gate, documentation and installed
+sdist/wheel checks. No console source changed in this increment. Changes remain
+local and unpushed; no live cloud scan was needed.
+
+7 October, P1-04 SQLite contention increment: local repository writes now use
+three attempts with short busy waits and bounded backoff, retrying only SQLite
+busy/locked result codes. Every attempt uses a fresh transaction and explicitly
+closes its connection. Rollback and retry include commit-time contention; terminal
+failure retains the last committed state. Fifteen regressions cover extended
+codes, nonretryable failures, rollback, connection cleanup, exhausted attempts
+and real write/commit locks. The existing save-before-cache boundary remains.
+See [lock policy](deployment-security.md#sqlite-lock-retry-policy). Persistent
+outages, cloud job retries, durable leases and distributed recovery remain open.
+Local verification passes 997 tests on both supported Python versions with
+81.57% combined coverage, plus Ruff, the 14-module type gate, documentation and
+installed sdist/wheel checks. Console source is unchanged in this increment.
+Changes remain local and unpushed; no live cloud assessment was run.
+
+23 October publication: backend worker and persistence changes are published in
+`2883249`; browser cancellation is published in `18b9962`. Local revalidation
+passed 997 tests on each Python version, 56 console tests and seven browser
+workflows. Ruff, the 14-module type gate, documentation and installed-package
+checks also passed. Only technical changes are included; customer reports,
+research papers, provenance edits and archives remain local. Hosted checks are
+tracked separately and must not be inferred from these local results.
+
 | ID | Owner | Work and acceptance evidence |
 | --- | --- | --- |
 | P0-01 | RE | Repair stale Mermaid-only README assertion after SVG migration. Check linked diagrams and documents. CI summaries must reflect failed/cancelled jobs instead of always printing success. |

@@ -14,9 +14,12 @@ This is a single-host, trusted-filesystem safeguard, not distributed job leasing
 or tenant isolation. Direct library users and CLI scans do not take these locks;
 do not run them against a live API's output paths. Nested output roots, hard-link
 database aliases and network filesystems are not supported ownership boundaries.
-An API process exiting releases its locks but does not prove its scan child has
-stopped. Stop the entire service process group (the container supervisor does
-this) and verify no old scan is running before restarting after a crash. A bind
+Normal SIGINT/SIGTERM shutdown requests cloud cancellation, terminates each managed
+worker's separate process group and waits for worker cleanup before releasing
+state ownership. An API crash or forced SIGKILL releases locks without proving
+its workers stopped. Workers have separate sessions: stopping only the API's
+process group is insufficient after such a crash. Stop the container/worker
+processes and verify no old scan is running before restarting. A bind
 failure can still occur after persisted-run recovery; it releases all locks.
 
 ## Current Supported Boundary
@@ -174,6 +177,96 @@ New namespaces start with empty comparison history. They intentionally do not
 inherit the previous organization's report. Historical report selection remains
 available, but automatic cross-run drift/lifecycle comparison needs explicit
 account, connection and scope matching before being enabled for these runs.
+
+## Cloud Scan Cancellation
+
+`POST /api/assessments/<run-id>/cancel` with a JSON object requests cancellation
+of an active AWS/Azure scan. It returns 202 with `cancelling`; status polling
+eventually returns `cancelled`. Cancelling an already cancelled run is idempotent
+(200). Unknown runs return 404 and other terminal/public runs return 409. Existing
+browser-origin and request-framing checks apply; this is not an authenticated
+tenant endpoint. The console exposes cancellation alongside cloud run progress.
+
+The default subprocess runner executes assessments and AWS credential-export
+helpers in dedicated POSIX sessions. Cancellation and timeout signal the entire
+worker group, escalate to SIGKILL after the bounded termination wait, and reap the
+direct worker. The shared scan slot is retained through this cleanup. Cancelled
+runs persist across restart and cannot publish partial reports, become latest,
+or replace the selected completed report. Completed publication and cancellation
+are serialized: an already completed run cannot be retroactively cancelled.
+
+Shutdown rejects new cloud workers, requests cancellation and joins existing
+workers for up to eight seconds. This covers normal SIGINT/SIGTERM shutdown, not
+forced termination, host failure or processes deliberately escaping their group.
+Trusted injected command runners cannot be forcibly interrupted by this helper;
+they must cooperate and return. These local mechanisms are not durable leases,
+distributed cancellation, a subprocess sandbox or retry/idempotency guarantees.
+Public exposure remains synchronous and does not support cancellation.
+
+## Cloud Worker Output Budget
+
+Native cloud assessment workers and their managed AWS credential-export helpers
+share a default 8 MiB stdout-plus-stderr budget per command. The parent drains
+both pipes incrementally, counts raw bytes before appending, and rejects output
+over the budget. Output exactly at the limit is accepted. This avoids unbounded
+`communicate()` accumulation and prevents one full pipe from blocking the other.
+Normal text decoding and newline normalization are retained; credential JSON
+within budget is captured in full, not silently truncated.
+
+An assessment command exceeding its budget fails after process-group cleanup;
+the scan slot is retained through cleanup, partial reports stay unpublished and
+the browser receives the existing sanitized failure message. Captured over-budget
+content is discarded rather than placed in the private diagnostic tails. Timeout
+and cancellation still work if the worker closes its pipes but remains running.
+Cleanup closes pipes and waits for the process without recapturing unbounded
+shutdown output. AWS helper failure retains the existing credential-chain fallback.
+
+This budget covers captured pipe bytes, not report/log files on disk, worker
+memory/CPU, decoded-text peak memory, or trusted injected command runners. Separate
+environment-check endpoints still use their existing command paths. Filesystem
+quotas, OS resource limits and isolated credential-check execution remain pending.
+
+## Run State Commit Ordering
+
+Lifecycle updates prepare a candidate run, save it to SQLite, then apply its
+fields to the cached run under the runner lock. A rejected database write leaves
+cached status, timestamps, return code and diagnostics unchanged. Successful
+updates retain the existing run object, so worker/request references see the
+committed state. AWS External IDs remain excluded from persistence.
+
+Completion-write failure cannot produce a cached success ahead of the database.
+Cloud and synchronous public scans attempt to record failure instead; their
+partial files remain excluded from completed history and artifact downloads.
+Cancellation similarly persists `cancelling` before signalling the worker. If
+that write fails, no cancellation signal is sent.
+
+This ordering does not make file generation and SQLite a single transaction,
+provide durable database recovery, or ensure status recovery during a sustained
+database outage. If failure-state writes also fail, the last saved active status
+can remain until restart recovery. Files may exist privately without being
+published; assess the failure and clean them up under the retention policy.
+
+## SQLite Lock Retry Policy
+
+Schema writes, run saves and interrupted-run recovery retry only SQLite
+`SQLITE_BUSY` and `SQLITE_LOCKED` errors, including their extended codes. Each
+operation gets at most three attempts, separated by 50 ms and 100 ms backoff.
+Each attempt uses a fresh connection and explicit transaction; failures roll
+back, and connections close before backoff. Commit-time contention is covered
+by the same policy. Upserts retain the same run ID rather than creating retries
+as new scans.
+
+The SQLite busy-wait timeout is 200 ms per lock wait, replacing the previous
+ten-second timeout. The policy bounds attempts and backoff, not total filesystem
+or OS execution time; schema and lifecycle writes have separate retry budgets.
+Read queries use the short connection timeout without their own retry loop.
+Permission, corruption, disk-full, I/O and unknown errors are not retried based
+on their text. Exhausted contention propagates to the caller and does not advance
+cached run status or publish partial results.
+
+This handles brief local SQLite contention, not a persistent outage, distributed
+leases, broker recovery or automatic cloud-assessment retries. Keep the local
+single-owner requirements; retries are not a substitute for ownership locks.
 
 ## Public Exposure Run Storage
 

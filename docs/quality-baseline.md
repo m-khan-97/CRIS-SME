@@ -1,6 +1,6 @@
 # Quality Baseline
 
-Updated 2 October 2026. Local measurements and commit-specific hosted results
+Updated 7 October 2026. Local measurements and commit-specific hosted results
 are distinguished below. Neither establishes independent security validation or
 enterprise readiness.
 
@@ -35,19 +35,27 @@ validation adds 65, worker environments add 15, and state ownership/startup
 recovery adds 24. Cloud run namespaces add 17 checks, including a real mock-mode
 child assessment and artifact retrieval. Public run storage adds 19 checks for
 retention, restart, failures and publication boundaries. Five public-history and
-selected-report API cases bring the current total to 926 passing
-on each. Coverage
+selected-report API cases brought the preceding total to 926. Twenty-two managed
+worker/cancellation cases brought the preceding total to 948. Fifteen streaming
+output-budget cases brought the preceding total to 963. Nineteen state-commit
+failure-injection cases brought the preceding total to 982. Fifteen SQLite lock
+retry cases bring the current total to 997. These include native
+process-group cleanup, queued/active cancellation, publication exclusion,
+shutdown admission, signal handling, persisted recovery, pipe backpressure,
+exact/over-budget output, text compatibility, unpublished noisy-worker results,
+save-before-cache ordering, rejected completion/cancellation writes, bounded
+contention retries, transaction rollback and connection cleanup. Coverage
 measures the whole `cris_sme` package, including unimported modules, with branches
 enabled and no module omit list. Scripts, frontend and child-process execution
 are outside this measurement. Coverage.py standard exclusions apply (9 lines).
 
 | Measure | Executed / total | Percentage |
 | --- | --- | --- |
-| Statements | 10,320 / 12,092 | 85.35% |
-| Branches | 2,608 / 3,804 | 68.56% |
-| Combined coverage.py metric | 12,928 / 15,896 | 81.33% |
+| Statements | 10,493 / 12,267 | 85.54% |
+| Branches | 2,668 / 3,868 | 68.98% |
+| Combined coverage.py metric | 13,161 / 16,135 | 81.57% |
 
-Both Python versions produced these measurements and passed all 926 tests.
+Both Python versions passed all 997 tests and produced these measurements.
 CI requires 78% **combined** coverage,
 not 78% branches or a per-module guarantee. JSON/XML evidence is retained for
 seven days. Supervisor behavior tested in subprocesses does not contribute to
@@ -55,9 +63,9 @@ its in-process coverage. Azure SQL SDK imports emitted three escape-sequence
 warnings on the first clean run; they did not fail tests.
 
 Ruff F/E9 checks cover `src`, `tests`, `scripts` and `setup.py`. Mypy checks
-thirteen entry/runtime modules: the assessment and AzureGoat entry scripts,
+fourteen entry/runtime modules: the assessment and AzureGoat entry scripts,
 run repository, supervisor, browser policy, public progress, request validation,
-worker environment, state ownership, data paths, and control definitions/registry/validation.
+worker environment, state ownership, managed worker, data paths, and control definitions/registry/validation.
 Imported modules use silent checking and missing-import tolerance; this is not a
 whole-backend strict type gate.
 
@@ -72,10 +80,10 @@ prevents DOM state leaking between cases.
 
 | Measure | Executed / total | Percentage | CI floor |
 | --- | --- | --- | --- |
-| Statements | 727 / 1,183 | 61.45% | 58% |
-| Branches | 695 / 1,469 | 47.31% | 44% |
-| Functions | 207 / 443 | 46.72% | 42% |
-| Lines | 684 / 1,075 | 63.62% | 60% |
+| Statements | 728 / 1,189 | 61.22% | 58% |
+| Branches | 696 / 1,486 | 46.83% | 44% |
+| Functions | 207 / 446 | 46.41% | 42% |
+| Lines | 685 / 1,081 | 63.36% | 60% |
 
 V8 coverage includes runtime source files, even unimported ones. Tests, ambient
 Vite declarations and the two type-only API contract files are excluded. Browser
@@ -90,7 +98,7 @@ is ignored by lint, but no source rules were disabled for this migration.
 
 ## Browser Workflows
 
-Six Chromium Playwright tests passed against the self-host build:
+Seven Chromium Playwright tests passed against the self-host build:
 
 1. Switch report, retain selection across reload, navigate to artifacts, and
    retrieve the artifact belonging to the selected report.
@@ -101,6 +109,8 @@ Six Chromium Playwright tests passed against the self-host build:
    and select a newly completed authorized scan.
 6. On a 390px mobile viewport, select public history, show missing-result errors
    without stale findings and navigate to another view. Check page overflow.
+7. Cancel an active mock cloud scan, retain the selected completed report, stop
+   polling at cancellation and enable another submission. Check mobile overflow.
 
 Network interception supplies synthetic fixtures and rejects external requests.
 No cloud credentials or customer scans are involved. CI retains screenshots,
@@ -135,7 +145,9 @@ review those upgrades separately rather than treating a passing run as permanenc
 Commit `5ce5d3a` publishes the subsequent API hardening and run-storage changes.
 The [full hosted run](https://github.com/m-khan-97/CRIS-SME/actions/runs/36995365921)
 passed both Python versions, console/browser and Docker checks. The public-history
-browser follow-up has local measurements recorded above; hosted results always
+browser follow-up [hosted run on fd111fd](https://github.com/m-khan-97/CRIS-SME/actions/runs/36996750117)
+also passed all configured jobs. Cloud cancellation has local measurements above;
+hosted results always
 apply to the recorded commit. These gates do not constitute identity authentication
 or a browser-engine/proxy penetration test.
 
