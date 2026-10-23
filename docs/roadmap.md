@@ -508,6 +508,20 @@ checks also passed. Only technical changes are included; customer reports,
 research papers, provenance edits and archives remain local. Hosted checks are
 tracked separately and must not be inferred from these local results.
 
+23 October, P1-09 readiness increment: backend `/ready` is separate from the
+existing `/health` liveness route. Readiness checks lifecycle admission and local
+SQLite write access, returning sanitized 503 responses for database failure or
+shutdown. The rollback-only zero-row update does not alter run records; initial
+schema creation is supported. Eleven regressions cover lock contention, recovery,
+read-only access, shutdown races, unchanged rows, sanitized errors and browser
+origin rejection. See [readiness limits](deployment-security.md#liveness-and-readiness).
+Cloud credential health, worker heartbeats and distributed readiness remain open.
+Local verification passes 1,010 tests on each Python version (81.60% combined
+coverage), Ruff, the 14-module type gate, documentation and installed-package
+smoke. Two additional test-helper regressions handle Linux processes disappearing
+while `/proc` is read. No console source changed in this increment. The backend
+readiness response and running console were checked locally without a cloud scan.
+
 | ID | Owner | Work and acceptance evidence |
 | --- | --- | --- |
 | P0-01 | RE | Repair stale Mermaid-only README assertion after SVG migration. Check linked diagrams and documents. CI summaries must reflect failed/cancelled jobs instead of always printing success. |

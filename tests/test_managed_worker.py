@@ -22,8 +22,16 @@ def alive(pid):
     status = Path(f"/proc/{pid}/stat")
     try:
         return status.read_text().rsplit(")", 1)[1].split()[0] != "Z"
-    except FileNotFoundError:
+    except (FileNotFoundError, ProcessLookupError):
         return False
+
+
+@pytest.mark.parametrize("error", [FileNotFoundError, ProcessLookupError])
+def test_process_disappearance_during_stat_read_means_not_alive(monkeypatch, error):
+    def disappeared(*args, **kwargs):
+        raise error()
+    monkeypatch.setattr(Path, "read_text", disappeared)
+    assert not alive(12345)
 
 
 def test_captures_command_result():

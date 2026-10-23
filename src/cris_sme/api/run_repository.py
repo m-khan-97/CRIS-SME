@@ -63,6 +63,17 @@ class SqliteAssessmentRunRepository:
             )
         self._write(write)
 
+    def check_writable(self) -> None:
+        """Probe schema access and write-lock admission without changing run rows."""
+        self._ensure_schema()
+        with closing(self._connect()) as connection:
+            try:
+                connection.execute("BEGIN IMMEDIATE")
+                connection.execute("SELECT run_id FROM assessment_runs LIMIT 1").fetchone()
+                connection.execute("UPDATE assessment_runs SET status = status WHERE 0")
+            finally:
+                connection.rollback()
+
     def get(self, run_id: str) -> dict[str, Any] | None:
         """Return one persisted run, if present."""
         if not self.database_path.is_file():

@@ -420,6 +420,20 @@ class LocalAssessmentRunner:
             return run_managed(command, cancel=event, **kwargs)
         return self.command_runner(command, **kwargs)
 
+    def readiness(self) -> dict[str, Any]:
+        """Check local persistence admission without checking cloud credentials."""
+        with self._lock:
+            if self._stopping:
+                return {"status": "not_ready", "checks": {"lifecycle": "stopping", "database": "not_checked"}}
+        try:
+            self._repository.check_writable()
+        except Exception:
+            return {"status": "not_ready", "checks": {"lifecycle": "accepting", "database": "unavailable"}}
+        with self._lock:
+            stopping = self._stopping
+        return {"status": "not_ready" if stopping else "ready",
+                "checks": {"lifecycle": "stopping" if stopping else "accepting", "database": "available"}}
+
     def stop_workers(self) -> None:
         """Request cancellation and wait before releasing API state ownership."""
         with self._lock:
@@ -928,6 +942,10 @@ def create_handler(
                         "message": "CRIS-SME local runner is available.",
                     }
                 )
+                return
+            if request_path == "/ready":
+                readiness = runner.readiness()
+                self._send_json(readiness, status=200 if readiness["status"] == "ready" else 503)
                 return
             if request_path == "/api/environment/azure":
                 self._send_json(runner.azure_environment())

@@ -1,6 +1,6 @@
 # Quality Baseline
 
-Updated 7 October 2026. Local measurements and commit-specific hosted results
+Updated 23 October 2026. Local measurements and commit-specific hosted results
 are distinguished below. Neither establishes independent security validation or
 enterprise readiness.
 
@@ -39,23 +39,25 @@ selected-report API cases brought the preceding total to 926. Twenty-two managed
 worker/cancellation cases brought the preceding total to 948. Fifteen streaming
 output-budget cases brought the preceding total to 963. Nineteen state-commit
 failure-injection cases brought the preceding total to 982. Fifteen SQLite lock
-retry cases bring the current total to 997. These include native
+retry cases brought the preceding total to 997. Eleven readiness cases and two
+process-disappearance checks bring the current total to 1,010. These include native
 process-group cleanup, queued/active cancellation, publication exclusion,
 shutdown admission, signal handling, persisted recovery, pipe backpressure,
 exact/over-budget output, text compatibility, unpublished noisy-worker results,
 save-before-cache ordering, rejected completion/cancellation writes, bounded
-contention retries, transaction rollback and connection cleanup. Coverage
+contention retries, transaction rollback, connection cleanup, write-readiness and
+shutdown/error projections. Coverage
 measures the whole `cris_sme` package, including unimported modules, with branches
 enabled and no module omit list. Scripts, frontend and child-process execution
 are outside this measurement. Coverage.py standard exclusions apply (9 lines).
 
 | Measure | Executed / total | Percentage |
 | --- | --- | --- |
-| Statements | 10,493 / 12,267 | 85.54% |
-| Branches | 2,668 / 3,868 | 68.98% |
-| Combined coverage.py metric | 13,161 / 16,135 | 81.57% |
+| Statements | 10,516 / 12,290 | 85.57% |
+| Branches | 2,672 / 3,872 | 69.01% |
+| Combined coverage.py metric | 13,188 / 16,162 | 81.60% |
 
-Both Python versions passed all 997 tests and produced these measurements.
+Both Python versions passed all 1,010 tests and produced these measurements.
 CI requires 78% **combined** coverage,
 not 78% branches or a per-module guarantee. JSON/XML evidence is retained for
 seven days. Supervisor behavior tested in subprocesses does not contribute to
@@ -150,6 +152,15 @@ also passed all configured jobs. Cloud cancellation has local measurements above
 hosted results always
 apply to the recorded commit. These gates do not constitute identity authentication
 or a browser-engine/proxy penetration test.
+
+23 October: technical changes are published in `2883249`, `18b9962` and `c1c2fcc`.
+The [static-site build on c1c2fcc](https://github.com/m-khan-97/CRIS-SME/actions/runs/39926067368)
+passed. The [explicit full-matrix run](https://github.com/m-khan-97/CRIS-SME/actions/runs/39926354445)
+has passing Python 3.11/3.12 and container jobs; its console job is still running
+at this recording. Those hosted results concern the 997-test baseline, not the
+subsequent local readiness increment. Readiness and the process-observation race
+fix passed 1,010 tests locally on each interpreter. Frontend revalidation passed
+56 unit tests, seven Chromium workflows and full lint before publication.
 
 A read-only GitHub settings check found no classic protection for `main` and no
 repository rulesets. Required merge checks still need administrator configuration;

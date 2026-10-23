@@ -268,6 +268,28 @@ This handles brief local SQLite contention, not a persistent outage, distributed
 leases, broker recovery or automatic cloud-assessment retries. Keep the local
 single-owner requirements; retries are not a substitute for ownership locks.
 
+## Liveness And Readiness
+
+`GET /health` on the backend (default `127.0.0.1:8787`) remains a liveness check:
+it reports that the HTTP API responds, not that scans can run successfully.
+`GET /ready` returns 200 with `status: ready` only when the runner is not stopping
+and its local SQLite write probe succeeds. It returns 503 with `status: not_ready`
+when persistence is unavailable or shutdown is in progress. Responses contain
+fixed lifecycle/database check labels, not raw exceptions, paths or credentials.
+Existing Host/Origin restrictions apply to both routes.
+
+The readiness probe initializes missing schema, takes a write transaction,
+attempts a zero-row update and rolls back. It neither changes run records nor
+marks active scans interrupted. Temporary lock contention can make it unavailable;
+normal short SQLite timeouts and schema-retry limits apply. Monitoring should
+avoid aggressive polling. Shutdown is checked again after the database probe.
+
+Readiness does not test Azure/AWS credentials, provider permissions, report-volume
+capacity, worker heartbeats, rule accuracy or tenant isolation. It does not gate
+scan submission or replace the existing process supervisor/container liveness
+check. This route is on the backend; proxying it through a console gateway must
+be configured explicitly. It is not an enterprise-service readiness guarantee.
+
 ## Public Exposure Run Storage
 
 New public-exposure API scans reserve the same run directory layout and save
