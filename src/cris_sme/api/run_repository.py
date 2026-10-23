@@ -3,8 +3,15 @@ from __future__ import annotations
 
 import sqlite3
 import builtins
+import time
+from contextlib import closing
 from pathlib import Path
-from typing import Any
+from typing import Any, Callable, TypeVar
+
+
+SQLITE_BUSY_TIMEOUT = 0.2
+WRITE_RETRY_DELAYS = (0.05, 0.1)
+_T = TypeVar("_T")
 
 
 RUN_COLUMNS = (
@@ -45,7 +52,7 @@ class SqliteAssessmentRunRepository:
         updates = ", ".join(
             f"{column}=excluded.{column}" for column in RUN_COLUMNS if column != "run_id"
         )
-        with self._connect() as connection:
+        def write(connection: sqlite3.Connection) -> None:
             connection.execute(
                 f"""
                 INSERT INTO assessment_runs ({columns})
@@ -54,13 +61,14 @@ class SqliteAssessmentRunRepository:
                 """,
                 values,
             )
+        self._write(write)
 
     def get(self, run_id: str) -> dict[str, Any] | None:
         """Return one persisted run, if present."""
         if not self.database_path.is_file():
             return None
         self._ensure_schema()
-        with self._connect() as connection:
+        with closing(self._connect()) as connection:
             row = connection.execute(
                 f"SELECT {', '.join(RUN_COLUMNS)} FROM assessment_runs WHERE run_id = ?",
                 (run_id,),
@@ -73,7 +81,7 @@ class SqliteAssessmentRunRepository:
             return []
         self._ensure_schema()
         safe_limit = max(1, min(int(limit), 1000))
-        with self._connect() as connection:
+        with closing(self._connect()) as connection:
             rows = connection.execute(
                 f"""
                 SELECT {', '.join(RUN_COLUMNS)}
@@ -92,7 +100,7 @@ class SqliteAssessmentRunRepository:
         self._ensure_schema()
         collectors = (collector,) if collector is not None else ("aws", "azure")
         placeholders = ", ".join("?" for _ in collectors)
-        with self._connect() as connection:
+        with closing(self._connect()) as connection:
             rows = connection.execute(
                 "SELECT run_id, output_dir FROM assessment_runs "
                 f"WHERE status = 'completed' AND collector IN ({placeholders}) "
@@ -106,7 +114,7 @@ class SqliteAssessmentRunRepository:
         if not self.database_path.is_file():
             return 0
         self._ensure_schema()
-        with self._connect() as connection:
+        def write(connection: sqlite3.Connection) -> int:
             cursor = connection.execute(
                 """
                 UPDATE assessment_runs
@@ -114,15 +122,16 @@ class SqliteAssessmentRunRepository:
                     completed_at = ?,
                     returncode = -1,
                     error = 'Local runner restarted before the assessment completed.'
-                WHERE status IN ('queued', 'running')
+                WHERE status IN ('queued', 'running', 'cancelling')
                 """,
                 (completed_at,),
             )
             return int(cursor.rowcount)
+        return self._write(write)
 
     def _ensure_schema(self) -> None:
         self.database_path.parent.mkdir(parents=True, exist_ok=True)
-        with self._connect() as connection:
+        def write(connection: sqlite3.Connection) -> None:
             connection.execute(
                 """
                 CREATE TABLE IF NOT EXISTS assessment_runs (
@@ -154,9 +163,24 @@ class SqliteAssessmentRunRepository:
                 ON assessment_runs(requested_at DESC)
                 """
             )
+        self._write(write)
+
+    def _write(self, operation: Callable[[sqlite3.Connection], _T]) -> _T:
+        """Retry only lock contention, rolling back and closing each attempt."""
+        for attempt in range(len(WRITE_RETRY_DELAYS) + 1):
+            try:
+                with closing(self._connect()) as connection, connection:
+                    connection.execute("BEGIN")
+                    return operation(connection)
+            except sqlite3.OperationalError as exc:
+                code = getattr(exc, "sqlite_errorcode", 0)
+                if not isinstance(code, int) or code & 0xFF not in (sqlite3.SQLITE_BUSY, sqlite3.SQLITE_LOCKED) or attempt == len(WRITE_RETRY_DELAYS):
+                    raise
+                time.sleep(WRITE_RETRY_DELAYS[attempt])
+        raise AssertionError("Unreachable retry state")
 
     def _connect(self) -> sqlite3.Connection:
-        connection = sqlite3.connect(self.database_path, timeout=10)
+        connection = sqlite3.connect(self.database_path, timeout=SQLITE_BUSY_TIMEOUT)
         connection.row_factory = sqlite3.Row
         return connection
 

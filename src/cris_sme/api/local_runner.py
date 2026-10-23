@@ -6,13 +6,14 @@ import json
 import math
 import os
 import re
+import signal
 import shutil
 import subprocess
 import sys
 import threading
 import time
 import uuid
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, replace
 from datetime import UTC, datetime
 from http.server import BaseHTTPRequestHandler
 from pathlib import Path
@@ -20,6 +21,7 @@ from typing import Any, Callable
 from urllib.parse import parse_qs, unquote, urlparse
 
 from cris_sme.api.run_repository import SqliteAssessmentRunRepository
+from cris_sme.api.managed_worker import run_managed, WorkerCancelled
 from cris_sme.api.state_ownership import own_state
 from cris_sme.api.public_progress import read_public_events
 from cris_sme.api.worker_environment import scan_environment
@@ -147,8 +149,11 @@ class LocalAssessmentRunner:
         self.database_path = database_path or output_dir / ".runs" / DEFAULT_DATABASE_NAME
         self._repository = SqliteAssessmentRunRepository(self.database_path)
         self._runs: dict[str, AssessmentRun] = {}
-        self._lock = threading.Lock()
+        self._lock = threading.RLock()
         self._scan_slot = threading.BoundedSemaphore(1)
+        self._cancel_events: dict[str, threading.Event] = {}
+        self._workers: dict[str, threading.Thread] = {}
+        self._stopping = False
         self._restore_persisted_runs()
 
     def azure_environment(self) -> dict[str, Any]:
@@ -359,13 +364,20 @@ class LocalAssessmentRunner:
             self._register_run(run)
             registered = True
             thread = threading.Thread(target=self._execute_scan, args=(run.run_id, execute), daemon=True)
-            thread.start()
+            with self._lock:
+                if self._stopping:
+                    raise AssessmentBusyError("The local runner is shutting down.")
+                self._workers[run.run_id] = thread
+                thread.start()
         except Exception:
             try:
                 if registered:
                     self._update_run(run.run_id, status="failed", completed_at=_utc_now(),
                                      returncode=-1, error="Unable to start assessment worker.")
             finally:
+                with self._lock:
+                    self._workers.pop(run.run_id, None)
+                    self._cancel_events.pop(run.run_id, None)
                 self._scan_slot.release()
             raise
         return run
@@ -376,16 +388,64 @@ class LocalAssessmentRunner:
         Path(run.output_dir).mkdir()
         Path(run.figure_dir).mkdir()
         with self._lock:
+            if self._stopping:
+                raise AssessmentBusyError("The local runner is shutting down.")
             self._repository.save(run.to_persisted())
             self._runs[run.run_id] = run
+            if run.collector in {"aws", "azure"}:
+                self._cancel_events[run.run_id] = threading.Event()
+
+    def cancel_assessment(self, run_id: str) -> AssessmentRun:
+        run = self.get_run(run_id)
+        if run is None:
+            raise RequestBodyError("Run not found.", status=404)
+        with self._lock:
+            if run.status == "cancelled":
+                return run
+            event = self._cancel_events.get(run_id)
+            if run.collector not in {"aws", "azure"} or run.status not in {"queued", "running", "cancelling"} or event is None:
+                raise AssessmentBusyError("This run is not an active cancellable cloud assessment.")
+            values = run.to_persisted()
+            values["status"] = "cancelling"
+            self._repository.save(values)
+            run.status = "cancelling"
+            event.set()
+            return run
+
+    def _run_command(self, run_id: str, command: list[str], **kwargs: Any) -> subprocess.CompletedProcess[str]:
+        event = self._cancel_events[run_id]
+        if event.is_set():
+            raise WorkerCancelled()
+        if self.command_runner is subprocess.run:
+            return run_managed(command, cancel=event, **kwargs)
+        return self.command_runner(command, **kwargs)
+
+    def stop_workers(self) -> None:
+        """Request cancellation and wait before releasing API state ownership."""
+        with self._lock:
+            self._stopping = True
+            for event in self._cancel_events.values():
+                event.set()
+            workers = list(self._workers.values())
+        deadline = time.monotonic() + 8
+        for worker in workers:
+            worker.join(timeout=max(0, deadline - time.monotonic()))
+            if worker.is_alive():
+                raise RuntimeError("Cloud worker did not stop within the shutdown deadline")
 
     def _execute_scan(self, run_id: str, execute: Callable[[str], None]) -> None:
         try:
-            execute(run_id)
+            if self._cancel_events[run_id].is_set():
+                self._update_run(run_id, status="cancelled", completed_at=_utc_now(), returncode=-1)
+            else:
+                execute(run_id)
         except Exception:
             self._update_run(run_id, status="failed", completed_at=_utc_now(),
                              returncode=-1, error="Assessment worker failed unexpectedly.")
         finally:
+            with self._lock:
+                self._workers.pop(run_id, None)
+                self._cancel_events.pop(run_id, None)
             self._scan_slot.release()
 
     def assess_public_exposure(self, request: dict[str, Any]) -> dict[str, Any]:
@@ -568,7 +628,8 @@ class LocalAssessmentRunner:
         if run.organization_name:
             env["CRIS_SME_AZURE_ORGANIZATION_NAME"] = run.organization_name
         try:
-            completed = self.command_runner(
+            completed = self._run_command(
+                run_id,
                 [sys.executable, "-m", "cris_sme.main"],
                 capture_output=True,
                 text=True,
@@ -616,8 +677,9 @@ class LocalAssessmentRunner:
         if run.external_id:
             env["CRIS_SME_AWS_EXTERNAL_ID"] = run.external_id
         try:
-            env.update(_aws_login_environment(self.command_runner, env))
-            completed = self.command_runner(
+            env.update(_aws_login_environment(lambda command, **kwargs: self._run_command(run_id, command, **kwargs), env))
+            completed = self._run_command(
+                run_id,
                 [sys.executable, "-m", "cris_sme.main"],
                 capture_output=True,
                 text=True,
@@ -648,9 +710,14 @@ class LocalAssessmentRunner:
             run = self._runs.get(run_id)
             if run is None:
                 return
+            event = self._cancel_events.get(run_id)
+            if event is not None and event.is_set() and updates.get("status") in {"running", "completed", "failed"}:
+                updates["status"] = "cancelling" if updates["status"] == "running" else "cancelled"
+                updates["error"] = ""
+            candidate = replace(run, **updates)
+            self._repository.save(candidate.to_persisted())
             for key, value in updates.items():
                 setattr(run, key, value)
-            self._repository.save(run.to_persisted())
 
     def _restore_persisted_runs(self) -> None:
         """Restore durable state and close runs interrupted by a process restart."""
@@ -990,6 +1057,18 @@ def create_handler(
             self._send_artifact(target, body)
 
         def do_POST(self) -> None:  # noqa: N802 - stdlib handler API
+            if self.path.startswith("/api/assessments/") and self.path.endswith("/cancel"):
+                try:
+                    self._read_json()
+                    result = runner.cancel_assessment(unquote(self.path.split("/")[-2]))
+                except PublicRequestError as exc:
+                    self._send_error(str(exc), status=getattr(exc, "status", 400))
+                    return
+                except Exception:
+                    self._send_error("Unable to cancel the assessment.", status=500)
+                    return
+                self._send_json(result.to_dict(), status=202 if result.status == "cancelling" else 200)
+                return
             if self.path == "/api/assessments/azure":
                 self._start_assessment(runner.start_azure_assessment)
                 return
@@ -1149,10 +1228,21 @@ def run_server(
             runner, browser_policy=policy, request_read_timeout=request_read_timeout,
         ), max_connections=max_connections)
         print(f"CRIS-SME local runner listening on http://{host}:{port}")
+        previous_handlers = {}
+        def interrupt_server(signum: int, frame: Any) -> None:
+            raise KeyboardInterrupt
+        if threading.current_thread() is threading.main_thread():
+            for signum in (signal.SIGINT, signal.SIGTERM):
+                previous_handlers[signum] = signal.signal(signum, interrupt_server)
         try:
             server.serve_forever()
         finally:
-            server.server_close()
+            try:
+                server.server_close()
+                runner.stop_workers()
+            finally:
+                for signum, handler in previous_handlers.items():
+                    signal.signal(signum, handler)
 
 
 def main() -> int:

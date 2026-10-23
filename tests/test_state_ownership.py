@@ -3,6 +3,7 @@ from pathlib import Path
 import subprocess
 import sys
 import select
+from types import SimpleNamespace
 
 import pytest
 
@@ -144,7 +145,7 @@ def test_startup_and_shutdown_failures_release_locks(tmp_path, monkeypatch, stag
     def runner(**kwargs):
         if stage == "runner":
             raise OSError("runner")
-        return object()
+        return SimpleNamespace(stop_workers=lambda: None)
 
     monkeypatch.setattr(local_runner, "LocalAssessmentRunner", runner)
     monkeypatch.setattr(local_runner, "BoundedHTTPServer", Server)
