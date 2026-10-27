@@ -147,7 +147,8 @@ test("analysts see reports but no connection or scan administration", async ({ p
   await expect(page.getByRole("button", { name: "Start assessment" })).toHaveCount(0);
   await page.getByRole("link", { name: "Cloud connections", exact: true }).click();
   await expect(page.getByRole("button", { name: "Create connection" })).toHaveCount(0);
-  await page.getByRole("link", { name: "Members", exact: true }).click();
+  await expect(page.getByRole("link", { name: "Members", exact: true })).toHaveCount(0);
+  await page.goto("/members");
   await expect(page.getByText("Your role does not permit member administration.", { exact: true })).toBeVisible();
   expect(state.requests.some(r => r.endsWith("/members"))).toBe(false);
   expect(state.legacy).toEqual([]); expect(errors).toEqual([]);
@@ -239,5 +240,65 @@ test("mobile workspace remains within viewport and clears expired sessions", asy
   await page.screenshot({ path: test.info().outputPath("enterprise-connections-mobile.png"), fullPage: true });
   await page.getByRole("button", { name: "Sign out", exact: true }).click();
   await expect(page.getByRole("button", { name: "Sign in", exact: true })).toBeVisible();
+  expect(state.legacy).toEqual([]); expect(errors).toEqual([]);
+});
+
+test("expired stored credentials cannot load a workspace", async ({ page }) => {
+  const { state, errors } = await setup(page, { expiry: -60 });
+  await page.goto("/findings");
+  await expect(page.getByRole("button", { name: "Sign in", exact: true })).toBeVisible();
+  expect(state.requests).toEqual([]); expect(errors).toEqual([]);
+});
+
+test("a callback without matching OAuth state is rejected and removed from the URL", async ({ page }) => {
+  const { state, errors } = await setup(page, { authenticated: false });
+  await page.goto("/auth/callback?code=untrusted-code&state=untrusted-state");
+  await expect(page.getByRole("alert")).toContainText("Sign-in could not be completed");
+  await expect(page.getByRole("button", { name: "Sign in", exact: true })).toBeVisible();
+  expect(new URL(page.url()).search).toBe("");
+  expect(state.tokenRequests).toEqual([]); expect(state.requests).toEqual([]); expect(errors).toEqual([]);
+});
+
+test("token expiry removes an already visible report without waiting for an API failure", async ({ page }) => {
+  const { state, errors } = await setup(page, { expiry: 8 });
+  await page.goto("/findings"); await expect(page.getByRole("heading", { name: "Finding Alpha", exact: true })).toBeVisible();
+  await expect(page.getByRole("button", { name: "Sign in", exact: true })).toBeVisible({ timeout: 15_000 });
+  await expect(page.getByRole("heading", { name: "Finding Alpha", exact: true })).toHaveCount(0);
+  expect(state.legacy).toEqual([]); expect(errors).toEqual([]);
+});
+
+test("an organization role downgrade removes administrative controls", async ({ page }) => {
+  const { state, errors } = await setup(page);
+  await page.goto("/connections"); await expect(page.getByRole("button", { name: "Create connection", exact: true })).toBeVisible();
+  state.role = "analyst"; await page.getByRole("button", { name: "Refresh organizations" }).click();
+  await expect(page.getByRole("button", { name: "Create connection", exact: true })).toHaveCount(0);
+  await expect(page.getByRole("button", { name: "Verify AWS Production", exact: true })).toHaveCount(0);
+  expect(state.legacy).toEqual([]); expect(errors).toEqual([]);
+});
+
+test("a foreign persisted run ID does not fall back to another completed report", async ({ page }) => {
+  const { state, errors } = await setup(page);
+  await page.addInitScript(({ org, run }) => sessionStorage.setItem(`cris.enterprise.run.${org}`, run), { org: orgA, run: runB });
+  await page.goto("/findings");
+  await expect(page.getByRole("combobox", { name: "Active assessment" })).toHaveValue("");
+  await expect(page.getByText("Selected assessment unavailable", { exact: true })).toHaveCount(1);
+  expect(state.requests.some(r => r.includes("/artifacts/"))).toBe(false);
+  await page.getByRole("combobox", { name: "Active assessment" }).selectOption(runA);
+  await expect(page.getByRole("heading", { name: "Finding Alpha", exact: true })).toBeVisible();
+  expect(state.legacy).toEqual([]); expect(errors).toEqual([]);
+});
+
+test("every report view stays on the selected organization and never calls local endpoints", async ({ page }) => {
+  const { state, errors } = await setup(page);
+  await page.goto("/findings"); await expect(page.getByRole("heading", { name: "Finding Alpha", exact: true })).toBeVisible();
+  const views = ["Overview", "Resources", "Attack paths", "Compliance", "Cyber Essentials", "Healthcare IoT", "Remediation", "Personas", "Evidence", "Trust center", "Disclosure", "Governance", "Trends", "Native validation"];
+  for (const name of views) {
+    await page.getByRole("link", { name, exact: true }).click();
+    await expect(page.getByRole("main")).toBeVisible();
+    await expect(page.getByRole("main")).not.toContainText(/Loading.*\.\.\.|Loading.*…/);
+    await expect(page.getByRole("combobox", { name: "Organization", exact: true })).toHaveValue(orgA);
+    await expect(page.getByRole("combobox", { name: "Active assessment" })).toHaveValue(runA);
+    await expect(page.getByLabel("Assessment scope")).toContainText("123456789012");
+  }
   expect(state.legacy).toEqual([]); expect(errors).toEqual([]);
 });

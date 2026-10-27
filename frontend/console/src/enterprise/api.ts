@@ -34,7 +34,7 @@ export class EnterpriseApi {
     if (!token) { this.unauthorized(); throw new ApiError(401); }
     const response = await fetch(path, { method, body: body === undefined ? undefined : JSON.stringify(body),
       headers: { Authorization: `Bearer ${token}`, ...(body === undefined ? {} : { "Content-Type": "application/json" }), ...(key ? { "Idempotency-Key": key } : {}) },
-      cache: "no-store", credentials: "omit", redirect: "error", signal: this.controller.signal });
+      cache: "no-store", credentials: "omit", redirect: "error", signal: AbortSignal.any([this.controller.signal, AbortSignal.timeout(30_000)]) });
     if (response.status === 401) this.unauthorized();
     if (!response.ok) throw new ApiError(response.status);
     return response;
@@ -46,13 +46,25 @@ export class EnterpriseApi {
   job(tenant: string, id: string) { return this.request<Job>(this.path(tenant, `assessments/${encodeURIComponent(id)}`)); }
   async artifact(tenant: string, artifact: Artifact) {
     const generation = this.generation;
+    if (!Number.isSafeInteger(artifact.size) || artifact.size < 0 || artifact.size > 32 * 1024 * 1024) throw new Error("Artifact size check failed.");
     const response = await this.fetch(this.path(tenant, `artifacts/${encodeURIComponent(artifact.id)}`));
-    const bytes = await response.arrayBuffer();
-    if (bytes.byteLength > 32 * 1024 * 1024 || bytes.byteLength !== artifact.size) throw new Error("Artifact size check failed.");
+    const reader = response.body?.getReader();
+    if (!reader) throw new Error("Artifact body unavailable.");
+    const bytes = new Uint8Array(artifact.size);
+    let offset = 0;
+    try {
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        if (offset + value.byteLength > bytes.length) throw new Error("Artifact size check failed.");
+        bytes.set(value, offset); offset += value.byteLength;
+      }
+    } finally { await reader.cancel(); reader.releaseLock(); }
+    if (offset !== artifact.size) throw new Error("Artifact size check failed.");
     const digest = Array.from(new Uint8Array(await crypto.subtle.digest("SHA-256", bytes)), b => b.toString(16).padStart(2, "0")).join("");
     if (digest !== artifact.sha256) throw new Error("Artifact integrity check failed.");
     this.assertCurrent(generation);
-    return bytes;
+    return bytes.buffer;
   }
   async report(tenant: string, artifact: Artifact): Promise<CrisReport> {
     const report = JSON.parse(new TextDecoder().decode(await this.artifact(tenant, artifact))) as CrisReport;

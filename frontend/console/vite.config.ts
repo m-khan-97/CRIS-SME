@@ -10,6 +10,7 @@ export default defineConfig(({ command, mode }) => {
   return ({
   define: { 'import.meta.env.VITE_ENTERPRISE_MODE': JSON.stringify(String(enterprise)) },
   publicDir: enterprise ? false : 'public',
+  optimizeDeps: { entries: ['index.html'] },
   // Demo mode and self-host mode both build a bundle served at "/" (demo:
   // static, no backend; selfhost: same origin as the Docker-packaged
   // local_runner, full live functionality). Regular production builds land
@@ -34,6 +35,7 @@ export default defineConfig(({ command, mode }) => {
     },
   },
   server: {
+    watch: { ignored: ['**/playwright*-report/**', '**/test-results*/**', '**/coverage/**'] },
     proxy: {
       '/api': {
         target,

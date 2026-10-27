@@ -13,6 +13,11 @@ describe("enterprise identity configuration", () => {
       response_type: "code", scope: "openid cris.api", redirect_uri: "https://cris.example/console/auth/callback", automaticSilentRenew: false,
     });
   });
+  it("supports resource-qualified Entra scopes and explicit provider audience parameters", () => {
+    expect(identitySettings({ ...env, VITE_OIDC_SCOPE: "openid api://api-application/cris.api", VITE_OIDC_AUDIENCE: "api-audience" }, "https://cris.example", "/")).toMatchObject({
+      scope: "openid api://api-application/cris.api", extraQueryParams: { audience: "api-audience" },
+    });
+  });
   it.each([
     { VITE_OIDC_AUTHORITY: "http://identity.example" }, { VITE_OIDC_AUTHORITY: "https://name:password@identity.example" },
     { VITE_OIDC_AUTHORITY: "https://identity.example?redirect=foo" }, { VITE_OIDC_CLIENT_ID: "" },
@@ -80,6 +85,15 @@ describe("authorized artifacts", () => {
   it("rejects size mismatch", async () => {
     const { api, artifact } = await fixture(baseReport);
     await expect(api.artifact("org", { ...artifact, size: 0 })).rejects.toThrow("size check failed");
+  });
+  it("rejects oversized declared artifacts without fetching them", async () => {
+    const { api, artifact } = await fixture(baseReport);
+    await expect(api.artifact("org", { ...artifact, size: 33 * 1024 * 1024 })).rejects.toThrow("size check failed");
+    expect(fetch).not.toHaveBeenCalled();
+  });
+  it("rejects a truncated stream", async () => {
+    const { api, artifact } = await fixture(baseReport);
+    await expect(api.artifact("org", { ...artifact, size: artifact.size + 1 })).rejects.toThrow("size check failed");
   });
   it("rejects digest mismatch", async () => {
     const { api, artifact } = await fixture(baseReport);

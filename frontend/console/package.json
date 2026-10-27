@@ -8,7 +8,7 @@
     "build": "tsc -b && vite build",
     "build:demo": "tsc -b && vite build --mode demo --outDir dist/demo",
     "build:selfhost": "tsc -b && vite build --mode selfhost --outDir dist/selfhost",
-    "build:enterprise": "tsc -b && vite build --mode enterprise --outDir dist/enterprise",
+    "build:enterprise": "tsc -b && vite build --mode enterprise --outDir dist/enterprise && node scripts/check-enterprise-build.mjs",
     "dev:enterprise": "vite --mode enterprise",
     "lint": "eslint . --max-warnings 0",
     "lint:core": "npm run lint",

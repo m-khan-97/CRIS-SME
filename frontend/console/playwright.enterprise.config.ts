@@ -7,7 +7,7 @@ export default defineConfig({
   retries: process.env.CI ? 1 : 0,
   workers: 2,
   reporter: [["list"], ["html", { outputFolder: "playwright-enterprise-report", open: "never" }]],
-  outputDir: "test-results/enterprise",
+  outputDir: "test-results-enterprise",
   use: { baseURL: "http://127.0.0.1:4180", trace: "retain-on-failure", screenshot: "only-on-failure" },
   projects: [{ name: "chromium", use: { ...devices["Desktop Chrome"] } }],
   webServer: {

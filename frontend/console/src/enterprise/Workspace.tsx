@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { NavLink, Route, Routes, Navigate, useLocation, useNavigate } from "react-router-dom";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { LogOut, RefreshCw, ShieldCheck } from "lucide-react";
 import { useSession } from "./Auth";
@@ -33,26 +32,3 @@ export function Workspace() {
       : <p className="p-6" role="status">No organization access. Contact your administrator.</p>}
   </div>;
 }
-
-const enterpriseTabs = [
-  ["/", "Assessments"], ["/connections", "Cloud connections"], ["/findings", "Findings"],
-  ["/resources", "Resources"], ["/attack-paths", "Attack paths"], ["/compliance", "Compliance"],
-  ["/cyber-essentials", "Cyber Essentials"], ["/iomt", "Healthcare IoT"], ["/evidence", "Evidence"],
-  ["/reports", "Reports"], ["/members", "Members"], ["/audit", "Audit"],
-  ["/overview", "Overview"], ["/remediation", "Remediation"], ["/personas", "Personas"],
-  ["/trust", "Trust center"], ["/disclosure", "Disclosure"], ["/governance", "Governance"],
-  ["/trend", "Trends"], ["/native-validation", "Native validation"],
-];
-
-export function WorkspaceNav() {
-  const navigate = useNavigate();
-  const location = useLocation();
-  return <nav aria-label="Workspace" className="border-b border-border-card bg-surface-card px-4 py-2">
-    <select aria-label="Navigation" className="md:hidden" value={enterpriseTabs.some(([to]) => to === location.pathname) ? location.pathname : "/"} onChange={e => navigate(e.target.value)}>
-      {enterpriseTabs.map(([to, label]) => <option value={to} key={to}>{label}</option>)}
-    </select>
-    <div className="hidden flex-wrap gap-1 md:flex">{enterpriseTabs.map(([to, label]) => <NavLink key={to} to={to} end className={({ isActive }) => `rounded px-3 py-2 text-sm ${isActive ? "bg-primary text-white" : "text-text-body hover:bg-surface-subtle"}`}>{label}</NavLink>)}</div>
-  </nav>;
-}
-
-export function EnterpriseFallback() { return <Routes><Route path="*" element={<Navigate to="/" replace />} /></Routes>; }

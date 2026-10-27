@@ -29,16 +29,24 @@ export function EnterpriseAuth({ children }: { children: ReactNode }) {
   const [error, setError] = useState("");
   const [session] = useState(() => {
     let current: User | null = null;
+    let removing = false;
     const signOut = () => {
-      const remove = current !== null;
       current = null;
       api.cancel();
       cache.clear();
       setUser(null);
-      if (remove) void manager?.removeUser();
+      if (!removing && manager) {
+        removing = true;
+        void manager.removeUser().finally(() => { removing = false; });
+      }
     };
     const api = new EnterpriseApi(() => current && !current.expired ? current.access_token : undefined, signOut);
-    return { api, signOut, accept: (value: User | null) => { current = value; setUser(value); } };
+    return { api, signOut, accept: (value: User | null) => {
+      if (current && (current.access_token !== value?.access_token || current.profile?.sub !== value?.profile?.sub || current.profile?.iss !== value?.profile?.iss)) {
+        api.cancel(); cache.clear();
+      }
+      current = value; setUser(value);
+    } };
   });
   useEffect(() => {
     let alive = true;
@@ -80,5 +88,5 @@ export function EnterpriseAuth({ children }: { children: ReactNode }) {
     {error && <p role="alert">{error}</p>}
     <button className="enterprise-primary" onClick={() => { setError(""); try { void identity().signinRedirect().catch(() => setError("Sign-in unavailable. Contact your administrator.")); } catch { setError("Enterprise sign-in is not configured. Contact your administrator."); } }}>Sign in</button>
   </main>;
-  return <SessionContext.Provider value={session}>{children}</SessionContext.Provider>;
+  return <SessionContext.Provider key={`${user.profile?.iss ?? ""}:${user.profile?.sub ?? ""}`} value={session}>{children}</SessionContext.Provider>;
 }
