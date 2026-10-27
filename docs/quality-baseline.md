@@ -82,7 +82,11 @@ whole-backend strict type gate.
 
 ## Frontend Coverage
 
-All 56 Vitest component/unit tests passed. Four public-history tests cover saved
+All 100 Vitest component/unit tests passed in the 27 October enterprise console
+batch. Session tests cover configuration failure, expiry, sign-out, API 401 and
+callback rejection. Enterprise transport/workspace fixtures cover tenant context,
+roles, scan admission, connections, membership and bounded artifact integrity.
+Four public-history tests cover saved
 selection, exact exports, missing results and new completed scans. Route smoke tests wait for settled
 report or missing-data states, rather than passing on loading text. Dedicated
 fixtures cover populated governance, native-validation and trend views, including
@@ -91,10 +95,10 @@ prevents DOM state leaking between cases.
 
 | Measure | Executed / total | Percentage | CI floor |
 | --- | --- | --- | --- |
-| Statements | 728 / 1,189 | 61.22% | 58% |
-| Branches | 696 / 1,486 | 46.83% | 44% |
-| Functions | 207 / 446 | 46.41% | 42% |
-| Lines | 685 / 1,081 | 63.36% | 60% |
+| Statements | 1,081 / 1,605 | 67.35% | 58% |
+| Branches | 996 / 1,830 | 54.42% | 44% |
+| Functions | 325 / 612 | 53.10% | 42% |
+| Lines | 947 / 1,358 | 69.73% | 60% |
 
 V8 coverage includes runtime source files, even unimported ones. Tests, ambient
 Vite declarations and the two type-only API contract files are excluded. Browser
@@ -123,6 +127,16 @@ Seven Chromium Playwright tests passed against the self-host build:
 7. Cancel an active mock cloud scan, retain the selected completed report, stop
    polling at cancellation and enable another submission. Check mobile overflow.
 
+The opt-in enterprise build has a separate 17-workflow Chromium suite, covering
+PKCE code/challenge exchange, organization/run selection and export integrity,
+role restrictions, scan idempotency/cancellation, AWS connection lifecycle,
+Azure secret clearing, session expiry, callback rejection, revocation and role
+downgrade, foreign saved selections, mobile layout and all report-derived routes.
+Its artifact directories are independent of the legacy suite. Fixtures intercept
+both the IdP and API; this does not establish live provider compatibility or a
+full PostgreSQL-to-browser production deployment. The enterprise build explicitly
+checks that no public report data is bundled.
+
 Network interception supplies synthetic fixtures and rejects external requests.
 No cloud credentials or customer scans are involved. CI retains screenshots,
 failure traces and HTML reports for seven days. Desktop/mobile screenshots were
@@ -135,6 +149,15 @@ Targeted compatible frontend dependency updates reduced the clean-install npm
 audit result from ten advisories to zero on 26 September. This is an advisory
 snapshot, not proof that all dependencies are secure. No forced major upgrade was
 used. Python lock fingerprints and the 36-control metadata gate passed.
+
+The 27 October console batch adds `oidc-client-ts` and applies compatible
+development-tool updates. The final full npm audit again reports zero known
+vulnerabilities. The refreshed npm inventory records 377 lockfile declarations,
+with two requiring metadata review; inventory output is not legal approval.
+Local enterprise console validation is recorded on `ba4966b` and `963f631`.
+The expanded CI configuration has not been executed remotely for this unpushed
+batch. No new Python/backend test count or live identity/cloud observation is
+implied by the frontend results.
 
 Commit `8eb0595` was pushed to main. Its
 [hosted static-site run](https://github.com/m-khan-97/CRIS-SME/actions/runs/36265166338)
@@ -191,7 +214,7 @@ including enterprise image build/import and its non-root user. Explicit response
 contracts and equivalent-parameter AWS negative trust checks were subsequently
 revalidated locally (1,084 tests on each interpreter; 82.07% combined coverage).
 Their hosted follow-up is separate from that passing run. Real IdP/cloud onboarding, enterprise
-console migration, managed object storage and production release gates remain.
+live console qualification, managed object storage and production release gates remain.
 
 The [full hosted contract/trust follow-up on 385e855](https://github.com/m-khan-97/CRIS-SME/actions/runs/39933622781)
 also passed all four jobs: both PostgreSQL/Python gates, console/browser and private

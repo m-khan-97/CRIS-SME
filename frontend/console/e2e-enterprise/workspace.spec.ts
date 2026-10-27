@@ -133,6 +133,7 @@ test("organization switching clears old findings, preserves scoped selection and
   await expect(page.getByRole("heading", { name: "Finding Alpha", exact: true })).toHaveCount(0);
   await expect(page.getByRole("combobox", { name: "Active assessment" })).toHaveValue(runB);
   await page.getByRole("link", { name: "Reports", exact: true }).click();
+  await expect(page.getByRole("combobox", { name: "Navigation", exact: true })).toHaveCount(0);
   const download = page.waitForEvent("download");
   await page.getByRole("button", { name: "Download cris_sme_report.json", exact: true }).click();
   expect((await download).suggestedFilename()).toBe("cris_sme_report.json");
@@ -236,6 +237,7 @@ test("mobile workspace remains within viewport and clears expired sessions", asy
   const { state, errors } = await setup(page);
   await page.setViewportSize({ width: 390, height: 844 }); await page.goto("/connections");
   await expect(page.getByRole("heading", { name: "Cloud connections", exact: true })).toBeVisible();
+  await expect(page.getByRole("combobox", { name: "Navigation", exact: true })).toBeVisible();
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1)).toBe(true);
   await page.screenshot({ path: test.info().outputPath("enterprise-connections-mobile.png"), fullPage: true });
   await page.getByRole("button", { name: "Sign out", exact: true }).click();

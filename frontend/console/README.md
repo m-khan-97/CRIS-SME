@@ -71,3 +71,20 @@ export default defineConfig([
   },
 ])
 ```
+## Enterprise Mode
+
+The opt-in enterprise console uses the separate authenticated API on port 8788.
+It does not use the local runner or static report fallback. Configure a public
+OIDC SPA client and the public build settings described in
+[the enterprise console guide](../../docs/enterprise-console.md), then run:
+
+```bash
+npm run dev:enterprise -- --host 127.0.0.1 --port 5174 --strictPort
+```
+
+`npm run build:enterprise` produces an assets-only root-hosted bundle in
+`dist/enterprise/`. Deploy it behind HTTPS and a same-origin enterprise API proxy.
+`npm run test:e2e:enterprise` exercises intercepted OIDC/API fixtures, not live
+provider qualification. Browser tokens use sessionStorage; see the guide for
+scope, session and deployment limitations. Local/demo workflows remain
+separate modes.

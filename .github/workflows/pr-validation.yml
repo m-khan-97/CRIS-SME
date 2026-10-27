@@ -39,10 +39,13 @@ jobs:
           npm run build
           npm run build:demo
           npm run build:selfhost
+          npm run build:enterprise
       - name: Install Chromium
         run: npx playwright install --with-deps chromium
       - name: Mocked browser workflows
         run: npm run test:e2e
+      - name: Enterprise PKCE and tenant-boundary browser workflows
+        run: npm run test:e2e:enterprise
       - name: Preserve console quality evidence
         if: ${{ always() }}
         uses: actions/upload-artifact@v4
@@ -51,7 +54,9 @@ jobs:
           path: |
             frontend/console/coverage
             frontend/console/playwright-report
+            frontend/console/playwright-enterprise-report
             frontend/console/test-results
+            frontend/console/test-results-enterprise
             frontend/console/quality-artifacts
           retention-days: 7
 

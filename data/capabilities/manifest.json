@@ -230,8 +230,36 @@
       "independent_reviews": [],
       "limitations": [
         "Signed fixture tokens, disposable PostgreSQL schemas and mocked cloud SDK calls are not live OIDC or customer-cloud qualification.",
-        "The existing console and local runner remain outside this authenticated API; shared hosting is not approved by this implementation claim.",
+        "The local runner remains outside this authenticated API; the separate opt-in enterprise console does not approve shared hosting.",
         "Managed blob storage, customer consent UX, independent security review and production release gates remain open."
+      ]
+    },
+    {
+      "id": "enterprise_console",
+      "title": "Opt-in authenticated enterprise browser console",
+      "owner": "FE",
+      "delivery": "implemented",
+      "scope": "OIDC code-flow PKCE sign-in, organization/run-scoped report views, cloud connection administration, authorized scan lifecycle and integrity-checked artifact downloads.",
+      "implementation": [
+        "frontend/console/src/enterprise/Auth.tsx",
+        "frontend/console/src/enterprise/Workspace.tsx",
+        "frontend/console/src/enterprise/TenantWorkspace.tsx",
+        "frontend/console/src/enterprise/api.ts",
+        "frontend/console/src/enterprise/connections.tsx",
+        "frontend/console/src/enterprise/assessments.tsx"
+      ],
+      "fixture_tests": [
+        "frontend/console/src/test/enterpriseApi.test.ts",
+        "frontend/console/src/test/enterpriseAuth.test.tsx",
+        "frontend/console/src/test/enterpriseWorkspace.test.tsx",
+        "frontend/console/e2e-enterprise/workspace.spec.ts"
+      ],
+      "live_observations": [],
+      "independent_reviews": [],
+      "limitations": [
+        "Intercepted fixture identity/API browser workflows are not live OIDC, customer-cloud or end-to-end PostgreSQL deployment qualification.",
+        "Session tokens use tab-local sessionStorage; no BFF, federated Azure onboarding, automatic token renewal or IdP-wide logout is supplied.",
+        "Public-exposure enterprise workflows, historical local report import, managed blob storage and production review remain open."
       ]
     },
     {

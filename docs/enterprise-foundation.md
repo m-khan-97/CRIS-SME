@@ -196,8 +196,10 @@ immediate membership revocation, secret redaction/encryption, idempotency,
 connection cancellation, concurrent claims, expired leases and artifact integrity.
 Cloud provider calls are fixtures, not live provider qualification. Real OIDC
 browser sign-in, customer authorization, cloud verification and deployment review
-are required before any production use. The existing console remains local-only
-until its enterprise session, connection and tenant context migration is completed.
+are required before any production use. The opt-in
+[enterprise console](enterprise-console.md) now provides PKCE sign-in, organization
+and run context, cloud connections, role-aware controls and scoped downloads.
+The original local console remains a separate unauthenticated deployment mode.
 
 The Compose definition is a development/reference topology, not hardened production
 configuration. Use separate migration and runtime database roles in production:

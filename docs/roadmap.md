@@ -549,10 +549,10 @@ queued work and signal active workers. Namespaced, bounded, hash-checked artifac
 downloads require the correct tenant and completed job. Organization names come
 from the selected tenant, not a hard-coded customer or connection label.
 
-This implements a connected **backend** path, not the P1 release gate. P1-08
+This implemented a connected **backend** path, not the P1 release gate. At that point, P1-08
 console session/tenant migration, managed blob storage and historical import,
 live IdP/cloud qualification, Azure federation/consent UX, production database
-roles, backups, deployment hardening and independent security review remain open.
+roles, backups, deployment hardening and independent security review remained open.
 The legacy runner is neither exposed through nor secured by the new service.
 See [operator setup and explicit limits](enterprise-foundation.md). Docker image
 and Compose definitions are included; local Docker execution is unavailable in
@@ -570,11 +570,37 @@ follow-up gives the protected JSON routes explicit response models and common
 error schemas, filters connection outputs, and ensures AWS negative trust probes
 differ only in ExternalId. Local follow-up verification remains 1,084 tests per
 interpreter with 82.07% combined coverage. These results do not close the external
-qualification or console-migration gates above.
+qualification or console-migration gates at that publication point.
 Publication `385e855` passed the [full hosted follow-up](https://github.com/m-khan-97/CRIS-SME/actions/runs/39933622781):
 both PostgreSQL/Python gates, console/browser and container jobs, including the
 enterprise image. The connected backend batch is implemented and tested; the P1
 shared-hosting release gate remains open for the explicitly listed qualifications.
+
+27 October connected console batch: the opt-in enterprise browser now implements
+P1-08's organization/run context over the authenticated API. Authorization-code
+PKCE sign-in uses a maintained OIDC client. Tenant selection cancels requests and
+clears cached data; report selection stays scoped to that organization. Global
+context shows the selected scope, evidence mode and reported coverage gaps.
+All report-derived views, including budget planning, Cyber Essentials and IoMT,
+read this context; exports require opaque artifact IDs, bearer headers and
+bounded SHA-256-checked delivery. Local filesystem paths and demo reports are
+not fallback sources. Owners/admins manage cloud connections and memberships;
+operators can submit/cancel authorized scans. Browser verification covers expiry,
+revocation, role downgrade, foreign saved selections, idempotent retry and
+connection lifecycle. Public exposure is intentionally unavailable here until
+it has its own tenant-scoped backend. The original local mode remains separate.
+
+Implementation milestone `ba4966b` and hardening milestone `963f631` are committed.
+The follow-up strengthens bounded
+artifact streaming, adds enterprise CI/build checks and documents the real IdP
+and deployment requirements in the [enterprise console guide](enterprise-console.md).
+Local validation passes 100 frontend tests, 17 enterprise Chromium workflows,
+seven legacy Chromium workflows and the existing coverage floors. The normal,
+demo, self-host and enterprise builds are checked separately; no hosted CI result
+is claimed for this unpushed console batch.
+Fixture browser flows are not live IdP/cloud or full PostgreSQL-to-browser pilot
+qualification. P1 remains open for those qualifications, managed storage/import,
+Azure federation, production infrastructure and independent security review.
 
 | ID | Owner | Work and acceptance evidence |
 | --- | --- | --- |
