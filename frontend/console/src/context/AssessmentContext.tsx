@@ -6,7 +6,7 @@ import type { AssessmentHistoryEntry, CrisReport } from "../api/types";
 
 const STORAGE_KEY = "cris-sme-selected-assessment";
 
-interface AssessmentContextValue {
+export interface AssessmentContextValue {
   assessments: AssessmentHistoryEntry[];
   selectedAssessment: AssessmentHistoryEntry | null;
   selectedReportId: string;
@@ -18,6 +18,10 @@ interface AssessmentContextValue {
 }
 
 const AssessmentContext = createContext<AssessmentContextValue | null>(null);
+
+export function ScopedAssessmentProvider({ value, children }: { value: AssessmentContextValue; children: ReactNode }) {
+  return <AssessmentContext.Provider value={value}>{children}</AssessmentContext.Provider>;
+}
 
 export function AssessmentProvider({ children }: { children: ReactNode }) {
   const [requestedReportId, setRequestedReportId] = useState(

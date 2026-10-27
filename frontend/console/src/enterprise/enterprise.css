@@ -1,0 +1,17 @@
+.enterprise-shell { letter-spacing: 0; }
+.enterprise-shell label { font-size: 0.875rem; }
+.enterprise-shell select, .enterprise-shell input:not([type="checkbox"]) {
+  display: block; width: 100%; min-height: 38px; padding: 6px 10px;
+  border: 1px solid var(--color-border-strong); border-radius: 4px;
+  background: var(--color-surface-card); color: var(--color-text-strong);
+}
+.enterprise-shell button, .enterprise-primary {
+  display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+  min-height: 36px; padding: 6px 10px; border: 1px solid var(--color-border-strong);
+  border-radius: 4px; cursor: pointer; background: var(--color-surface-card);
+}
+.enterprise-shell button:disabled { opacity: .5; cursor: not-allowed; }
+.enterprise-shell button.enterprise-primary, button.enterprise-primary { background: var(--color-primary); color: white; }
+.enterprise-shell th, .enterprise-shell td { padding: 12px 10px; border-bottom: 1px solid var(--color-border-card); vertical-align: top; }
+.enterprise-shell th { font-weight: 600; white-space: nowrap; }
+.enterprise-shell :focus-visible { outline: 2px solid var(--color-primary); outline-offset: 2px; }

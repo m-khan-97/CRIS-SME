@@ -11,6 +11,7 @@ coverage.json
 coverage.xml
 frontend/console/coverage/
 frontend/console/playwright-report/
+frontend/console/playwright-enterprise-report/
 frontend/console/test-results/
 htmlcov/
 quality-artifacts/

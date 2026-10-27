@@ -8,12 +8,18 @@ import type {
   PublicExposureReport,
   PublicExposureHistoryEntry,
 } from "./types";
+import { enterpriseMode } from "../enterprise/config";
+
+function requireLocalMode() {
+  if (enterpriseMode) throw new Error("Local runner endpoints are disabled in enterprise mode");
+}
 
 // Empty by default so requests stay relative and rely on the Vite dev proxy
 // (or a same-origin reverse proxy in production) to reach the local runner API.
 const API_BASE = import.meta.env.VITE_API_BASE_URL ?? "";
 
 async function apiGet<T>(path: string): Promise<T> {
+  requireLocalMode();
   const response = await fetch(`${API_BASE}${path}`, { cache: "no-store" });
   if (!response.ok) {
     throw new Error(`GET ${path} failed with status ${response.status}`);
@@ -22,6 +28,7 @@ async function apiGet<T>(path: string): Promise<T> {
 }
 
 async function apiPost<T>(path: string, body: unknown): Promise<T> {
+  requireLocalMode();
   const response = await fetch(`${API_BASE}${path}`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -106,6 +113,7 @@ export function getPublicExposureReport(runId: string) {
 }
 
 export async function getLatestReport(): Promise<CrisReport | null> {
+  requireLocalMode();
   const response = await fetch(outputUrl("cris_sme_report.json"), {
     cache: "no-store",
   });
@@ -122,11 +130,13 @@ export async function getLatestReport(): Promise<CrisReport | null> {
 // runner. In static production builds, BASE_URL is "/console/" and report
 // artifacts are copied alongside the bundle under console/outputs/.
 export function outputUrl(filename: string): string {
+  requireLocalMode();
   return `${API_BASE}${import.meta.env.BASE_URL}outputs/${filename}`;
 }
 
 // report_artifacts paths are repo-relative (e.g. "outputs/reports/cris_sme_report.sarif").
 // The local runner serves files under outputs/reports/ at /outputs/, so strip that prefix.
 export function artifactUrl(path: string): string {
+  requireLocalMode();
   return `${API_BASE}/api/report-artifact?path=${encodeURIComponent(path)}`;
 }

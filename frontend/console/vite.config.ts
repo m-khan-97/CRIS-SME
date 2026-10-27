@@ -1,16 +1,24 @@
-import { defineConfig } from 'vite'
+import { defineConfig, loadEnv, type Plugin } from 'vite'
 import react from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
+import { readFileSync } from 'node:fs'
 
 // https://vite.dev/config/
-export default defineConfig(({ command, mode }) => ({
+export default defineConfig(({ command, mode }) => {
+  const enterprise = mode === 'enterprise' || loadEnv(mode, process.cwd()).VITE_ENTERPRISE_MODE === 'true';
+  const target = enterprise ? 'http://127.0.0.1:8788' : 'http://127.0.0.1:8787';
+  return ({
+  define: { 'import.meta.env.VITE_ENTERPRISE_MODE': JSON.stringify(String(enterprise)) },
+  publicDir: enterprise ? false : 'public',
   // Demo mode and self-host mode both build a bundle served at "/" (demo:
   // static, no backend; selfhost: same origin as the Docker-packaged
   // local_runner, full live functionality). Regular production builds land
   // in dist/site/console/ and resolve under "/console/". Dev server stays at
   // "/" so the proxy rules work.
-  base: mode === 'demo' || mode === 'selfhost' ? '/' : command === 'build' ? '/console/' : '/',
-  plugins: [react(), tailwindcss()],
+  base: mode === 'demo' || mode === 'selfhost' || mode === 'enterprise' ? '/' : command === 'build' ? '/console/' : '/',
+  plugins: [react(), tailwindcss(), ...(enterprise ? [{ name: 'enterprise-public-assets',
+    generateBundle() { this.emitFile({ type: 'asset', fileName: 'favicon.svg', source: readFileSync(new URL('./public/favicon.svg', import.meta.url)) }); },
+  } satisfies Plugin] : [])],
   build: {
     rollupOptions: {
       output: {
@@ -28,17 +36,17 @@ export default defineConfig(({ command, mode }) => ({
   server: {
     proxy: {
       '/api': {
-        target: 'http://127.0.0.1:8787',
+        target,
         changeOrigin: true,
       },
       '/outputs': {
-        target: 'http://127.0.0.1:8787',
+        target,
         changeOrigin: true,
       },
       '/health': {
-        target: 'http://127.0.0.1:8787',
+        target,
         changeOrigin: true,
       },
     },
   },
-}))
+})})
