@@ -1,6 +1,6 @@
 {
   "schema_version": "1.0",
-  "reviewed_on": "2026-10-23",
+  "reviewed_on": "2026-10-28",
   "capabilities": [
     {
       "id": "azure_collection",
@@ -224,12 +224,21 @@
         "tests/enterprise/test_auth.py",
         "tests/enterprise/test_api.py",
         "tests/enterprise/test_worker.py",
-        "tests/enterprise/test_cloud.py"
+        "tests/enterprise/test_cloud.py",
+        "tests/enterprise/test_local_keycloak.py"
       ],
-      "live_observations": [],
+      "live_observations": [{
+        "path": "docs/qualification/keycloak-local-2026-10-27.md",
+        "sha256": "25310be9c0b2276a05948d9c423f57a0c1b68acfc5296fd5df009ed3950d35c5",
+        "observed_on": "2026-10-27",
+        "scope": "Real browser PKCE, signed-token validation and PostgreSQL membership/tenant/role denial paths only; no cloud assessment.",
+        "environment": "Controlled local Keycloak 26.8.1, PostgreSQL 16.15 and Chromium; private localhost CA and loopback APIs.",
+        "observer": "Codex-assisted implementation-team execution",
+        "independence": "internal"
+      }],
       "independent_reviews": [],
       "limitations": [
-        "Signed fixture tokens, disposable PostgreSQL schemas and mocked cloud SDK calls are not live OIDC or customer-cloud qualification.",
+        "Fixture tests and one controlled local Keycloak integration do not establish customer-cloud or public production qualification.",
         "The local runner remains outside this authenticated API; the separate opt-in enterprise console does not approve shared hosting.",
         "Managed blob storage, customer consent UX, independent security review and production release gates remain open."
       ]
@@ -254,10 +263,18 @@
         "frontend/console/src/test/enterpriseWorkspace.test.tsx",
         "frontend/console/e2e-enterprise/workspace.spec.ts"
       ],
-      "live_observations": [],
+      "live_observations": [{
+        "path": "docs/qualification/keycloak-local-2026-10-27.md",
+        "sha256": "25310be9c0b2276a05948d9c423f57a0c1b68acfc5296fd5df009ed3950d35c5",
+        "observed_on": "2026-10-27",
+        "scope": "Real browser PKCE, signed-token validation and PostgreSQL membership/tenant/role denial paths only; no cloud assessment.",
+        "environment": "Controlled local Keycloak 26.8.1, PostgreSQL 16.15 and Chromium; private localhost CA and loopback APIs.",
+        "observer": "Codex-assisted implementation-team execution",
+        "independence": "internal"
+      }],
       "independent_reviews": [],
       "limitations": [
-        "Intercepted fixture identity/API browser workflows are not live OIDC, customer-cloud or end-to-end PostgreSQL deployment qualification.",
+        "Browser fixtures are supplemented by one controlled local Keycloak/API/PostgreSQL observation, not public production or customer-cloud qualification.",
         "Session tokens use tab-local sessionStorage; no BFF, federated Azure onboarding, automatic token renewal or IdP-wide logout is supplied.",
         "Public-exposure enterprise workflows, historical local report import, managed blob storage and production review remain open."
       ]

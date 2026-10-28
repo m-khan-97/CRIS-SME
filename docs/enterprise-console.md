@@ -5,6 +5,10 @@ The opt-in enterprise console connects the browser to the versioned
 consoles remain separate deployment modes. This is an implemented, fixture-tested
 workflow, not approval for public multi-tenant hosting.
 
+For an executed local identity integration without Azure directory permissions,
+see the [Keycloak pilot](keycloak-local-pilot.md) and its
+[scoped internal record](qualification/keycloak-local-2026-10-27.md).
+
 ## Identity Setup
 
 Register a **public SPA client**, using authorization code flow with PKCE S256.

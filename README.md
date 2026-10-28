@@ -408,6 +408,12 @@ separate from the unauthenticated local runner/console. Live OIDC/cloud
 qualification and production release gates remain required; this is not a
 hosted-enterprise claim.
 
+A [local Keycloak pilot](docs/keycloak-local-pilot.md) now provides real browser
+sign-in backed by PostgreSQL memberships. Its
+[internal qualification record](docs/qualification/keycloak-local-2026-10-27.md)
+covers the identity boundary only; no customer-cloud scan or production hosting
+qualification is implied.
+
 Follow the [canonical phased roadmap](docs/roadmap.md). The immediate priorities are reproducible packaging and CI, complete control metadata, isolated scan artifacts, authenticated workspaces and durable execution. PQC discovery and broader enterprise capabilities follow explicit evidence and release gates, rather than being presented as already available.
 
 ---

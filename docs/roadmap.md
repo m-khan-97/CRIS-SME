@@ -602,6 +602,27 @@ Fixture browser flows are not live IdP/cloud or full PostgreSQL-to-browser pilot
 qualification. P1 remains open for those qualifications, managed storage/import,
 Azure federation, production infrastructure and independent security review.
 
+The local identity follow-up (`ceeef92`) now supplies a real Keycloak 26.8.1
+provider, loopback HTTPS with an explicitly trusted private CA, exact-origin
+PKCE client, generated local users, dedicated PostgreSQL and private lifecycle
+tooling. Eight non-intercepted Chromium/API checks passed for actual sign-in,
+identity/access-token distinction, signature rejection, tenant isolation,
+analyst restrictions, immediate membership revocation and console sign-out.
+An explicit Keycloak subject mapper fixed a real provider interoperability issue
+without weakening the API's mandatory-claim checks. Restart retained identities
+and membership. Runtime archives were checksum-verified; credentials and raw
+results remain ignored local state. See the
+[scoped internal observation](qualification/keycloak-local-2026-10-27.md).
+
+Local validation passes 1,092 tests on each Python version (82.08% combined
+coverage), 100 frontend tests and the 17 fixture enterprise browser workflows,
+plus the eight real local identity checks. A manual CI workflow can reproduce
+that identity integration, but has not been executed remotely for this unpushed
+batch. This closes the **local Keycloak identity integration** increment, not
+public identity deployment, live cloud collection or the P1 hosting gate.
+The user selected finishing local identity first; no cloud scan or infrastructure
+change is included. Customer-cloud qualification remains a separately scoped step.
+
 | ID | Owner | Work and acceptance evidence |
 | --- | --- | --- |
 | P1-01 | BE/SE | Maintained API framework, versioned OpenAPI and OIDC. Validate issuer, audience, signatures, expiry and algorithms; fail closed. Add session/CSRF protections appropriate to the flow. |

@@ -1,6 +1,6 @@
 # Quality Baseline
 
-Updated 23 October 2026. Local measurements and commit-specific hosted results
+Updated 28 October 2026. Local measurements and commit-specific hosted results
 are distinguished below. Neither establishes independent security validation or
 enterprise readiness.
 
@@ -42,7 +42,8 @@ failure-injection cases brought the preceding total to 982. Fifteen SQLite lock
 retry cases brought the preceding total to 997. Eleven readiness cases and two
 process-disappearance checks brought the preceding total to 1,010. Seventy-four
 enterprise authentication, API, cloud-adapter, CLI and PostgreSQL worker tests
-bring the current total to 1,084. These include native
+brought the preceding total to 1,084. Eight local-Keycloak configuration/TLS and
+process-safety cases bring the current total to 1,092. These include native
 process-group cleanup, queued/active cancellation, publication exclusion,
 shutdown admission, signal handling, persisted recovery, pipe backpressure,
 exact/over-budget output, text compatibility, unpublished noisy-worker results,
@@ -55,11 +56,11 @@ are outside this measurement. Coverage.py standard exclusions apply (9 lines).
 
 | Measure | Executed / total | Percentage |
 | --- | --- | --- |
-| Statements | 11,215 / 13,046 | 85.97% |
-| Branches | 2,824 / 4,060 | 69.56% |
-| Combined coverage.py metric | 14,039 / 17,106 | 82.07% |
+| Statements | 11,220 / 13,051 | 85.97% |
+| Branches | 2,826 / 4,062 | 69.57% |
+| Combined coverage.py metric | 14,046 / 17,113 | 82.08% |
 
-Both Python versions passed all 1,084 tests and produced these measurements.
+Both Python versions passed all 1,092 tests and produced these measurements.
 Enterprise integration tests used PostgreSQL 16.15 with disposable, random
 schemas, signed fixture tokens and mocked cloud SDK calls. Set
 `CRIS_TEST_DATABASE_URL` to a dedicated test database to run them; without it,
@@ -72,7 +73,7 @@ its in-process coverage. Azure SQL SDK imports emitted three escape-sequence
 warnings on the first clean run; they did not fail tests.
 
 Ruff F/E9 checks cover `src`, `tests`, `scripts` and `setup.py`. Mypy checks
-twenty-two entry/runtime modules: the assessment and AzureGoat entry scripts,
+twenty-three entry/runtime modules: the assessment, AzureGoat and local Keycloak entry scripts,
 run repository, supervisor, browser policy, public progress, request validation,
 worker environment, state ownership, managed worker, data paths, and control definitions/registry/validation.
 The eight new enterprise modules are included. Untyped function bodies are not
@@ -149,6 +150,16 @@ Targeted compatible frontend dependency updates reduced the clean-install npm
 audit result from ten advisories to zero on 26 September. This is an advisory
 snapshot, not proof that all dependencies are secure. No forced major upgrade was
 used. Python lock fingerprints and the 36-control metadata gate passed.
+
+The Keycloak follow-up (`ceeef92`) passes 1,092 tests per Python version with
+real disposable-schema PostgreSQL integration, and 23 modules under the type
+gate. It also passed eight **non-intercepted local identity** checks through
+actual Keycloak, the browser console and PostgreSQL; see the
+[scope-bound observation](qualification/keycloak-local-2026-10-27.md).
+These are additional to, not replacements for, the 17 intercepted enterprise
+browser workflows and 100 frontend tests. HTTPS issuer enforcement, certificate
+verification and mandatory token claims were retained. No live cloud scan or
+remote execution of the new manual identity workflow is claimed.
 
 The 27 October console batch adds `oidc-client-ts` and applies compatible
 development-tool updates. The final full npm audit again reports zero known

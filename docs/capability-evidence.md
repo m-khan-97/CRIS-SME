@@ -17,13 +17,19 @@ review. These are separate dimensions, not a maturity score or certification.
 | `limitations` | Explicit restrictions that must accompany capability claims. |
 
 The register contains 15 entries, including the opt-in enterprise backend and console.
-Live-observation and independent-review
-lists are deliberately empty **pending evidence admission**, not a statement that
+Most live-observation lists and all independent-review lists remain empty
+**pending evidence admission**, not a statement that
 no live assessment or practitioner engagement has ever occurred. In particular,
 historical SIGI engagements and reported practitioner feedback are not erased or
 reclassified. Review their original scope, authorization, execution provenance
 and permitted disclosure before adding records. Positive walkthrough feedback
 alone is not independent adjudication of all controls.
+
+The enterprise backend and console now reference one hash-bound
+[controlled local Keycloak observation](qualification/keycloak-local-2026-10-27.md).
+This records actual browser/API/PostgreSQL identity integration with generated
+local identities. It is internal, is not a customer-cloud assessment, and does
+not advance the planned hosted-tenancy claim or establish independent review.
 
 ## Admitting Evidence
 

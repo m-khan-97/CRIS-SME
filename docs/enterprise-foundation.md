@@ -2,9 +2,10 @@
 
 This is an **opt-in backend**, separate from the unauthenticated local runner.
 Do not expose the legacy runner or connect the existing local console to a shared
-enterprise deployment. The current console has not been migrated to enterprise
-sign-in and tenant APIs. The versioned OpenAPI interface provides the initial
-browser/API integration surface. This is not a production-readiness certification.
+enterprise deployment. The opt-in enterprise console uses authenticated tenant
+APIs; the original local console remains separate. See the
+[Keycloak pilot](keycloak-local-pilot.md) for an executed private identity
+integration. This is not a production-readiness certification.
 
 ## Implemented Boundary
 
@@ -59,6 +60,7 @@ file, not CLI arguments or committed `.env` files:
 | `CRIS_ENTERPRISE_OIDC_ISSUER` | Exact trusted HTTPS issuer, including trailing slash if used |
 | `CRIS_ENTERPRISE_OIDC_AUDIENCE` | API resource audience, not an unrelated ID-token client |
 | `CRIS_ENTERPRISE_JWKS_URL` | Explicit HTTPS signing-key endpoint; never taken from a token |
+| `CRIS_ENTERPRISE_OIDC_CA_FILE` | Optional operator-owned CA PEM added to verified JWKS TLS; no verification bypass |
 | `CRIS_ENTERPRISE_OIDC_CLIENT_ID` | Public browser client registered for authorization code + PKCE |
 | `CRIS_ENTERPRISE_AUTHORIZE_URL` | Trusted HTTPS authorization endpoint |
 | `CRIS_ENTERPRISE_TOKEN_URL` | Trusted HTTPS token endpoint |
