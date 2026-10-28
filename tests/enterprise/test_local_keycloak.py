@@ -91,3 +91,42 @@ def test_stop_never_signals_a_reused_pid(tmp_path, monkeypatch):
     monkeypatch.setattr(pilot.subprocess, "run", lambda *args, **kwargs: None)
     pilot.stop(tmp_path)
     assert killed == []
+
+
+def test_browser_environment_removes_ide_overrides_without_changing_host(monkeypatch):
+    monkeypatch.setenv("GSETTINGS_SCHEMA_DIR", "/snap/code/schemas")
+    monkeypatch.setenv("GTK_PATH", "/snap/code/gtk")
+    monkeypatch.setenv("XDG_DATA_DIRS", "/home/example/snap/code/272:/snap/code/272/usr/share:/usr/share/gnome:/usr/share")
+    monkeypatch.setenv("DISPLAY", ":0")
+    env = pilot.browser_environment()
+    assert "GSETTINGS_SCHEMA_DIR" not in env and "GTK_PATH" not in env
+    assert env["XDG_DATA_DIRS"] == "/usr/share/gnome:/usr/share"
+    assert env["DISPLAY"] == ":0"
+    assert pilot.os.environ["GTK_PATH"] == "/snap/code/gtk"
+
+
+@pytest.mark.parametrize("exit_code", [0, 133, None])
+def test_browser_launch_checks_exit_status_and_keeps_errors_private(tmp_path, monkeypatch, capsys, exit_code):
+    import subprocess
+    (tmp_path / "certificate-spki.txt").write_text("public-key-pin\n")
+    monkeypatch.setattr(pilot.shutil, "which", lambda name: "/usr/bin/google-chrome")
+    captured = {}
+    def launch(command, **kwargs):
+        captured.update(command=command, **kwargs)
+        def wait(timeout):
+            if exit_code is None:
+                raise subprocess.TimeoutExpired(command, timeout)
+            return exit_code
+        return SimpleNamespace(wait=wait)
+    monkeypatch.setattr(pilot.subprocess, "Popen", launch)
+    if exit_code:
+        with pytest.raises(RuntimeError, match="failed to start"):
+            pilot.browser(tmp_path)
+        assert "Opened" not in capsys.readouterr().out
+    else:
+        pilot.browser(tmp_path)
+        assert "browser profile" in capsys.readouterr().out
+    assert "--ignore-certificate-errors-spki-list=public-key-pin" in captured["command"]
+    assert "--ignore-certificate-errors" not in captured["command"]
+    assert captured["env"].get("DISPLAY") == pilot.os.environ.get("DISPLAY")
+    assert (tmp_path / "browser.log").stat().st_mode & 0o777 == 0o600

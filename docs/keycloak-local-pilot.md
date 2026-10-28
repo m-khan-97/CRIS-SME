@@ -61,6 +61,12 @@ normal browser profile. Alternatively, trust the public `ca.pem` explicitly in
 a suitable local profile. Use `localhost:5174`, not `127.0.0.1:5174`, to match
 the registered origin. Development browser flags are not a production solution.
 
+An ordinary browser profile that does not trust this CA will show a generic
+sign-in failure when fetching Keycloak discovery. Use the isolated launcher
+above. It removes IDE-injected GTK/schema overrides from the child environment
+and checks for early browser crashes; startup errors remain in private
+`.local/keycloak/browser.log`. Your desktop environment is not modified.
+
 ## Lifecycle And Reproduction
 
 Prerequisites: enterprise Python dependencies, Node 22.12+ in PATH, PostgreSQL 16

@@ -295,15 +295,39 @@ def stop(state):
     print("Local pilot services stopped; private identity/database state retained.")
 
 
+def browser_environment():
+    env = dict(os.environ)
+    # IDE sandbox GTK overrides can crash the host browser before a window opens.
+    for key in ("GSETTINGS_SCHEMA_DIR", "GTK_PATH", "GTK_EXE_PREFIX", "GTK_DATA_PREFIX",
+                "GDK_PIXBUF_MODULE_FILE", "GIO_EXTRA_MODULES", "QT_PLUGIN_PATH",
+                "QT_QPA_PLATFORM_PLUGIN_PATH", "LD_LIBRARY_PATH"):
+        env.pop(key, None)
+    directories = env.get("XDG_DATA_DIRS", "/usr/local/share:/usr/share").split(":")
+    env["XDG_DATA_DIRS"] = ":".join(directory for directory in directories if directory and not any(
+        left == "snap" and right == "code" for left, right in zip(Path(directory).parts, Path(directory).parts[1:])
+    )) or "/usr/local/share:/usr/share"
+    return env
+
+
 def browser(state):
     executable = shutil.which("google-chrome") or shutil.which("chromium")
     if not executable:
         raise ValueError("Install Chrome/Chromium or trust this pilot's ca.pem in your browser manually.")
     pin = (state / "certificate-spki.txt").read_text().strip()
-    subprocess.Popen([executable, "--user-data-dir=" + str(state / "browser-profile"),
-        "--ignore-certificate-errors-spki-list=" + pin, CONSOLE], start_new_session=True,
-        stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-    print("Opened a separate local-pilot browser profile, pinned to this server's TLS public key.")
+    log_path = state / "browser.log"
+    with log_path.open("a") as log:
+        child = subprocess.Popen([executable, "--user-data-dir=" + str(state / "browser-profile"),
+            "--ignore-certificate-errors-spki-list=" + pin, "--no-first-run", "--no-default-browser-check", CONSOLE],
+            start_new_session=True, env=browser_environment(), stdout=log, stderr=log)
+    log_path.chmod(0o600)
+    try:
+        code = child.wait(timeout=2)
+    except subprocess.TimeoutExpired:
+        print("Opened a separate local-pilot browser profile, pinned to this server's TLS public key.")
+    else:
+        if code:
+            raise RuntimeError(f"Local browser failed to start (exit {code}). Check {log_path}")
+        print("Sent the console URL to the existing local-pilot browser profile.")
 
 
 def main():
