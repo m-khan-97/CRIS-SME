@@ -32,6 +32,7 @@ class Settings:
     artifact_root: Path
     aws_principal_arn: str = ""
     allowed_hosts: tuple[str, ...] = ("127.0.0.1", "localhost")
+    oidc_ca_file: str | None = None
 
 
 class ConnectionInput(BaseModel):
@@ -208,7 +209,7 @@ def create_app(settings: Settings, store: Store, *, verifier=None, cloud_verify=
         if parts.scheme != "https" or not parts.hostname or parts.username or parts.password or parts.fragment:
             raise ValueError("Configure HTTPS OIDC authorization and token URLs")
     store.check_schema()
-    verifier = verifier or AccessTokenVerifier(settings.issuer, settings.audience, settings.jwks_url)
+    verifier = verifier or AccessTokenVerifier(settings.issuer, settings.audience, settings.jwks_url, ca_file=settings.oidc_ca_file)
     oauth = OAuth2AuthorizationCodeBearer(authorizationUrl=settings.authorization_url,
         tokenUrl=settings.token_url, scopes={"openid": "Sign in", "cris.api": "CRIS API"}, auto_error=False)
     app = FastAPI(title="CRIS Enterprise API", version="1.0.0", openapi_url="/api/v1/openapi.json",

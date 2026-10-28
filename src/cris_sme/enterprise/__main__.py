@@ -39,6 +39,7 @@ def main():
             client_id=os.environ["CRIS_ENTERPRISE_OIDC_CLIENT_ID"], authorization_url=os.environ["CRIS_ENTERPRISE_AUTHORIZE_URL"],
             token_url=os.environ["CRIS_ENTERPRISE_TOKEN_URL"], artifact_root=root,
             aws_principal_arn=os.environ.get("CRIS_ENTERPRISE_AWS_PRINCIPAL_ARN", ""),
+            oidc_ca_file=os.environ.get("CRIS_ENTERPRISE_OIDC_CA_FILE"),
             allowed_hosts=tuple(os.environ.get("CRIS_ENTERPRISE_ALLOWED_HOSTS", "127.0.0.1,localhost").split(",")))
         uvicorn.run(create_app(settings, store), host=args.host, port=args.port, limit_concurrency=32,
                     timeout_keep_alive=5, access_log=False)

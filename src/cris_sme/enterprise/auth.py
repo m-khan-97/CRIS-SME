@@ -2,6 +2,7 @@
 from dataclasses import dataclass
 import threading
 import time
+import ssl
 from urllib.parse import urlsplit
 
 import httpx
@@ -16,7 +17,7 @@ class Principal:
 
 class AccessTokenVerifier:
     def __init__(self, issuer: str, audience: str, jwks_url: str,
-                 required_scope: str = "cris.api", *, jwks: dict | None = None):
+                 required_scope: str = "cris.api", *, jwks: dict | None = None, ca_file: str | None = None):
         for url in (issuer, jwks_url):
             parsed = urlsplit(url)
             if parsed.scheme != "https" or not parsed.hostname or parsed.username or parsed.password or parsed.fragment:
@@ -24,6 +25,9 @@ class AccessTokenVerifier:
         if not audience or not required_scope:
             raise ValueError("Audience and API scope are required")
         self.issuer, self.audience, self.url, self.scope = issuer, audience, jwks_url, required_scope
+        self._tls = ssl.create_default_context()
+        if ca_file:
+            self._tls.load_verify_locations(cafile=ca_file)
         self._jwks, self._loaded = jwks, time.monotonic() if jwks is not None else 0.0
         self._static = jwks is not None
         self._retry_after = 0.0
@@ -35,7 +39,7 @@ class AccessTokenVerifier:
                 if time.monotonic() < self._retry_after:
                     raise ValueError("Signing keys temporarily unavailable")
                 self._retry_after = time.monotonic() + 5
-                with httpx.stream("GET", self.url, timeout=5, follow_redirects=False, trust_env=False) as response:
+                with httpx.stream("GET", self.url, timeout=5, follow_redirects=False, trust_env=False, verify=self._tls) as response:
                     response.raise_for_status()
                     data = bytearray()
                     for chunk in response.iter_bytes():

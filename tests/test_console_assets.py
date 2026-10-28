@@ -8,7 +8,10 @@ CONSOLE_SRC = ROOT / "frontend" / "console" / "src"
 
 def _iter_source_files():
     for suffix in (".ts", ".tsx", ".css", ".html"):
-        yield from CONSOLE_SRC.rglob(f"*{suffix}")
+        for path in CONSOLE_SRC.rglob(f"*{suffix}"):
+            # Authentication fixtures use example origins, not runtime assets.
+            if "test" not in path.relative_to(CONSOLE_SRC).parts:
+                yield path
     yield ROOT / "frontend" / "console" / "index.html"
 
 

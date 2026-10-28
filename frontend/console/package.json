@@ -15,6 +15,7 @@
     "test:coverage": "vitest run --coverage",
     "test:e2e": "playwright test",
     "test:e2e:enterprise": "playwright test --config playwright.enterprise.config.ts",
+    "qualify:keycloak": "node scripts/qualify-keycloak.mjs",
     "test": "vitest run",
     "preview": "vite preview",
     "preview:demo": "vite preview --outDir dist/demo"

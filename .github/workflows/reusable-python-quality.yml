@@ -76,6 +76,7 @@ jobs:
             --follow-imports=silent \
             scripts/run_assessment_snapshot.py \
             scripts/run_azuregoat_assessment.py \
+            scripts/keycloak_local.py \
             src/cris_sme/api/run_repository.py \
             src/cris_sme/api/supervisor.py \
             src/cris_sme/api/browser_policy.py \
