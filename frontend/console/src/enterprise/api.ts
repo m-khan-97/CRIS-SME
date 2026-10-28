@@ -2,9 +2,10 @@ import type { CrisReport } from "../api/types";
 
 export type Role = "owner" | "admin" | "operator" | "analyst" | "auditor";
 export interface Tenant { id: string; name: string; role: Role }
-export interface Connection { id: string; name: string; provider: "aws" | "azure"; scope_id: string; enabled: boolean; verified_until: number }
+export interface Connection { id: string; name: string; provider: "aws" | "azure"; scope_id: string; enabled: boolean; verified_until: number; origin?: "cloud" | "historical_archive" }
 export interface Artifact { id: string; name: string; sha256: string; size: number }
-export interface Job { id: string; tenant_id: string; connection_id: string; status: "queued" | "running" | "cancelling" | "cancelled" | "completed" | "failed"; requested_at: number; attempt: number; error_code: string; artifacts?: Artifact[] }
+export interface HistoricalImport { source_run_id: string; source_organization_id: string; source_sha256: string; bundle_sha256: string; generated_at: string; imported_at: number; provider: "aws" | "azure"; scope_id: string; reported_source_type: string }
+export interface Job { id: string; tenant_id: string; connection_id: string; status: "queued" | "running" | "cancelling" | "cancelled" | "completed" | "failed"; requested_at: number; attempt: number; error_code: string; artifacts?: Artifact[]; origin?: "live_scan" | "historical_import"; historical_import?: HistoricalImport | null }
 export interface Member { subject: string; issuer: string; role: Role }
 export interface Audit { id: string; subject: string; action: string; resource_id: string; created_at: number }
 export interface ConnectionInput { name: string; provider: "aws" | "azure"; scope_id: string; role_arn?: string; tenant_id?: string; client_id?: string; client_secret?: string }

@@ -11,7 +11,7 @@ const artifactA = "dddddddd-dddd-4ddd-8ddd-dddddddddddd";
 const artifactB = "eeeeeeee-eeee-4eee-8eee-eeeeeeeeeeee";
 const queuedId = "ffffffff-ffff-4fff-8fff-ffffffffffff";
 
-async function setup(page: Page, options: { role?: string; authenticated?: boolean; expiry?: number } = {}) {
+async function setup(page: Page, options: { role?: string; authenticated?: boolean; expiry?: number; imported?: boolean } = {}) {
   const state = { role: options.role ?? "owner", revoked: false, expired: false, missing: false, queued: false,
     cancel: false, connections: true, verified: true, failSubmission: false, submissions: [] as { key: string; body: unknown }[],
     requests: [] as string[], legacy: [] as string[], created: [] as Record<string, unknown>[], tokenRequests: [] as string[], authorization: "" };
@@ -38,7 +38,12 @@ async function setup(page: Page, options: { role?: string; authenticated?: boole
     return [{ id: org === orgA ? artifactA : artifactB, name: "cris_sme_report.json", size: Buffer.byteLength(text), sha256: createHash("sha256").update(text).digest("hex") }];
   };
   const job = (org: string) => ({ id: org === orgA ? runA : runB, tenant_id: org, connection_id: conn,
-    requested_at: 1790000000, status: "completed", attempt: 1, error_code: "" });
+    requested_at: 1790000000, status: "completed", attempt: 1, error_code: "",
+    ...(options.imported ? { origin: "historical_import", historical_import: {
+      source_run_id: "archived-source-run", source_organization_id: "legacy-org", source_sha256: "b".repeat(64),
+      bundle_sha256: "c".repeat(64), generated_at: "2026-07-03T12:40:13Z", imported_at: 1790000000,
+      provider: "aws", scope_id: "123456789012", reported_source_type: "vulnerable_lab",
+    } } : {}) });
   await page.context().route("**/*", async route => {
     const request = route.request(); const url = new URL(request.url());
     if (url.origin === "https://identity.invalid") {
@@ -80,7 +85,8 @@ async function setup(page: Page, options: { role?: string; authenticated?: boole
       if (action === "verify") { state.verified = true; return route.fulfill({ json: { status: "verified" } }); }
       if (action === "disconnect") { state.connections = false; return route.fulfill({ json: { status: "disconnected" } }); }
       return route.fulfill({ json: { connections: [{ id: conn, name: "AWS Production", provider: "aws", scope_id: "123456789012", enabled: state.connections,
-        verified_until: state.verified ? Math.floor(Date.now() / 1000) + 3600 : 0 }] } });
+        verified_until: state.verified ? Math.floor(Date.now() / 1000) + 3600 : 0,
+        ...(options.imported ? { origin: "historical_archive", enabled: false } : {}) }] } });
     }
     if (section === "assessments") {
       if (request.method() === "POST" && !id) {
@@ -303,4 +309,40 @@ test("every report view stays on the selected organization and never calls local
     await expect(page.getByLabel("Assessment scope")).toContainText("123456789012");
   }
   expect(state.legacy).toEqual([]); expect(errors).toEqual([]);
+});
+
+test("historical results retain their source identity and never become live connections", async ({ page }) => {
+  const { state, errors } = await setup(page, { imported: true });
+  await page.goto("/findings");
+  await expect(page.getByRole("heading", { name: "Finding Alpha", exact: true })).toBeVisible();
+  await expect(page.getByRole("region", { name: "Historical import" })).toContainText("Not rescanned");
+  await expect(page.getByRole("region", { name: "Historical import" })).toContainText("vulnerable_lab");
+  await expect(page.getByRole("combobox", { name: "Active assessment" })).toHaveValue(runA);
+  await expect(page.getByRole("combobox", { name: "Active assessment" })).toContainText("[Imported]");
+  await page.getByRole("link", { name: "Reports", exact: true }).click();
+  const download = page.waitForEvent("download");
+  await page.getByRole("button", { name: "Download cris_sme_report.json", exact: true }).click();
+  expect((await download).suggestedFilename()).toBe("cris_sme_report.json");
+  await page.getByRole("link", { name: "Cloud connections", exact: true }).click();
+  await expect(page.getByRole("cell", { name: "Historical archive", exact: true })).toBeVisible();
+  await expect(page.getByRole("button", { name: "Verify AWS Production", exact: true })).toHaveCount(0);
+  expect(state.legacy).toEqual([]); expect(errors).toEqual([]);
+});
+
+test("reselecting the active assessment does not abort its loading report", async ({ page }) => {
+  const { errors } = await setup(page);
+  let release!: () => void;
+  const pending = new Promise<void>(resolve => { release = resolve; });
+  await page.route("**/api/v1/tenants/*/artifacts/*", async route => {
+    await pending;
+    await route.fallback();
+  });
+  const download = page.waitForRequest(request => request.url().includes(`/artifacts/${artifactA}`));
+  await page.goto("/findings");
+  await download;
+  await page.getByRole("combobox", { name: "Active assessment" }).selectOption(runA);
+  release();
+  await expect(page.getByRole("heading", { name: "Finding Alpha", exact: true })).toBeVisible();
+  await expect(page.getByRole("alert")).toHaveCount(0);
+  expect(errors).toEqual([]);
 });

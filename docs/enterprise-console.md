@@ -103,9 +103,11 @@ request limits, IdP origins and access logs before shared hosting.
 
 The API currently lists at most 100 jobs and 100 audit events, with no pagination
 UI. Older reports must not be interpreted as deleted merely because they are
-outside that window. Historical local-runner reports are not auto-imported.
-The selected-run date in the selector is its **request time**; the report retains
-its own generated timestamp. Backend artifact publication remains allowlisted;
+outside that window. Historical local-runner reports are not auto-imported;
+an administrator can use the [operator import procedure](historical-assessment-import.md).
+Imported selections display the original generation time, provider and run ID,
+with an import banner on report views. New-run dates use their **request time**;
+the report retains its own generated timestamp. Backend artifact publication remains allowlisted;
 not every legacy export format is available in enterprise mode.
 
 ## Session And Export Handling

@@ -623,6 +623,27 @@ public identity deployment, live cloud collection or the P1 hosting gate.
 The user selected finishing local identity first; no cloud scan or infrastructure
 change is included. Customer-cloud qualification remains a separately scoped step.
 
+28 October historical-assessment increment: P1-03 now has an explicit operator
+import path with a transactional v1-to-v2 schema upgrade, deliberate tenant UUID
+mapping, original-byte/hash and timestamp preservation, same-tenant deduplication,
+concurrent import tests and an import manifest/audit event. Imports create
+completed archival jobs, not queued scans or usable cloud connections. Recognized
+exports may accompany a canonical report; historical snapshots remain JSON-only.
+The enterprise console marks imported selections and all report views as not
+rescanned, retains original run IDs/dates and does not revalidate source labels.
+The follow-up also fixes active-assessment reselection aborting an in-flight
+report. See the [operator procedure](historical-assessment-import.md).
+
+Local verification passes 1,124 tests per Python 3.11/3.12 interpreter (82.23% and
+82.24% coverage), 102 frontend tests, 19 enterprise fixture browser workflows and
+eight real local Keycloak identity checks. Controlled local import verification
+also checked four archived assessments across 28 browser views, all 90 artifact
+hashes and nonmember denial; this is copy/access verification, not cloud or
+finding validation. Private source reports and local identity data are excluded
+from technical commits. Managed blob storage, production restore/retention,
+live cloud qualification and independent security review remain open; this does
+not close P1 or authorize shared hosting.
+
 | ID | Owner | Work and acceptance evidence |
 | --- | --- | --- |
 | P1-01 | BE/SE | Maintained API framework, versioned OpenAPI and OIDC. Validate issuer, audience, signatures, expiry and algorithms; fail closed. Add session/CSRF protections appropriate to the flow. |

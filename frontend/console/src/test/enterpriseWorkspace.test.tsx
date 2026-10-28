@@ -119,4 +119,25 @@ describe("enterprise workspace", () => {
     fireEvent.click(await screen.findByRole("button", { name: "Download cris_sme_report.json" }));
     await screen.findByText("Artifact integrity check failed.");
   });
+  it("identifies imported assessments with original IDs and source classifications", async () => {
+    const historical_import = { source_run_id: "original-source-run", source_organization_id: "old-org-id",
+      source_sha256: "b".repeat(64), bundle_sha256: "c".repeat(64), generated_at: "2026-07-03T12:40:13Z",
+      imported_at: 1790000000, provider: "aws", scope_id: "123456789012", reported_source_type: "vulnerable_lab" };
+    const imported = { ...job, origin: "historical_import", historical_import };
+    mocks.jobs.mockResolvedValue({ assessments: [imported] }); mocks.job.mockResolvedValue(imported);
+    mocks.connections.mockResolvedValue({ connections: [{ ...connection, enabled: false, origin: "historical_archive" }] });
+    mount("/reports");
+    await screen.findByRole("region", { name: "Historical import" });
+    expect(screen.getByText("Imported historical assessment · Not rescanned")).toBeInTheDocument();
+    expect(screen.getByText(/vulnerable_lab.*preserved as supplied, not revalidated/)).toBeInTheDocument();
+    expect(screen.getByRole("combobox", { name: "Active assessment" })).toHaveValue("run-a");
+    expect(screen.getByRole("option", { name: /\[Imported\].*original-source-run/ })).toBeInTheDocument();
+  });
+  it("never offers onboarding or verification for an archive connection", async () => {
+    mocks.connections.mockResolvedValue({ connections: [{ ...connection, enabled: false, origin: "historical_archive" }] });
+    mount("/connections");
+    await screen.findByRole("cell", { name: "Historical archive" });
+    expect(screen.queryByRole("button", { name: "Onboarding" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Verify AWS Test" })).not.toBeInTheDocument();
+  });
 });

@@ -98,11 +98,13 @@ In a separate process with the same private configuration:
 python -m cris_sme.enterprise worker
 ```
 
-Migration version 1 is explicit and transactionally serialized with a PostgreSQL
-advisory lock. Unsupported schema versions fail closed. No legacy/customer outputs
-are imported or reassigned automatically. Review future versioned migrations
-before applying them; this initial migration does not provide historical-import
-or downgrade tooling.
+Migration version 2 is explicit and transactionally serialized with a PostgreSQL
+advisory lock. It supports fresh installs and an additive upgrade from version 1;
+unsupported schema versions fail closed. Back up the database and private artifact
+storage before upgrading, and restart API/worker processes together. No outputs
+are imported or reassigned automatically. The operator-only
+[historical importer](historical-assessment-import.md) requires explicit tenant
+ownership mapping. Downgrade tooling is not supplied.
 
 Open `/api/v1/docs`, authorize using PKCE, then list `/api/v1/tenants`. Bootstrap
 prints the new tenant UUID. An owner can add other verified subjects from the

@@ -48,12 +48,12 @@ export function Connections({ tenant, connections, error }: { tenant: Tenant; co
     </form>}
     {!connections.length ? <p>No cloud connections.</p> : <div className="overflow-x-auto"><table className="w-full text-left text-sm"><thead><tr><th>Name</th><th>Provider / scope</th><th>Status</th>{admin && <th>Actions</th>}</tr></thead><tbody>
       {connections.map(c => <tr key={c.id}><td>{c.name}</td><td>{c.provider.toUpperCase()}<span className="block font-mono text-xs">{c.scope_id}</span></td>
-        <td>{!c.enabled ? "Disconnected" : c.verified_until * 1000 > now ? "Verified" : "Verification required"}</td>
-        {admin && <td><div className="flex flex-wrap gap-2">
+        <td>{c.origin === "historical_archive" ? "Historical archive" : !c.enabled ? "Disconnected" : c.verified_until * 1000 > now ? "Verified" : "Verification required"}</td>
+        {admin && <td>{c.origin !== "historical_archive" && <div className="flex flex-wrap gap-2">
           <button disabled={!c.enabled || action.isPending} onClick={() => action.mutate({ id: c.id, command: "onboarding" })}>Onboarding</button>
           <button aria-label={`Verify ${c.name}`} title="Verify connection" disabled={!c.enabled || action.isPending} onClick={() => action.mutate({ id: c.id, command: "verify" })}><Check size={16} /></button>
           <button aria-label={`Disconnect ${c.name}`} title="Disconnect connection" disabled={!c.enabled || action.isPending} onClick={() => setConfirm(c.id)}><Unplug size={16} /></button>
-        </div></td>}
+        </div>}</td>}
       </tr>)}
     </tbody></table></div>}
     {confirm && <div role="alertdialog" aria-label="Confirm disconnection" className="space-y-3 border border-border-card p-4"><p>Disconnect {connections.find(c => c.id === confirm)?.name}? Queued and active assessments will be cancelled.</p><button onClick={() => action.mutate({ id: confirm, command: "disconnect" })} disabled={action.isPending}>Confirm disconnect</button> <button onClick={() => setConfirm("")}>Keep connection</button></div>}

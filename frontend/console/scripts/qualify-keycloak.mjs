@@ -58,8 +58,11 @@ try {
     assert.equal((await me.json()).subject, accounts.owner.id);
     const response = await request(owner.user, "/api/v1/tenants"); assert.equal(response.status, 200);
     const rows = (await response.json()).tenants;
-    assert.equal(rows.length, 1); assert.equal(rows[0].role, "owner"); assert.equal(rows[0].name, "CRIS Local Workspace");
-    tenant = rows[0].id;
+    const workspaces = rows.filter(row => row.name === "CRIS Local Workspace" && row.role === "owner");
+    assert.equal(workspaces.length, 1, "The dedicated qualification workspace must exist exactly once");
+    tenant = workspaces[0].id;
+    await owner.page.getByRole("combobox", { name: "Organization", exact: true }).selectOption(tenant);
+    await owner.page.getByRole("heading", { name: "Assessments", exact: true }).waitFor();
     await owner.page.screenshot({ path: resolve(output, "owner-workspace.png"), fullPage: true });
   });
   await check("real identity token cannot substitute for an API access token", async () => {

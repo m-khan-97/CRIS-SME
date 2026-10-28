@@ -31,8 +31,8 @@ export function Assessments({ tenant, jobs, connections, select }: { tenant: Ten
     </form>}
     {(submit.error || cancel.error) && <p role="alert">{(submit.error || cancel.error)?.message}</p>}
     {submit.isSuccess && <p role="status">Assessment queued.</p>}
-    {!jobs.length ? <p>No assessments available.</p> : <div className="overflow-x-auto"><table className="w-full text-left text-sm"><thead><tr><th>Requested</th><th>Connection</th><th>Assessment ID</th><th>Status</th><th>Actions</th></tr></thead><tbody>
-      {jobs.map(j => <tr key={j.id}><td>{new Date(j.requested_at * 1000).toLocaleString()}</td><td>{connections.find(c => c.id === j.connection_id)?.name ?? j.connection_id}</td><td className="font-mono text-xs">{j.id}</td><td>{j.status}{j.error_code && <span className="block">{j.error_code}</span>}</td><td>
+    {!jobs.length ? <p>No assessments available.</p> : <div className="overflow-x-auto"><table className="w-full text-left text-sm"><thead><tr><th>Date</th><th>Connection</th><th>Assessment ID</th><th>Status</th><th>Actions</th></tr></thead><tbody>
+      {jobs.map(j => <tr key={j.id}><td>{new Date(j.historical_import?.generated_at ?? j.requested_at * 1000).toLocaleString()}</td><td>{connections.find(c => c.id === j.connection_id)?.name ?? j.connection_id}</td><td className="font-mono text-xs">{j.historical_import?.source_run_id ?? j.id}</td><td>{j.origin === "historical_import" && <strong className="block">Imported</strong>}{j.status}{j.error_code && <span className="block">{j.error_code}</span>}</td><td>
         {j.status === "completed" && <button onClick={() => select(j.id)}>Select report</button>}
         {operate && ["queued", "running"].includes(j.status) && <button title="Cancel assessment" aria-label={`Cancel ${j.id}`} disabled={cancel.isPending} onClick={() => cancel.mutate(j.id)}><X size={16} /></button>}
       </td></tr>)}

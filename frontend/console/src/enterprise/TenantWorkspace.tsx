@@ -1,6 +1,6 @@
 import { lazy, Suspense, useState } from "react";
 import { Outlet, Route, Routes } from "react-router-dom";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { ScopedAssessmentProvider } from "../context/AssessmentContext";
 import type { AssessmentHistoryEntry } from "../api/types";
 import type { Tenant } from "./api";
@@ -30,6 +30,7 @@ function ReportScope() { return <main><Outlet /></main>; }
 
 export function TenantWorkspace({ tenant }: { tenant: Tenant }) {
   const { api } = useSession();
+  const cache = useQueryClient();
   const [requested, setRequested] = useState(() => sessionStorage.getItem(`cris.enterprise.run.${tenant.id}`) ?? "");
   const jobs = useQuery({ queryKey: ["enterprise", tenant.id, "jobs"], queryFn: () => api.jobs(tenant.id), refetchInterval: 3000, retry: false });
   const connections = useQuery({ queryKey: ["enterprise", tenant.id, "connections"], queryFn: () => api.connections(tenant.id), refetchInterval: 15_000, retry: false });
@@ -43,11 +44,19 @@ export function TenantWorkspace({ tenant }: { tenant: Tenant }) {
   const visibleReport = chosen && artifact && !error ? report.data : undefined;
   const selectedConnection = !connections.isError ? connections.data?.connections.find(c => c.id === chosen?.connection_id) : undefined;
   const coverage = visibleReport?.collector_coverage ?? [];
-  const entries: AssessmentHistoryEntry[] = completed.map(j => ({ report_id: j.id, run_id: j.id,
-    organization_id: tenant.id, organization_name: tenant.name, provider: connections.data?.connections.find(c => c.id === j.connection_id)?.provider ?? "cloud",
-    generated_at: new Date(j.requested_at * 1000).toISOString(), overall_risk_score: j.id === chosen?.id ? visibleReport?.overall_risk_score ?? null : null,
+  const historical = chosen?.historical_import;
+  const entries: AssessmentHistoryEntry[] = completed.map(j => ({ report_id: j.id, run_id: j.historical_import?.source_run_id ?? j.id,
+    organization_id: tenant.id, organization_name: tenant.name, provider: j.historical_import?.provider ?? connections.data?.connections.find(c => c.id === j.connection_id)?.provider ?? "cloud",
+    generated_at: j.historical_import?.generated_at ?? new Date(j.requested_at * 1000).toISOString(), overall_risk_score: j.id === chosen?.id ? visibleReport?.overall_risk_score ?? null : null,
     finding_count: j.id === chosen?.id ? visibleReport?.prioritized_risks.length ?? 0 : 0, collector_mode: j.id === chosen?.id ? visibleReport?.collector_mode ?? "unknown" : "unknown" }));
-  const select = (id: string) => { api.cancel(); setRequested(id); sessionStorage.setItem(`cris.enterprise.run.${tenant.id}`, id); };
+  const select = async (id: string) => {
+    if (id === chosen?.id) return;
+    await cache.cancelQueries({ queryKey: ["enterprise", tenant.id] });
+    api.cancel();
+    setRequested(id);
+    sessionStorage.setItem(`cris.enterprise.run.${tenant.id}`, id);
+    void cache.invalidateQueries({ queryKey: ["enterprise", tenant.id] });
+  };
   const value = { assessments: entries, selectedAssessment: entries.find(e => e.report_id === chosen?.id) ?? null,
     selectedReportId: chosen?.id ?? "", setSelectedReportId: select, historyLoading: jobs.isPending,
     report: visibleReport, reportLoading: jobs.isPending || (!!chosen && (job.isPending || (!!artifact && report.isPending))), reportError: error };
@@ -57,10 +66,16 @@ export function TenantWorkspace({ tenant }: { tenant: Tenant }) {
       <label className="flex min-w-0 flex-1 items-center gap-2 text-sm">Assessment
         <select aria-label="Active assessment" className="min-w-0 max-w-xl flex-1" value={chosen?.id ?? ""} onChange={e => select(e.target.value)}>
           {!chosen && <option value="">{requested ? "Selected assessment unavailable" : "No completed assessments"}</option>}
-          {entries.map(e => <option key={e.run_id} value={e.run_id}>{new Date(e.generated_at).toLocaleString()} - {e.provider.toUpperCase()} - {e.run_id}</option>)}
+          {entries.map(e => <option key={e.report_id} value={e.report_id}>{completed.find(j => j.id === e.report_id)?.origin === "historical_import" ? "[Imported] " : ""}{new Date(e.generated_at).toLocaleString()} - {e.provider.toUpperCase()} - {e.run_id}</option>)}
         </select>
       </label>
     </div>
+    {historical && <section aria-label="Historical import" className="space-y-1 border-b border-border-card bg-surface-card px-4 py-3 text-sm">
+      <strong>Imported historical assessment · Not rescanned</strong>
+      <p className="break-words">Generated {new Date(historical.generated_at).toLocaleString()} · Imported {new Date(historical.imported_at * 1000).toLocaleString()} · Original run: {historical.source_run_id}</p>
+      <p className="break-all font-mono text-xs">Source SHA-256: {historical.source_sha256}</p>
+      <p className="text-xs text-text-muted">Recorded source: {historical.reported_source_type || "Unspecified"}. Original source classifications are preserved as supplied, not revalidated.</p>
+    </section>}
     {chosen && <div aria-label="Assessment scope" className="flex flex-wrap gap-x-5 gap-y-1 border-b border-border-card px-4 py-2 text-xs text-text-muted">
       <span className="min-w-0 break-all">Scope: {selectedConnection ? `${selectedConnection.provider.toUpperCase()} / ${selectedConnection.scope_id}` : "Unavailable"}</span>
       <span>Evidence mode: {visibleReport?.collector_mode ?? "Unavailable"}</span>
