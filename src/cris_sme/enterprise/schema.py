@@ -1,4 +1,4 @@
-"""Version-one enterprise metadata; migration is an explicit operator action."""
+"""Versioned enterprise metadata; migration is an explicit operator action."""
 from sqlalchemy import (Boolean, Column, ForeignKey, ForeignKeyConstraint, Index, Integer,
                         MetaData, String, Table, Text, UniqueConstraint)
 
@@ -39,6 +39,17 @@ audit = Table("cris_audit", metadata, Column("id", String(36), primary_key=True)
               Column("tenant_id", ForeignKey("cris_tenants.id"), nullable=False),
               Column("subject", String(255), nullable=False), Column("action", String(60), nullable=False),
               Column("resource_id", String(36), nullable=False), Column("created_at", Integer, nullable=False))
+historical_imports = Table("cris_historical_imports", metadata,
+    Column("tenant_id", String(36), nullable=False), Column("job_id", String(36), primary_key=True),
+    Column("source_run_id", String(160), nullable=False), Column("source_organization_id", String(512), nullable=False),
+    Column("source_sha256", String(64), nullable=False), Column("bundle_sha256", String(64), nullable=False),
+    Column("generated_at", String(80), nullable=False), Column("imported_at", Integer, nullable=False),
+    Column("provider", String(10), nullable=False), Column("scope_id", String(36), nullable=False),
+    Column("reported_source_type", String(200), nullable=False),
+    ForeignKeyConstraint(["tenant_id", "job_id"], ["cris_jobs.tenant_id", "cris_jobs.id"]),
+    UniqueConstraint("tenant_id", "source_run_id"), UniqueConstraint("tenant_id", "source_sha256"))
+
+SCHEMA_VERSION = 2
 
 
 def migrate(engine):
@@ -46,9 +57,12 @@ def migrate(engine):
         raise ValueError("Enterprise migrations require PostgreSQL")
     with engine.begin() as connection:
         connection.exec_driver_sql("SELECT pg_advisory_xact_lock(754392810)")
-        metadata.create_all(connection)
+        versions.create(connection, checkfirst=True)
         rows = list(connection.execute(versions.select()).scalars())
-        if not rows:
-            connection.execute(versions.insert().values(version=1))
-        elif rows != [1]:
+        if rows not in ([], [1], [SCHEMA_VERSION]):
             raise RuntimeError("Unsupported enterprise schema version")
+        # V2 adds only the historical-import table; V1 tables are retained intact.
+        metadata.create_all(connection)
+        if rows != [SCHEMA_VERSION]:
+            connection.execute(versions.delete())
+            connection.execute(versions.insert().values(version=SCHEMA_VERSION))

@@ -85,6 +85,7 @@ class ConnectionSummary(BaseModel):
     scope_id: str
     enabled: bool
     verified_until: int
+    origin: Literal["cloud", "historical_archive"] = "cloud"
 
 
 class ConnectionView(ConnectionSummary):
@@ -96,6 +97,18 @@ class ConnectionList(BaseModel):
     connections: list[ConnectionSummary]
 
 
+class HistoricalImportView(BaseModel):
+    source_run_id: str
+    source_organization_id: str
+    source_sha256: str
+    bundle_sha256: str
+    generated_at: str
+    imported_at: int
+    provider: Literal["aws", "azure"]
+    scope_id: str
+    reported_source_type: str
+
+
 class JobView(BaseModel):
     id: UUID
     tenant_id: UUID
@@ -104,6 +117,8 @@ class JobView(BaseModel):
     requested_at: int
     attempt: int
     error_code: str
+    origin: Literal["live_scan", "historical_import"] = "live_scan"
+    historical_import: HistoricalImportView | None = None
 
 
 class ArtifactView(BaseModel):
@@ -313,6 +328,8 @@ def create_app(settings: Settings, store: Store, *, verifier=None, cloud_verify=
     @app.get("/api/v1/tenants/{tenant}/connections/{connection}/onboarding", response_model=AwsOnboardingView | AzureOnboardingView)
     def onboarding(tenant: UUID, connection: UUID, actor=Depends(principal)):
         row = store.connection(str(tenant), actor, str(connection), secrets=True)
+        if row["config"].get("origin") == "historical_import":
+            raise HTTPException(409, "Historical archives do not provide cloud credentials")
         if row["provider"] == "aws":
             try:
                 return aws_onboarding(row, settings.aws_principal_arn)

@@ -38,7 +38,7 @@ class Store:
 
     def check_schema(self):
         with self.engine.connect() as c:
-            if list(c.execute(select(s.versions.c.version)).scalars()) != [1]:
+            if list(c.execute(select(s.versions.c.version)).scalars()) != [s.SCHEMA_VERSION]:
                 raise RuntimeError("Run enterprise migrations before serving requests")
 
     def check_ready(self):
@@ -153,9 +153,16 @@ class Store:
         with self.engine.connect() as c:
             self._access(c, tenant, principal)
             rows = c.execute(select(s.connections.c.id, s.connections.c.name, s.connections.c.provider,
-                                    s.connections.c.scope_id, s.connections.c.enabled, s.connections.c.verified_until)
+                                    s.connections.c.scope_id, s.connections.c.enabled, s.connections.c.verified_until,
+                                    s.connections.c.config)
                              .where(s.connections.c.tenant_id == tenant)).mappings()
-            return [dict(row) for row in rows]
+            result = []
+            for row in rows:
+                item = dict(row)
+                config = json.loads(item.pop("config"))
+                item["origin"] = "historical_archive" if config.get("origin") == "historical_import" else "cloud"
+                result.append(item)
+            return result
 
     def verified(self, tenant, principal, connection_id):
         with self.engine.begin() as c:
@@ -205,11 +212,27 @@ class Store:
     def _public_job(row):
         return {key: row[key] for key in ("id", "tenant_id", "connection_id", "status", "requested_at", "attempt", "error_code")}
 
+    @staticmethod
+    def _history(c, tenant, results):
+        if not results:
+            return results
+        records = {row["job_id"]: dict(row) for row in c.execute(select(s.historical_imports).where(
+            s.historical_imports.c.tenant_id == tenant,
+            s.historical_imports.c.job_id.in_([item["id"] for item in results]))).mappings()}
+        for item in results:
+            record = records.get(item["id"])
+            if record:
+                record.pop("tenant_id")
+                record.pop("job_id")
+            item.update(origin="historical_import" if record else "live_scan", historical_import=record)
+        return results
+
     def job_list(self, tenant, principal):
         with self.engine.connect() as c:
             self._access(c, tenant, principal)
-            return [self._public_job(row) for row in c.execute(select(s.jobs).where(s.jobs.c.tenant_id == tenant)
+            results = [self._public_job(row) for row in c.execute(select(s.jobs).where(s.jobs.c.tenant_id == tenant)
                 .order_by(s.jobs.c.requested_at.desc(), s.jobs.c.id).limit(100)).mappings()]
+            return self._history(c, tenant, results)
 
     def job(self, tenant, principal, job_id):
         with self.engine.connect() as c:
@@ -221,7 +244,7 @@ class Store:
             result["artifacts"] = [dict(a) for a in c.execute(select(s.artifacts.c.id, s.artifacts.c.name,
                 s.artifacts.c.sha256, s.artifacts.c.size).where(s.artifacts.c.tenant_id == tenant,
                 s.artifacts.c.job_id == job_id)).mappings()] if row["status"] == "completed" else []
-            return result
+            return self._history(c, tenant, [result])[0]
 
     def cancel(self, tenant, principal, job_id):
         with self.engine.begin() as c:
