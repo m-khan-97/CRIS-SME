@@ -644,6 +644,34 @@ from technical commits. Managed blob storage, production restore/retention,
 live cloud qualification and independent security review remain open; this does
 not close P1 or authorize shared hosting.
 
+29 October local recovery increment: the operator CLI now creates, checks and
+restores bounded offline logical bundles containing committed PostgreSQL metadata
+and report files. Backup requires terminal jobs and excludes metadata writers
+with fail-fast table locks. Restore requires an empty database and unused artifact
+directory, retains original IDs/history/memberships/report bytes, and disables
+every cloud connection. Digests and secure bounded reads reject damaged files,
+symlinks, traversal and cross-namespace artifact references. Metadata publication
+is transactional; interrupted filesystem copies still require reconciliation.
+Bundles contain sensitive data, are not themselves encrypted/signed, and exclude
+the connection encryption key, identity provider and deployment state. See the
+[recovery runbook](enterprise-recovery.md) for limits and operator prerequisites.
+
+An internal isolated local PostgreSQL drill restored three organizations and
+90 artifacts, compared metadata/file hashes, checked outsider denial and empty
+worker claims, and verified that the source workspace was unchanged. The restored
+test database was removed; private backups/results remain local. This is logical
+copy/access verification, not a production disaster-recovery or cloud claim.
+Local validation passes 1,148 tests per Python 3.11/3.12 interpreter with 82.29%
+coverage, the 25-module type gate, Ruff, documentation and capability checks.
+Frontend code is unchanged by this increment.
+
+The user deferred live-cloud qualification after Azure directory permissions
+blocked application registration and saved AWS login sessions were found expired.
+Those gates are not waived. Remaining P1 work includes managed blob storage,
+off-host encrypted retention and PITR/key/IdP recovery, production hardening,
+live cloud authorization/collection and independent security review. The local
+recovery increment does not approve shared hosting or close the overall P1 gate.
+
 | ID | Owner | Work and acceptance evidence |
 | --- | --- | --- |
 | P1-01 | BE/SE | Maintained API framework, versioned OpenAPI and OIDC. Validate issuer, audience, signatures, expiry and algorithms; fail closed. Add session/CSRF protections appropriate to the flow. |

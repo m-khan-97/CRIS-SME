@@ -166,7 +166,10 @@ and POSIX process-group cleanup. Never run arbitrary customer commands in worker
 Leases fence publication, not physical cloud execution: a dead worker's orphan
 process may overlap a reclaimed attempt. Use container/cgroup supervision and
 stop all old processes during crash recovery. Stale attempt files require a
-retention/garbage-collection policy. The service does not provide storage quotas,
+retention/garbage-collection policy. A bounded operator-only
+[logical backup and isolated restore](enterprise-recovery.md) is available for
+private pilots; it does not replace production PITR or identity/key recovery.
+The service does not provide storage quotas,
 object-store immutability, transactional database-plus-filesystem writes, automated
 restore verification, distributed rate limits or independent security review.
 
