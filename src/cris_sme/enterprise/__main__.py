@@ -11,11 +11,12 @@ from cris_sme.enterprise.schema import migrate
 from cris_sme.enterprise.store import Store
 from cris_sme.enterprise.worker import run_worker
 from cris_sme.enterprise.historical import prepare_import, publish_import
+from cris_sme.enterprise.recovery import backup, inspect_backup, restore
 
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("command", choices=["migrate", "bootstrap", "serve", "worker", "historical-import"])
+    parser.add_argument("command", choices=["migrate", "bootstrap", "serve", "worker", "historical-import", "backup", "check-backup", "restore"])
     parser.add_argument("--name")
     parser.add_argument("--subject")
     parser.add_argument("--host", default="127.0.0.1")
@@ -25,6 +26,7 @@ def main():
     parser.add_argument("--report", type=Path, action="append")
     parser.add_argument("--include-exports", action="store_true")
     parser.add_argument("--apply", action="store_true")
+    parser.add_argument("--backup-dir", type=Path)
     args = parser.parse_args()
     os.umask(0o077)
     store = Store.connect(os.environ["CRIS_ENTERPRISE_DATABASE_URL"], os.environ["CRIS_ENTERPRISE_ENCRYPTION_KEY"])
@@ -33,7 +35,20 @@ def main():
         return
     store.check_schema()
     root = Path(os.environ.get("CRIS_ENTERPRISE_ARTIFACT_ROOT", "outputs/enterprise-artifacts")).resolve()
-    if args.command == "bootstrap":
+    if args.command in {"backup", "check-backup", "restore"}:
+        if not args.backup_dir:
+            parser.error("Recovery commands require --backup-dir")
+        if args.command == "backup":
+            result = backup(store, root, args.backup_dir)
+        elif args.command == "restore":
+            if not args.apply:
+                parser.error("Restore requires --apply and an empty isolated target")
+            result = restore(store, args.backup_dir, root)
+        else:
+            tables = inspect_backup(store, args.backup_dir)
+            result = {"verified": True, "artifacts": len(tables["cris_artifacts"])}
+        print(json.dumps(result))
+    elif args.command == "bootstrap":
         if not args.name or not args.subject:
             parser.error("bootstrap requires --name and --subject")
         print(store.bootstrap(Principal(os.environ["CRIS_ENTERPRISE_OIDC_ISSUER"], args.subject), args.name))

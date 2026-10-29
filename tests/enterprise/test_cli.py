@@ -56,3 +56,40 @@ def test_historical_cli_defaults_to_preview_then_applies_explicitly(context, tmp
     assert created["created"] is True
     cli.main()
     assert json.loads(capsys.readouterr().out) == {**created, "created": False}
+
+
+def test_recovery_cli_requires_explicit_restore_and_checks_bundle(store, tmp_path, monkeypatch, capsys):
+    import json
+    from tests.enterprise.test_recovery import isolated
+    root = tmp_path / "artifacts"
+    root.mkdir()
+    monkeypatch.setenv("CRIS_ENTERPRISE_DATABASE_URL", "postgresql+psycopg://fixture")
+    monkeypatch.setenv("CRIS_ENTERPRISE_ENCRYPTION_KEY", "fixture")
+    monkeypatch.setenv("CRIS_ENTERPRISE_ARTIFACT_ROOT", str(root))
+    monkeypatch.setattr(cli.Store, "connect", lambda *args: store)
+    monkeypatch.setattr(cli.os, "umask", lambda mask: None)
+    destination = tmp_path / "backup"
+    for command in ["backup", "check-backup"]:
+        monkeypatch.setattr(sys, "argv", ["enterprise", command, "--backup-dir", str(destination)])
+        cli.main()
+        assert json.loads(capsys.readouterr().out)["artifacts"] == 0
+    with isolated(store) as target:
+        monkeypatch.setattr(cli.Store, "connect", lambda *args: target)
+        monkeypatch.setenv("CRIS_ENTERPRISE_ARTIFACT_ROOT", str(tmp_path / "restored"))
+        args = ["enterprise", "restore", "--backup-dir", str(destination)]
+        monkeypatch.setattr(sys, "argv", args)
+        with pytest.raises(SystemExit):
+            cli.main()
+        monkeypatch.setattr(sys, "argv", args + ["--apply"])
+        cli.main()
+        assert json.loads(capsys.readouterr().out)["connections_disabled"] is True
+
+
+@pytest.mark.parametrize("command", ["backup", "check-backup", "restore"])
+def test_recovery_cli_requires_directory(store, monkeypatch, command):
+    monkeypatch.setenv("CRIS_ENTERPRISE_DATABASE_URL", "postgresql+psycopg://fixture")
+    monkeypatch.setenv("CRIS_ENTERPRISE_ENCRYPTION_KEY", "fixture")
+    monkeypatch.setattr(cli.Store, "connect", lambda *args: store)
+    monkeypatch.setattr(sys, "argv", ["enterprise", command])
+    with pytest.raises(SystemExit):
+        cli.main()
