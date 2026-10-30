@@ -9,8 +9,8 @@ compliance.** No scheduler or automatic deletion is enabled.
 
 Back up PostgreSQL and private artifacts. Stop API/workers, run
 `python -m cris_sme.enterprise migrate`, then restart matching versions. Schema
-v3 adds retention tables without changing existing jobs, memberships or artifact
-rows. Fresh installs and v1/v2 upgrades are supported. Existing v2 logical backups
+v4 includes the v3 retention tables without changing existing jobs, memberships or artifact
+rows. Fresh installs and v1/v2/v3 upgrades are supported. Existing v2/v3 logical backups
 remain readable; downgrade tooling is not supplied.
 
 `CRIS_ENTERPRISE_RETENTION_ENABLED` defaults to disabled. Only the exact value
@@ -116,6 +116,7 @@ only to quarantine and invalidates pending approvals. Cloud connections remain
 disabled. S3 restore/migration of local-quarantine history is refused until its
 lifecycle is qualified. Never discard source storage after a failed migration.
 
-S3 version cleanup, permanent erasure, backup expiry, legal-case integration,
-scheduling, quota admission and independent security/recovery review remain open.
+Report quota/admission and selected action budgets are covered by the
+[operational safeguards](enterprise-operations.md). S3 version cleanup, permanent
+erasure, backup expiry, legal-case integration, scheduling and independent review remain open.
 This closes a local retention increment, not the overall P1 hosting gate.

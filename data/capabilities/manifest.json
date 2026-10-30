@@ -223,7 +223,8 @@
         "src/cris_sme/enterprise/recovery.py",
         "src/cris_sme/enterprise/storage.py",
         "src/cris_sme/enterprise/storage_operations.py",
-        "src/cris_sme/enterprise/retention.py"
+        "src/cris_sme/enterprise/retention.py",
+        "src/cris_sme/enterprise/operations.py"
       ],
       "fixture_tests": [
         "tests/enterprise/test_auth.py",
@@ -235,7 +236,8 @@
         "tests/enterprise/test_recovery.py",
         "tests/enterprise/test_storage.py",
         "tests/enterprise/test_storage_operations.py",
-        "tests/enterprise/test_retention.py"
+        "tests/enterprise/test_retention.py",
+        "tests/enterprise/test_operations.py"
       ],
       "live_observations": [{
         "path": "docs/qualification/keycloak-local-2026-10-27.md",
@@ -250,7 +252,7 @@
       "limitations": [
         "Fixture tests and one controlled local Keycloak integration do not establish customer-cloud or public production qualification.",
         "The local runner remains outside this authenticated API; the separate opt-in enterprise console does not approve shared hosting.",
-        "Historical import, logical restore, optional S3 transport and controlled local retention are implemented. Retention is disabled by default and quarantines rather than erases; S3 lifecycle/qualification, production PITR/key/IdP recovery and independent review remain open."
+        "Quotas, reservations, selected shared rate limits, sampled resource guards and redacted snapshots are implemented; hard OS isolation, production load/alert qualification and independent review remain open. Retention remains recoverable local quarantine, not erasure; S3 lifecycle/qualification is separate."
       ]
     },
     {
@@ -265,7 +267,8 @@
         "frontend/console/src/enterprise/TenantWorkspace.tsx",
         "frontend/console/src/enterprise/api.ts",
         "frontend/console/src/enterprise/connections.tsx",
-        "frontend/console/src/enterprise/assessments.tsx"
+        "frontend/console/src/enterprise/assessments.tsx",
+        "frontend/console/src/enterprise/operations.tsx"
       ],
       "fixture_tests": [
         "frontend/console/src/test/enterpriseApi.test.ts",

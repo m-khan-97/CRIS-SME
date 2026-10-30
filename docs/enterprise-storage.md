@@ -125,6 +125,7 @@ reports `deletion_executed: false`. Explicit exclusions are still not legal
 holds. The separately enabled [controlled local retention workflow](enterprise-retention.md)
 adds durable holds, reviewed proposals, a different owner identity's approval,
 cooling, logical expiry and recoverable quarantine. It is not permission to erase
-data permanently. S3 version cleanup, quota admission and storage lifecycle
-reconciliation remain open. Local-quarantine history cannot be migrated/restored
+data permanently. [Tenant quota/admission controls](enterprise-operations.md) are
+implemented; S3 version cleanup and storage lifecycle reconciliation remain open.
+Local-quarantine history cannot be migrated/restored
 to S3 by this tool. Existing reports are not moved by inventory or preview.

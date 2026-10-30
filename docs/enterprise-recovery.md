@@ -97,6 +97,10 @@ worker can claim work and that source records/files remain unchanged. Only after
 a separately approved recovery review should a recovered service receive network
 access or become a replacement deployment.
 
+V4 also preserves tenant storage-limit policy. Ephemeral worker-health and action
+rate counters are not backed up or restored. Legacy v2/v3 bundles receive default
+limits. See [operational safeguards](enterprise-operations.md).
+
 ## Remaining Gates
 
 Retention schedules, automatic encrypted off-host backups, backup expiry,

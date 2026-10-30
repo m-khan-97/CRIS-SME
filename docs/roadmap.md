@@ -747,6 +747,46 @@ code/tests/docs are included in commits.
 The schema-v3 isolated logical restore drill also passes for three organizations
 and 90 artifacts, preserving source records and nonmember denial.
 
+30 October operational-safeguards increment: schema v4 adds operator-controlled
+tenant storage policy, bounded PostgreSQL action counters and ephemeral worker
+health. Scan admission reserves 128 MiB/five files within a default 1 GiB/10,000
+artifact quota. Imports cannot spend scan reservations, publication rechecks
+capacity and terminal jobs release reservations. Existing report reads remain
+available over quota; retention quarantine does not free registered capacity.
+Selected tenant action windows are shared across API instances, with failed
+provider verification charged before SDK calls. Retry hints accompany denials;
+idempotent scan retries do not spend more capacity or rate allowance.
+
+Workers check staging/disk headroom before collection and poll sampled filesystem
+guards independently of lease renewal. Oversize/stale namespace output and low
+disk stop work without successful publication; this is not a hard OS quota or
+container sandbox. Operators can inspect aggregate worker/queue/failure/disk
+snapshots without public metric labels. The authenticated Operations view exposes
+only authorized organization capacity, job/queue/lease counts and action budgets;
+role downgrade hides cached values. Limit changes are privileged CLI-only and
+require draining jobs. Quota policy survives backup/restore, while worker records
+and action counters are ephemeral; v2/v3 bundles remain supported.
+
+Verification passes 1,237 backend tests per Python 3.11/3.12 interpreter (82.75%
+and 82.76% coverage), 105 frontend tests, 23 enterprise browser workflows and the
+29-module type gate. A parallel local test-migration lock timeout was resolved
+by rerunning Python 3.11 against its own disposable database, without weakening
+production locking. Fault/concurrency fixtures include shared rate contention,
+provider denial, idempotence, quota/import contention, pressure cancellation and
+ten synthetic organizations/twenty scans; they do not establish live throughput.
+Eight actual Keycloak checks and the read-only customer archive/Operations
+desktop/mobile checks pass after a backed-up local schema upgrade. No live cloud
+collection or customer report deletion is included. See the
+[operational safeguards runbook](enterprise-operations.md).
+The final operational/CLI/recovery subset passes 62 cases after additive tenant
+query indexes were checked. A schema-v4 isolated restore drill passes for three
+organizations and 90 artifacts; ephemeral rate/worker state is excluded while
+customer metadata and source files remain unchanged.
+
+Hard filesystem/container isolation, all-route/network abuse controls, production
+load/soak/alerting, live cloud/S3 qualification and independent review remain open.
+This closes another local P1 increment, not the shared-hosting release gate.
+
 ### P1 Gate Snapshot
 
 | Area | Current evidence | Still required |
@@ -756,7 +796,7 @@ and 90 artifacts, preserving source records and nonmember denial.
 | Recovery | Local isolated restore drill, legacy bundle upgrades and held-expired-byte recovery tested | Off-host/PITR/key/IdP recovery and measured operational objectives |
 | Storage and retention | Local transport, fixture-tested S3, durable holds, reviewed local expiry/quarantine | Live S3 qualification, remote version lifecycle, permanent purge/backup expiry policy |
 | Cloud onboarding | Application/role connection flows implemented with negative fixtures | Authorized live Azure/AWS qualification; credentials/admin grants remain unavailable |
-| Operations | Bounded API/worker paths, readiness and audit records | Remaining quota/rate/observability/deployment safeguards and independent security review |
+| Operations | Tenant quotas/reservations, shared selected action budgets, sampled filesystem guards, readiness, redacted snapshots and scoped dashboard | Hard OS/container isolation, full network/abuse/alerting and deployment/load qualification; independent review |
 
 P1 is materially advanced but its release gate remains open. Do not substitute
 implemented code or internal test counts for unavailable cloud qualification or

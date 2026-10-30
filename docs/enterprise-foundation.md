@@ -99,8 +99,8 @@ In a separate process with the same private configuration:
 python -m cris_sme.enterprise worker
 ```
 
-Migration version 3 is explicit and transactionally serialized with a PostgreSQL
-advisory lock. It supports fresh installs and additive upgrades from versions 1/2;
+Migration version 4 is explicit and transactionally serialized with a PostgreSQL
+advisory lock. It supports fresh installs and additive upgrades from versions 1/2/3;
 unsupported schema versions fail closed. Back up the database and private artifact
 storage before upgrading, and restart API/worker processes together. No outputs
 are imported or reassigned automatically. The operator-only
@@ -113,8 +113,10 @@ same issuer using the membership API. Authentication success alone grants no
 tenant membership. OpenAPI lists the full request/response surface; service errors
 are sanitized and carry server-generated request IDs. Request bodies are capped
 at 64 KiB with a ten-second receive budget; Uvicorn admits at most 32 connections.
-Production TLS, trusted proxy configuration and endpoint rate limits remain
-operator responsibilities. No credentialed wildcard CORS is configured.
+Selected costly actions now have PostgreSQL-coordinated tenant budgets; see
+[operational safeguards](enterprise-operations.md). Production TLS, trusted proxy
+configuration and network/all-route abuse limits remain operator responsibilities.
+No credentialed wildcard CORS is configured.
 
 ## AWS Connection
 
@@ -175,9 +177,11 @@ adds verified conditional publication, configured-backend downloads and explicit
 local-to-S3 copying. It is fixture-tested, not live S3-qualified. Retention previews
 do not delete anything. The separately enabled [local retention workflow](enterprise-retention.md)
 adds holds, reviewed approval, report expiry and recoverable quarantine, not erasure.
-The service does not provide storage quotas,
-Object Lock, transactional database-plus-filesystem/object writes, automated
-restore verification, distributed rate limits or independent security review.
+Tenant report quotas, scan reservations, selected shared action budgets and
+sampled filesystem guards are implemented. Hard OS quotas, Object Lock,
+transactional database-plus-filesystem/object writes, automated production
+restore verification, all-route/network abuse controls and independent security
+review remain open.
 
 Use `GET /health` for liveness and `/ready` for schema/write readiness. Readiness
 does not establish cloud permissions or identity-provider availability. Audit

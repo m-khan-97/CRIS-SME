@@ -11,7 +11,7 @@ Back up PostgreSQL and private artifact storage. Configure the same private
 enterprise environment used by the API, including the database URL, encryption
 key, issuer and artifact root. Stop services for the schema upgrade, run
 `python -m cris_sme.enterprise migrate`, then restart matching API/worker versions.
-Schema v3 accepts fresh installations or additive v1/v2 upgrades; unsupported
+Schema v4 accepts fresh installations or additive v1/v2/v3 upgrades; unsupported
 versions fail closed. No downgrade command is supplied.
 
 Choose the tenant UUID deliberately and verify the operator's issuer/subject
