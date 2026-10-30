@@ -50,7 +50,7 @@ def test_roundtrip_preserves_tenants_memberships_history_and_bytes_but_disables_
     aws_connection(ctx)
     destination = tmp_path / "backup"
     result = backup(ctx["store"], ctx["root"], destination)
-    assert result == {"artifacts": 3, "tenants": 1, "schema_version": 2}
+    assert result == {"artifacts": 3, "tenants": 1, "schema_version": s.SCHEMA_VERSION}
     assert destination.stat().st_mode & 0o777 == 0o700
     assert all(p.stat().st_mode & 0o777 == 0o600 for p in destination.rglob("*") if p.is_file())
     tables = inspect_backup(ctx["store"], destination)

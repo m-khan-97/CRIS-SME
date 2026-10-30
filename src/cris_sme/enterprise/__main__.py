@@ -14,11 +14,12 @@ from cris_sme.enterprise.historical import prepare_import, publish_import
 from cris_sme.enterprise.recovery import backup, inspect_backup, restore
 from cris_sme.enterprise.storage import configured_storage, LocalStorage, S3Storage
 from cris_sme.enterprise.storage_operations import copy_registered, retention_plan, usage
+from cris_sme.enterprise import retention
 
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("command", choices=["migrate", "bootstrap", "serve", "worker", "historical-import", "backup", "check-backup", "restore", "storage-check", "storage-copy", "storage-usage", "retention-plan"])
+    parser.add_argument("command", choices=["migrate", "bootstrap", "serve", "worker", "historical-import", "backup", "check-backup", "restore", "storage-check", "storage-copy", "storage-usage", "retention-plan", "retention-hold", "retention-propose", "retention-approve", "retention-withdraw", "retention-expire", "retention-cleanup"])
     parser.add_argument("--name")
     parser.add_argument("--subject")
     parser.add_argument("--host", default="127.0.0.1")
@@ -32,6 +33,11 @@ def main():
     parser.add_argument("--retention-days", type=int)
     parser.add_argument("--exclude-job", type=UUID, action="append", default=[])
     parser.add_argument("--include-historical", action="store_true")
+    parser.add_argument("--assessment", type=UUID)
+    parser.add_argument("--plan", type=UUID)
+    parser.add_argument("--plan-sha256")
+    parser.add_argument("--reason")
+    parser.add_argument("--release", action="store_true")
     args = parser.parse_args()
     os.umask(0o077)
     store = Store.connect(os.environ["CRIS_ENTERPRISE_DATABASE_URL"], os.environ["CRIS_ENTERPRISE_ENCRYPTION_KEY"])
@@ -41,9 +47,35 @@ def main():
     store.check_schema()
     root = Path(os.environ.get("CRIS_ENTERPRISE_ARTIFACT_ROOT", "outputs/enterprise-artifacts")).resolve()
     storage = configured_storage(root) if args.command in {
-        "serve", "worker", "historical-import", "backup", "restore", "storage-check", "storage-copy"
+        "serve", "worker", "historical-import", "backup", "restore", "storage-check", "storage-copy", "retention-expire", "retention-cleanup"
     } else LocalStorage(root)
-    if args.command in {"storage-usage", "retention-plan"}:
+    if args.command in {"retention-hold", "retention-propose", "retention-approve", "retention-withdraw", "retention-expire", "retention-cleanup"}:
+        if not args.tenant or not args.subject or not args.apply:
+            parser.error("Retention mutations require --tenant, --subject and explicit --apply")
+        if args.command not in {"retention-hold", "retention-withdraw"} and os.environ.get("CRIS_ENTERPRISE_RETENTION_ENABLED") != "true":
+            parser.error("Retention mutation execution is disabled")
+        principal = Principal(os.environ["CRIS_ENTERPRISE_OIDC_ISSUER"], args.subject)
+        if args.command == "retention-hold":
+            if not args.assessment or not args.reason:
+                parser.error("Hold changes require --assessment and --reason")
+            result = retention.hold(store, str(args.tenant), principal, str(args.assessment), args.reason, active=not args.release)
+        elif args.command == "retention-propose":
+            if args.retention_days is None or not args.reason:
+                parser.error("Proposals require --retention-days and --reason")
+            result = retention.propose(store, str(args.tenant), principal, args.retention_days, args.reason,
+                exclude=[str(value) for value in args.exclude_job], include_historical=args.include_historical)
+        else:
+            if not args.plan or (args.command != "retention-cleanup" and not args.plan_sha256):
+                parser.error("A --plan and --plan-sha256 are required")
+            if args.command in {"retention-approve", "retention-withdraw"}:
+                result = retention.decide(store, str(args.tenant), principal, str(args.plan), args.plan_sha256,
+                                          approve=args.command == "retention-approve")
+            elif args.command == "retention-expire":
+                result = retention.expire(store, str(args.tenant), principal, str(args.plan), args.plan_sha256, storage)
+            else:
+                result = retention.cleanup_local(store, str(args.tenant), principal, str(args.plan), storage)
+        print(json.dumps(result))
+    elif args.command in {"storage-usage", "retention-plan"}:
         if not args.tenant or not args.subject:
             parser.error("Storage inventory requires --tenant and --subject")
         principal = Principal(os.environ["CRIS_ENTERPRISE_OIDC_ISSUER"], args.subject)
@@ -102,7 +134,7 @@ def main():
             aws_principal_arn=os.environ.get("CRIS_ENTERPRISE_AWS_PRINCIPAL_ARN", ""),
             oidc_ca_file=os.environ.get("CRIS_ENTERPRISE_OIDC_CA_FILE"),
             allowed_hosts=tuple(os.environ.get("CRIS_ENTERPRISE_ALLOWED_HOSTS", "127.0.0.1,localhost").split(",")),
-            artifact_storage=storage)
+            artifact_storage=storage, retention_enabled=os.environ.get("CRIS_ENTERPRISE_RETENTION_ENABLED") == "true")
         uvicorn.run(create_app(settings, store), host=args.host, port=args.port, limit_concurrency=32,
                     timeout_keep_alive=5, access_log=False)
 

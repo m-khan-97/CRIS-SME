@@ -128,3 +128,45 @@ def test_metadata_storage_commands_never_load_cloud_credentials(store, monkeypat
     monkeypatch.setattr(sys, "argv", ["enterprise", command])
     with pytest.raises(SystemExit):
         cli.main()
+
+
+def test_retention_cli_requires_feature_gate_and_explicit_apply(context, monkeypatch, capsys):
+    import json
+    from tests.enterprise.test_retention import eligible, cooled
+    ctx = context
+    eligible(ctx)
+    ctx["store"].member(ctx["tenant"], ctx["principal"], "second-owner", "owner")
+    for name, value in {"DATABASE_URL": "postgresql+psycopg://fixture", "ENCRYPTION_KEY": "fixture",
+                        "OIDC_ISSUER": ISSUER, "ARTIFACT_ROOT": str(ctx["root"])}.items():
+        monkeypatch.setenv("CRIS_ENTERPRISE_" + name, value)
+    monkeypatch.setattr(cli.Store, "connect", lambda *args: ctx["store"])
+    base = ["--tenant", ctx["tenant"], "--subject", "owner"]
+    proposal = ["enterprise", "retention-propose", *base, "--retention-days", "30", "--reason", "Approved test policy", "--apply"]
+    monkeypatch.setattr(sys, "argv", proposal)
+    monkeypatch.delenv("CRIS_ENTERPRISE_RETENTION_ENABLED", raising=False)
+    with pytest.raises(SystemExit):
+        cli.main()
+    monkeypatch.setenv("CRIS_ENTERPRISE_RETENTION_ENABLED", "true")
+    cli.main()
+    plan = json.loads(capsys.readouterr().out)
+    identity = ["--tenant", ctx["tenant"], "--subject", "second-owner", "--plan", plan["id"], "--plan-sha256", plan["sha256"], "--apply"]
+    monkeypatch.setattr(sys, "argv", ["enterprise", "retention-approve", *identity])
+    cli.main()
+    assert json.loads(capsys.readouterr().out)["state"] == "approved"
+    cooled(ctx, plan)
+    monkeypatch.setattr(sys, "argv", ["enterprise", "retention-expire", *identity])
+    cli.main()
+    assert json.loads(capsys.readouterr().out)["state"] == "expired"
+    monkeypatch.setattr(sys, "argv", ["enterprise", "retention-cleanup", *identity])
+    cli.main()
+    assert json.loads(capsys.readouterr().out)["quarantined"] == 2
+
+
+@pytest.mark.parametrize("command", ["retention-hold", "retention-propose", "retention-approve", "retention-withdraw", "retention-expire", "retention-cleanup"])
+def test_retention_mutations_never_apply_by_default(store, monkeypatch, command):
+    monkeypatch.setenv("CRIS_ENTERPRISE_DATABASE_URL", "postgresql+psycopg://fixture")
+    monkeypatch.setenv("CRIS_ENTERPRISE_ENCRYPTION_KEY", "fixture")
+    monkeypatch.setattr(cli.Store, "connect", lambda *args: store)
+    monkeypatch.setattr(sys, "argv", ["enterprise", command])
+    with pytest.raises(SystemExit):
+        cli.main()

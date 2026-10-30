@@ -140,7 +140,7 @@ def test_retention_is_read_only_keeps_latest_and_protects_imports(context, tmp_p
     assert retention_plan(ctx["store"], ctx["tenant"], ctx["principal"], 30)["candidates"] == []
     plan = retention_plan(ctx["store"], ctx["tenant"], ctx["principal"], 30, include_historical=True, exclude=[jobs[0]])
     assert [row["assessment_id"] for row in plan["candidates"]] == [jobs[1]]
-    assert plan["deletion_executed"] is False and plan["legal_hold_checked"] is False
+    assert plan["deletion_executed"] is False and plan["legal_hold_checked"] is True
     assert plan["candidates"][0]["age_basis"] == "imported_at"
     assert len(ctx["store"].job_list(ctx["tenant"], ctx["principal"])) == 3
     for job in jobs:

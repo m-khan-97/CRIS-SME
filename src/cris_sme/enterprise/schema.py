@@ -49,7 +49,41 @@ historical_imports = Table("cris_historical_imports", metadata,
     ForeignKeyConstraint(["tenant_id", "job_id"], ["cris_jobs.tenant_id", "cris_jobs.id"]),
     UniqueConstraint("tenant_id", "source_run_id"), UniqueConstraint("tenant_id", "source_sha256"))
 
-SCHEMA_VERSION = 2
+holds = Table("cris_retention_holds", metadata,
+    Column("tenant_id", String(36), primary_key=True), Column("job_id", String(36), primary_key=True),
+    Column("active", Boolean, nullable=False), Column("reason", String(500), nullable=False),
+    Column("issuer", String(512), nullable=False), Column("subject", String(255), nullable=False),
+    Column("updated_at", Integer, nullable=False),
+    ForeignKeyConstraint(["tenant_id", "job_id"], ["cris_jobs.tenant_id", "cris_jobs.id"]))
+retention_plans = Table("cris_retention_plans", metadata,
+    Column("id", String(36), primary_key=True), Column("tenant_id", ForeignKey("cris_tenants.id"), nullable=False),
+    Column("state", String(30), nullable=False), Column("reason", String(500), nullable=False),
+    Column("issuer", String(512), nullable=False), Column("subject", String(255), nullable=False),
+    Column("approver_issuer", String(512), nullable=False, default=""), Column("approver_subject", String(255), nullable=False, default=""),
+    Column("created_at", Integer, nullable=False), Column("expires_at", Integer, nullable=False),
+    Column("execute_after", Integer, nullable=False, default=0),
+    Column("snapshot", Text, nullable=False), Column("sha256", String(64), nullable=False),
+    UniqueConstraint("tenant_id", "id"))
+hold_events = Table("cris_retention_hold_events", metadata,
+    Column("id", String(36), primary_key=True), Column("tenant_id", String(36), nullable=False),
+    Column("job_id", String(36), nullable=False), Column("active", Boolean, nullable=False),
+    Column("reason", String(500), nullable=False), Column("issuer", String(512), nullable=False),
+    Column("subject", String(255), nullable=False), Column("updated_at", Integer, nullable=False),
+    ForeignKeyConstraint(["tenant_id", "job_id"], ["cris_jobs.tenant_id", "cris_jobs.id"]))
+retirements = Table("cris_retirements", metadata,
+    Column("job_id", String(36), primary_key=True), Column("tenant_id", String(36), nullable=False),
+    Column("plan_id", String(36), nullable=False), Column("expired_at", Integer, nullable=False),
+    ForeignKeyConstraint(["tenant_id", "job_id"], ["cris_jobs.tenant_id", "cris_jobs.id"]),
+    ForeignKeyConstraint(["tenant_id", "plan_id"], ["cris_retention_plans.tenant_id", "cris_retention_plans.id"]),
+    UniqueConstraint("tenant_id", "job_id"))
+cleanup = Table("cris_retention_cleanup", metadata,
+    Column("artifact_id", ForeignKey("cris_artifacts.id"), primary_key=True),
+    Column("tenant_id", String(36), nullable=False), Column("job_id", String(36), nullable=False),
+    Column("state", String(30), nullable=False), Column("attempts", Integer, nullable=False, default=0),
+    Column("error_code", String(40), nullable=False, default=""),
+    ForeignKeyConstraint(["tenant_id", "job_id"], ["cris_retirements.tenant_id", "cris_retirements.job_id"]))
+
+SCHEMA_VERSION = 3
 
 
 def migrate(engine):
@@ -59,9 +93,9 @@ def migrate(engine):
         connection.exec_driver_sql("SELECT pg_advisory_xact_lock(754392810)")
         versions.create(connection, checkfirst=True)
         rows = list(connection.execute(versions.select()).scalars())
-        if rows not in ([], [1], [SCHEMA_VERSION]):
+        if rows not in ([], [1], [2], [SCHEMA_VERSION]):
             raise RuntimeError("Unsupported enterprise schema version")
-        # V2 adds only the historical-import table; V1 tables are retained intact.
+        # Additive upgrades retain existing assessment, membership and artifact rows.
         metadata.create_all(connection)
         if rows != [SCHEMA_VERSION]:
             connection.execute(versions.delete())

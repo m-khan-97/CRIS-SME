@@ -40,13 +40,15 @@ def retention_plan(store, tenant, principal, days: int, *, exclude=(), include_h
         totals = {row["job_id"]: (row["count"], row["size"]) for row in c.execute(select(s.artifacts.c.job_id,
             func.count().label("count"), func.sum(s.artifacts.c.size).label("size"))
             .where(s.artifacts.c.tenant_id == tenant).group_by(s.artifacts.c.job_id)).mappings()}
+        held = set(c.execute(select(s.holds.c.job_id).where(s.holds.c.tenant_id == tenant, s.holds.c.active.is_(True))).scalars())
+        expired = set(c.execute(select(s.retirements.c.job_id).where(s.retirements.c.tenant_id == tenant)).scalars())
         latest, candidates = set(), []
         for row in rows:
             scope = (row["provider"], row["scope_id"])
             keep_latest = scope not in latest
             latest.add(scope)
             age_from = row["imported_at"] if row["imported_at"] is not None else row["requested_at"]
-            if keep_latest or row["id"] in exclude or age_from >= now - days * 86400:
+            if keep_latest or row["id"] in exclude or row["id"] in held or row["id"] in expired or age_from >= now - days * 86400:
                 continue
             if row["imported_at"] is not None and not include_historical:
                 continue
@@ -57,7 +59,7 @@ def retention_plan(store, tenant, principal, days: int, *, exclude=(), include_h
         payload = {"tenant_id": tenant, "evaluated_at": now, "retention_days": days,
                    "include_historical": bool(include_historical), "excluded_assessments": sorted(set(exclude)),
                    "keep_latest_per_cloud_scope": True, "candidates": candidates, "deletion_executed": False,
-                   "legal_hold_checked": False}
+                   "legal_hold_checked": True}
         return {**payload, "plan_sha256": hashlib.sha256(json.dumps(payload, sort_keys=True).encode()).hexdigest()}
 
 
@@ -67,6 +69,8 @@ def copy_registered(store, root: Path, storage, *, apply=False):
         _lock(c)
         if c.execute(select(s.jobs.c.id).where(s.jobs.c.status.not_in(["completed", "failed", "cancelled"])).limit(1)).first():
             raise ValueError("Drain assessments before storage migration")
+        if c.execute(select(s.retirements.c.job_id).limit(1)).first():
+            raise ValueError("Local quarantine history requires a separately qualified remote migration")
         rows = list(c.execute(select(s.artifacts).limit(10001)).mappings())
         if len(rows) > 10000 or sum(row["size"] for row in rows) > 512 * 1024 * 1024:
             raise ValueError("Storage migration exceeds its bounded batch limit")

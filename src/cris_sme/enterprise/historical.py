@@ -151,6 +151,9 @@ def publish_import(store, tenant, principal, prepared: PreparedImport, artifact_
             or_(s.historical_imports.c.source_run_id == prepared.source_run_id,
                 s.historical_imports.c.source_sha256 == prepared.source_sha256))).mappings().first()
         if existing:
+            if c.execute(select(s.retirements.c.job_id).where(s.retirements.c.tenant_id == tenant,
+                         s.retirements.c.job_id == existing["job_id"])).first():
+                raise Rejected("The original imported assessment has expired; it cannot be silently reimported", 409)
             if existing["source_sha256"] != prepared.source_sha256 or existing["bundle_sha256"] != prepared.bundle_sha256:
                 raise Rejected("Historical source run or export bundle changed; existing import retained", 409)
             for row in c.execute(select(s.artifacts).where(s.artifacts.c.tenant_id == tenant,

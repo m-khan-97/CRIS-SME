@@ -219,12 +219,17 @@ class Store:
         records = {row["job_id"]: dict(row) for row in c.execute(select(s.historical_imports).where(
             s.historical_imports.c.tenant_id == tenant,
             s.historical_imports.c.job_id.in_([item["id"] for item in results]))).mappings()}
+        expired = {row["job_id"]: row["expired_at"] for row in c.execute(select(s.retirements).where(
+            s.retirements.c.tenant_id == tenant, s.retirements.c.job_id.in_([item["id"] for item in results]))).mappings()}
         for item in results:
             record = records.get(item["id"])
             if record:
                 record.pop("tenant_id")
                 record.pop("job_id")
             item.update(origin="historical_import" if record else "live_scan", historical_import=record)
+            item.update(report_state="expired" if item["id"] in expired else "available", expired_at=expired.get(item["id"]))
+            if item["id"] in expired and "artifacts" in item:
+                item["artifacts"] = []
         return results
 
     def job_list(self, tenant, principal):
@@ -324,6 +329,9 @@ class Store:
                 s.artifacts.c.tenant_id == tenant, s.artifacts.c.id == artifact_id, s.jobs.c.status == "completed")).mappings().first()
             if row is None:
                 raise Rejected()
+            if c.execute(select(s.retirements.c.job_id).where(s.retirements.c.tenant_id == tenant,
+                         s.retirements.c.job_id == row["job_id"])).first():
+                raise Rejected("Report expired under approved retention", 410)
             return dict(row)
 
     def audit_list(self, tenant, principal):

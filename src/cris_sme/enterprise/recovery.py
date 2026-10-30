@@ -14,11 +14,16 @@ from cris_sme.enterprise.historical import unique_object, reject_constant
 from cris_sme.enterprise.storage import LocalStorage, S3Storage
 
 TABLES = tuple(table for table in s.metadata.sorted_tables if table is not s.versions)
+V3_TABLES = (s.holds, s.hold_events, s.retention_plans, s.retirements, s.cleanup)
 MAX_METADATA = 16 * 1024 * 1024
 MAX_BYTES = 512 * 1024 * 1024
 MAX_ROWS = 100_000
 MAX_FILES = 10_000
 TERMINAL = {"completed", "failed", "cancelled"}
+
+
+def quarantine_key(artifact, retired):
+    return str(Path("retention_quarantine") / artifact["tenant_id"] / retired["plan_id"] / artifact["id"])
 
 
 def _hash(content):
@@ -63,6 +68,14 @@ def _validate(tables, cipher):
     jobs = {(row["tenant_id"], row["id"]): row for row in tables[s.jobs.name]}
     if any(row["status"] not in TERMINAL for row in jobs.values()):
         raise ValueError("Recovery requires all assessments to be terminal; stop admission and drain workers")
+    plans = {row["id"]: row for row in tables[s.retention_plans.name]}
+    for row in tables[s.retirements.name]:
+        for key in ("tenant_id", "job_id", "plan_id"):
+            if str(UUID(row[key])) != row[key]:
+                raise ValueError("Invalid recovery quarantine identifier")
+        plan = plans.get(row["plan_id"])
+        if (row["tenant_id"], row["job_id"]) not in jobs or plan is None or plan["tenant_id"] != row["tenant_id"] or plan["state"] != "expired":
+            raise ValueError("Invalid recovery quarantine scope")
     artifacts = tables[s.artifacts.name]
     if len(artifacts) > MAX_FILES:
         raise ValueError("Recovery artifact count exceeded")
@@ -125,8 +138,15 @@ def backup(store, artifact_root: Path, destination: Path, *, storage=None):
         destination.mkdir(mode=0o700)
         directory = destination / "artifacts"
         directory.mkdir(mode=0o700)
+        retired = {row["job_id"]: row for row in tables[s.retirements.name]}
         for row in tables[s.artifacts.name]:
-            content = storage.read(row["key"])
+            if row["job_id"] in retired:
+                try:
+                    content = _checked(artifact_root, Path(quarantine_key(row, retired[row["job_id"]])), row)
+                except FileNotFoundError:
+                    content = _checked(artifact_root, Path(row["key"]), row)
+            else:
+                content = storage.read(row["key"])
             if len(content) != row["size"] or _hash(content) != row["sha256"]:
                 raise ValueError("Recovery artifact integrity check failed")
             _write(directory / row["id"], content)
@@ -143,11 +163,16 @@ def inspect_backup(store, source: Path):
     if not isinstance(complete, dict) or complete.get("format") != 1 or complete.get("metadata_sha256") != _hash(payload):
         raise ValueError("Recovery metadata integrity check failed")
     metadata = json.loads(payload, object_pairs_hook=unique_object, parse_constant=reject_constant)
-    if not isinstance(metadata, dict) or metadata.get("format") != 1 or metadata.get("schema_version") != s.SCHEMA_VERSION:
+    if not isinstance(metadata, dict) or metadata.get("format") != 1 or metadata.get("schema_version") not in (2, s.SCHEMA_VERSION):
         raise ValueError("Unsupported recovery format or schema")
     tables = metadata.get("tables")
     if not isinstance(tables, dict):
         raise ValueError("Unsupported recovery tables")
+    if metadata["schema_version"] == 2:
+        for table in V3_TABLES:
+            if table.name in tables:
+                raise ValueError("V2 bundle must not contain V3 retention records")
+            tables[table.name] = []
     _validate(tables, store.cipher)
     for row in tables[s.artifacts.name]:
         _checked(source, Path("artifacts") / row["id"], row)
@@ -159,6 +184,9 @@ def restore(store, source: Path, artifact_root: Path, *, storage=None):
     tables = inspect_backup(store, source)
     artifact_root = artifact_root.absolute()
     storage = storage or LocalStorage(artifact_root)
+    retired = {row["job_id"]: row for row in tables[s.retirements.name]}
+    if retired and isinstance(storage, S3Storage):
+        raise ValueError("Restore local quarantine history to local storage; remote quarantine is not qualified")
     source_path, target_path = source.resolve(), artifact_root.resolve()
     if target_path == source_path or source_path in target_path.parents or target_path in source_path.parents:
         raise ValueError("Restore storage must be separate from the backup")
@@ -171,15 +199,20 @@ def restore(store, source: Path, artifact_root: Path, *, storage=None):
             storage.require_empty()
         artifact_root.mkdir(mode=0o700)
         for row in tables[s.artifacts.name]:
-            path = artifact_root / row["key"]
+            path = artifact_root / (quarantine_key(row, retired[row["job_id"]]) if row["job_id"] in retired else row["key"])
             path.parent.mkdir(parents=True, exist_ok=True, mode=0o700)
             content = _checked(source, Path("artifacts") / row["id"], row)
             _write(path, content)
-            storage.publish(row["key"], content)
+            if row["job_id"] not in retired:
+                storage.publish(row["key"], content)
         for table in TABLES:
             rows = tables[table.name]
             if table is s.connections:
                 rows = [{**row, "enabled": False, "verified_until": 0} for row in rows]
+            elif table is s.retention_plans:
+                rows = [{**row, "state": "invalidated_restore"} if row["state"] in {"proposed", "approved"} else row for row in rows]
+            elif table is s.cleanup:
+                rows = [{**row, "state": "quarantined", "error_code": ""} for row in rows]
             if rows:
                 connection.execute(insert(table), rows)
     return {"artifacts": len(tables[s.artifacts.name]), "tenants": len(tables[s.tenants.name]), "connections_disabled": True}

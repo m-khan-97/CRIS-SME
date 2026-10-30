@@ -18,6 +18,7 @@ from starlette.middleware.trustedhost import TrustedHostMiddleware
 from cris_sme.enterprise.auth import AccessTokenVerifier
 from cris_sme.enterprise.storage import ArtifactStorage, LocalStorage
 from cris_sme.enterprise.storage_operations import usage
+from cris_sme.enterprise import retention
 from cris_sme.enterprise.cloud import ROLE, aws_onboarding, verify_connection
 from cris_sme.enterprise.store import Rejected, Store, new_id
 
@@ -35,6 +36,7 @@ class Settings:
     allowed_hosts: tuple[str, ...] = ("127.0.0.1", "localhost")
     oidc_ca_file: str | None = None
     artifact_storage: ArtifactStorage | None = None
+    retention_enabled: bool = False
 
 
 class ConnectionInput(BaseModel):
@@ -59,6 +61,63 @@ class StorageUsageView(BaseModel):
     assessments: int
     includes_unreferenced_files: bool
     includes_s3_versions: bool
+
+
+class HoldInput(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    reason: str = Field(min_length=1, max_length=500)
+    active: StrictBool
+
+
+class ProposalInput(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    days: int = Field(ge=1, le=36500, strict=True)
+    reason: str = Field(min_length=1, max_length=500)
+    exclude: list[UUID] = Field(default_factory=list, max_length=100)
+    include_historical: StrictBool = False
+
+
+class DecisionInput(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    sha256: str = Field(pattern="^[a-f0-9]{64}$")
+    confirmed: StrictBool
+
+
+class HoldView(BaseModel):
+    job_id: UUID
+    active: bool
+    reason: str
+    issuer: str
+    subject: str
+    updated_at: int
+
+
+class PlanView(BaseModel):
+    id: UUID
+    tenant_id: UUID
+    state: str
+    reason: str
+    issuer: str
+    subject: str
+    approver_issuer: str
+    approver_subject: str
+    created_at: int
+    expires_at: int
+    execute_after: int
+    snapshot: dict | None
+    sha256: str
+
+
+class RetentionView(BaseModel):
+    plans: list[PlanView]
+    holds: list[HoldView]
+    permanent_erasure: bool
+
+
+class DecisionView(BaseModel):
+    id: UUID
+    state: str
+    execute_after: int | None = None
 
 
 class ScanInput(BaseModel):
@@ -129,6 +188,8 @@ class JobView(BaseModel):
     error_code: str
     origin: Literal["live_scan", "historical_import"] = "live_scan"
     historical_import: HistoricalImportView | None = None
+    report_state: Literal["available", "expired"] = "available"
+    expired_at: int | None = None
 
 
 class ArtifactView(BaseModel):
@@ -239,7 +300,7 @@ def create_app(settings: Settings, store: Store, *, verifier=None, cloud_verify=
         tokenUrl=settings.token_url, scopes={"openid": "Sign in", "cris.api": "CRIS API"}, auto_error=False)
     app = FastAPI(title="CRIS Enterprise API", version="1.0.0", openapi_url="/api/v1/openapi.json",
                   docs_url="/api/v1/docs", redoc_url=None,
-                  responses={code: {"model": ErrorView} for code in (400, 401, 403, 404, 409, 413, 422, 429, 503)},
+                  responses={code: {"model": ErrorView} for code in (400, 401, 403, 404, 409, 410, 413, 422, 429, 503)},
                   swagger_ui_init_oauth={"clientId": settings.client_id, "usePkceWithAuthorizationCodeGrant": True,
                                          "scopes": "openid cris.api"})
     app.add_middleware(BodyLimit)
@@ -398,6 +459,47 @@ def create_app(settings: Settings, store: Store, *, verifier=None, cloud_verify=
             raise HTTPException(409, "Artifact integrity check failed")
         return Response(data, media_type="application/octet-stream",
                         headers={"Content-Disposition": 'attachment; filename="' + record["name"] + '"'})
+
+    @app.get("/api/v1/tenants/{tenant}/retention", response_model=RetentionView)
+    def retention_state(tenant: UUID, actor=Depends(principal)):
+        return retention.list_state(store, str(tenant), actor)
+
+    @app.get("/api/v1/tenants/{tenant}/retention/plans/{plan}", response_model=PlanView)
+    def retention_details(tenant: UUID, plan: UUID, actor=Depends(principal)):
+        return retention.get_plan(store, str(tenant), actor, str(plan))
+
+    @app.put("/api/v1/tenants/{tenant}/assessments/{assessment}/hold", response_model=HoldView)
+    def retention_hold(tenant: UUID, assessment: UUID, body: HoldInput, actor=Depends(principal)):
+        try:
+            return retention.hold(store, str(tenant), actor, str(assessment), body.reason, active=body.active)
+        except ValueError:
+            raise HTTPException(422, "A nonempty hold reason is required") from None
+
+    @app.post("/api/v1/tenants/{tenant}/retention/plans", response_model=PlanView, status_code=201)
+    def retention_propose(tenant: UUID, body: ProposalInput, actor=Depends(principal)):
+        with store.engine.connect() as c:
+            store._access(c, str(tenant), actor, {"owner", "admin"})
+        if not settings.retention_enabled:
+            raise HTTPException(409, "Retention proposals and approval are disabled")
+        try:
+            return retention.propose(store, str(tenant), actor, body.days, body.reason,
+                                     exclude=[str(value) for value in body.exclude], include_historical=body.include_historical)
+        except ValueError:
+            raise HTTPException(422, "Invalid retention proposal") from None
+
+    @app.post("/api/v1/tenants/{tenant}/retention/plans/{plan}/approve", response_model=DecisionView)
+    def retention_approve(tenant: UUID, plan: UUID, body: DecisionInput, actor=Depends(principal)):
+        with store.engine.connect() as c:
+            store._access(c, str(tenant), actor, {"owner"})
+        if not settings.retention_enabled or not body.confirmed:
+            raise HTTPException(409, "Retention approval is disabled or unconfirmed")
+        return retention.decide(store, str(tenant), actor, str(plan), body.sha256)
+
+    @app.post("/api/v1/tenants/{tenant}/retention/plans/{plan}/withdraw", response_model=DecisionView)
+    def retention_withdraw(tenant: UUID, plan: UUID, body: DecisionInput, actor=Depends(principal)):
+        if not body.confirmed:
+            raise HTTPException(409, "Explicit confirmation is required")
+        return retention.decide(store, str(tenant), actor, str(plan), body.sha256, approve=False)
 
     @app.get("/api/v1/tenants/{tenant}/storage", response_model=StorageUsageView)
     def storage_usage(tenant: UUID, actor=Depends(principal)):
