@@ -104,6 +104,30 @@ describe("enterprise workspace", () => {
     fireEvent.click(screen.getByRole("button", { name: "Refresh audit" }));
     await waitFor(() => expect(mocks.request).toHaveBeenCalledTimes(2));
   });
+  it("shows organization-scoped quota, queue and action budgets", async () => {
+    mocks.request.mockResolvedValue({ quota_bytes: 1073741824, max_artifacts: 10000,
+      registered_bytes: 4096, registered_artifacts: 2, reserved_bytes: 134217728, reserved_artifacts: 5,
+      pending_assessments: 1, assessments: { queued: 1, running: 0, failed: 2 }, oldest_queue_age_seconds: 15,
+      expired_leases: 0, rate_limits: { scan_submission: { used: 2, limit: 24, remaining: 22, reset_after_seconds: 60 } } });
+    mount("/operations");
+    await screen.findByText("1.00 GiB");
+    expect(screen.getByRole("region", { name: "Action budgets" })).toHaveTextContent("2 / 24");
+    expect(mocks.request).toHaveBeenCalledWith("/api/v1/tenants/alpha/operations");
+    fireEvent.click(screen.getByRole("button", { name: "Refresh operations" }));
+    await waitFor(() => expect(mocks.request).toHaveBeenCalledTimes(2));
+  });
+  it("does not load operations for analysts", async () => {
+    mocks.tenants.mockResolvedValue({ tenants: [{ ...tenant, role: "analyst" }] });
+    mount("/operations");
+    await screen.findByText("Your role does not permit this view.");
+    expect(mocks.request).not.toHaveBeenCalled();
+  });
+  it("hides operations data on a request failure", async () => {
+    mocks.request.mockRejectedValue(new Error("Operation unavailable"));
+    mount("/operations");
+    await screen.findByText("Operation unavailable");
+    expect(screen.queryByRole("region", { name: "Storage capacity" })).not.toBeInTheDocument();
+  });
   it("does not request member or audit administration for an analyst", async () => {
     mocks.tenants.mockResolvedValue({ tenants: [{ ...tenant, role: "analyst" }] });
     const view = mount("/members"); await screen.findByText("Your role does not permit member administration.");

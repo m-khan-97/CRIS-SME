@@ -103,6 +103,13 @@ async function setup(page: Page, options: { role?: string; authenticated?: boole
       return route.fulfill({ body: texts.get(org), contentType: "application/octet-stream" });
     }
     if (section === "members") return route.fulfill({ json: { members: [{ issuer: "https://identity.invalid", subject: "fixture-owner", role: state.role }] } });
+    if (section === "operations") return route.fulfill({ json: {
+      quota_bytes: 1073741824, max_artifacts: 10000, registered_bytes: 8192, registered_artifacts: 2,
+      reserved_bytes: 134217728, reserved_artifacts: 5, pending_assessments: 1,
+      assessments: { queued: 1, running: 0, cancelling: 0, completed: 1, failed: 0, cancelled: 0 },
+      oldest_queue_age_seconds: 12, expired_leases: 0,
+      rate_limits: { connection_verification: { used: 1, limit: 6, remaining: 5, reset_after_seconds: 30 } },
+    } });
     if (section === "audit") return route.fulfill({ json: { events: [] } });
     return route.fulfill({ status: 404, json: { detail: "Unconfigured fixture route" } });
   });
@@ -369,5 +376,27 @@ test("retention expiry removes a visible cached report and its export controls",
   await expect(page.getByRole("heading", { name: "Finding Alpha", exact: true })).toHaveCount(0);
   await page.getByRole("link", { name: "Reports", exact: true }).click();
   await expect(page.getByRole("button", { name: "Download cris_sme_report.json", exact: true })).toHaveCount(0);
+  expect(errors).toEqual([]);
+});
+
+test("operations shows scoped capacity and hides cached data on role downgrade", async ({ page }) => {
+  const { state, errors } = await setup(page);
+  await page.goto("/operations");
+  await expect(page.getByRole("heading", { name: "Operations", exact: true })).toBeVisible();
+  await expect(page.getByRole("region", { name: "Storage capacity" })).toContainText("1.00 GiB");
+  await expect(page.getByRole("region", { name: "Action budgets" })).toContainText("1 / 6");
+  state.role = "analyst";
+  await page.getByRole("button", { name: "Refresh organizations", exact: true }).click();
+  await expect(page.getByRole("region", { name: "Storage capacity" })).toHaveCount(0);
+  await expect(page.getByRole("link", { name: "Operations", exact: true })).toHaveCount(0);
+  expect(errors).toEqual([]);
+});
+
+test("mobile operations stays within the viewport", async ({ page }) => {
+  const { errors } = await setup(page);
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto("/operations");
+  await expect(page.getByRole("region", { name: "Action budgets" })).toBeVisible();
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
   expect(errors).toEqual([]);
 });

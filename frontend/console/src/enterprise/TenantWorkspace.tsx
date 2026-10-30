@@ -9,6 +9,7 @@ import { WorkspaceNav, EnterpriseFallback } from "./navigation";
 import { Assessments, Reports } from "./assessments";
 import { Connections } from "./connections";
 import { Members, AuditLog } from "./administration";
+import { Operations } from "./operations";
 
 const Findings = lazy(() => import("../pages/Findings").then(m => ({ default: m.Findings })));
 const Resources = lazy(() => import("../pages/Resources").then(m => ({ default: m.Resources })));
@@ -103,6 +104,7 @@ export function TenantWorkspace({ tenant }: { tenant: Tenant }) {
         </Route>
         <Route path="reports" element={<Reports key={chosen?.id ?? "empty"} tenant={tenant} job={error ? undefined : expired && job.data ? { ...job.data, report_state: "expired", artifacts: [] } : job.data} />} />
         <Route path="members" element={<Members tenant={tenant} />} /><Route path="audit" element={<AuditLog tenant={tenant} />} />
+        <Route path="operations" element={<Operations tenant={tenant} />} />
         <Route path="*" element={<EnterpriseFallback />} />
       </Routes>
     </Suspense></ScopedAssessmentProvider>

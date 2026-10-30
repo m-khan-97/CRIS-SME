@@ -69,6 +69,11 @@ try {
     const retention = await request(owner.user, `/api/v1/tenants/${tenant}/retention`);
     assert.equal(retention.status, 200);
     assert.ok(Array.isArray((await retention.json()).holds));
+    const operations = await request(owner.user, `/api/v1/tenants/${tenant}/operations`);
+    assert.equal(operations.status, 200);
+    const operational = await operations.json();
+    assert.ok(operational.quota_bytes > 0 && operational.registered_bytes >= 0);
+    assert.equal(operational.rate_limits.scan_submission.limit, 24);
     await owner.page.getByRole("combobox", { name: "Organization", exact: true }).selectOption(tenant);
     await owner.page.getByRole("heading", { name: "Assessments", exact: true }).waitFor();
     await owner.page.screenshot({ path: resolve(output, "owner-workspace.png"), fullPage: true });
@@ -87,12 +92,14 @@ try {
     assert.equal(rows.length, 1); assert.notEqual(rows[0].id, tenant);
     assert.equal((await request(other.user, `/api/v1/tenants/${tenant}/assessments`)).status, 404);
     assert.equal((await request(other.user, `/api/v1/tenants/${tenant}/connections`)).status, 404);
+    assert.equal((await request(other.user, `/api/v1/tenants/${tenant}/operations`)).status, 404);
   });
   await check("analyst identity reads its organization but cannot create cloud connections", async () => {
     analyst = await login(accounts.analyst);
     assert.equal((await request(analyst.user, `/api/v1/tenants/${tenant}/assessments`)).status, 200);
     assert.equal((await request(analyst.user, `/api/v1/tenants/${tenant}/storage`)).status, 403);
     assert.equal((await request(analyst.user, `/api/v1/tenants/${tenant}/retention`)).status, 403);
+    assert.equal((await request(analyst.user, `/api/v1/tenants/${tenant}/operations`)).status, 403);
     assert.equal((await request(analyst.user, `/api/v1/tenants/${tenant}/connections`, { method: "POST", body: JSON.stringify({
       name: "Denied qualification request", provider: "aws", scope_id: "000000000000", role_arn: "arn:aws:iam::000000000000:role/not-created",
     }) })).status, 403);
