@@ -170,3 +170,23 @@ def test_retention_mutations_never_apply_by_default(store, monkeypatch, command)
     monkeypatch.setattr(sys, "argv", ["enterprise", command])
     with pytest.raises(SystemExit):
         cli.main()
+
+
+def test_operator_status_and_limit_configuration(context, monkeypatch, capsys):
+    import json
+    ctx = context
+    for name, value in {"DATABASE_URL": "postgresql+psycopg://fixture", "ENCRYPTION_KEY": "fixture",
+                        "ARTIFACT_ROOT": str(ctx["root"]), "OIDC_ISSUER": ISSUER}.items():
+        monkeypatch.setenv("CRIS_ENTERPRISE_" + name, value)
+    monkeypatch.setattr(cli.Store, "connect", lambda *args: ctx["store"])
+    monkeypatch.setattr(sys, "argv", ["enterprise", "operations-status"])
+    cli.main()
+    assert json.loads(capsys.readouterr().out)["redacted"] is True
+    arguments = ["enterprise", "operations-limits", "--tenant", ctx["tenant"], "--subject", "owner",
+                 "--quota-bytes", str(256 * 1024 * 1024), "--max-artifacts", "100"]
+    monkeypatch.setattr(sys, "argv", arguments)
+    with pytest.raises(SystemExit):
+        cli.main()
+    monkeypatch.setattr(sys, "argv", arguments + ["--apply"])
+    cli.main()
+    assert json.loads(capsys.readouterr().out)["max_artifacts"] == 100

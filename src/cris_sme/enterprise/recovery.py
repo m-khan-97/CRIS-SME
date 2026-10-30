@@ -13,8 +13,9 @@ from cris_sme.enterprise import schema as s
 from cris_sme.enterprise.historical import unique_object, reject_constant
 from cris_sme.enterprise.storage import LocalStorage, S3Storage
 
-TABLES = tuple(table for table in s.metadata.sorted_tables if table is not s.versions)
+TABLES = tuple(table for table in s.metadata.sorted_tables if table not in (s.versions, s.workers, s.rates))
 V3_TABLES = (s.holds, s.hold_events, s.retention_plans, s.retirements, s.cleanup)
+V4_TABLES = (s.limits,)
 MAX_METADATA = 16 * 1024 * 1024
 MAX_BYTES = 512 * 1024 * 1024
 MAX_ROWS = 100_000
@@ -35,6 +36,8 @@ def _lock(connection):
     quote = connection.dialect.identifier_preparer.quote
     names = []
     for table in s.metadata.sorted_tables:
+        if table is s.workers:
+            continue
         schema = connection.schema_for_object(table)
         names.append((quote(schema) + "." if schema else "") + quote(table.name))
     connection.exec_driver_sql("LOCK TABLE " + ", ".join(names) + " IN SHARE ROW EXCLUSIVE MODE NOWAIT")
@@ -163,7 +166,7 @@ def inspect_backup(store, source: Path):
     if not isinstance(complete, dict) or complete.get("format") != 1 or complete.get("metadata_sha256") != _hash(payload):
         raise ValueError("Recovery metadata integrity check failed")
     metadata = json.loads(payload, object_pairs_hook=unique_object, parse_constant=reject_constant)
-    if not isinstance(metadata, dict) or metadata.get("format") != 1 or metadata.get("schema_version") not in (2, s.SCHEMA_VERSION):
+    if not isinstance(metadata, dict) or metadata.get("format") != 1 or metadata.get("schema_version") not in (2, 3, s.SCHEMA_VERSION):
         raise ValueError("Unsupported recovery format or schema")
     tables = metadata.get("tables")
     if not isinstance(tables, dict):
@@ -172,6 +175,11 @@ def inspect_backup(store, source: Path):
         for table in V3_TABLES:
             if table.name in tables:
                 raise ValueError("V2 bundle must not contain V3 retention records")
+            tables[table.name] = []
+    if metadata["schema_version"] in (2, 3):
+        for table in V4_TABLES:
+            if table.name in tables:
+                raise ValueError("Legacy bundle must not contain V4 operational records")
             tables[table.name] = []
     _validate(tables, store.cipher)
     for row in tables[s.artifacts.name]:
@@ -192,7 +200,7 @@ def restore(store, source: Path, artifact_root: Path, *, storage=None):
         raise ValueError("Restore storage must be separate from the backup")
     with store.engine.begin() as connection:
         _lock(connection)
-        if any(connection.execute(select(table).limit(1)).first() is not None for table in TABLES):
+        if any(connection.execute(select(table).limit(1)).first() is not None for table in s.metadata.sorted_tables if table is not s.versions):
             raise ValueError("Restore requires an empty isolated database")
         if isinstance(storage, S3Storage):
             storage.check_ready()

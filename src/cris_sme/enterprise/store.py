@@ -6,6 +6,7 @@ from cryptography.fernet import Fernet
 from sqlalchemy import and_, create_engine, delete, false, func, insert, or_, select, update
 
 from cris_sme.enterprise import schema as s
+from cris_sme.enterprise import operations
 
 
 ROLES = {"owner", "admin", "operator", "analyst", "auditor"}
@@ -14,9 +15,10 @@ OPERATE = ADMIN | {"operator"}
 
 
 class Rejected(Exception):
-    def __init__(self, message="Resource not found", status=404):
+    def __init__(self, message="Resource not found", status=404, *, retry_after=None):
         super().__init__(message)
         self.status = status
+        self.retry_after = retry_after
 
 
 def new_id():
@@ -125,6 +127,7 @@ class Store:
         connection_id = new_id()
         with self.engine.begin() as c:
             self._access(c, tenant, principal, ADMIN, lock=True)
+            operations.charge(self, c, tenant, "connection_creation")
             c.execute(insert(s.connections).values(id=connection_id, tenant_id=tenant, name=name,
                 provider=provider, scope_id=scope_id, config=json.dumps(config),
                 secret=self.cipher.encrypt(json.dumps(secret).encode()).decode(), enabled=True, verified_until=0))
@@ -173,6 +176,13 @@ class Store:
             c.execute(update(s.connections).where(s.connections.c.id == connection_id).values(verified_until=self._now(c) + 3600))
             self._audit(c, tenant, principal.subject, "connection.verified", connection_id)
 
+    def admit_verification(self, tenant, principal, connection_id):
+        with self.engine.begin() as c:
+            self._access(c, tenant, principal, ADMIN, lock=True)
+            if not self._connection(c, tenant, connection_id)["enabled"]:
+                raise Rejected("Connection is disconnected", 409)
+            operations.charge(self, c, tenant, "connection_verification")
+
     def disconnect(self, tenant, principal, connection_id):
         with self.engine.begin() as c:
             self._access(c, tenant, principal, ADMIN, lock=True)
@@ -184,7 +194,7 @@ class Store:
                 s.jobs.c.status.in_(["running", "cancelling"])).values(status="cancelling", cancel_requested=True))
             self._audit(c, tenant, principal.subject, "connection.disconnected", connection_id)
 
-    def submit(self, tenant, principal, connection_id, idempotency_key):
+    def submit(self, tenant, principal, connection_id, idempotency_key, *, resource_check=None):
         with self.engine.begin() as c:
             self._access(c, tenant, principal, OPERATE, lock=True)
             previous = c.execute(select(s.jobs).where(s.jobs.c.tenant_id == tenant,
@@ -200,6 +210,10 @@ class Store:
                 s.jobs.c.status.in_(["queued", "running", "cancelling"]))).scalar_one()
             if count >= 2:
                 raise Rejected("Organization scan capacity reached", 429)
+            operations.check_budget(c, tenant, operations.JOB_BYTES, operations.JOB_FILES)
+            if resource_check is not None:
+                resource_check()
+            operations.charge(self, c, tenant, "scan_submission")
             job = dict(id=new_id(), tenant_id=tenant, connection_id=connection_id, idempotency_key=idempotency_key,
                        requested_by_issuer=principal.issuer, requested_by_subject=principal.subject,
                        status="queued", requested_at=self._now(c), attempt=0, lease_token="", lease_until=0,
@@ -302,10 +316,23 @@ class Store:
                 s.jobs.c.status == "running", s.jobs.c.lease_until > now, s.jobs.c.cancel_requested.is_(False),
                 s.jobs.c.connection_id.in_(enabled)).values(lease_until=now + lease_seconds)).rowcount == 1
 
-    def finish(self, lease, state, artifact_rows=()):
+    def publication_budget(self, lease, size, count):
+        with self.engine.begin() as c:
+            c.execute(select(s.tenants.c.id).where(s.tenants.c.id == lease["tenant_id"]).with_for_update()).scalar_one()
+            row = c.execute(select(s.jobs.c.id).where(s.jobs.c.id == lease["id"], s.jobs.c.tenant_id == lease["tenant_id"],
+                s.jobs.c.lease_token == lease["lease_token"], s.jobs.c.status == "running",
+                s.jobs.c.lease_until > self._now(c), s.jobs.c.cancel_requested.is_(False))).first()
+            if row is None or not self._connection(c, lease["tenant_id"], lease["connection_id"])["enabled"]:
+                raise Rejected("Assessment lease is unavailable", 409)
+            operations.check_budget(c, lease["tenant_id"], size, count, exclude_job=lease["id"])
+
+    def finish(self, lease, state, artifact_rows=(), *, error_code=""):
         if state not in {"completed", "failed", "cancelled"}:
             raise ValueError("Invalid terminal state")
+        if error_code not in {"", "worker_failed", "storage_quota", "staging_limit", "disk_pressure"}:
+            raise ValueError("Invalid worker error code")
         with self.engine.begin() as c:
+            c.execute(select(s.tenants.c.id).where(s.tenants.c.id == lease["tenant_id"]).with_for_update()).scalar_one()
             connection = self._connection(c, lease["tenant_id"], lease["connection_id"], lock=True)
             row = c.execute(select(s.jobs).where(s.jobs.c.id == lease["id"], s.jobs.c.lease_token == lease["lease_token"],
                 s.jobs.c.lease_until > self._now(c), s.jobs.c.status.in_(["running", "cancelling"]))
@@ -315,10 +342,20 @@ class Store:
             if row["cancel_requested"] or not connection["enabled"]:
                 state = "cancelled"
             if state == "completed":
+                try:
+                    if any(isinstance(a["size"], bool) or not isinstance(a["size"], int) or not 0 <= a["size"] <= 32 * 1024 * 1024 for a in artifact_rows):
+                        raise Rejected("Invalid publication size", 429)
+                    size = sum(a["size"] for a in artifact_rows)
+                    if size > operations.JOB_BYTES or len(artifact_rows) > operations.JOB_FILES:
+                        raise Rejected("Publication exceeds its reservation", 429)
+                    operations.check_budget(c, row["tenant_id"], size, len(artifact_rows), exclude_job=row["id"])
+                except Rejected:
+                    state, error_code = "failed", "storage_quota"
+            if state == "completed":
                 for artifact in artifact_rows:
                     c.execute(insert(s.artifacts).values(**artifact, tenant_id=row["tenant_id"], job_id=row["id"]))
             c.execute(update(s.jobs).where(s.jobs.c.id == row["id"]).values(status=state,
-                error_code="worker_failed" if state == "failed" else "", lease_token="", lease_until=0))
+                error_code=(error_code or "worker_failed") if state == "failed" else "", lease_token="", lease_until=0))
             self._audit(c, row["tenant_id"], "worker", "assessment." + state, row["id"])
             return True
 

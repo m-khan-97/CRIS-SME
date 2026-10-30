@@ -15,11 +15,12 @@ from cris_sme.enterprise.recovery import backup, inspect_backup, restore
 from cris_sme.enterprise.storage import configured_storage, LocalStorage, S3Storage
 from cris_sme.enterprise.storage_operations import copy_registered, retention_plan, usage
 from cris_sme.enterprise import retention
+from cris_sme.enterprise import operations
 
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("command", choices=["migrate", "bootstrap", "serve", "worker", "historical-import", "backup", "check-backup", "restore", "storage-check", "storage-copy", "storage-usage", "retention-plan", "retention-hold", "retention-propose", "retention-approve", "retention-withdraw", "retention-expire", "retention-cleanup"])
+    parser.add_argument("command", choices=["migrate", "bootstrap", "serve", "worker", "historical-import", "backup", "check-backup", "restore", "storage-check", "storage-copy", "storage-usage", "retention-plan", "retention-hold", "retention-propose", "retention-approve", "retention-withdraw", "retention-expire", "retention-cleanup", "operations-status", "operations-limits"])
     parser.add_argument("--name")
     parser.add_argument("--subject")
     parser.add_argument("--host", default="127.0.0.1")
@@ -38,6 +39,8 @@ def main():
     parser.add_argument("--plan-sha256")
     parser.add_argument("--reason")
     parser.add_argument("--release", action="store_true")
+    parser.add_argument("--quota-bytes", type=int)
+    parser.add_argument("--max-artifacts", type=int)
     args = parser.parse_args()
     os.umask(0o077)
     store = Store.connect(os.environ["CRIS_ENTERPRISE_DATABASE_URL"], os.environ["CRIS_ENTERPRISE_ENCRYPTION_KEY"])
@@ -49,7 +52,14 @@ def main():
     storage = configured_storage(root) if args.command in {
         "serve", "worker", "historical-import", "backup", "restore", "storage-check", "storage-copy", "retention-expire", "retention-cleanup"
     } else LocalStorage(root)
-    if args.command in {"retention-hold", "retention-propose", "retention-approve", "retention-withdraw", "retention-expire", "retention-cleanup"}:
+    if args.command == "operations-status":
+        print(json.dumps(operations.operator_status(store, root)))
+    elif args.command == "operations-limits":
+        if not args.apply or not args.tenant or not args.subject or args.quota_bytes is None or args.max_artifacts is None:
+            parser.error("Limit changes require --apply, --tenant, --subject, --quota-bytes and --max-artifacts")
+        actor = Principal(os.environ["CRIS_ENTERPRISE_OIDC_ISSUER"], args.subject)
+        print(json.dumps(operations.set_limits(store, str(args.tenant), actor, args.quota_bytes, args.max_artifacts)))
+    elif args.command in {"retention-hold", "retention-propose", "retention-approve", "retention-withdraw", "retention-expire", "retention-cleanup"}:
         if not args.tenant or not args.subject or not args.apply:
             parser.error("Retention mutations require --tenant, --subject and explicit --apply")
         if args.command not in {"retention-hold", "retention-withdraw"} and os.environ.get("CRIS_ENTERPRISE_RETENTION_ENABLED") != "true":

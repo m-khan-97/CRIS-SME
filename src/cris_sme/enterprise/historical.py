@@ -13,6 +13,7 @@ from cris_sme.api.artifact_access import MAX_ARTIFACT_BYTES, MAX_REPORT_BYTES, R
 from cris_sme.enterprise import schema as s
 from cris_sme.enterprise.store import ADMIN, Rejected, new_id
 from cris_sme.enterprise.storage import LocalStorage
+from cris_sme.enterprise.operations import check_budget, check_disk
 
 
 def digest(content):
@@ -165,14 +166,16 @@ def publish_import(store, tenant, principal, prepared: PreparedImport, artifact_
         job, connection, now = new_id(), new_id(), store._now(c)
         artifact_root = artifact_root.resolve()
         artifact_root.mkdir(parents=True, exist_ok=True, mode=0o700)
-        directory = artifact_root / tenant
-        directory.mkdir(exist_ok=True, mode=0o700)
-        directory = directory / job
-        directory.mkdir(mode=0o700)
         preview = prepared.preview()
         manifest = {**preview, "tenant_id": tenant, "job_id": job, "imported_at": now,
                     "origin": "historical_import", "collector_executed": False}
         files = {**prepared.files, "historical_import_manifest.json": (json.dumps(manifest, indent=2) + "\n").encode()}
+        check_budget(c, tenant, sum(map(len, files.values())), len(files))
+        check_disk(artifact_root, required_bytes=sum(map(len, files.values())))
+        directory = artifact_root / tenant
+        directory.mkdir(exist_ok=True, mode=0o700)
+        directory = directory / job
+        directory.mkdir(mode=0o700)
         records = []
         for name, content in sorted(files.items()):
             path = directory / name

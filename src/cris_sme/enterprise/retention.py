@@ -13,6 +13,7 @@ from cris_sme.enterprise.auth import Principal
 from cris_sme.enterprise.storage import LocalStorage
 from cris_sme.enterprise.storage_operations import retention_plan
 from cris_sme.enterprise.store import ADMIN, Rejected, new_id
+from cris_sme.enterprise.operations import charge
 
 COOLING_SECONDS = 86400
 PLAN_LIFETIME = 7 * 86400
@@ -80,6 +81,9 @@ def _artifacts(c, tenant, jobs):
 def propose(store, tenant, actor, days, reason, *, exclude=(), include_historical=False):
     if not isinstance(reason, str) or not reason.strip() or len(reason) > 500:
         raise ValueError("A reason of 1-500 characters is required")
+    with store.engine.begin() as c:
+        store._access(c, tenant, actor, ADMIN, lock=True)
+        charge(store, c, tenant, "retention_proposal")
     preview = retention_plan(store, tenant, actor, days, exclude=exclude, include_historical=include_historical)
     jobs = [row["assessment_id"] for row in preview["candidates"]]
     if not jobs:

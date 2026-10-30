@@ -19,6 +19,7 @@ from cris_sme.enterprise.auth import AccessTokenVerifier
 from cris_sme.enterprise.storage import ArtifactStorage, LocalStorage
 from cris_sme.enterprise.storage_operations import usage
 from cris_sme.enterprise import retention
+from cris_sme.enterprise import operations
 from cris_sme.enterprise.cloud import ROLE, aws_onboarding, verify_connection
 from cris_sme.enterprise.store import Rejected, Store, new_id
 
@@ -61,6 +62,27 @@ class StorageUsageView(BaseModel):
     assessments: int
     includes_unreferenced_files: bool
     includes_s3_versions: bool
+
+
+class RateStatusView(BaseModel):
+    used: int
+    limit: int
+    remaining: int
+    reset_after_seconds: int
+
+
+class OperationsView(BaseModel):
+    quota_bytes: int
+    max_artifacts: int
+    registered_bytes: int
+    registered_artifacts: int
+    reserved_bytes: int
+    reserved_artifacts: int
+    pending_assessments: int
+    assessments: dict[str, int]
+    oldest_queue_age_seconds: int
+    expired_leases: int
+    rate_limits: dict[str, RateStatusView]
 
 
 class HoldInput(BaseModel):
@@ -316,7 +338,8 @@ def create_app(settings: Settings, store: Store, *, verifier=None, cloud_verify=
 
     @app.exception_handler(Rejected)
     async def rejected(request, exc):
-        return JSONResponse({"detail": str(exc)}, status_code=exc.status)
+        return JSONResponse({"detail": str(exc)}, status_code=exc.status,
+                            headers={"Retry-After": str(exc.retry_after)} if exc.retry_after is not None else None)
 
     @app.exception_handler(Exception)
     async def unexpected(request, exc):
@@ -343,6 +366,7 @@ def create_app(settings: Settings, store: Store, *, verifier=None, cloud_verify=
     def ready():
         try:
             store.check_ready()
+            operations.check_disk(settings.artifact_root)
             if settings.artifact_storage is not None:
                 settings.artifact_storage.check_ready()
         except Exception:
@@ -417,6 +441,7 @@ def create_app(settings: Settings, store: Store, *, verifier=None, cloud_verify=
         row = store.connection(str(tenant), actor, str(connection), secrets=True)
         if not row["enabled"]:
             raise HTTPException(409, "Connection is disconnected")
+        store.admit_verification(str(tenant), actor, str(connection))
         try:
             cloud_verify(row)
         except Exception:
@@ -433,7 +458,11 @@ def create_app(settings: Settings, store: Store, *, verifier=None, cloud_verify=
     def assess(tenant: UUID, body: ScanInput, actor=Depends(principal), idempotency_key: str = Header()):
         if not body.authorization_confirmed or not re.fullmatch(r"[A-Za-z0-9_.:-]{1,128}", idempotency_key):
             raise HTTPException(422, "Explicit authorization and a valid idempotency key are required")
-        return store.submit(str(tenant), actor, str(body.connection_id), idempotency_key)
+        try:
+            return store.submit(str(tenant), actor, str(body.connection_id), idempotency_key,
+                resource_check=lambda: operations.check_disk(settings.artifact_root, required_bytes=operations.STAGING_BYTES))
+        except operations.ResourceLimit:
+            raise HTTPException(503, "Assessment storage is under pressure") from None
 
     @app.get("/api/v1/tenants/{tenant}/assessments", response_model=JobList)
     def assessment_list(tenant: UUID, actor=Depends(principal)):
@@ -504,6 +533,10 @@ def create_app(settings: Settings, store: Store, *, verifier=None, cloud_verify=
     @app.get("/api/v1/tenants/{tenant}/storage", response_model=StorageUsageView)
     def storage_usage(tenant: UUID, actor=Depends(principal)):
         return usage(store, str(tenant), actor)
+
+    @app.get("/api/v1/tenants/{tenant}/operations", response_model=OperationsView)
+    def operation_status(tenant: UUID, actor=Depends(principal)):
+        return operations.tenant_status(store, str(tenant), actor)
 
     @app.get("/api/v1/tenants/{tenant}/audit", response_model=AuditList)
     def audit(tenant: UUID, actor=Depends(principal)):

@@ -264,7 +264,7 @@ def test_v2_upgrade_and_legacy_bundle_remain_supported(context, tmp_path):
         backup(ctx["store"], ctx["root"], destination)
         document = json.loads((destination / "metadata.json").read_bytes())
         document["schema_version"] = 2
-        for table in (s.holds, s.hold_events, s.retention_plans, s.retirements, s.cleanup):
+        for table in (s.holds, s.hold_events, s.retention_plans, s.retirements, s.cleanup, s.limits):
             document["tables"].pop(table.name)
         raw = json.dumps(document).encode()
         (destination / "metadata.json").write_bytes(raw)

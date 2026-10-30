@@ -1,5 +1,5 @@
 """Versioned enterprise metadata; migration is an explicit operator action."""
-from sqlalchemy import (Boolean, Column, ForeignKey, ForeignKeyConstraint, Index, Integer,
+from sqlalchemy import (BigInteger, Boolean, Column, ForeignKey, ForeignKeyConstraint, Index, Integer,
                         MetaData, String, Table, Text, UniqueConstraint)
 
 metadata = MetaData()
@@ -29,12 +29,14 @@ jobs = Table("cris_jobs", metadata, Column("id", String(36), primary_key=True),
              UniqueConstraint("tenant_id", "idempotency_key"), UniqueConstraint("tenant_id", "id"),
              ForeignKeyConstraint(["tenant_id", "connection_id"], ["cris_connections.tenant_id", "cris_connections.id"]))
 Index("cris_jobs_claim", jobs.c.status, jobs.c.lease_until, jobs.c.requested_at)
+job_tenant_index = Index("cris_jobs_tenant_status", jobs.c.tenant_id, jobs.c.status, jobs.c.requested_at)
 artifacts = Table("cris_artifacts", metadata, Column("id", String(36), primary_key=True),
                   Column("tenant_id", String(36), nullable=False), Column("job_id", String(36), nullable=False),
                   Column("name", String(160), nullable=False), Column("key", Text, nullable=False),
                   Column("sha256", String(64), nullable=False), Column("size", Integer, nullable=False),
                   ForeignKeyConstraint(["tenant_id", "job_id"], ["cris_jobs.tenant_id", "cris_jobs.id"]),
                   UniqueConstraint("job_id", "name"))
+artifact_tenant_index = Index("cris_artifacts_tenant_job", artifacts.c.tenant_id, artifacts.c.job_id)
 audit = Table("cris_audit", metadata, Column("id", String(36), primary_key=True),
               Column("tenant_id", ForeignKey("cris_tenants.id"), nullable=False),
               Column("subject", String(255), nullable=False), Column("action", String(60), nullable=False),
@@ -83,7 +85,17 @@ cleanup = Table("cris_retention_cleanup", metadata,
     Column("error_code", String(40), nullable=False, default=""),
     ForeignKeyConstraint(["tenant_id", "job_id"], ["cris_retirements.tenant_id", "cris_retirements.job_id"]))
 
-SCHEMA_VERSION = 3
+limits = Table("cris_tenant_limits", metadata,
+    Column("tenant_id", ForeignKey("cris_tenants.id"), primary_key=True),
+    Column("quota_bytes", BigInteger, nullable=False), Column("max_artifacts", Integer, nullable=False),
+    Column("updated_at", Integer, nullable=False), Column("subject", String(255), nullable=False))
+rates = Table("cris_action_rates", metadata,
+    Column("tenant_id", ForeignKey("cris_tenants.id"), primary_key=True), Column("action", String(40), primary_key=True),
+    Column("window", Integer, nullable=False), Column("used", Integer, nullable=False))
+workers = Table("cris_worker_health", metadata, Column("id", String(36), primary_key=True),
+    Column("last_seen", Integer, nullable=False), Column("busy", Boolean, nullable=False))
+
+SCHEMA_VERSION = 4
 
 
 def migrate(engine):
@@ -93,10 +105,13 @@ def migrate(engine):
         connection.exec_driver_sql("SELECT pg_advisory_xact_lock(754392810)")
         versions.create(connection, checkfirst=True)
         rows = list(connection.execute(versions.select()).scalars())
-        if rows not in ([], [1], [2], [SCHEMA_VERSION]):
+        if rows not in ([], [1], [2], [3], [SCHEMA_VERSION]):
             raise RuntimeError("Unsupported enterprise schema version")
         # Additive upgrades retain existing assessment, membership and artifact rows.
         metadata.create_all(connection)
+        # create_all skips indexes on existing tables during additive upgrades.
+        for index in (job_tenant_index, artifact_tenant_index):
+            index.create(connection, checkfirst=True)
         if rows != [SCHEMA_VERSION]:
             connection.execute(versions.delete())
             connection.execute(versions.insert().values(version=SCHEMA_VERSION))
