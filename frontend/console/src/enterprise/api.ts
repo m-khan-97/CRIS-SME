@@ -5,13 +5,13 @@ export interface Tenant { id: string; name: string; role: Role }
 export interface Connection { id: string; name: string; provider: "aws" | "azure"; scope_id: string; enabled: boolean; verified_until: number; origin?: "cloud" | "historical_archive" }
 export interface Artifact { id: string; name: string; sha256: string; size: number }
 export interface HistoricalImport { source_run_id: string; source_organization_id: string; source_sha256: string; bundle_sha256: string; generated_at: string; imported_at: number; provider: "aws" | "azure"; scope_id: string; reported_source_type: string }
-export interface Job { id: string; tenant_id: string; connection_id: string; status: "queued" | "running" | "cancelling" | "cancelled" | "completed" | "failed"; requested_at: number; attempt: number; error_code: string; artifacts?: Artifact[]; origin?: "live_scan" | "historical_import"; historical_import?: HistoricalImport | null }
+export interface Job { id: string; tenant_id: string; connection_id: string; status: "queued" | "running" | "cancelling" | "cancelled" | "completed" | "failed"; requested_at: number; attempt: number; error_code: string; artifacts?: Artifact[]; origin?: "live_scan" | "historical_import"; historical_import?: HistoricalImport | null; report_state?: "available" | "expired"; expired_at?: number | null }
 export interface Member { subject: string; issuer: string; role: Role }
 export interface Audit { id: string; subject: string; action: string; resource_id: string; created_at: number }
 export interface ConnectionInput { name: string; provider: "aws" | "azure"; scope_id: string; role_arn?: string; tenant_id?: string; client_id?: string; client_secret?: string }
 export class ApiError extends Error {
   status: number;
-  constructor(status: number) { super(status === 401 ? "Your session has expired. Sign in again." : status === 403 ? "Your role does not permit this action." : status === 404 ? "This organization or resource is unavailable." : `Request failed (${status}).`); this.status = status; }
+  constructor(status: number) { super(status === 401 ? "Your session has expired. Sign in again." : status === 403 ? "Your role does not permit this action." : status === 404 ? "This organization or resource is unavailable." : status === 410 ? "This report has expired under approved retention." : `Request failed (${status}).`); this.status = status; }
 }
 
 export class EnterpriseApi {

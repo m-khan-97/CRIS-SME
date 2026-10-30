@@ -66,6 +66,9 @@ try {
     const usage = await inventory.json();
     assert.ok(Number.isSafeInteger(usage.registered_bytes) && usage.registered_bytes >= 0);
     assert.equal(usage.includes_unreferenced_files, false);
+    const retention = await request(owner.user, `/api/v1/tenants/${tenant}/retention`);
+    assert.equal(retention.status, 200);
+    assert.ok(Array.isArray((await retention.json()).holds));
     await owner.page.getByRole("combobox", { name: "Organization", exact: true }).selectOption(tenant);
     await owner.page.getByRole("heading", { name: "Assessments", exact: true }).waitFor();
     await owner.page.screenshot({ path: resolve(output, "owner-workspace.png"), fullPage: true });
@@ -89,6 +92,7 @@ try {
     analyst = await login(accounts.analyst);
     assert.equal((await request(analyst.user, `/api/v1/tenants/${tenant}/assessments`)).status, 200);
     assert.equal((await request(analyst.user, `/api/v1/tenants/${tenant}/storage`)).status, 403);
+    assert.equal((await request(analyst.user, `/api/v1/tenants/${tenant}/retention`)).status, 403);
     assert.equal((await request(analyst.user, `/api/v1/tenants/${tenant}/connections`, { method: "POST", body: JSON.stringify({
       name: "Denied qualification request", provider: "aws", scope_id: "000000000000", role_arn: "arn:aws:iam::000000000000:role/not-created",
     }) })).status, 403);

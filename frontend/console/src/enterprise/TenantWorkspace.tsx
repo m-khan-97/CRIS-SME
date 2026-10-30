@@ -37,7 +37,8 @@ export function TenantWorkspace({ tenant }: { tenant: Tenant }) {
   const completed = jobs.isError ? [] : jobs.data?.assessments.filter(j => j.status === "completed") ?? [];
   const chosen = requested ? completed.find(j => j.id === requested) : completed[0];
   const job = useQuery({ queryKey: ["enterprise", tenant.id, "job", chosen?.id], queryFn: () => api.job(tenant.id, chosen!.id), enabled: !!chosen, retry: false, refetchInterval: 15_000 });
-  const artifact = !job.isError && job.data?.status === "completed" ? job.data.artifacts?.find(a => a.name === "cris_sme_report.json") : undefined;
+  const expired = chosen?.report_state === "expired" || job.data?.report_state === "expired";
+  const artifact = !expired && !job.isError && job.data?.status === "completed" ? job.data.artifacts?.find(a => a.name === "cris_sme_report.json") : undefined;
   const report = useQuery({ queryKey: ["enterprise", tenant.id, chosen?.id, artifact?.id, artifact?.sha256],
     queryFn: () => api.report(tenant.id, artifact!), enabled: !!artifact, retry: false });
   const error = jobs.error ?? job.error ?? report.error;
@@ -66,7 +67,7 @@ export function TenantWorkspace({ tenant }: { tenant: Tenant }) {
       <label className="flex min-w-0 flex-1 items-center gap-2 text-sm">Assessment
         <select aria-label="Active assessment" className="min-w-0 max-w-xl flex-1" value={chosen?.id ?? ""} onChange={e => select(e.target.value)}>
           {!chosen && <option value="">{requested ? "Selected assessment unavailable" : "No completed assessments"}</option>}
-          {entries.map(e => <option key={e.report_id} value={e.report_id}>{completed.find(j => j.id === e.report_id)?.origin === "historical_import" ? "[Imported] " : ""}{new Date(e.generated_at).toLocaleString()} - {e.provider.toUpperCase()} - {e.run_id}</option>)}
+          {entries.map(e => <option key={e.report_id} value={e.report_id}>{completed.find(j => j.id === e.report_id)?.report_state === "expired" ? "[Expired] " : ""}{completed.find(j => j.id === e.report_id)?.origin === "historical_import" ? "[Imported] " : ""}{new Date(e.generated_at).toLocaleString()} - {e.provider.toUpperCase()} - {e.run_id}</option>)}
         </select>
       </label>
     </div>
@@ -81,6 +82,10 @@ export function TenantWorkspace({ tenant }: { tenant: Tenant }) {
       <span>Evidence mode: {visibleReport?.collector_mode ?? "Unavailable"}</span>
       <span>Coverage: {coverage.length ? `${new Set(coverage.flatMap(c => c.observed_domains)).size} observed / ${new Set(coverage.flatMap(c => c.partially_observed_domains)).size} partial / ${new Set(coverage.flatMap(c => c.unavailable_domains)).size} unavailable domains` : "Not reported"}</span>
     </div>}
+    {expired && <section aria-label="Expired report" className="space-y-1 border-b border-border-card px-4 py-3 text-sm">
+      <strong>Report expired under approved retention</strong>
+      <p>Assessment history is preserved. Report contents and downloads are unavailable.</p>
+    </section>}
     {error && <p role="alert" className="p-4">{error.message}</p>}
     <ScopedAssessmentProvider value={value}><Suspense fallback={<p className="p-6">Loading view...</p>}>
       <Routes>
@@ -96,7 +101,7 @@ export function TenantWorkspace({ tenant }: { tenant: Tenant }) {
         <Route path="disclosure" element={<Disclosure />} /><Route path="governance" element={<Governance />} />
         <Route path="trend" element={<Trends />} /><Route path="native-validation" element={<NativeValidation />} />
         </Route>
-        <Route path="reports" element={<Reports key={chosen?.id ?? "empty"} tenant={tenant} job={error ? undefined : job.data} />} />
+        <Route path="reports" element={<Reports key={chosen?.id ?? "empty"} tenant={tenant} job={error ? undefined : expired && job.data ? { ...job.data, report_state: "expired", artifacts: [] } : job.data} />} />
         <Route path="members" element={<Members tenant={tenant} />} /><Route path="audit" element={<AuditLog tenant={tenant} />} />
         <Route path="*" element={<EnterpriseFallback />} />
       </Routes>

@@ -11,9 +11,9 @@ const artifactA = "dddddddd-dddd-4ddd-8ddd-dddddddddddd";
 const artifactB = "eeeeeeee-eeee-4eee-8eee-eeeeeeeeeeee";
 const queuedId = "ffffffff-ffff-4fff-8fff-ffffffffffff";
 
-async function setup(page: Page, options: { role?: string; authenticated?: boolean; expiry?: number; imported?: boolean } = {}) {
+async function setup(page: Page, options: { role?: string; authenticated?: boolean; expiry?: number; imported?: boolean; retired?: boolean } = {}) {
   const state = { role: options.role ?? "owner", revoked: false, expired: false, missing: false, queued: false,
-    cancel: false, connections: true, verified: true, failSubmission: false, submissions: [] as { key: string; body: unknown }[],
+    cancel: false, connections: true, verified: true, retired: options.retired ?? false, failSubmission: false, submissions: [] as { key: string; body: unknown }[],
     requests: [] as string[], legacy: [] as string[], created: [] as Record<string, unknown>[], tokenRequests: [] as string[], authorization: "" };
   const errors: string[] = [];
   page.on("pageerror", error => errors.push(error.message));
@@ -38,7 +38,7 @@ async function setup(page: Page, options: { role?: string; authenticated?: boole
     return [{ id: org === orgA ? artifactA : artifactB, name: "cris_sme_report.json", size: Buffer.byteLength(text), sha256: createHash("sha256").update(text).digest("hex") }];
   };
   const job = (org: string) => ({ id: org === orgA ? runA : runB, tenant_id: org, connection_id: conn,
-    requested_at: 1790000000, status: "completed", attempt: 1, error_code: "",
+    requested_at: 1790000000, status: "completed", attempt: 1, error_code: "", report_state: state.retired ? "expired" : "available",
     ...(options.imported ? { origin: "historical_import", historical_import: {
       source_run_id: "archived-source-run", source_organization_id: "legacy-org", source_sha256: "b".repeat(64),
       bundle_sha256: "c".repeat(64), generated_at: "2026-07-03T12:40:13Z", imported_at: 1790000000,
@@ -344,5 +344,30 @@ test("reselecting the active assessment does not abort its loading report", asyn
   release();
   await expect(page.getByRole("heading", { name: "Finding Alpha", exact: true })).toBeVisible();
   await expect(page.getByRole("alert")).toHaveCount(0);
+  expect(errors).toEqual([]);
+});
+
+test("expired history stays selected and never fetches or downloads report bytes", async ({ page }) => {
+  const { state, errors } = await setup(page, { retired: true });
+  await page.goto("/findings");
+  await expect(page.getByRole("region", { name: "Expired report" })).toBeVisible();
+  await expect(page.getByRole("combobox", { name: "Active assessment" })).toHaveValue(runA);
+  await expect(page.getByRole("combobox", { name: "Active assessment" })).toContainText("[Expired]");
+  await expect(page.getByRole("heading", { name: "Finding Alpha", exact: true })).toHaveCount(0);
+  await page.getByRole("link", { name: "Reports", exact: true }).click();
+  await expect(page.getByRole("button", { name: "Download cris_sme_report.json", exact: true })).toHaveCount(0);
+  expect(state.requests.some(request => request.includes("/artifacts/"))).toBe(false);
+  expect(errors).toEqual([]);
+});
+
+test("retention expiry removes a visible cached report and its export controls", async ({ page }) => {
+  const { state, errors } = await setup(page);
+  await page.goto("/findings");
+  await expect(page.getByRole("heading", { name: "Finding Alpha", exact: true })).toBeVisible();
+  state.retired = true;
+  await expect(page.getByRole("region", { name: "Expired report" })).toBeVisible({ timeout: 10_000 });
+  await expect(page.getByRole("heading", { name: "Finding Alpha", exact: true })).toHaveCount(0);
+  await page.getByRole("link", { name: "Reports", exact: true }).click();
+  await expect(page.getByRole("button", { name: "Download cris_sme_report.json", exact: true })).toHaveCount(0);
   expect(errors).toEqual([]);
 });

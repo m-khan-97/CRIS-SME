@@ -33,7 +33,8 @@ export function Assessments({ tenant, jobs, connections, select }: { tenant: Ten
     {submit.isSuccess && <p role="status">Assessment queued.</p>}
     {!jobs.length ? <p>No assessments available.</p> : <div className="overflow-x-auto"><table className="w-full text-left text-sm"><thead><tr><th>Date</th><th>Connection</th><th>Assessment ID</th><th>Status</th><th>Actions</th></tr></thead><tbody>
       {jobs.map(j => <tr key={j.id}><td>{new Date(j.historical_import?.generated_at ?? j.requested_at * 1000).toLocaleString()}</td><td>{connections.find(c => c.id === j.connection_id)?.name ?? j.connection_id}</td><td className="font-mono text-xs">{j.historical_import?.source_run_id ?? j.id}</td><td>{j.origin === "historical_import" && <strong className="block">Imported</strong>}{j.status}{j.error_code && <span className="block">{j.error_code}</span>}</td><td>
-        {j.status === "completed" && <button onClick={() => select(j.id)}>Select report</button>}
+        {j.report_state === "expired" && <strong className="block">Report expired</strong>}
+        {j.status === "completed" && <button onClick={() => select(j.id)}>{j.report_state === "expired" ? "Select history" : "Select report"}</button>}
         {operate && ["queued", "running"].includes(j.status) && <button title="Cancel assessment" aria-label={`Cancel ${j.id}`} disabled={cancel.isPending} onClick={() => cancel.mutate(j.id)}><X size={16} /></button>}
       </td></tr>)}
     </tbody></table></div>}
@@ -44,7 +45,7 @@ export function Reports({ tenant, job }: { tenant: Tenant; job?: Job }) {
   const { api } = useSession();
   const download = useMutation({ mutationFn: async (id: string) => {
     const artifact = job?.artifacts?.find(a => a.id === id);
-    if (!artifact || job?.status !== "completed") throw new Error("Select a completed assessment.");
+    if (!artifact || job?.status !== "completed" || job.report_state === "expired") throw new Error("Select an available completed assessment.");
     const bytes = await api.artifact(tenant.id, artifact);
     const url = URL.createObjectURL(new Blob([bytes], { type: "application/octet-stream" }));
     const anchor = document.createElement("a");
@@ -53,7 +54,7 @@ export function Reports({ tenant, job }: { tenant: Tenant; job?: Job }) {
   } });
   return <main className="space-y-4 p-4 md:p-6"><h1 className="text-xl font-semibold text-text-strong">Reports</h1>
     {download.error && <p role="alert">{download.error.message}</p>}
-    {!job || job.status !== "completed" ? <p>No completed assessment selected.</p> : <>
+    {job?.report_state === "expired" ? <p>Report downloads are unavailable under approved retention.</p> : !job || job.status !== "completed" ? <p>No completed assessment selected.</p> : <>
       <p className="break-words text-sm">{tenant.name} / {job.id}</p>
       <ul className="divide-y divide-border-card">{job.artifacts?.map(a => <li className="flex min-w-0 flex-wrap items-center gap-3 py-3" key={a.id}>
         <div className="min-w-0 flex-1"><strong className="break-all">{a.name}</strong><div className="break-all font-mono text-xs">SHA-256 {a.sha256}</div><div className="text-sm">{a.size.toLocaleString()} bytes</div></div>
