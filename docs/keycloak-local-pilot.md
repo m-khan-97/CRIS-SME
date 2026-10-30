@@ -44,28 +44,55 @@ details. Never put those values in chat, public screenshots or `VITE_*` settings
 The bootstrap administrator is for this private pilot, not a production account
 lifecycle design.
 
-The setup generates a 30-day private CA and localhost server certificate. The
+The setup generates a private CA and a 365-day localhost server certificate. The
 API adds the CA using `CRIS_ENTERPRISE_OIDC_CA_FILE`, retaining hostname and
-certificate verification. No global trust store is changed. The CA issuing
-private key is not retained; automatic certificate renewal is not implemented.
+certificate verification. The CA issuing private key is not retained. Startup
+renews certificates within 30 days of expiry, archives the old material privately,
+and refreshes recorded browser trust. If services are already running, use
+`restart` to renew safely. A continuously running pilot must still be restarted
+before its certificate expires; this is not a production certificate manager.
 
-Open a separate interactive Chrome/Chromium profile with:
+For normal Chrome/Chromium on Linux, install `libnss3-tools` and trust the exact
+localhost server certificate once (no administrator rights needed for the trust
+operation):
 
 ```bash
+.venv/bin/python scripts/keycloak_local.py trust-browser
 .venv/bin/python scripts/keycloak_local.py browser
 ```
 
-The launcher accepts **only this server's public-key pin** for its private
-certificate. It does not use a blanket certificate-error bypass or alter your
-normal browser profile. Alternatively, trust the public `ca.pem` explicitly in
-a suitable local profile. Use `localhost:5174`, not `127.0.0.1:5174`, to match
-the registered origin. Development browser flags are not a production solution.
+The trust command adds **only the exact non-CA localhost TLS peer** (`P,,`) to
+your user NSS certificate database, not the CA or a system-wide trust store.
+It follows Chromium's legacy `~/.pki/nssdb` precedence, otherwise uses
+`~/.local/share/pki/nssdb`. It backs up the public certificate database without
+copying private keys. The tool uses system `certutil`, or an operator-provided
+copy extracted from the official Ubuntu `libnss3-tools` package under
+`.venv/nss-tools/usr/bin/certutil`. It never downloads executables itself.
+See [Chromium's Linux certificate documentation](https://chromium.googlesource.com/chromium/src/+/main/docs/linux/cert_management.md).
 
-An ordinary browser profile that does not trust this CA will show a generic
-sign-in failure when fetching Keycloak discovery. Use the isolated launcher
-above. It removes IDE-injected GTK/schema overrides from the child environment
-and checks for early browser crashes; startup errors remain in private
-`.local/keycloak/browser.log`. Your desktop environment is not modified.
+The launcher opens your **normal browser**, without TLS bypass flags. If Chrome
+was already running when trust was first installed, fully quit and reopen it
+once if it still caches the certificate error. Use `http://localhost:5174`, not
+`127.0.0.1:5174`, to match the registered origin. Firefox uses a different trust
+store and is not configured by this helper. The launcher removes IDE-injected
+GTK/schema overrides and checks early browser crashes; errors remain private in
+`.local/keycloak/browser.log`.
+
+To undo, run `.venv/bin/python scripts/keycloak_local.py untrust-browser`.
+Removal checks the recorded fingerprint and leaves unrelated certificates alone.
+Do not restore the whole NSS backup over later user changes. Browser trust is
+local development setup, not production identity qualification.
+
+To exercise the real PKCE flow without certificate bypass flags, run from
+`frontend/console` (Node 22.12+):
+
+```bash
+CRIS_KEYCLOAK_SYSTEM_TRUST=true node scripts/qualify-keycloak.mjs
+```
+
+The default qualification mode still uses an isolated, exact-SPKI-pinned browser
+for CI environments where changing host trust is inappropriate. Its results
+identify the TLS mode explicitly.
 
 ## Lifecycle And Reproduction
 

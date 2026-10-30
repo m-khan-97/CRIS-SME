@@ -7,13 +7,16 @@ import { chromium } from "playwright";
 const state = resolve(process.argv[2] ?? "../../.local/keycloak");
 const accounts = JSON.parse(await readFile(resolve(state, "accounts.json"), "utf8"));
 const pin = (await readFile(resolve(state, "certificate-spki.txt"), "utf8")).trim();
+const normalTrust = process.env.CRIS_KEYCLOAK_SYSTEM_TRUST === "true";
 const output = resolve(state, "qualification");
 await mkdir(output, { recursive: true, mode: 0o700 });
 const results = { environment: "local_identity_integration", identity_provider: "Keycloak 26.8.1",
   started_at: new Date().toISOString(), console: "http://localhost:5174", issuer: "https://localhost:8443/realms/cris",
-  tls: "private CA verified by backend; exact server SPKI pinned in isolated Chromium",
+  tls: normalTrust ? "private CA verified by backend; normal Chrome NSS exact-leaf trust, no TLS bypass flags"
+    : "private CA verified by backend; exact server SPKI pinned in isolated Chromium",
   database: "dedicated local PostgreSQL", cloud_calls: false, checks: [] };
-const browser = await chromium.launch({ args: [`--ignore-certificate-errors-spki-list=${pin}`] });
+const browser = await chromium.launch(normalTrust ? { channel: "chrome" }
+  : { args: [`--ignore-certificate-errors-spki-list=${pin}`] });
 const contexts = [];
 const errors = [];
 
