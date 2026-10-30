@@ -11,13 +11,15 @@ from cris_sme.api.artifact_access import read_regular_file
 from cris_sme.api.managed_worker import WorkerCancelled, run_managed
 from cris_sme.enterprise.cloud import worker_environment
 from cris_sme.enterprise.store import new_id
+from cris_sme.enterprise.storage import LocalStorage
 
 
 EXPORTS = {"cris_sme_report.json", "cris_sme_report.html", "cris_sme_report.csv",
            "cris_sme_report.sarif", "cris_sme_summary.txt"}
 
 
-def execute_once(store, root: Path, *, lease_seconds=30, execute=run_managed, shutdown=None):
+def execute_once(store, root: Path, *, lease_seconds=30, execute=run_managed, shutdown=None, storage=None):
+    storage = storage or LocalStorage(root)
     lease = store.claim(lease_seconds=lease_seconds)
     if lease is None:
         return False
@@ -53,6 +55,7 @@ def execute_once(store, root: Path, *, lease_seconds=30, execute=run_managed, sh
             for name in sorted(EXPORTS):
                 if (output / name).exists():
                     content = read_regular_file(output, Path(name), max_bytes=32 * 1024 * 1024)
+                    storage.publish(str((output / name).relative_to(root)), content)
                     artifacts.append(dict(id=new_id(), name=name, key=str((output / name).relative_to(root)),
                                           sha256=hashlib.sha256(content).hexdigest(), size=len(content)))
             state = "completed"
@@ -70,13 +73,13 @@ def execute_once(store, root: Path, *, lease_seconds=30, execute=run_managed, sh
     return True
 
 
-def run_worker(store, root):
+def run_worker(store, root, storage=None):
     stop = threading.Event()
     previous = {sig: signal.signal(sig, lambda *args: stop.set()) for sig in (signal.SIGINT, signal.SIGTERM)}
     try:
         while not stop.is_set():
             try:
-                if not execute_once(store, root, shutdown=stop):
+                if not execute_once(store, root, shutdown=stop, storage=storage):
                     stop.wait(1)
             except Exception:
                 # No credentials, SQL parameters or provider errors enter public logs.

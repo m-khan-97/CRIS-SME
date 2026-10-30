@@ -61,13 +61,15 @@ def test_prepare_never_overwrites_existing_state(tmp_path):
     assert (tmp_path / "settings.json").read_text() == "existing-state"
 
 
-def test_environment_keeps_private_credentials_out_of_vite(tmp_path):
+def test_environment_keeps_private_credentials_out_of_vite(tmp_path, monkeypatch):
+    monkeypatch.setenv("CRIS_ENTERPRISE_STORAGE_BACKEND", "s3")
     (tmp_path / "settings.json").write_text(json.dumps({"java_home": "java", "pg_password": "test-private-password", "encryption_key": "test-private-key"}))
     env = pilot.environment(tmp_path)
     public = {key: value for key, value in env.items() if key.startswith("VITE_")}
     assert "test-private" not in json.dumps(public)
     assert env["CRIS_ENTERPRISE_OIDC_CA_FILE"] == str(tmp_path / "ca.pem")
     assert env["CRIS_ENTERPRISE_OIDC_AUDIENCE"] == "cris-api"
+    assert env["CRIS_ENTERPRISE_STORAGE_BACKEND"] == "local"
 
 
 def test_process_identity_ignores_dead_and_reused_processes(monkeypatch):

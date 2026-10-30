@@ -135,6 +135,7 @@ def environment(state):
         "CRIS_ENTERPRISE_TOKEN_URL": ISSUER + "/protocol/openid-connect/token",
         "CRIS_ENTERPRISE_OIDC_CA_FILE": str(state / "ca.pem"),
         "CRIS_ENTERPRISE_ARTIFACT_ROOT": str(state / "artifacts"),
+        "CRIS_ENTERPRISE_STORAGE_BACKEND": "local",
         "CRIS_ENTERPRISE_ALLOWED_HOSTS": "localhost,127.0.0.1",
         "VITE_OIDC_AUTHORITY": ISSUER, "VITE_OIDC_CLIENT_ID": "cris-console", "VITE_OIDC_SCOPE": "openid cris.api"})
     env.pop("VITE_API_BASE_URL", None)

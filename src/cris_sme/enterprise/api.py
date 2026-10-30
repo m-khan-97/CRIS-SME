@@ -15,8 +15,9 @@ from fastapi.security import OAuth2AuthorizationCodeBearer
 from pydantic import BaseModel, ConfigDict, Field, SecretStr, StrictBool
 from starlette.middleware.trustedhost import TrustedHostMiddleware
 
-from cris_sme.api.artifact_access import read_regular_file
 from cris_sme.enterprise.auth import AccessTokenVerifier
+from cris_sme.enterprise.storage import ArtifactStorage, LocalStorage
+from cris_sme.enterprise.storage_operations import usage
 from cris_sme.enterprise.cloud import ROLE, aws_onboarding, verify_connection
 from cris_sme.enterprise.store import Rejected, Store, new_id
 
@@ -33,6 +34,7 @@ class Settings:
     aws_principal_arn: str = ""
     allowed_hosts: tuple[str, ...] = ("127.0.0.1", "localhost")
     oidc_ca_file: str | None = None
+    artifact_storage: ArtifactStorage | None = None
 
 
 class ConnectionInput(BaseModel):
@@ -49,6 +51,14 @@ class ConnectionInput(BaseModel):
 class MemberInput(BaseModel):
     model_config = ConfigDict(extra="forbid")
     role: str = Field(pattern="^(owner|admin|operator|analyst|auditor)$")
+
+
+class StorageUsageView(BaseModel):
+    registered_artifacts: int
+    registered_bytes: int
+    assessments: int
+    includes_unreferenced_files: bool
+    includes_s3_versions: bool
 
 
 class ScanInput(BaseModel):
@@ -272,6 +282,8 @@ def create_app(settings: Settings, store: Store, *, verifier=None, cloud_verify=
     def ready():
         try:
             store.check_ready()
+            if settings.artifact_storage is not None:
+                settings.artifact_storage.check_ready()
         except Exception:
             return JSONResponse({"status": "not_ready"}, status_code=503)
         return {"status": "ready"}
@@ -378,11 +390,18 @@ def create_app(settings: Settings, store: Store, *, verifier=None, cloud_verify=
     @app.get("/api/v1/tenants/{tenant}/artifacts/{artifact}")
     def artifact(tenant: UUID, artifact: UUID, actor=Depends(principal)):
         record = store.artifact(str(tenant), actor, str(artifact))
-        data = read_regular_file(settings.artifact_root, Path(record["key"]), max_bytes=32 * 1024 * 1024)
+        storage = settings.artifact_storage or LocalStorage(settings.artifact_root)
+        if settings.artifact_storage is not None:
+            storage.check_ready()
+        data = storage.read(record["key"], max_bytes=32 * 1024 * 1024)
         if len(data) != record["size"] or hashlib.sha256(data).hexdigest() != record["sha256"]:
             raise HTTPException(409, "Artifact integrity check failed")
         return Response(data, media_type="application/octet-stream",
                         headers={"Content-Disposition": 'attachment; filename="' + record["name"] + '"'})
+
+    @app.get("/api/v1/tenants/{tenant}/storage", response_model=StorageUsageView)
+    def storage_usage(tenant: UUID, actor=Depends(principal)):
+        return usage(store, str(tenant), actor)
 
     @app.get("/api/v1/tenants/{tenant}/audit", response_model=AuditList)
     def audit(tenant: UUID, actor=Depends(principal)):

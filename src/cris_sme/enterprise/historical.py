@@ -12,6 +12,7 @@ from sqlalchemy import insert, or_, select
 from cris_sme.api.artifact_access import MAX_ARTIFACT_BYTES, MAX_REPORT_BYTES, REPORT_FILES, read_regular_file
 from cris_sme.enterprise import schema as s
 from cris_sme.enterprise.store import ADMIN, Rejected, new_id
+from cris_sme.enterprise.storage import LocalStorage
 
 
 def digest(content):
@@ -135,7 +136,7 @@ def prepare_import(source_root: Path, relative: Path, *, include_exports=False):
                           scope_id or "", source_type, digest(raw), bundle, files, tuple(skipped))
 
 
-def publish_import(store, tenant, principal, prepared: PreparedImport, artifact_root: Path):
+def publish_import(store, tenant, principal, prepared: PreparedImport, artifact_root: Path, *, storage=None):
     """Files precede one metadata transaction; interrupted copies may leave private orphans."""
     if "cris_sme_report.json" not in prepared.files or any(name not in REPORT_FILES for name in prepared.files):
         raise ValueError("Only recognized report exports can be published")
@@ -143,6 +144,7 @@ def publish_import(store, tenant, principal, prepared: PreparedImport, artifact_
         raise ValueError("Prepared source changed before publication")
     if len(prepared.files) > 64 or sum(map(len, prepared.files.values())) > 128 * 1024 * 1024:
         raise ValueError("Historical export bundle exceeds import limits")
+    storage = storage or LocalStorage(artifact_root)
     with store.engine.begin() as c:
         store._access(c, tenant, principal, ADMIN, lock=True)
         existing = c.execute(select(s.historical_imports).where(s.historical_imports.c.tenant_id == tenant,
@@ -153,7 +155,7 @@ def publish_import(store, tenant, principal, prepared: PreparedImport, artifact_
                 raise Rejected("Historical source run or export bundle changed; existing import retained", 409)
             for row in c.execute(select(s.artifacts).where(s.artifacts.c.tenant_id == tenant,
                                 s.artifacts.c.job_id == existing["job_id"])).mappings():
-                content = read_regular_file(artifact_root, Path(row["key"]), max_bytes=MAX_ARTIFACT_BYTES)
+                content = storage.read(row["key"], max_bytes=MAX_ARTIFACT_BYTES)
                 if digest(content) != row["sha256"] or len(content) != row["size"]:
                     raise Rejected("Existing imported artifact failed integrity verification", 409)
             return {"job_id": existing["job_id"], "created": False}
@@ -176,6 +178,7 @@ def publish_import(store, tenant, principal, prepared: PreparedImport, artifact_
                 stream.flush()
                 os.fsync(stream.fileno())
             path.chmod(0o600)
+            storage.publish(str(path.relative_to(artifact_root)), content)
             records.append(dict(id=new_id(), tenant_id=tenant, job_id=job, name=name,
                                 key=str(path.relative_to(artifact_root)), sha256=digest(content), size=len(content)))
         c.execute(insert(s.connections).values(id=connection, tenant_id=tenant,

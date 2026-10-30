@@ -11,6 +11,7 @@ from sqlalchemy import insert, select
 from cris_sme.api.artifact_access import MAX_ARTIFACT_BYTES, read_regular_file
 from cris_sme.enterprise import schema as s
 from cris_sme.enterprise.historical import unique_object, reject_constant
+from cris_sme.enterprise.storage import LocalStorage, S3Storage
 
 TABLES = tuple(table for table in s.metadata.sorted_tables if table is not s.versions)
 MAX_METADATA = 16 * 1024 * 1024
@@ -107,10 +108,11 @@ def _checked(root, path, row):
     return content
 
 
-def backup(store, artifact_root: Path, destination: Path):
+def backup(store, artifact_root: Path, destination: Path, *, storage=None):
     """Require an unused destination and a quiescent database; no credentials are decrypted to disk."""
     destination = destination.absolute()
     artifact_root = artifact_root.absolute()
+    storage = storage or LocalStorage(artifact_root)
     if destination.resolve() == artifact_root.resolve() or artifact_root.resolve() in destination.resolve().parents:
         raise ValueError("Keep backups outside the artifact root")
     with store.engine.begin() as connection:
@@ -124,7 +126,10 @@ def backup(store, artifact_root: Path, destination: Path):
         directory = destination / "artifacts"
         directory.mkdir(mode=0o700)
         for row in tables[s.artifacts.name]:
-            _write(directory / row["id"], _checked(artifact_root, Path(row["key"]), row))
+            content = storage.read(row["key"])
+            if len(content) != row["size"] or _hash(content) != row["sha256"]:
+                raise ValueError("Recovery artifact integrity check failed")
+            _write(directory / row["id"], content)
         _write(destination / "metadata.json", payload)
         # Completion marker is written last. Hashes detect damage, not malicious replacement.
         _write(destination / "complete.json", json.dumps({"format": 1, "metadata_sha256": _hash(payload)}).encode())
@@ -149,10 +154,11 @@ def inspect_backup(store, source: Path):
     return tables
 
 
-def restore(store, source: Path, artifact_root: Path):
+def restore(store, source: Path, artifact_root: Path, *, storage=None):
     """Restore into an empty isolated target only, with every cloud connection disabled."""
     tables = inspect_backup(store, source)
     artifact_root = artifact_root.absolute()
+    storage = storage or LocalStorage(artifact_root)
     source_path, target_path = source.resolve(), artifact_root.resolve()
     if target_path == source_path or source_path in target_path.parents or target_path in source_path.parents:
         raise ValueError("Restore storage must be separate from the backup")
@@ -160,11 +166,16 @@ def restore(store, source: Path, artifact_root: Path):
         _lock(connection)
         if any(connection.execute(select(table).limit(1)).first() is not None for table in TABLES):
             raise ValueError("Restore requires an empty isolated database")
+        if isinstance(storage, S3Storage):
+            storage.check_ready()
+            storage.require_empty()
         artifact_root.mkdir(mode=0o700)
         for row in tables[s.artifacts.name]:
             path = artifact_root / row["key"]
             path.parent.mkdir(parents=True, exist_ok=True, mode=0o700)
-            _write(path, _checked(source, Path("artifacts") / row["id"], row))
+            content = _checked(source, Path("artifacts") / row["id"], row)
+            _write(path, content)
+            storage.publish(row["key"], content)
         for table in TABLES:
             rows = tables[table.name]
             if table is s.connections:

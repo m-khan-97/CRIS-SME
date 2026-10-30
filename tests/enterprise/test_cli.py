@@ -93,3 +93,38 @@ def test_recovery_cli_requires_directory(store, monkeypatch, command):
     monkeypatch.setattr(sys, "argv", ["enterprise", command])
     with pytest.raises(SystemExit):
         cli.main()
+
+
+def test_storage_cli_checks_inventory_preview_and_explicit_copy(context, tmp_path, monkeypatch, capsys):
+    import json
+    from tests.enterprise.test_storage import remote
+    ctx = context
+    monkeypatch.setenv("CRIS_ENTERPRISE_DATABASE_URL", "postgresql+psycopg://fixture")
+    monkeypatch.setenv("CRIS_ENTERPRISE_ENCRYPTION_KEY", "fixture")
+    monkeypatch.setenv("CRIS_ENTERPRISE_OIDC_ISSUER", ISSUER)
+    monkeypatch.setenv("CRIS_ENTERPRISE_ARTIFACT_ROOT", str(ctx["root"]))
+    monkeypatch.setattr(cli.Store, "connect", lambda *args: ctx["store"])
+    transport = remote()
+    monkeypatch.setattr(cli, "configured_storage", lambda root: transport)
+    for command in ["storage-check", "storage-copy", "storage-usage", "retention-plan"]:
+        args = ["enterprise", command, "--tenant", ctx["tenant"], "--subject", "owner"]
+        if command == "retention-plan":
+            args += ["--retention-days", "30"]
+        monkeypatch.setattr(sys, "argv", args)
+        cli.main()
+        result = json.loads(capsys.readouterr().out)
+        assert result.get("deletion_executed", False) is False
+    monkeypatch.setattr(sys, "argv", args + ["--apply"])
+    with pytest.raises(SystemExit):
+        cli.main()
+
+
+@pytest.mark.parametrize("command", ["storage-usage", "retention-plan"])
+def test_metadata_storage_commands_never_load_cloud_credentials(store, monkeypatch, command):
+    monkeypatch.setenv("CRIS_ENTERPRISE_DATABASE_URL", "postgresql+psycopg://fixture")
+    monkeypatch.setenv("CRIS_ENTERPRISE_ENCRYPTION_KEY", "fixture")
+    monkeypatch.setattr(cli.Store, "connect", lambda *args: store)
+    monkeypatch.setattr(cli, "configured_storage", lambda root: pytest.fail("Metadata preview must not contact storage"))
+    monkeypatch.setattr(sys, "argv", ["enterprise", command])
+    with pytest.raises(SystemExit):
+        cli.main()
