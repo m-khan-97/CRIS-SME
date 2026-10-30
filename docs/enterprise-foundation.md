@@ -99,8 +99,8 @@ In a separate process with the same private configuration:
 python -m cris_sme.enterprise worker
 ```
 
-Migration version 2 is explicit and transactionally serialized with a PostgreSQL
-advisory lock. It supports fresh installs and an additive upgrade from version 1;
+Migration version 3 is explicit and transactionally serialized with a PostgreSQL
+advisory lock. It supports fresh installs and additive upgrades from versions 1/2;
 unsupported schema versions fail closed. Back up the database and private artifact
 storage before upgrading, and restart API/worker processes together. No outputs
 are imported or reassigned automatically. The operator-only
@@ -172,8 +172,10 @@ retention/garbage-collection policy. A bounded operator-only
 private pilots; it does not replace production PITR or identity/key recovery.
 The optional [private S3 transport and retention preview](enterprise-storage.md)
 adds verified conditional publication, configured-backend downloads and explicit
-local-to-S3 copying. It is fixture-tested, not live S3-qualified. Retention plans
-do not delete anything. The service does not provide storage quotas,
+local-to-S3 copying. It is fixture-tested, not live S3-qualified. Retention previews
+do not delete anything. The separately enabled [local retention workflow](enterprise-retention.md)
+adds holds, reviewed approval, report expiry and recoverable quarantine, not erasure.
+The service does not provide storage quotas,
 Object Lock, transactional database-plus-filesystem/object writes, automated
 restore verification, distributed rate limits or independent security review.
 

@@ -120,9 +120,11 @@ Explicit exclusions are respected. Imported history is protected unless
 original report date. Native age uses recorded request time because a separate
 completion timestamp is not yet persisted. Changed data/time can change a plan.
 
-These exclusions are not durable legal holds. Every plan explicitly reports
-`legal_hold_checked: false` and `deletion_executed: false`. It is not permission
-to delete files or a persisted retention policy. Automated deletion, first-class
-legal holds/approvals, quota admission, version-aware garbage collection and
-storage lifecycle reconciliation remain future work. No existing reports are
-deleted or moved merely by enabling inventory/planning.
+Preview now checks the durable hold registry (`legal_hold_checked: true`) and
+reports `deletion_executed: false`. Explicit exclusions are still not legal
+holds. The separately enabled [controlled local retention workflow](enterprise-retention.md)
+adds durable holds, reviewed proposals, a different owner identity's approval,
+cooling, logical expiry and recoverable quarantine. It is not permission to erase
+data permanently. S3 version cleanup, quota admission and storage lifecycle
+reconciliation remain open. Local-quarantine history cannot be migrated/restored
+to S3 by this tool. Existing reports are not moved by inventory or preview.

@@ -75,7 +75,11 @@ never replaced. Unsupported versions, missing/damaged files, symlinks, traversal
 cross-namespace artifact paths and wrong connection keys are rejected.
 
 Original record IDs, tenant membership, history, report bytes and audit records
-are retained. **All restored cloud connections are disabled and their verification
+are retained. Holds, hold events and report-expiry markers are preserved. Expired
+bytes are retained privately in quarantine rather than republished; pending
+retention approvals are invalidated. Remote restore of local-quarantine history
+is refused. See [controlled retention](enterprise-retention.md).
+**All restored cloud connections are disabled and their verification
 deadlines cleared**, so restored workers cannot start new collection. This does
 not revoke or delete credentials at AWS/Azure. Reconnection requires deliberate
 new connection creation and verification; do not automatically re-enable restored

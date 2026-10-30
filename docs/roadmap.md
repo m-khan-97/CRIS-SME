@@ -710,6 +710,58 @@ retention enforcement, quota admission, version-aware/orphan cleanup, production
 backup/restore and independent security review remain open. Customer-cloud
 qualification remains deferred, not waived; this increment does not close P1.
 
+30 October controlled-retention increment: schema v3 adds durable current holds,
+append-oriented hold reason/event history, digest-bound proposals, separate-owner
+approval, expiry records and retryable cleanup state. Existing assessment,
+artifact and membership rows are retained. A seven-day proposal lifetime and
+24-hour cooling period precede explicit operator execution. Expiry rechecks both
+actors' current roles, holds, scope/latest guards and exact artifact inventory.
+Self-approval, stale/tampered proposals and withdrawn authority fail closed.
+The API supports review/hold/approval actions; expiry/quarantine are operator-only.
+
+Local quarantine verifies bytes, creates a no-overwrite hard link under a private
+namespace and makes it durable before unlinking the published name. Retry can
+reconcile a filesystem change whose metadata transaction did not commit. Late
+holds stop pending work without starving eligible jobs. This is recoverable
+quarantine, not permanent erasure or disk-space reclamation. S3 execution remains
+refused. Original assessment history is retained; authorized expired downloads
+return 410, foreign access remains 404, and the browser removes cached report
+views/exports while keeping expired history selectable. Silent reimport is blocked.
+
+Backups retain available/quarantined evidence and holds. Restore keeps expired
+bytes private, preserves expiry, invalidates pending approvals and disables cloud
+connections. V2 logical bundles remain readable. Local-quarantine history cannot
+be migrated/restored into S3 until that lifecycle is qualified. The feature is
+disabled by default and explicitly disabled in the local identity pilot.
+See the [controlled-retention runbook](enterprise-retention.md).
+
+Local verification passes 1,214 tests per supported Python interpreter (82.64%
+coverage in the full regression), 102 frontend tests and 21 enterprise Chromium
+workflows. Follow-up quarantine/recovery/CLI checks pass 60 cases on both Python
+versions; the expanded type gate covers 28 modules. Ruff, frontend lint, docs and
+capability checks pass. Eight real Keycloak checks pass after the backed-up local
+v2-to-v3 upgrade. A read-only customer-archive check reverified 90 artifact hashes,
+28 report views and nonmember denial. The pilot retains zero retention proposals
+and zero expiries; no customer report was quarantined or deleted. Only technical
+code/tests/docs are included in commits.
+The schema-v3 isolated logical restore drill also passes for three organizations
+and 90 artifacts, preserving source records and nonmember denial.
+
+### P1 Gate Snapshot
+
+| Area | Current evidence | Still required |
+| --- | --- | --- |
+| Identity and tenant boundaries | Real local Keycloak, PostgreSQL and browser checks; role/revocation and cross-tenant fixtures | Qualified deployed IdP/gateway and independent review |
+| Runs and publication | Leases, cancellation, retry/fencing, tenant-scoped history and exports implemented/tested | Deployment-level process/storage/load qualification |
+| Recovery | Local isolated restore drill, legacy bundle upgrades and held-expired-byte recovery tested | Off-host/PITR/key/IdP recovery and measured operational objectives |
+| Storage and retention | Local transport, fixture-tested S3, durable holds, reviewed local expiry/quarantine | Live S3 qualification, remote version lifecycle, permanent purge/backup expiry policy |
+| Cloud onboarding | Application/role connection flows implemented with negative fixtures | Authorized live Azure/AWS qualification; credentials/admin grants remain unavailable |
+| Operations | Bounded API/worker paths, readiness and audit records | Remaining quota/rate/observability/deployment safeguards and independent security review |
+
+P1 is materially advanced but its release gate remains open. Do not substitute
+implemented code or internal test counts for unavailable cloud qualification or
+independent assessment. P2/PQC expansion does not take priority over these gates.
+
 | ID | Owner | Work and acceptance evidence |
 | --- | --- | --- |
 | P1-01 | BE/SE | Maintained API framework, versioned OpenAPI and OIDC. Validate issuer, audience, signatures, expiry and algorithms; fail closed. Add session/CSRF protections appropriate to the flow. |
