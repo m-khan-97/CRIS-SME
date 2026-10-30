@@ -672,6 +672,44 @@ off-host encrypted retention and PITR/key/IdP recovery, production hardening,
 live cloud authorization/collection and independent security review. The local
 recovery increment does not approve shared hosting or close the overall P1 gate.
 
+30 October storage-governance increment: optional AWS S3 transport now connects
+worker publication, authenticated artifact delivery, historical import and logical
+recovery. Local storage remains the default. S3 publication checks public-access
+blocking/versioning, uses SSE-S3/checksummed conditional PUTs and verifies readback.
+Tenant authorization still precedes downloads, which remain bounded/hash-checked
+attachments with no presigned URLs or local fallback. Restore checks for an
+unused destination prefix, including noncurrent versions and delete markers.
+Explicit local-to-S3 copying defaults to integrity preview, never removes source
+files or changes metadata, and rejects active work/conflicting writers.
+
+Owner/admin storage usage is exposed through a typed API and operator CLI.
+Tenant-scoped retention previews preserve the newest completed assessment per
+cloud scope, protect historical imports by default, respect explicit exclusions,
+and age imports from admission time. They reject `--apply`, never delete reports
+and explicitly do not claim durable legal holds. Usage excludes staging, orphaned
+objects, noncurrent S3 versions and backups; it is not billed-storage accounting
+or quota enforcement. The local Keycloak helper explicitly keeps local storage
+even if a parent shell is configured for S3. See the
+[storage operations guide](enterprise-storage.md) and example runtime IAM policy.
+
+SDK-contract stubs and a transport fixture exercise remote worker/API/import/
+backup/restore flows, conflicts, bounded reads, failed upload and cancellation,
+tenant denial and prefix reuse. These are not live S3 or MinIO qualification.
+An internal read-only local inventory retained four assessments/90 artifacts,
+and the 30-day default retention preview selected no deletion candidates. No
+existing reports were moved/deleted, no bucket was created and S3 was not enabled
+on the local pilot. Eight real local Keycloak checks pass, now including storage
+inventory access/role denial. The technical increment does not change frontend UI.
+Local regression passes 1,186 tests on each supported Python 3.11/3.12 interpreter
+with 82.55% coverage, the 27-module type gate, Ruff, frontend lint, documentation
+and capability validation. The final transport/CLI/pilot subset passes 59 cases.
+No hosted CI result or independent review is claimed for this local batch.
+
+Live S3 authorization/policy qualification, durable legal holds and approved
+retention enforcement, quota admission, version-aware/orphan cleanup, production
+backup/restore and independent security review remain open. Customer-cloud
+qualification remains deferred, not waived; this increment does not close P1.
+
 | ID | Owner | Work and acceptance evidence |
 | --- | --- | --- |
 | P1-01 | BE/SE | Maintained API framework, versioned OpenAPI and OIDC. Validate issuer, audience, signatures, expiry and algorithms; fail closed. Add session/CSRF protections appropriate to the flow. |

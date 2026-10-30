@@ -39,9 +39,10 @@ integration. This is not a production-readiness certification.
   files but cannot register them as completed artifacts.
 - Outputs live under `<root>/<tenant-id>/<job-id>/<lease-token>/reports`. Only a
   fixed export allowlist is indexed. Downloads require tenant membership and a
-  completed job, use no-follow bounded reads, and verify stored size/SHA-256.
-  HTML is downloaded as an attachment, never served inline. Local shared volumes
-  are implemented; managed object-storage backends are not yet implemented.
+  completed job, use bounded local no-follow or private S3 reads, and verify stored
+  size/SHA-256. HTML is downloaded as an attachment, never served inline. Local
+  volumes remain the default; the optional [S3 transport](enterprise-storage.md)
+  is fixture-tested and requires separate live storage qualification.
 
 ## Install And Configure
 
@@ -169,8 +170,11 @@ stop all old processes during crash recovery. Stale attempt files require a
 retention/garbage-collection policy. A bounded operator-only
 [logical backup and isolated restore](enterprise-recovery.md) is available for
 private pilots; it does not replace production PITR or identity/key recovery.
-The service does not provide storage quotas,
-object-store immutability, transactional database-plus-filesystem writes, automated
+The optional [private S3 transport and retention preview](enterprise-storage.md)
+adds verified conditional publication, configured-backend downloads and explicit
+local-to-S3 copying. It is fixture-tested, not live S3-qualified. Retention plans
+do not delete anything. The service does not provide storage quotas,
+Object Lock, transactional database-plus-filesystem/object writes, automated
 restore verification, distributed rate limits or independent security review.
 
 Use `GET /health` for liveness and `/ready` for schema/write readiness. Readiness

@@ -6,6 +6,11 @@ for controlled private pilots and restore drills. It is not PostgreSQL physical
 backup/PITR, an online backup service, managed object storage or a production
 disaster-recovery qualification.
 
+The optional [S3 artifact transport](enterprise-storage.md) can supply backup
+reads and restore publication. Remote restores additionally require an unused
+deployment prefix and prefix-scoped listing permission; no source bucket is
+created, reconfigured or deleted by recovery commands.
+
 ## Boundaries
 
 - Stop API admission and drain/stop workers before operating. All jobs must be

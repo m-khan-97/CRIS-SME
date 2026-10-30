@@ -1,6 +1,6 @@
 {
   "schema_version": "1.0",
-  "reviewed_on": "2026-10-29",
+  "reviewed_on": "2026-10-30",
   "capabilities": [
     {
       "id": "azure_collection",
@@ -220,7 +220,9 @@
         "src/cris_sme/enterprise/worker.py",
         "src/cris_sme/enterprise/cloud.py",
         "src/cris_sme/enterprise/historical.py",
-        "src/cris_sme/enterprise/recovery.py"
+        "src/cris_sme/enterprise/recovery.py",
+        "src/cris_sme/enterprise/storage.py",
+        "src/cris_sme/enterprise/storage_operations.py"
       ],
       "fixture_tests": [
         "tests/enterprise/test_auth.py",
@@ -229,7 +231,9 @@
         "tests/enterprise/test_cloud.py",
         "tests/enterprise/test_local_keycloak.py",
         "tests/enterprise/test_historical.py",
-        "tests/enterprise/test_recovery.py"
+        "tests/enterprise/test_recovery.py",
+        "tests/enterprise/test_storage.py",
+        "tests/enterprise/test_storage_operations.py"
       ],
       "live_observations": [{
         "path": "docs/qualification/keycloak-local-2026-10-27.md",
@@ -244,7 +248,7 @@
       "limitations": [
         "Fixture tests and one controlled local Keycloak integration do not establish customer-cloud or public production qualification.",
         "The local runner remains outside this authenticated API; the separate opt-in enterprise console does not approve shared hosting.",
-        "Historical import and bounded offline logical restore are implemented; managed blob storage, production PITR/key/IdP recovery, customer consent UX and independent review remain open."
+        "Historical import, logical restore and optional S3 transport are implemented; S3 transport is fixture-tested only. Automatic retention deletion, production PITR/key/IdP recovery, customer consent UX and independent review remain open."
       ]
     },
     {
@@ -280,7 +284,7 @@
       "limitations": [
         "Browser fixtures are supplemented by one controlled local Keycloak/API/PostgreSQL observation, not public production or customer-cloud qualification.",
         "Session tokens use tab-local sessionStorage; no BFF, federated Azure onboarding, automatic token renewal or IdP-wide logout is supplied.",
-        "Historical report import is operator-only and preserves source labels as supplied, not revalidated; public-exposure enterprise workflows, managed blob storage and production review remain open."
+        "Historical report import is operator-only and preserves source labels as supplied, not revalidated; public-exposure enterprise workflows, live storage qualification and production review remain open."
       ]
     },
     {
