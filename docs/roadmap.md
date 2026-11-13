@@ -787,11 +787,35 @@ Hard filesystem/container isolation, all-route/network abuse controls, productio
 load/soak/alerting, live cloud/S3 qualification and independent review remain open.
 This closes another local P1 increment, not the shared-hosting release gate.
 
+13 November, P1 database-isolation increment: explicit dedicated-database
+hardening now installs separate API/worker table and column grants, removes
+PUBLIC table access, and enables/forces RLS for tenant/worker metadata. API
+transactions supply parameterized local tenant/issuer/subject context; it is
+cleared by commit/rollback before pooled connections are reused. Organization
+discovery preserves the authenticated subject's own memberships. Trusted workers
+retain cross-tenant claims and fenced publication, without membership/connection
+mutation or report deletion grants. Operator ownership/bootstrap/recovery remains
+separate. Existing rows and logical schema version v4 are unchanged.
+
+Opt-in `api`/`worker` profiles check service identity, dangerous role attributes,
+ownership, memberships, effective table/column grants and enabled/forced/applicable
+row policies at startup; API readiness also fails closed on drift. The CLI adds
+non-mutating preview, explicit application and runtime checks. Local Keycloak and
+the reference Compose file remain development configurations, not automatically
+converted production deployments. See the
+[database security runbook](enterprise-database-security.md).
+
+Policies defend trusted application code against omitted filters, not arbitrary
+SQL execution: the service supplies context and a compromised login could forge
+it. Policy-expression integrity and database administrators remain trusted;
+independent review and real deployment qualification are not waived. Restored
+logical bundles require separate role provisioning and hardening before serving.
+
 ### P1 Gate Snapshot
 
 | Area | Current evidence | Still required |
 | --- | --- | --- |
-| Identity and tenant boundaries | Real local Keycloak, PostgreSQL and browser checks; role/revocation and cross-tenant fixtures | Qualified deployed IdP/gateway and independent review |
+| Identity and tenant boundaries | Real local Keycloak, PostgreSQL and browser checks; role/revocation and cross-tenant fixtures; opt-in restricted API/worker database profiles with forced RLS | Qualified deployed IdP/gateway, operator-configured database/TLS/secrets and independent review |
 | Runs and publication | Leases, cancellation, retry/fencing, tenant-scoped history and exports implemented/tested | Deployment-level process/storage/load qualification |
 | Recovery | Local isolated restore drill, legacy bundle upgrades and held-expired-byte recovery tested | Off-host/PITR/key/IdP recovery and measured operational objectives |
 | Storage and retention | Local transport, fixture-tested S3, durable holds, reviewed local expiry/quarantine | Live S3 qualification, remote version lifecycle, permanent purge/backup expiry policy |

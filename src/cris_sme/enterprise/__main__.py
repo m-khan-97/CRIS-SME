@@ -16,11 +16,15 @@ from cris_sme.enterprise.storage import configured_storage, LocalStorage, S3Stor
 from cris_sme.enterprise.storage_operations import copy_registered, retention_plan, usage
 from cris_sme.enterprise import retention
 from cris_sme.enterprise import operations
+from cris_sme.enterprise import database_security
 
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("command", choices=["migrate", "bootstrap", "serve", "worker", "historical-import", "backup", "check-backup", "restore", "storage-check", "storage-copy", "storage-usage", "retention-plan", "retention-hold", "retention-propose", "retention-approve", "retention-withdraw", "retention-expire", "retention-cleanup", "operations-status", "operations-limits"])
+    parser.add_argument("command", choices=["migrate", "bootstrap", "serve", "worker", "historical-import", "backup", "check-backup", "restore", "storage-check", "storage-copy", "storage-usage", "retention-plan", "retention-hold", "retention-propose", "retention-approve", "retention-withdraw", "retention-expire", "retention-cleanup", "operations-status", "operations-limits", "database-harden", "database-check"])
+    parser.add_argument("--api-role")
+    parser.add_argument("--worker-role")
+    parser.add_argument("--database-profile", choices=["api", "worker"])
     parser.add_argument("--name")
     parser.add_argument("--subject")
     parser.add_argument("--host", default="127.0.0.1")
@@ -44,10 +48,22 @@ def main():
     args = parser.parse_args()
     os.umask(0o077)
     store = Store.connect(os.environ["CRIS_ENTERPRISE_DATABASE_URL"], os.environ["CRIS_ENTERPRISE_ENCRYPTION_KEY"])
+    if args.command == "database-check":
+        if not args.database_profile:
+            parser.error("database-check requires --database-profile api or worker")
+        print(json.dumps(database_security.check_runtime(store.engine, args.database_profile)))
+        return
+    if args.command not in {"serve", "worker"} and store.database_profile != "development":
+        parser.error("Operator commands require separate migration/operator credentials, not a runtime profile")
     if args.command == "migrate":
         migrate(store.engine)
         return
     store.check_schema()
+    if args.command == "database-harden":
+        if not args.api_role or not args.worker_role:
+            parser.error("database-harden requires --api-role and --worker-role")
+        print(json.dumps(database_security.harden(store.engine, args.api_role, args.worker_role, apply=args.apply)))
+        return
     root = Path(os.environ.get("CRIS_ENTERPRISE_ARTIFACT_ROOT", "outputs/enterprise-artifacts")).resolve()
     storage = configured_storage(root) if args.command in {
         "serve", "worker", "historical-import", "backup", "restore", "storage-check", "storage-copy", "retention-expire", "retention-cleanup"

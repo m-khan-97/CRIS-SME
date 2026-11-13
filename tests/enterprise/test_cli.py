@@ -33,6 +33,47 @@ def test_operator_commands_use_explicit_configuration(store, tmp_path, monkeypat
         assert calls[0][1] == tmp_path
 
 
+def test_database_commands_preview_apply_and_check_roles(store, monkeypatch, capsys):
+    import json
+    monkeypatch.setenv("CRIS_ENTERPRISE_DATABASE_URL", "postgresql+psycopg://fixture")
+    monkeypatch.setenv("CRIS_ENTERPRISE_ENCRYPTION_KEY", "fixture")
+    monkeypatch.setattr(cli.Store, "connect", lambda *args: store)
+    calls = []
+    monkeypatch.setattr(cli.database_security, "harden", lambda engine, api, worker, **kw: calls.append((api, worker, kw)) or kw)
+    monkeypatch.setattr(sys, "argv", ["enterprise", "database-harden", "--api-role", "cris_api", "--worker-role", "cris_worker"])
+    cli.main()
+    assert json.loads(capsys.readouterr().out) == {"apply": False}
+    monkeypatch.setattr(sys, "argv", sys.argv + ["--apply"])
+    cli.main()
+    assert json.loads(capsys.readouterr().out) == {"apply": True}
+    assert calls == [("cris_api", "cris_worker", {"apply": False}), ("cris_api", "cris_worker", {"apply": True})]
+    monkeypatch.setattr(cli.database_security, "check_runtime", lambda engine, profile: {"verified": True, "profile": profile})
+    monkeypatch.setattr(sys, "argv", ["enterprise", "database-check", "--database-profile", "api"])
+    cli.main()
+    assert json.loads(capsys.readouterr().out) == {"verified": True, "profile": "api"}
+
+
+@pytest.mark.parametrize("command", ["migrate", "bootstrap", "backup", "database-harden"])
+def test_runtime_profile_refuses_operator_cli_commands(store, monkeypatch, command):
+    monkeypatch.setenv("CRIS_ENTERPRISE_DATABASE_URL", "postgresql+psycopg://fixture")
+    monkeypatch.setenv("CRIS_ENTERPRISE_ENCRYPTION_KEY", "fixture")
+    monkeypatch.setattr(cli.Store, "connect", lambda *args: store)
+    store.database_profile = "api"
+    monkeypatch.setattr(sys, "argv", ["enterprise", command])
+    with pytest.raises(SystemExit):
+        cli.main()
+
+
+@pytest.mark.parametrize("args", [["database-harden"], ["database-check"]])
+def test_database_cli_requires_explicit_roles_and_profile(store, monkeypatch, args):
+    monkeypatch.setenv("CRIS_ENTERPRISE_DATABASE_URL", "postgresql+psycopg://fixture")
+    monkeypatch.setenv("CRIS_ENTERPRISE_ENCRYPTION_KEY", "fixture")
+    monkeypatch.setattr(cli.Store, "connect", lambda *args: store)
+    monkeypatch.setattr(sys, "argv", ["enterprise", *args])
+    with pytest.raises(SystemExit):
+        cli.main()
+
+
 def test_historical_cli_defaults_to_preview_then_applies_explicitly(context, tmp_path, monkeypatch, capsys):
     import json
     from tests.enterprise.test_historical import source

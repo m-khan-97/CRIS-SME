@@ -1,5 +1,6 @@
 """Tenant-scoped PostgreSQL metadata and fenced assessment leases."""
 import json
+import os
 import uuid
 
 from cryptography.fernet import Fernet
@@ -7,6 +8,7 @@ from sqlalchemy import and_, create_engine, delete, false, func, insert, or_, se
 
 from cris_sme.enterprise import schema as s
 from cris_sme.enterprise import operations
+from cris_sme.enterprise import database_security
 
 
 ROLES = {"owner", "admin", "operator", "analyst", "auditor"}
@@ -26,17 +28,27 @@ def new_id():
 
 
 class Store:
-    def __init__(self, engine, encryption_key):
+    def __init__(self, engine, encryption_key, *, database_profile="development"):
         if engine.dialect.name != "postgresql":
             raise ValueError("Enterprise storage requires PostgreSQL")
         self.engine, self.cipher = engine, Fernet(encryption_key)
+        if database_profile not in {"development", "api", "worker"}:
+            raise ValueError("Invalid enterprise database profile")
+        self.database_profile = database_profile
 
     @classmethod
     def connect(cls, url, encryption_key):
         engine = create_engine(url, pool_pre_ping=True, pool_size=5, max_overflow=5,
                                pool_timeout=5, hide_parameters=True,
                                connect_args={"connect_timeout": 5, "options": "-c statement_timeout=5000 -c lock_timeout=1000"})
-        return cls(engine, encryption_key)
+        return cls(engine, encryption_key, database_profile=os.environ.get("CRIS_ENTERPRISE_DATABASE_PROFILE", "development"))
+
+    def check_database_profile(self, service):
+        if self.database_profile == "development":
+            return
+        if self.database_profile != service:
+            raise ValueError("Database credential profile does not match this service")
+        database_security.check_runtime(self.engine, service)
 
     def check_schema(self):
         with self.engine.connect() as c:
@@ -45,6 +57,7 @@ class Store:
 
     def check_ready(self):
         self.check_schema()
+        self.check_database_profile("api")
         with self.engine.connect() as c:
             transaction = c.begin()
             try:
@@ -56,6 +69,7 @@ class Store:
         return int(c.execute(select(func.extract("epoch", func.clock_timestamp()))).scalar_one())
 
     def _access(self, c, tenant, principal, roles=ROLES, *, lock=False):
+        database_security.request_context(c, principal, tenant)
         query = select(s.tenants.c.id).where(s.tenants.c.id == tenant)
         if lock:
             query = query.with_for_update()
@@ -87,6 +101,7 @@ class Store:
 
     def tenants(self, principal):
         with self.engine.connect() as c:
+            database_security.request_context(c, principal)
             return [dict(row) for row in c.execute(select(s.tenants, s.memberships.c.role).join(
                 s.memberships, s.memberships.c.tenant_id == s.tenants.c.id).where(
                 s.memberships.c.issuer == principal.issuer, s.memberships.c.subject == principal.subject)).mappings()]

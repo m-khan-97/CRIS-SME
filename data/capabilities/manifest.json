@@ -224,7 +224,8 @@
         "src/cris_sme/enterprise/storage.py",
         "src/cris_sme/enterprise/storage_operations.py",
         "src/cris_sme/enterprise/retention.py",
-        "src/cris_sme/enterprise/operations.py"
+        "src/cris_sme/enterprise/operations.py",
+        "src/cris_sme/enterprise/database_security.py"
       ],
       "fixture_tests": [
         "tests/enterprise/test_auth.py",
@@ -237,7 +238,8 @@
         "tests/enterprise/test_storage.py",
         "tests/enterprise/test_storage_operations.py",
         "tests/enterprise/test_retention.py",
-        "tests/enterprise/test_operations.py"
+        "tests/enterprise/test_operations.py",
+        "tests/enterprise/test_database_security.py"
       ],
       "live_observations": [{
         "path": "docs/qualification/keycloak-local-2026-10-27.md",
@@ -252,6 +254,7 @@
       "limitations": [
         "Fixture tests and one controlled local Keycloak integration do not establish customer-cloud or public production qualification.",
         "The local runner remains outside this authenticated API; the separate opt-in enterprise console does not approve shared hosting.",
+        "Opt-in restricted database profiles and transaction-local RLS catch omitted tenant filters; service-supplied context is not a boundary against arbitrary SQL or compromised service credentials. Workers intentionally span tenants. Production deployment and independent database-policy review remain required.",
         "Quotas, reservations, selected shared rate limits, sampled resource guards and redacted snapshots are implemented; hard OS isolation, production load/alert qualification and independent review remain open. Retention remains recoverable local quarantine, not erasure; S3 lifecycle/qualification is separate."
       ]
     },

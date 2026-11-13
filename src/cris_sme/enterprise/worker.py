@@ -113,6 +113,7 @@ def execute_once(store, root: Path, *, lease_seconds=30, execute=run_managed, sh
 
 
 def run_worker(store, root, storage=None):
+    store.check_database_profile("worker")
     stop = threading.Event()
     worker_id = new_id()
     previous = {sig: signal.signal(sig, lambda *args: stop.set()) for sig in (signal.SIGINT, signal.SIGTERM)}

@@ -224,5 +224,9 @@ migrations need DDL ownership; API/worker roles need only schema access, reads o
 the version table, and the required CRUD grants on service tables. Do not run the
 application with the PostgreSQL image's bootstrap superuser. Supply TLS for
 database connections, secret-manager delivery, tested backups and network egress
-policies before shared hosting. The initial SQL migration does not create or grant
-these operator-owned database roles automatically.
+policies before shared hosting. The SQL migration does not create database logins.
+The explicit [database-hardening procedure](enterprise-database-security.md) now
+installs reviewed per-service grants and forced tenant row policies for dedicated
+databases. Opt-in `api`/`worker` profiles reject privileged runtime credentials
+and configuration drift. The reference Compose topology and local identity
+helper still use the development profile; neither is automatically converted.

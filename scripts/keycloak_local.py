@@ -262,6 +262,7 @@ def environment(state):
         "CRIS_ENTERPRISE_OIDC_CA_FILE": str(state / "ca.pem"),
         "CRIS_ENTERPRISE_ARTIFACT_ROOT": str(state / "artifacts"),
         "CRIS_ENTERPRISE_STORAGE_BACKEND": "local",
+        "CRIS_ENTERPRISE_DATABASE_PROFILE": "development",
         "CRIS_ENTERPRISE_RETENTION_ENABLED": "false",
         "CRIS_ENTERPRISE_ALLOWED_HOSTS": "localhost,127.0.0.1",
         "VITE_OIDC_AUTHORITY": ISSUER, "VITE_OIDC_CLIENT_ID": "cris-console", "VITE_OIDC_SCOPE": "openid cris.api"})
